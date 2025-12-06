@@ -576,8 +576,13 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
     // 6. Generate Bindings for both classes and IDs
     let mut bindings = TokenStream::new();
 
-    // Generate class bindings
+    // Generate class bindings (only for valid Rust identifiers - no dashes)
     for class in classes {
+        // Skip dashed class names - they can only be used via class="..." syntax
+        if class.contains('-') {
+            eprintln!("DEBUG: Skipping binding for dashed class '{}'", class);
+            continue;
+        }
         let snake_name = class.to_snake_case();
         let ident = format_ident!("{}", snake_name);
         let scoped_class = format!("{}-{}", class, scope_id);
@@ -588,7 +593,12 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
     }
 
     // Generate ID bindings (IDs are NOT scoped, they remain as-is)
+    // Skip dashed IDs - they can only be used via id="..." syntax
     for id in ids {
+        if id.contains('-') {
+            eprintln!("DEBUG: Skipping binding for dashed ID '{}'", id);
+            continue;
+        }
         let ident = format_ident!("{}", id);
 
         bindings.extend(quote! {

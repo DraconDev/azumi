@@ -418,6 +418,10 @@ enum Context {
 struct GenerationContext {
     mode: Context,
     scope_id: Option<String>,
+    /// All valid class names (before scoping) for auto-scoping static strings
+    valid_classes: std::collections::HashSet<String>,
+    /// All valid ID names for auto-scoping static strings  
+    valid_ids: std::collections::HashSet<String>,
 }
 
 impl GenerationContext {
@@ -425,13 +429,17 @@ impl GenerationContext {
         Self {
             mode: Context::Normal,
             scope_id: None,
+            valid_classes: std::collections::HashSet::new(),
+            valid_ids: std::collections::HashSet::new(),
         }
     }
 
-    fn with_scope(scope_id: String) -> Self {
+    fn with_scope(scope_id: String, valid_classes: std::collections::HashSet<String>, valid_ids: std::collections::HashSet<String>) -> Self {
         Self {
             mode: Context::Normal,
             scope_id: Some(scope_id),
+            valid_classes,
+            valid_ids,
         }
     }
 
@@ -439,6 +447,8 @@ impl GenerationContext {
         Self {
             mode,
             scope_id: self.scope_id.clone(),
+            valid_classes: self.valid_classes.clone(),
+            valid_ids: self.valid_ids.clone(),
         }
     }
 }
@@ -561,8 +571,8 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
             // Scope the CSS
             let scoped_output = crate::css::scope_css(&scoped_css, &scope_id);
 
-            // Generate body with scope context
-            let ctx = GenerationContext::with_scope(scope_id.clone());
+            // Generate body with scope context (pass valid_classes/ids for auto-scoping)
+            let ctx = GenerationContext::with_scope(scope_id.clone(), valid_classes.clone(), valid_ids.clone());
             let body_content = generate_body_with_context(nodes, &ctx);
 
             // Inject global CSS first (unscoped), then scoped CSS
