@@ -94,6 +94,39 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 
 ---
 
+---
+
+## 🚀 Setup & Configuration
+
+### Injecting Client Runtime
+
+To enable Azumi's live features (DOM morphing, event delegation), you must inject the client runtime into your page head. Use the `azumi::azumi_script()` helper, which embeds the optimized runtime scripts directly.
+
+```rust
+#[azumi::component]
+pub fn RootLayout(children: impl Component) -> impl Component {
+    html! {
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <meta charset="utf-8" />
+                <title>"My Azumi App"</title>
+                // ⚡ AUTOMATIC RUNTIME INJECTION
+                // Injects Azumi client + Idiomorph (no manual file copying needed!)
+                {azumi::azumi_script()}
+            </head>
+            <body>
+                {children}
+            </body>
+        </html>
+    }
+}
+```
+
+This ensures your application always uses the matching runtime version for your compiled crate.
+
+---
+
 ## 🏗️ Component Fundamentals
 
 ### Basic Component Structure
