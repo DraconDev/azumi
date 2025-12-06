@@ -1043,6 +1043,61 @@ fn generate_body_with_context(
                         continue;
                     }
 
+                    // Handle class attribute - AUTO-SCOPE static strings
+                    if attr_name == "class" {
+                        match &attr.value {
+                            token_parser::AttributeValue::Static(val) => {
+                                // Auto-scope: split by whitespace, scope each class if it's valid
+                                if let Some(ref scope_id) = ctx.scope_id {
+                                    let scoped_classes: Vec<String> = val.split_whitespace()
+                                        .map(|class_name| {
+                                            if ctx.valid_classes.contains(class_name) {
+                                                format!("{}-{}", class_name, scope_id)
+                                            } else {
+                                                // Unknown class - validation should have caught this
+                                                // but pass through just in case (for global classes)
+                                                class_name.to_string()
+                                            }
+                                        })
+                                        .collect();
+                                    let scoped_string = scoped_classes.join(" ");
+                                    attr_code.extend(quote! {
+                                        write!(f, " class=\"{}\"", #scoped_string)?;
+                                    });
+                                } else {
+                                    // No scope - output as-is
+                                    attr_code.extend(quote! {
+                                        write!(f, " class=\"{}\"", #val)?;
+                                    });
+                                }
+                                continue;
+                            }
+                            token_parser::AttributeValue::Dynamic(_) => {
+                                // Dynamic class uses variables which are already scoped
+                                // Fall through to generic handler
+                            }
+                            _ => {}
+                        }
+                    }
+
+                    // Handle id attribute - IDs are NOT scoped (they remain as-is)
+                    // But we still need to handle them specially for static values
+                    if attr_name == "id" {
+                        match &attr.value {
+                            token_parser::AttributeValue::Static(val) => {
+                                // IDs are not scoped, output as-is
+                                attr_code.extend(quote! {
+                                    write!(f, " id=\"{}\"", #val)?;
+                                });
+                                continue;
+                            }
+                            token_parser::AttributeValue::Dynamic(_) => {
+                                // Fall through to generic handler
+                            }
+                            _ => {}
+                        }
+                    }
+
                     // Handle az-on DSL: az-on={click call foo} -> az-on="click call foo"
                     if attr_name == "az-on" {
                         match &attr.value {
