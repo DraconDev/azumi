@@ -10,6 +10,49 @@ class Azumi {
     constructor() {
         this.scopes = new WeakMap(); // Element -> state cache
         this.delegate();
+        this.connectHotReload();
+    }
+
+    // Hot Reload Logic
+    connectHotReload() {
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${protocol}//${window.location.host}/_azumi/live_reload`;
+
+        try {
+            const ws = new WebSocket(wsUrl);
+            let connected = false;
+
+            ws.onopen = () => {
+                connected = true;
+                console.log("🔥 Hot Reload: Connected");
+            };
+
+            ws.onclose = () => {
+                if (connected) {
+                    console.log(
+                        "🔥 Hot Reload: Connection lost, polling for restart..."
+                    );
+                    this.pollForReload();
+                }
+            };
+        } catch (e) {
+            // Hot reload likely not enabled on server
+        }
+    }
+
+    pollForReload() {
+        const interval = setInterval(() => {
+            fetch(window.location.href, { method: "HEAD" })
+                .then((res) => {
+                    if (res.ok) {
+                        clearInterval(interval);
+                        window.location.reload();
+                    }
+                })
+                .catch(() => {
+                    /* keep polling */
+                });
+        }, 200);
     }
 
     // Event delegation
@@ -78,6 +121,19 @@ class Azumi {
         }
 
         // TODO: Implement 'set' for local state
+        if (actionType === "set") {
+            // Format: "set field = value"
+            // tokens: ["set", "field", "=", "value"]
+            const field = tokens[1];
+            const value = tokens.slice(3).join(" "); // everything after "="
+
+            return {
+                type: "set",
+                field,
+                value,
+            };
+        }
+
         return null;
     }
 
@@ -329,65 +385,43 @@ class Azumi {
         }
     }
 
-    // Local state change
+    // Local state change (no server roundtrip)
     setState(action, element) {
-        console.log("Set state not implemented yet");
-    }
-
-    // Initialize Hot Reload
-    initHotReload() {
-        if (!window.WebSocket) return;
-
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const url = `${protocol}//${window.location.host}/_azumi/live_reload`;
-
-        const connect = () => {
-            console.log("🔥 [Hot Reload] Connecting...");
-            const socket = new WebSocket(url);
-
-            socket.onopen = () => {
-                console.log("🔥 [Hot Reload] Connected");
-            };
-
-            socket.onclose = () => {
-                console.log(
-                    "🔥 [Hot Reload] Disconnected - Waiting for server..."
-                );
-                // Start polling for server
-                setTimeout(() => this.pollForServerSync(), 500);
-            };
-
-            socket.onerror = (e) => {
-                // Connection failed, likely server down
-                // Do nothing, onclose will trigger
-            };
-        };
-
-        connect();
-    }
-
-    /**
-     * Poll server until it responds, then reload
-     */
-    async pollForServerSync() {
-        try {
-            // Try to fetch current page header only
-            const res = await fetch(window.location.href, { method: "HEAD" });
-            if (res.ok) {
-                console.log("🔥 [Hot Reload] Server is back! Reloading...");
-                window.location.reload();
-                return;
-            }
-        } catch (e) {
-            // Still down, ignore
+        const scopeElement = element.closest("[az-scope]");
+        if (!scopeElement) {
+            console.warn("setState: No az-scope found");
+            return;
         }
 
-        // Retry
-        setTimeout(() => this.pollForServerSync(), 500);
+        const scopeAttr = scopeElement.getAttribute("az-scope");
+        if (!scopeAttr) return;
+
+        try {
+            const state = JSON.parse(scopeAttr);
+
+            // Apply the prediction DSL (reuse existing logic)
+            const prediction = `${action.field} = ${action.value}`;
+            this.applyPrediction(state, prediction);
+
+            // Update the scope attribute
+            scopeElement.setAttribute("az-scope", JSON.stringify(state));
+
+            // Update bound elements
+            this.updateBindings(scopeElement, state);
+
+            console.log(
+                "🎯 Client set:",
+                action.field,
+                "=",
+                action.value,
+                state
+            );
+        } catch (err) {
+            console.warn("setState failed:", err);
+        }
     }
 }
 
 // Initialize
 window.azumi = new Azumi();
-window.azumi.initHotReload();
 console.log("Azumi Live Client Initialized 🚀");
