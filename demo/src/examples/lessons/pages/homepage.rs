@@ -161,7 +161,7 @@ pub fn Lessons() -> impl Component {
 }
 
 #[azumi::component]
-fn LessonCard(num: &str, title: &str, desc: &str, link: &str) -> impl Component + '_ {
+fn LessonCard<'a>(num: &'a str, title: &'a str, desc: &'a str, link: &'a str) -> impl Component + 'a {
     html! {
         <style>
             .lesson_card {
