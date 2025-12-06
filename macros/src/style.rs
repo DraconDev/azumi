@@ -136,17 +136,18 @@ fn validate_selectors(tokens: &TokenStream) -> syn::Result<()> {
         if let TokenTree::Punct(p) = &tt {
             // Check for class selectors
             if p.as_char() == '.' {
-                // Class start
-                if let Some(TokenTree::Ident(ident)) = iter.peek() {
-                    let ident_span = ident.span();
+                // Class start - consume the identifier
+                if let Some(TokenTree::Ident(_)) = iter.peek() {
                     let _ = iter.next(); // consume ident
-
-                    if let Some(TokenTree::Punct(next_p)) = iter.peek() {
+                                         // Dashes are now allowed - consume any dash-separated parts
+                    while let Some(TokenTree::Punct(next_p)) = iter.peek() {
                         if next_p.as_char() == '-' {
-                            return Err(syn::Error::new(
-                                ident_span,
-                                "Class names in <style> tag must be snake_case (no dashes allowed). Use underscores instead."
-                            ));
+                            let _ = iter.next(); // consume dash
+                            if let Some(TokenTree::Ident(_)) = iter.peek() {
+                                let _ = iter.next(); // consume next part
+                            }
+                        } else {
+                            break;
                         }
                     }
                 }
@@ -156,8 +157,22 @@ fn validate_selectors(tokens: &TokenStream) -> syn::Result<()> {
                 // ID start
                 if let Some(TokenTree::Ident(ident)) = iter.peek() {
                     let ident_span = ident.span();
-                    let id_name = ident.to_string();
+                    let mut id_name = ident.to_string();
                     let _ = iter.next(); // consume ident
+
+                    // Dashes are now allowed - consume any dash-separated parts
+                    while let Some(TokenTree::Punct(next_p)) = iter.peek() {
+                        if next_p.as_char() == '-' {
+                            id_name.push('-');
+                            let _ = iter.next(); // consume dash
+                            if let Some(TokenTree::Ident(next_ident)) = iter.peek() {
+                                id_name.push_str(&next_ident.to_string());
+                                let _ = iter.next(); // consume next part
+                            }
+                        } else {
+                            break;
+                        }
+                    }
 
                     // Check for duplicate IDs
                     if seen_ids.contains(&id_name) {
@@ -170,16 +185,6 @@ fn validate_selectors(tokens: &TokenStream) -> syn::Result<()> {
                         ));
                     }
                     seen_ids.insert(id_name);
-
-                    // Check for dashes (enforce snake_case like classes)
-                    if let Some(TokenTree::Punct(next_p)) = iter.peek() {
-                        if next_p.as_char() == '-' {
-                            return Err(syn::Error::new(
-                                ident_span,
-                                "ID names in <style> tag must be snake_case (no dashes allowed). Use underscores instead."
-                            ));
-                        }
-                    }
                 }
             }
         }
