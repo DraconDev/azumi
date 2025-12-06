@@ -1,4 +1,5 @@
 # TODO
+- ?text based class and id? still checked but allows for - names and a little easier to add more 
 
 # Later
 
