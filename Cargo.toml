@@ -1,6 +1,6 @@
 [package]
 name = "azumi"
-version = "0.7.1233"
+version = "0.7.1234"
 edition = "2021"
 authors = [" DraconDev <dracsharp@gmail.com>"]
 license = "MIT"

@@ -139,7 +139,12 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 
 ### Injecting Client Runtime
 
-To enable Azumi's live features (DOM morphing, event delegation), you must inject the client runtime into your page head. Use the `azumi::azumi_script()` helper, which embeds the optimized runtime scripts directly.
+### Injecting Client Runtime
+
+Azumi automatically injects the necessary client runtime (`azumi.js` and `idiomorph.js`) into your page.
+
+-   **Automatic Injection**: If you write `html! { <head> ... </head> }` or `html! { <body> ... </body> }`, the compiler will automatically inject the runtime script at the end of the tag. You don't need to do anything.
+-   **Manual Control**: If you need specific placement or are building a fragment without standard tags, you can use `{azumi::azumi_script()}` explicitly.
 
 ```rust
 #[azumi::component]
@@ -150,9 +155,7 @@ pub fn RootLayout(children: impl Component) -> impl Component {
             <head>
                 <meta charset="utf-8" />
                 <title>"My Azumi App"</title>
-                // ⚡ AUTOMATIC RUNTIME INJECTION
-                // Injects Azumi client + Idiomorph (no manual file copying needed!)
-                {azumi::azumi_script()}
+                // Runtime is automatically injected here if missing!
             </head>
             <body>
                 {children}
@@ -162,7 +165,7 @@ pub fn RootLayout(children: impl Component) -> impl Component {
 }
 ```
 
-This ensures your application always uses the matching runtime version for your compiled crate.
+This ensures your application always uses the matching runtime version for your compiled crate, and prevents duplicate injections.
 
 ---
 
@@ -1365,9 +1368,9 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a { }
 ### ❌ Missing Script Include
 
 ```rust
-// For interactive components, include azumi.js
-<script src="/static/azumi.js"></script>
-<script src="/static/idiomorph.js"></script>
+// Compiler automatically handles injection for standard layouts.
+// Only required manually for non-standard fragments:
+{azumi::azumi_script()}
 ```
 
 ---
@@ -1419,15 +1422,18 @@ cargo run
 
 ### Client Runtime Integration
 
+### Client Runtime Integration
+
+The client runtime is **automatically injected** by the compiler when it detects a `<head>` or `<body>` tag.
+
 ```rust
 #[azumi::component]
 pub fn InteractivePage() -> impl Component {
     html! {
         <html>
         <head>
-            // Include Azumi client runtime (required for live components)
-            <script src="/static/idiomorph.js"></script>
-            <script src="/static/azumi.js"></script>
+            // No manual script tags needed!
+            // The compiler injects the runtime here automatically.
         </head>
         <body>
             // Your components here
@@ -1436,6 +1442,8 @@ pub fn InteractivePage() -> impl Component {
     }
 }
 ```
+
+If you ever need to manually place it (e.g. for specific ordering), use `{azumi::azumi_script()}`.
 
 ### CSS ID Handling
 
@@ -1485,7 +1493,7 @@ Common error patterns and solutions:
 | Schema        | `#[derive(Schema)]`                    | `#[schema(type = "BlogPosting")]`                    |
 | Form Bind     | `bind={StructName}`                    | `form bind={UserRegistration}`                       |
 | Data Bind     | `data-bind="property"`                 | `data-bind="count"`                                  |
-| Client Script | `<script src="...">`                   | `<script src="/static/azumi.js"></script>`           |
+| Client Script | `Auto / {azumi::azumi_script()}`       | `html! { <head>...` (Auto)                           |
 | Text          | Quoted strings                         | `"Hello world"`                                      |
 
 ---
