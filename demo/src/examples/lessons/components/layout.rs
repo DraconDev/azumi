@@ -191,8 +191,7 @@ pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Componen
                 {children}
             </div>
             // Scripts for Hot Reload and Interactivity
-            <script src="/static/idiomorph.js"></script>
-            <script src="/static/azumi.js"></script>
+            @azumi::prelude::AzumiScript
         </div>
     }
 }
