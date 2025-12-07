@@ -34,38 +34,33 @@ Azumi is a **compiler-driven optimistic UI framework** that generates client-sid
 }
 ```
 
-### 2. CSS Classes: Quotes vs Brackets
+### 2. CSS Classes: The "Clean" Syntax
 
-Azumi uses a **Hybrid Class Syntax**:
+Azumi supports a **clean, space-separated syntax** for classes:
 
--   **Quotes (`class="foo"`)**: Use for static strings. **Required for dashed names** (e.g. `class="my-class"`).
-    -   Azumi automatically scopes these (`my-class-{id}`).
-    -   Strictly validated: Must exist in your `<style>` block.
--   **Brackets (`class={my_var}`)**: Use for dynamic variables or conditions.
-    -   Must be a valid Rust identifier (snake_case).
+-   **Space-Separated List**: `class={ "class1" class2 }` automatically joins with spaces.
+-   **Magic Dashed Names**: `class={ my-card }` works if `.my-card` exists in your styles.
+-   **Variables**: `class={ active_state }` works as expected.
 
 ```rust
 html! {
     <style>
-        .my-card { padding: "1rem"; }      // Kebab-case allowed!
-        .active_state { color: "blue"; }   // Snake-case for variables
+        .my-card { padding: "1rem"; }
+        .active { color: "blue"; }
     </style>
 
-    // ✅ CORRECT - Dashed class in quotes (auto-scoped)
-    <div class="my-card">"Content"</div>
+    // ✅ CLEANEST: Magic Dashed Syntax (auto-scoped)
+    <div class={ my-card }>...</div>
 
-    // ✅ CORRECT - Dynamic variable in brackets
-    <div class={active_state}>"Active"</div>
+    // ✅ MIXED: Combine dashed classes and variables
+    <div class={ my-card active_state }>...</div>
 
-    // ✅ CORRECT - Mixed
-    <div class="my-card" class={active_state}>"Mixed"</div>
-
-    // ❌ WRONG - Cannot use brackets for dashed names (invalid Rust)
-    <div class={my-card}>...</div>
+    // ✅ LOGIC: Expressions work too
+    <div class={ my-card if is_active { "active" } else { "" } }>...</div>
 }
 ```
 
-**Key Rule**: If it has a dash, use quotes. If it's a variable, use brackets.
+**Note**: `my-card` technically parses as subtraction (`my - card`), but Azumi smartly detects if it matches a valid CSS class and treats it as a string handle. If no class matches, it remains a subtraction expression.
 
 ### 3. Live State Requires Component Link
 

@@ -19,5 +19,12 @@ pub fn ClassSyntaxVerification() -> impl Component {
 
         // 4. Multiple classes in quotes
         <div class="dashed-class snake_class">"Multiple"</div>
+
+        // 5. Magic dashed syntax (subtraction -> class)
+        // This is the new "clean" syntax: my-card matches .my-card
+        <div class={dashed-class}>"Magic Dashed"</div>
+
+        // 6. Expression list with magic and strict
+        <div class={ "dashed-class" snake_class }></div>
     }
 }
