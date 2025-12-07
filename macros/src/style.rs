@@ -139,15 +139,13 @@ fn validate_selectors(tokens: &TokenStream) -> syn::Result<()> {
                 // Class start - consume the identifier
                 if let Some(TokenTree::Ident(_)) = iter.peek() {
                     let _ = iter.next(); // consume ident
-                                         // Dashes are now allowed - consume any dash-separated parts
-                    while let Some(TokenTree::Punct(next_p)) = iter.peek() {
+                                         // Check for dashes - explicitly forbidden
+                    if let Some(TokenTree::Punct(next_p)) = iter.peek() {
                         if next_p.as_char() == '-' {
-                            let _ = iter.next(); // consume dash
-                            if let Some(TokenTree::Ident(_)) = iter.peek() {
-                                let _ = iter.next(); // consume next part
-                            }
-                        } else {
-                            break;
+                            return Err(syn::Error::new(
+                                next_p.span(),
+                                "Dashes are not allowed in CSS classes in Azumi. Use snake_case (e.g. .my_class).",
+                            ));
                         }
                     }
                 }
@@ -157,20 +155,16 @@ fn validate_selectors(tokens: &TokenStream) -> syn::Result<()> {
                 // ID start
                 if let Some(TokenTree::Ident(ident)) = iter.peek() {
                     let ident_span = ident.span();
-                    let mut id_name = ident.to_string();
+                    let id_name = ident.to_string();
                     let _ = iter.next(); // consume ident
 
-                    // Dashes are now allowed - consume any dash-separated parts
-                    while let Some(TokenTree::Punct(next_p)) = iter.peek() {
+                    // Check for dashes - explicitly forbidden
+                    if let Some(TokenTree::Punct(next_p)) = iter.peek() {
                         if next_p.as_char() == '-' {
-                            id_name.push('-');
-                            let _ = iter.next(); // consume dash
-                            if let Some(TokenTree::Ident(next_ident)) = iter.peek() {
-                                id_name.push_str(&next_ident.to_string());
-                                let _ = iter.next(); // consume next part
-                            }
-                        } else {
-                            break;
+                            return Err(syn::Error::new(
+                                next_p.span(),
+                                "Dashes are not allowed in CSS IDs in Azumi. Use snake_case (e.g. #my_id).",
+                            ));
                         }
                     }
 

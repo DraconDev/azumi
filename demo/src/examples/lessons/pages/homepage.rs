@@ -161,7 +161,12 @@ pub fn Lessons() -> impl Component {
 }
 
 #[azumi::component]
-fn LessonCard<'a>(num: &'a str, title: &'a str, desc: &'a str, link: &'a str) -> impl Component + 'a {
+fn LessonCard<'a>(
+    num: &'a str,
+    title: &'a str,
+    desc: &'a str,
+    link: &'a str,
+) -> impl Component + 'a {
     html! {
         <style>
             .lesson_card {
@@ -195,7 +200,7 @@ fn LessonCard<'a>(num: &'a str, title: &'a str, desc: &'a str, link: &'a str) ->
             .card_desc {
                 color: "#9ca3af";
                 margin-bottom: "1rem";
-            }   
+            }
             .card_link {
                 display: "inline-flex";
                 align-items: "center";
@@ -208,9 +213,7 @@ fn LessonCard<'a>(num: &'a str, title: &'a str, desc: &'a str, link: &'a str) ->
                 transition: "all 0.2s";
                 align-self: "start";
             }
-            .card-desc {
-                margin-bottom: "1rem";
-            }
+
         </style>
         <div class={lesson_card}>
             <div class={card_number}>"LESSON " {num}</div>

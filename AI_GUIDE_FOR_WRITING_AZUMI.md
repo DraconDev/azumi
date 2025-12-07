@@ -34,33 +34,37 @@ Azumi is a **compiler-driven optimistic UI framework** that generates client-sid
 }
 ```
 
-### 2. CSS Classes: The "Clean" Syntax
+### 2. CSS Classes: Strict Syntax
 
-Azumi supports a **clean, space-separated syntax** for classes:
+Azumi enforces **strict snake_case conventions** for correct styling:
 
--   **Space-Separated List**: `class={ "class1" class2 }` automatically joins with spaces.
--   **Magic Dashed Names**: `class={ my-card }` works if `.my-card` exists in your styles.
--   **Variables**: `class={ active_state }` works as expected.
+-   **CSS Classes**: Must be `snake_case` (e.g. `.my_card`). Dashes are **BANNED**.
+-   **Static**: Use quotes `class="my_card"`. Validated against your CSS.
+-   **Dynamic**: Use brackets `class={my_card}`. This uses the auto-generated variable.
+-   **Multiple**: Use space-separated list `class={ active selected }`.
 
 ```rust
 html! {
     <style>
-        .my-card { padding: "1rem"; }
-        .active { color: "blue"; }
+        // ✅ Correct
+        .my_card { padding: "1rem"; }
+
+        // ❌ Wrong - Dashes banned!
+        // .my-card { ... }
     </style>
 
-    // ✅ CLEANEST: Magic Dashed Syntax (auto-scoped)
-    <div class={ my-card }>...</div>
+    // ✅ Static (Quotes)
+    <div class="my_card">...</div>
 
-    // ✅ MIXED: Combine dashed classes and variables
-    <div class={ my-card active_state }>...</div>
+    // ✅ Dynamic (Variable)
+    <div class={my_card}>...</div>
 
-    // ✅ LOGIC: Expressions work too
-    <div class={ my-card if is_active { "active" } else { "" } }>...</div>
+    // ✅ Mixed (Expression List)
+    <div class={ my_card if is_active { "active" } else { "" } }>...</div>
 }
 ```
 
-**Note**: `my-card` technically parses as subtraction (`my - card`), but Azumi smartly detects if it matches a valid CSS class and treats it as a string handle. If no class matches, it remains a subtraction expression.
+**Why?** This ensures full compatibility with Rust identifiers (which cannot have dashes) and allows the editor to provide perfect autocomplete and variable highlighting.
 
 ### 3. Live State Requires Component Link
 
