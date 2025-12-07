@@ -111,7 +111,10 @@ fn validate_style_only_css_vars(style_value: &str) -> Result<(), String> {
 #[proc_macro]
 pub fn html(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as token_parser::HtmlInput);
-    let nodes = input.nodes;
+    let mut nodes = input.nodes;
+    
+    // Auto-inject Azumi Runtime (Single Pass: Head -> Body)
+    token_parser::inject_azumi_script_once(&mut nodes);
 
     // 1. Process styles (hoist <style> tags)
     let (style_bindings, scoped_css, global_css) = process_styles(&nodes);

@@ -531,20 +531,18 @@ impl Parse for Attribute {
                         (AttributeValue::Dynamic(content.parse()?), None)
                     }
                 } else {
-                    (AttributeValue::Dynamic(content.parse()?), None)
-                }
-                let lit: syn::Lit = input.parse()?;
-                match lit {
-                    syn::Lit::Str(s) => {
-                        // Use the literal's span - this points to the string including quotes
-                        // The CSS validator should handle highlighting the content properly
-                        (AttributeValue::Static(s.value()), Some(lit_before))
-                    },
-                    _ => {
-                        return Err(Error::new(
-                            name_span,
-                            format!("Attribute '{}' value must be a double-quoted string literal or dynamic expression {{...}}. Non-string literals are not allowed.", name)
-                        ))
+                    let lit: syn::Lit = input.parse()?;
+                    match lit {
+                        syn::Lit::Str(s) => {
+                            // Use the literal's span
+                            (AttributeValue::Static(s.value()), Some(lit.span()))
+                        },
+                        _ => {
+                            return Err(Error::new(
+                                name_span,
+                                format!("Attribute '{}' value must be a double-quoted string literal or dynamic expression {{...}}. Non-string literals are not allowed.", name)
+                            ))
+                        }
                     }
                 }
             } else {
@@ -1212,4 +1210,92 @@ impl Parse for HtmlInput {
         let nodes = parse_nodes(input)?;
         Ok(HtmlInput { nodes })
     }
+}
+
+/// Helper to inject AzumiScript exactly once into the AST.
+/// Priority: <head> -> <body>
+/// Returns true if script was injected.
+pub fn inject_azumi_script_once(nodes: &mut Vec<Node>) -> bool {
+    // Pass 1: Try to inject into HEAD
+    if inject_in_tag(nodes, "head") {
+        return true;
+    }
+
+    // Pass 2: Try to inject into BODY
+    if inject_in_tag(nodes, "body") {
+        return true;
+    }
+
+    false
+}
+
+fn inject_in_tag(nodes: &mut Vec<Node>, target_tag: &str) -> bool {
+    for node in nodes {
+        match node {
+            Node::Element(elem) => {
+                if elem.name == target_tag {
+                    // Check if script already exists
+                    let has_script = elem.children.iter().any(|n| {
+                        if let Node::Block(Block::Component(comp)) = n {
+                            if let Some(segment) = comp.name.segments.last() {
+                                return segment.ident == "AzumiScript";
+                            }
+                        }
+                        false
+                    });
+
+                    if !has_script {
+                        // Inject script at the end
+                        let script_path: syn::Path =
+                            syn::parse_str("azumi::prelude::AzumiScript").unwrap();
+                        elem.children
+                            .push(Node::Block(Block::Component(ComponentBlock {
+                                name: script_path,
+                                span: proc_macro2::Span::call_site(),
+                            })));
+                        return true;
+                    }
+                    // If tag found but already has script, we stop searching.
+                    return false;
+                }
+
+                // Recurse
+                if inject_in_tag(&mut elem.children, target_tag) {
+                    return true;
+                }
+            }
+            Node::Fragment(frag) => {
+                if inject_in_tag(&mut frag.children, target_tag) {
+                    return true;
+                }
+            }
+            Node::Block(block) => match block {
+                Block::If(if_block) => {
+                    if inject_in_tag(&mut if_block.then_branch, target_tag) {
+                        return true;
+                    }
+                    if let Some(else_branch) = &mut if_block.else_branch {
+                        if inject_in_tag(else_branch, target_tag) {
+                            return true;
+                        }
+                    }
+                }
+                Block::For(for_block) => {
+                    if inject_in_tag(&mut for_block.body, target_tag) {
+                        return true;
+                    }
+                }
+                Block::Match(match_block) => {
+                    for arm in &mut match_block.arms {
+                        if inject_in_tag(&mut arm.body, target_tag) {
+                            return true;
+                        }
+                    }
+                }
+                _ => {}
+            },
+            _ => {}
+        }
+    }
+    false
 }
