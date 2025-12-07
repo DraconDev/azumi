@@ -475,81 +475,98 @@ impl Parse for Attribute {
 
         let (value, value_span) = if input.peek(Token![=]) {
             input.parse::<Token![=]>()?;
-            if input.peek(Brace) {
-                // {expr} - dynamic expression OR style DSL
-                let content;
-                syn::braced!(content in input);
+            
+            // Robust parsing: Consume the next token tree and inspect it
+            // This works around issues where peek(Brace) might fail for groups
+            let tt: proc_macro2::TokenTree = input.parse()?;
+            match tt {
+                proc_macro2::TokenTree::Group(g) if g.delimiter() == proc_macro2::Delimiter::Brace => {
+                     // It's a brace group { ... }
+                     let stream = g.stream();
+                     
+                     // Check if this is a style attribute with DSL syntax
+                     if name == "style" {
+                         // We need to parse the stream to check for --prop: val
+                         let mut fork = stream.clone().into_iter();
+                         if let Some(proc_macro2::TokenTree::Punct(p1)) = fork.next() {
+                             if p1.as_char() == '-' {
+                                 if let Some(proc_macro2::TokenTree::Punct(p2)) = fork.next() {
+                                     if p2.as_char() == '-' {
+                                         // Looks like --...
+                                         // Re-implement the style DSL parser using the stream
+                                         let content_parser = syn::parse::Parser::new(|input: ParseStream| {
+                                            let mut props = Vec::new();
+                                            while !input.is_empty() {
+                                                // Parse property name: --foo-bar
+                                                let mut prop_name = String::new();
+                                                input.parse::<Token![-]>()?;
+                                                input.parse::<Token![-]>()?;
+                                                prop_name.push_str("--");
 
-                // Check if this is a style attribute with DSL syntax: { --var: val, --var2: val2 }
-                if name == "style" {
-                    // Peek to see if it starts with --
-                    let fork = content.fork();
-                    if fork.peek(Token![-]) && fork.peek2(Token![-]) {
-                        // Parse as Style DSL
-                        let mut props = Vec::new();
-                        while !content.is_empty() {
-                            // Parse property name: --foo-bar
-                            let mut prop_name = String::new();
-                            content.parse::<Token![-]>()?;
-                            content.parse::<Token![-]>()?;
-                            prop_name.push_str("--");
+                                                // Parse rest of identifier parts
+                                                let ident = input.parse::<Ident>()?;
+                                                prop_name.push_str(&ident.to_string());
 
-                            // Parse rest of identifier parts
-                            let ident = content.parse::<Ident>()?;
-                            prop_name.push_str(&ident.to_string());
+                                                while input.peek(Token![-]) {
+                                                    input.parse::<Token![-]>()?;
+                                                    prop_name.push('-');
+                                                    let part = input.parse::<Ident>()?;
+                                                    prop_name.push_str(&part.to_string());
+                                                }
 
-                            while content.peek(Token![-]) {
-                                content.parse::<Token![-]>()?;
-                                prop_name.push('-');
-                                let part = content.parse::<Ident>()?;
-                                prop_name.push_str(&part.to_string());
-                            }
+                                                input.parse::<Token![:]>()?;
 
-                            content.parse::<Token![:]>()?;
+                                                // Parse value expression until semicolon, comma, or end
+                                                let mut value_tokens = TokenStream::new();
+                                                while !input.is_empty()
+                                                    && !input.peek(Token![;])
+                                                    && !input.peek(Token![,])
+                                                {
+                                                    value_tokens.extend(std::iter::once(input.parse::<TokenTree>()?));
+                                                }
 
-                            // Parse value expression until semicolon, comma, or end
-                            let mut value_tokens = TokenStream::new();
-                            while !content.is_empty()
-                                && !content.peek(Token![;])
-                                && !content.peek(Token![,])
-                            {
-                                value_tokens.extend(std::iter::once(content.parse::<TokenTree>()?));
-                            }
+                                                props.push((prop_name, value_tokens));
 
-                            props.push((prop_name, value_tokens));
-
-                            // Consume separator if present
-                            if content.peek(Token![;]) {
-                                content.parse::<Token![;]>()?;
-                            } else if content.peek(Token![,]) {
-                                content.parse::<Token![,]>()?;
-                            }
-                        }
-                        (AttributeValue::StyleDsl(props), None)
+                                                // Consume separator if present
+                                                if input.peek(Token![;]) {
+                                                    input.parse::<Token![;]>()?;
+                                                } else if input.peek(Token![,]) {
+                                                    input.parse::<Token![,]>()?;
+                                                }
+                                            }
+                                            Ok(props)
+                                         });
+                                         let props = content_parser.parse2(stream)?;
+                                         return (AttributeValue::StyleDsl(props), None);
+                                     }
+                                 }
+                             }
+                         }
+                         // Fallback to dynamic if not style DSL
+                         (AttributeValue::Dynamic(stream), None)
+                     } else {
+                         (AttributeValue::Dynamic(stream), None)
+                     }
+                }
+                proc_macro2::TokenTree::Literal(lit) => {
+                    // It's a literal. Convert to syn::Lit to check if string.
+                    let s = lit.to_string();
+                    if s.starts_with('"') && s.ends_with('"') {
+                         let content = s[1..s.len()-1].to_string();
+                         (AttributeValue::Static(content), Some(lit.span()))
                     } else {
-                        // Normal dynamic expression
-                        (AttributeValue::Dynamic(content.parse()?), None)
-                    }
-                } else {
-                    let lit: syn::Lit = input.parse()?;
-                    match lit {
-                        syn::Lit::Str(s) => {
-                            // Use the literal's span
-                            (AttributeValue::Static(s.value()), Some(lit.span()))
-                        },
-                        _ => {
-                            return Err(Error::new(
-                                name_span,
-                                format!("Attribute '{}' value must be a double-quoted string literal or dynamic expression {{...}}. Non-string literals are not allowed.", name)
-                            ))
-                        }
+                        return Err(Error::new(
+                            name_span,
+                            format!("Attribute '{}' value must be a double-quoted string literal or dynamic expression {{...}}.", name)
+                        ))
                     }
                 }
-            } else {
-                return Err(Error::new(
-                    input.span(),
-                    format!("Attribute '{}' requires a double-quoted string value or dynamic expression {{...}}.\nExample: {}=\"value\" or {}={{expr}}", name, name, name)
-                ));
+                 _ => {
+                        return Err(Error::new(
+                            name_span,
+                            format!("Attribute '{}' value error. Found unexpected token: {:?}. Expected string literal or {{...}}", name, tt)
+                        ))
+                 }
             }
         } else {
             // No = sign - must be a boolean attribute
