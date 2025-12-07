@@ -964,17 +964,16 @@ fn generate_body_with_context(
                     if attr_name == "style" {
                         match &attr.value {
                             token_parser::AttributeValue::Static(_) => {
-                                attr_code.extend(quote! {
-                                    compile_error!("Static style attributes are banned (e.g. style=\"...\"). Use style={ --prop: value } instead.");
-                                });
+                                let span = attr.value_span.unwrap_or(attr.span);
+                                let err = syn::Error::new(span, "Static style attributes are banned (e.g. style=\"...\"). Use style={ --prop: value } instead.");
+                                attr_code.extend(err.to_compile_error());
                                 continue;
                             }
                             token_parser::AttributeValue::Dynamic(expr) => {
                                 // Check for string literals -> BAN
                                 if let Ok(syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(_), .. })) = syn::parse2::<syn::Expr>(expr.clone()) {
-                                    attr_code.extend(quote! {
-                                        compile_error!("String literals in style attribute are banned. Use Style DSL style={ --prop: val }.");
-                                    });
+                                    let err = syn::Error::new_spanned(expr, "String literals in style attribute are banned. Use Style DSL style={ --prop: val }.");
+                                    attr_code.extend(err.to_compile_error());
                                 } else {
                                     attr_code.extend(quote! {
                                         write!(f, " style=\"{}\"", azumi::Escaped(&(#expr)))?;
