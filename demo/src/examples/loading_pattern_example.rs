@@ -110,7 +110,7 @@ pub fn user_list_view<'a>(state: &'a UserList) -> impl Component + 'a {
             .btn_secondary { background: "#9e9e9e"; color: "white"; }
         </style>
 
-        <div class={container}>
+        <div class="container">
             <h2>"👥 User List"</h2>
 
             // ============================================
@@ -143,13 +143,13 @@ pub fn user_list_view<'a>(state: &'a UserList) -> impl Component + 'a {
 
             // Actions
             <div class={btn_row}>
-                <button class="btn btn_primary" on:click={state.load_users}>
+                <button class={btn btn_primary} on:click={state.load_users}>
                     "Load Users"
                 </button>
-                <button class="btn btn_danger" on:click={state.load_with_error}>
+                <button class={btn btn_danger} on:click={state.load_with_error}>
                     "Simulate Error"
                 </button>
-                <button class="btn btn_secondary" on:click={state.reset}>
+                <button class={btn btn_secondary} on:click={state.reset}>
                     "Reset"
                 </button>
             </div>

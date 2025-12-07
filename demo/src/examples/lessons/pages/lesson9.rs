@@ -66,6 +66,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
             .btn_primary { background: "#4caf50"; color: "white"; }
             .btn_secondary { background: "#ff9800"; color: "white"; }
             .btn_danger { background: "#f44336"; color: "white"; }
+            .ml_md { margin-left: "1rem"; }
         </style>
         <div class={counter_box}>
             <h2>"🚀 Azumi Live Counter"</h2>
@@ -77,13 +78,14 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
             </div>
 
             <div class={btn_row}>
-                <button class="btn btn_primary" on:click={state.increment}>
+                <button class={btn btn_primary} on:click={state.increment}>
                     "+ Increment"
                 </button>
-                <button class="btn btn_secondary" on:click={state.decrement}>
+                <button class={btn btn_secondary} on:click={state.decrement}>
                     "- Decrement"
                 </button>
-                <button class="btn btn_danger" on:click={state.toggle}>
+                <button class={btn btn_danger ml_md} on:click={state.toggle}>
+                // <button class={btn btn_danger "cake"} on:click={state.toggle} style={"margin-left: 1rem;"} id={toggle_button1}>
                     "Toggle Status"
                 </button>
             </div>

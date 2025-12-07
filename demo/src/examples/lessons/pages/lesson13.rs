@@ -96,7 +96,7 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
                     <div class={success_icon}>"✅"</div>
                     <div class={success_text}>"Thank you for your message!"</div>
                 </div>
-                <button class="btn btn_secondary" on:click={state.reset} >
+                <button class={btn btn_secondary} on:click={state.reset} >
                     "Send Another"
                 </button>
             }

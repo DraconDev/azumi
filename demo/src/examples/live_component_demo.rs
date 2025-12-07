@@ -21,7 +21,7 @@ impl UnifiedCounter {
 #[azumi::component]
 pub fn unified_counter_view<'a>(state: &'a UnifiedCounter) -> impl Component + 'a {
     html! {
-        <div class="counter_box">
+        <div class={counter_box}>
             <h3>"Unified Component Demo"</h3>
             <p>"Count: " <span data-bind="count">{state.count}</span></p>
             <p>"Active: " <span data-bind="active">{state.active}</span></p>

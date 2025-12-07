@@ -633,14 +633,11 @@ fn validate_nodes(
                         // Rule 1: Check inline styles
                     if name == "style" {
                         match &attr.value {
-                            token_parser::AttributeValue::Static(val) => {
-                                // Validate that only CSS custom properties are used
-                                if let Err(error_msg) = validate_style_only_css_vars(val) {
-                                    let error_span = attr.value_span.unwrap_or(attr.span);
-                                    errors.push(quote_spanned! { error_span =>
-                                        compile_error!(#error_msg);
-                                    });
-                                }
+                            token_parser::AttributeValue::Static(_) => {
+                                let error_span = attr.value_span.unwrap_or(attr.span);
+                                errors.push(quote_spanned! { error_span =>
+                                    compile_error!("Static style attributes are banned (e.g. style=\"...\"). Use style={ --prop: value } instead.");
+                                });
                             }
                             token_parser::AttributeValue::StyleDsl(_) => {
                                 // Style DSL is allowed!
@@ -655,26 +652,11 @@ fn validate_nodes(
                         // Rule 2: Check class existence - COMPILE ERROR
                         if name == "class" {
                             match &attr.value {
-                                token_parser::AttributeValue::Static(val) => {
-                                    for class_name in val.split_whitespace() {
-                                        if !valid_classes.contains(class_name) {
-                                            let msg = if has_scoped_css {
-                                                format!(
-                                                    "CSS class '{}' is not defined in any CSS file. Check for typos or add the class to your CSS.",
-                                                    class_name
-                                                )
-                                            } else {
-                                                format!(
-                                                    "CSS class '{}' is used but no CSS styles are defined for this component. Import a CSS file with <style src=\"...\" />.",
-                                                    class_name
-                                                )
-                                            };
-                                            let error_span = attr.value_span.unwrap_or(attr.span);
-                                            errors.push(quote_spanned! { error_span =>
-                                                compile_error!(#msg);
-                                            });
-                                        }
-                                    }
+                                token_parser::AttributeValue::Static(_) => {
+                                    let error_span = attr.value_span.unwrap_or(attr.span);
+                                    errors.push(quote_spanned! { error_span =>
+                                        compile_error!("Static class attributes are banned (e.g. class=\"...\"). Use class={variable_name} instead.");
+                                    });
                                 }
                                 token_parser::AttributeValue::Dynamic(tokens) => {
                                     // Check if variable name matches an ID but is used in class
@@ -706,17 +688,11 @@ fn validate_nodes(
                         // Rule 3: Check ID existence - COMPILE ERROR
                         if name == "id" {
                             match &attr.value {
-                                token_parser::AttributeValue::Static(val) => {
-                                    if !valid_ids.contains(val) {
-                                        let msg = format!(
-                                            "ID '{}' is used in HTML but not defined in CSS.",
-                                            val
-                                        );
-                                        let error_span = attr.value_span.unwrap_or(attr.span);
-                                        errors.push(quote_spanned! { error_span =>
-                                            compile_error!(#msg);
-                                        });
-                                    }
+                                token_parser::AttributeValue::Static(_) => {
+                                    let error_span = attr.value_span.unwrap_or(attr.span);
+                                    errors.push(quote_spanned! { error_span =>
+                                        compile_error!("Static id attributes are banned (e.g. id=\"...\"). Use id={variable_name} instead.");
+                                    });
                                 }
                                 token_parser::AttributeValue::Dynamic(tokens) => {
                                     // Check if variable name matches a Class but is used in ID
@@ -991,11 +967,16 @@ fn generate_body_with_context(
                                 continue;
                             }
                             token_parser::AttributeValue::Dynamic(expr) => {
-                                // For dynamic style, we can't validate at compile time
-                                // but we trust the user is passing CSS variables
-                                attr_code.extend(quote! {
-                                    write!(f, " style=\"{}\"", azumi::Escaped(&(#expr)))?;
-                                });
+                                // Check for string literals -> BAN
+                                if let Ok(syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(_), .. })) = syn::parse2::<syn::Expr>(expr.clone()) {
+                                    attr_code.extend(quote! {
+                                        compile_error!("String literals in style attribute are banned. Use Style DSL style={ --prop: val }.");
+                                    });
+                                } else {
+                                    attr_code.extend(quote! {
+                                        write!(f, " style=\"{}\"", azumi::Escaped(&(#expr)))?;
+                                    });
+                                }
                             }
                             token_parser::AttributeValue::StyleDsl(props) => {
                                 // Generate optimized style string construction
@@ -1064,6 +1045,14 @@ fn generate_body_with_context(
                                     attr_code.extend(quote! { write!(f, " class=\"")?; });
                                     
                                     for (i, expr) in expr_list.iter().enumerate() {
+                                        // BAN String Literals in class list
+                                        if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(_), .. }) = expr {
+                                            attr_code.extend(quote_spanned! { expr.span() =>
+                                                compile_error!("String literals in class attribute are banned. Use variables.");
+                                            });
+                                            continue;
+                                        }
+
                                         if i > 0 {
                                             attr_code.extend(quote! { write!(f, " ")?; });
                                         }
@@ -1096,8 +1085,14 @@ fn generate_body_with_context(
                                 });
                                 continue;
                             }
-                            token_parser::AttributeValue::Dynamic(_) => {
-                                // Fall through to generic handler
+                            token_parser::AttributeValue::Dynamic(tokens) => {
+                                // BAN String Literals in id
+                                if let Ok(syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(_), .. })) = syn::parse2::<syn::Expr>(tokens.clone()) {
+                                    attr_code.extend(quote! {
+                                        compile_error!("String literals in id attribute are banned. Use variables.");
+                                    });
+                                    continue;
+                                }
                             }
                             _ => {}
                         }
