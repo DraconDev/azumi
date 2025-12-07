@@ -190,8 +190,7 @@ pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Componen
             <div class={content_container}>
                 {children}
             </div>
-            // Scripts for Hot Reload and Interactivity
-            @azumi::prelude::AzumiScript
+            // Scripts for Hot Reload and Interactivity (Auto-Injected)
         </div>
     }
 }
