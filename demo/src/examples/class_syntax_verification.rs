@@ -1,14 +1,11 @@
-use azumi::Component;
-use azumi_macros::component;
+use azumi::prelude::*;
 
-// Test component with mixed class usages
-#[component]
-fn ClassSyntaxTest() -> impl Component {
+#[azumi::component]
+pub fn ClassSyntaxVerification() -> impl Component {
     html! {
         <style>
-            .dashed-class { color: red; }
-            .snake_class { color: blue; }
-            /* Global class, not defined here, should fail verification if used */
+            .dashed-class { color: "red"; }
+            .snake_class { color: "blue"; }
         </style>
 
         // 1. Dashed class in quotes (should work and be scoped)
@@ -23,10 +20,4 @@ fn ClassSyntaxTest() -> impl Component {
         // 4. Multiple classes in quotes
         <div class="dashed-class snake_class">"Multiple"</div>
     }
-}
-
-#[test]
-fn test_class_syntax_compiles() {
-    // This test primarily checks that the macro expands successfully
-    let _ = ClassSyntaxTest();
 }

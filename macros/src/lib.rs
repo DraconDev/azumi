@@ -544,6 +544,7 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
     // Pass 0.5: Strict CSS Validation (New Feature)
     // Extract valid selectors from the SCOPED CSS only (global CSS is opt-out)
     let (valid_classes, valid_ids) = crate::css::extract_selectors(&scoped_css);
+    eprintln!("DEBUG: Extracted valid classes from CSS: {:?}", valid_classes);
 
     // Validate nodes against strict rules - COMPILE ERRORS
     let style_validation_errors =
