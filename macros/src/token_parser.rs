@@ -431,39 +431,7 @@ For dynamic styles: use style attribute with expressions"
                     return Err(Error::new(
                         start_span,
                         format!("Unclosed element <{}>", name),
-                    ));
                 }
-            }
-        }
-
-        // Auto-inject Azumi Runtime into <head> or <body>
-        if name == "head" || name == "body" {
-            // Check if AzumiScript is already present in children
-            let has_script = children.iter().any(|node| {
-                if let Node::Block(Block::Component(comp)) = node {
-                    // Check if path ends with AzumiScript
-                    if let Some(segment) = comp.name.segments.last() {
-                        return segment.ident == "AzumiScript";
-                    }
-                }
-                false
-            });
-
-            if !has_script {
-                // Inject @azumi::prelude::AzumiScript
-                // We use the full path to avoid import issues
-                let script_path: syn::Path = syn::parse_str("azumi::prelude::AzumiScript")
-                    .map_err(|e| {
-                        Error::new(
-                            start_span,
-                            format!("Internal error parsing AzumiScript path: {}", e),
-                        )
-                    })?;
-
-                children.push(Node::Block(Block::Component(ComponentBlock {
-                    name: script_path,
-                    span: start_span,
-                })));
             }
         }
 
