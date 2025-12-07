@@ -92,23 +92,19 @@ use azumi::html;
 pub fn WelcomeCard(name: &str) -> impl azumi::Component {
     html! {
         <style>
-            .card {
+            .welcome-card {
                 padding: "1.5rem";
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
                 color: "white";
                 border-radius: "12px";
-                box-shadow: "0 4px 6px rgba(0, 0, 0, 0.1)";
             }
-            .title {
-                font-size: "1.5rem";
-                font-weight: "bold";
-                margin-bottom: "0.5rem";
-            }
-            .subtitle { opacity: "0.9"; }
+            .title { font-size: "1.5rem"; font-weight: "bold"; }
         </style>
-        <div class={card}>
+
+        // Use quotes for dashed class names (auto-scoped + validated!)
+        <div class="welcome-card">
             <h2 class={title}>"Welcome to Azumi!"</h2>
-            <p class={subtitle}>{"Hello, "}{name}{" 👋"}</p>
+            <p>{"Hello, "}{name}{" 👋"}</p>
         </div>
     }
 }
@@ -116,10 +112,9 @@ pub fn WelcomeCard(name: &str) -> impl azumi::Component {
 
 **What happens:**
 
--   ✅ CSS classes become Rust variables (`card`, `title`, `subtitle`)
--   ✅ CSS automatically scoped to this component
--   ✅ Type-safe component props with lifetimes
--   ✅ Compile-time validation of all HTML/CSS
+-   ✅ **Hybrid Syntax**: Use `class="my-class"` for standard CSS names, `class={variable}` for dynamic logic
+-   ✅ **Auto-Scoping**: `.welcome-card` becomes `welcome-card-s7f2` automatically
+-   ✅ **Co-Validation**: `class="typo"` fails at compile time if not in `<style>`
 
 ### 2. Add Interactivity with Azumi Live
 
