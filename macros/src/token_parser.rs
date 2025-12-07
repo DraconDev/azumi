@@ -436,8 +436,8 @@ For dynamic styles: use style attribute with expressions"
             }
         }
 
-        // Auto-inject Azumi Runtime into <head>
-        if name == "head" {
+        // Auto-inject Azumi Runtime into <head> or <body>
+        if name == "head" || name == "body" {
             // Check if AzumiScript is already present in children
             let has_script = children.iter().any(|node| {
                 if let Node::Block(Block::Component(comp)) = node {
