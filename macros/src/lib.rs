@@ -984,16 +984,11 @@ fn generate_body_with_context(
                     // Handle style attribute - ONLY CSS custom properties allowed
                     if attr_name == "style" {
                         match &attr.value {
-                            token_parser::AttributeValue::Static(val) => {
-                                // Validate that only CSS custom properties are used
-                                if let Err(error_msg) = validate_style_only_css_vars(val) {
-                                    return quote! {
-                                        compile_error!(#error_msg);
-                                    };
-                                }
+                            token_parser::AttributeValue::Static(_) => {
                                 attr_code.extend(quote! {
-                                    write!(f, " style=\"{}\"", #val)?;
+                                    compile_error!("Static style attributes are banned (e.g. style=\"...\"). Use style={ --prop: value } instead.");
                                 });
+                                continue;
                             }
                             token_parser::AttributeValue::Dynamic(expr) => {
                                 // For dynamic style, we can't validate at compile time
@@ -1046,30 +1041,10 @@ fn generate_body_with_context(
                     // Handle class attribute - AUTO-SCOPE static strings
                     if attr_name == "class" {
                         match &attr.value {
-                            token_parser::AttributeValue::Static(val) => {
-                                // Auto-scope: split by whitespace, scope each class if it's valid
-                                if let Some(ref scope_id) = ctx.scope_id {
-                                    let scoped_classes: Vec<String> = val.split_whitespace()
-                                        .map(|class_name| {
-                                            if ctx.valid_classes.contains(class_name) {
-                                                format!("{}-{}", class_name, scope_id)
-                                            } else {
-                                                // Unknown class - validation should have caught this
-                                                // but pass through just in case (for global classes)
-                                                class_name.to_string()
-                                            }
-                                        })
-                                        .collect();
-                                    let scoped_string = scoped_classes.join(" ");
-                                    attr_code.extend(quote! {
-                                        write!(f, " class=\"{}\"", #scoped_string)?;
-                                    });
-                                } else {
-                                    // No scope - output as-is
-                                    attr_code.extend(quote! {
-                                        write!(f, " class=\"{}\"", #val)?;
-                                    });
-                                }
+                            token_parser::AttributeValue::Static(_) => {
+                                attr_code.extend(quote! {
+                                    compile_error!("Static class attributes are banned (e.g. class=\"...\"). Use class={variable_name} instead.");
+                                });
                                 continue;
                             }
                             token_parser::AttributeValue::Dynamic(tokens) => {
@@ -1115,10 +1090,9 @@ fn generate_body_with_context(
                     // But we still need to handle them specially for static values
                     if attr_name == "id" {
                         match &attr.value {
-                            token_parser::AttributeValue::Static(val) => {
-                                // IDs are not scoped, output as-is
+                            token_parser::AttributeValue::Static(_) => {
                                 attr_code.extend(quote! {
-                                    write!(f, " id=\"{}\"", #val)?;
+                                    compile_error!("Static id attributes are banned (e.g. id=\"...\"). Use id={variable_name} instead.");
                                 });
                                 continue;
                             }
