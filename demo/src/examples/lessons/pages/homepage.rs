@@ -208,11 +208,14 @@ fn LessonCard<'a>(num: &'a str, title: &'a str, desc: &'a str, link: &'a str) ->
                 transition: "all 0.2s";
                 align-self: "start";
             }
+            .card-desc {
+                margin-bottom: "1rem";
+            }
         </style>
         <div class={lesson_card}>
             <div class={card_number}>"LESSON " {num}</div>
             <h3 class={card_title}>{title}</h3>
-            <p class={card_desc card-desc}>{desc}</p>
+            <p class={card_desc}>{desc}</p>
             <a href={link} class={card_link}>"Start Lesson →"</a>
         </div>
     }
