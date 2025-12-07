@@ -1026,9 +1026,9 @@ fn generate_body_with_context(
                     if attr_name == "class" {
                         match &attr.value {
                             token_parser::AttributeValue::Static(_) => {
-                                attr_code.extend(quote! {
-                                    compile_error!("Static class attributes are banned (e.g. class=\"...\"). Use class={variable_name} instead.");
-                                });
+                                let span = attr.value_span.unwrap_or(attr.span);
+                                let err = syn::Error::new(span, "Static class attributes are banned (e.g. class=\"...\"). Use class={variable_name} instead.");
+                                attr_code.extend(err.to_compile_error());
                                 continue;
                             }
                             token_parser::AttributeValue::Dynamic(tokens) => {
@@ -1050,9 +1050,8 @@ fn generate_body_with_context(
                                     for (i, expr) in expr_list.iter().enumerate() {
                                         // BAN String Literals in class list
                                         if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(_), .. }) = expr {
-                                            attr_code.extend(quote_spanned! { expr.span() =>
-                                                compile_error!("String literals in class attribute are banned. Use variables.");
-                                            });
+                                            let err = syn::Error::new_spanned(expr, "String literals in class attribute are banned. Use variables.");
+                                            attr_code.extend(err.to_compile_error());
                                             continue;
                                         }
 
