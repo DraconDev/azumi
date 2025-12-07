@@ -486,64 +486,65 @@ impl Parse for Attribute {
                      
                      // Check if this is a style attribute with DSL syntax
                      if name == "style" {
-                         // We need to parse the stream to check for --prop: val
-                         let mut fork = stream.clone().into_iter();
-                         if let Some(proc_macro2::TokenTree::Punct(p1)) = fork.next() {
-                             if p1.as_char() == '-' {
-                                 if let Some(proc_macro2::TokenTree::Punct(p2)) = fork.next() {
-                                     if p2.as_char() == '-' {
-                                         // Looks like --...
-                                         // Re-implement the style DSL parser using the stream
-                                         let content_parser = syn::parse::Parser::new(|input: ParseStream| {
-                                            let mut props = Vec::new();
-                                            while !input.is_empty() {
-                                                // Parse property name: --foo-bar
-                                                let mut prop_name = String::new();
-                                                input.parse::<Token![-]>()?;
-                                                input.parse::<Token![-]>()?;
-                                                prop_name.push_str("--");
+                         // Check for -- prefix
+                         let is_style_dsl = 'check: {
+                            let mut fork = stream.clone().into_iter();
+                            if !matches!(fork.next(), Some(proc_macro2::TokenTree::Punct(p)) if p.as_char() == '-') { break 'check false; }
+                            if !matches!(fork.next(), Some(proc_macro2::TokenTree::Punct(p)) if p.as_char() == '-') { break 'check false; }
+                            true
+                         };
 
-                                                // Parse rest of identifier parts
-                                                let ident = input.parse::<syn::Ident>()?;
-                                                prop_name.push_str(&ident.to_string());
+                         if is_style_dsl {
+                             // Re-implement the style DSL parser using the stream
+                             let content_parser = |input: ParseStream| {
+                                let mut props = Vec::new();
+                                while !input.is_empty() {
+                                    // Parse property name: --foo-bar
+                                    let mut prop_name = String::new();
+                                    input.parse::<Token![-]>()?;
+                                    input.parse::<Token![-]>()?;
+                                    prop_name.push_str("--");
 
-                                                while input.peek(Token![-]) {
-                                                    input.parse::<Token![-]>()?;
-                                                    prop_name.push('-');
-                                                    let part = input.parse::<syn::Ident>()?;
-                                                    prop_name.push_str(&part.to_string());
-                                                }
+                                    // Parse rest of identifier parts
+                                    let ident = input.parse::<syn::Ident>()?;
+                                    prop_name.push_str(&ident.to_string());
 
-                                                input.parse::<Token![:]>()?;
+                                    while input.peek(Token![-]) {
+                                        input.parse::<Token![-]>()?;
+                                        prop_name.push('-');
+                                        let part = input.parse::<syn::Ident>()?;
+                                        prop_name.push_str(&part.to_string());
+                                    }
 
-                                                // Parse value expression until semicolon, comma, or end
-                                                let mut value_tokens = TokenStream::new();
-                                                while !input.is_empty()
-                                                    && !input.peek(Token![;])
-                                                    && !input.peek(Token![,])
-                                                {
-                                                    value_tokens.extend(std::iter::once(input.parse::<TokenTree>()?));
-                                                }
+                                    input.parse::<Token![:]>()?;
 
-                                                props.push((prop_name, value_tokens));
+                                    // Parse value expression until semicolon, comma, or end
+                                    let mut value_tokens = TokenStream::new();
+                                    while !input.is_empty()
+                                        && !input.peek(Token![;])
+                                        && !input.peek(Token![,])
+                                    {
+                                        value_tokens.extend(std::iter::once(input.parse::<TokenTree>()?));
+                                    }
 
-                                                // Consume separator if present
-                                                if input.peek(Token![;]) {
-                                                    input.parse::<Token![;]>()?;
-                                                } else if input.peek(Token![,]) {
-                                                    input.parse::<Token![,]>()?;
-                                                }
-                                            }
-                                            Ok(props)
-                                         });
-                                         let props = content_parser.parse2(stream)?;
-                                         (AttributeValue::StyleDsl(props), None)
-                                     }
-                                 }
-                             }
+                                    props.push((prop_name, value_tokens));
+
+                                    // Consume separator if present
+                                    if input.peek(Token![;]) {
+                                        input.parse::<Token![;]>()?;
+                                    } else if input.peek(Token![,]) {
+                                        input.parse::<Token![,]>()?;
+                                    }
+                                }
+                                Ok(props)
+                             };
+                             
+                             // Use Parser trait method parse2
+                             let props = syn::parse::Parser::parse2(content_parser, stream)?;
+                             (AttributeValue::StyleDsl(props), None)
+                         } else {
+                             (AttributeValue::Dynamic(stream), None)
                          }
-                         // Fallback to dynamic if not style DSL
-                         (AttributeValue::Dynamic(stream), None)
                      } else {
                          (AttributeValue::Dynamic(stream), None)
                      }
