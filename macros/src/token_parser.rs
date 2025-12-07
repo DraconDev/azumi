@@ -431,6 +431,7 @@ For dynamic styles: use style attribute with expressions"
                     return Err(Error::new(
                         start_span,
                         format!("Unclosed element <{}>", name),
+                    ));
                 }
             }
         }
@@ -532,8 +533,6 @@ impl Parse for Attribute {
                 } else {
                     (AttributeValue::Dynamic(content.parse()?), None)
                 }
-            } else if input.peek(syn::Lit) {
-                let lit_before = input.span();
                 let lit: syn::Lit = input.parse()?;
                 match lit {
                     syn::Lit::Str(s) => {
