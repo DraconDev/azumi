@@ -504,13 +504,13 @@ impl Parse for Attribute {
                                                 prop_name.push_str("--");
 
                                                 // Parse rest of identifier parts
-                                                let ident = input.parse::<Ident>()?;
+                                                let ident = input.parse::<syn::Ident>()?;
                                                 prop_name.push_str(&ident.to_string());
 
                                                 while input.peek(Token![-]) {
                                                     input.parse::<Token![-]>()?;
                                                     prop_name.push('-');
-                                                    let part = input.parse::<Ident>()?;
+                                                    let part = input.parse::<syn::Ident>()?;
                                                     prop_name.push_str(&part.to_string());
                                                 }
 
@@ -537,7 +537,7 @@ impl Parse for Attribute {
                                             Ok(props)
                                          });
                                          let props = content_parser.parse2(stream)?;
-                                         return (AttributeValue::StyleDsl(props), None);
+                                         (AttributeValue::StyleDsl(props), None)
                                      }
                                  }
                              }
