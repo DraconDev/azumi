@@ -1083,17 +1083,16 @@ fn generate_body_with_context(
                     if attr_name == "id" {
                         match &attr.value {
                             token_parser::AttributeValue::Static(_) => {
-                                attr_code.extend(quote! {
-                                    compile_error!("Static id attributes are banned (e.g. id=\"...\"). Use id={variable_name} instead.");
-                                });
+                                let span = attr.value_span.unwrap_or(attr.span);
+                                let err = syn::Error::new(span, "Static id attributes are banned (e.g. id=\"...\"). Use id={variable_name} instead.");
+                                attr_code.extend(err.to_compile_error());
                                 continue;
                             }
                             token_parser::AttributeValue::Dynamic(tokens) => {
                                 // BAN String Literals in id
                                 if let Ok(syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(_), .. })) = syn::parse2::<syn::Expr>(tokens.clone()) {
-                                    attr_code.extend(quote! {
-                                        compile_error!("String literals in id attribute are banned. Use variables.");
-                                    });
+                                    let err = syn::Error::new_spanned(tokens, "String literals in id attribute are banned. Use variables.");
+                                    attr_code.extend(err.to_compile_error());
                                     continue;
                                 }
                             }
