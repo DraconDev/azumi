@@ -1,12 +1,17 @@
 pub mod prelude {
     pub use crate::action::Action;
-    pub use crate::{action, azumi_script, component, head, html, live, live_impl, Component};
+    pub use crate::{
+        action, azumi_script, component, head, html, live, live_impl, AzumiScript, Component,
+    };
 }
 
 pub use azumi_macros::{action, component, head, html, live, live_impl};
 pub mod action;
 pub mod hot_reload;
+pub mod script;
 pub use inventory;
+
+pub use script::AzumiScript;
 
 pub trait Component {
     fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
