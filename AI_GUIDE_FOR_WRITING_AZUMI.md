@@ -34,21 +34,38 @@ Azumi is a **compiler-driven optimistic UI framework** that generates client-sid
 }
 ```
 
-### 2. CSS Classes Become Rust Variables
+### 2. CSS Classes: Quotes vs Brackets
+
+Azumi uses a **Hybrid Class Syntax**:
+
+-   **Quotes (`class="foo"`)**: Use for static strings. **Required for dashed names** (e.g. `class="my-class"`).
+    -   Azumi automatically scopes these (`my-class-{id}`).
+    -   Strictly validated: Must exist in your `<style>` block.
+-   **Brackets (`class={my_var}`)**: Use for dynamic variables or conditions.
+    -   Must be a valid Rust identifier (snake_case).
 
 ```rust
 html! {
     <style>
-        .my_button { padding: "1rem"; }  // Defines variable `my_button`
+        .my-card { padding: "1rem"; }      // Kebab-case allowed!
+        .active_state { color: "blue"; }   // Snake-case for variables
     </style>
-    <button class={my_button}>"Click"</button>  // Uses variable
+
+    // ✅ CORRECT - Dashed class in quotes (auto-scoped)
+    <div class="my-card">"Content"</div>
+
+    // ✅ CORRECT - Dynamic variable in brackets
+    <div class={active_state}>"Active"</div>
+
+    // ✅ CORRECT - Mixed
+    <div class="my-card" class={active_state}>"Mixed"</div>
+
+    // ❌ WRONG - Cannot use brackets for dashed names (invalid Rust)
+    <div class={my-card}>...</div>
 }
 ```
 
-**Naming rules:**
-
--   Use `snake_case` for class names (becomes Rust identifier)
--   Avoid hyphens in class names (`my-button` → use `my_button`)
+**Key Rule**: If it has a dash, use quotes. If it's a variable, use brackets.
 
 ### 3. Live State Requires Component Link
 
