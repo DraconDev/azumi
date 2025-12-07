@@ -544,7 +544,6 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
     // Pass 0.5: Strict CSS Validation (New Feature)
     // Extract valid selectors from the SCOPED CSS only (global CSS is opt-out)
     let (valid_classes, valid_ids) = crate::css::extract_selectors(&scoped_css);
-    eprintln!("DEBUG: Extracted valid classes from CSS: {:?}", valid_classes);
 
     // Validate nodes against strict rules - COMPILE ERRORS
     let style_validation_errors =
@@ -1073,9 +1072,76 @@ fn generate_body_with_context(
                                 }
                                 continue;
                             }
-                            token_parser::AttributeValue::Dynamic(_) => {
-                                // Dynamic class uses variables which are already scoped
-                                // Fall through to generic handler
+                            token_parser::AttributeValue::Dynamic(tokens) => {
+                                // Dynamic class - "Expression List" support
+                                // Allows: class={ "my-class" active_state } -> "my-class-s123 active_val"
+                                use syn::parse::Parser;
+                                
+                                let parser = |input: syn::parse::ParseStream| -> syn::Result<Vec<syn::Expr>> {
+                                    let mut exprs = Vec::new();
+                                    while !input.is_empty() {
+                                        exprs.push(input.parse()?);
+                                    }
+                                    Ok(exprs)
+                                };
+
+                                if let Ok(expr_list) = parser.parse2(tokens.clone()) {
+                                    attr_code.extend(quote! { write!(f, " class=\"")?; });
+                                    
+                                    for (i, expr) in expr_list.iter().enumerate() {
+                                        if i > 0 {
+                                            attr_code.extend(quote! { write!(f, " ")?; });
+                                        }
+
+                                        let output_expr = if let syn::Expr::Lit(expr_lit) = expr {
+                                            if let syn::Lit::Str(s) = &expr_lit.lit {
+                                                // Auto-scope string literals inside brackets
+                                                let s_val = s.value();
+                                                if let Some(ref scope_id) = ctx.scope_id {
+                                                    let scoped_val = s_val.split_whitespace()
+                                                        .map(|c| if ctx.valid_classes.contains(c) {
+                                                            format!("{}-{}", c, scope_id) 
+                                                        } else {
+                                                            c.to_string()
+                                                        })
+                                                        .collect::<Vec<_>>()
+                                                        .join(" ");
+                                                    quote! { #scoped_val }
+                                                } else {
+                                                    quote! { #s_val }
+                                                }
+                                            } else {
+                                                quote! { #expr }
+                                            }
+                                        } else {
+                                            // Handle "magic" dashed names: class={ my-card }
+                                            // If expression looks like subtraction (my - card) AND matches a valid class, treat as class
+                                            if let Some(dashed) = reconstruct_dashed_name(expr) {
+                                                if ctx.valid_classes.contains(&dashed) {
+                                                    if let Some(ref scope_id) = ctx.scope_id {
+                                                        let scoped = format!("{}-{}", dashed, scope_id);
+                                                        quote! { #scoped }
+                                                    } else {
+                                                        quote! { #dashed }
+                                                    }
+                                                } else {
+                                                    // Not a class, assume normal expression
+                                                    quote! { #expr }
+                                                }
+                                            } else {
+                                                quote! { #expr }
+                                            }
+                                        };
+
+                                        attr_code.extend(quote! {
+                                            write!(f, "{}", azumi::Escaped(&(#output_expr)))?;
+                                        });
+                                    }
+                                    
+                                    attr_code.extend(quote! { write!(f, "\"")?; });
+                                    continue;
+                                }
+                                // Fallback to generic handler if parsing fails (unlikely, but safe)
                             }
                             _ => {}
                         }
@@ -1512,6 +1578,34 @@ fn generate_body_with_context(
         stream.extend(chunk);
     }
     stream
+}
+
+
+/// Helper to reconstruct dashed class names from binary subtraction expressions
+/// e.g. `my - card` (Expr::Binary) -> "my-card"
+fn reconstruct_dashed_name(expr: &syn::Expr) -> Option<String> {
+    match expr {
+        syn::Expr::Path(path) => {
+            if let Some(ident) = path.path.get_ident() {
+                Some(ident.to_string())
+            } else {
+                None 
+            }
+        },
+        syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(i), .. }) => {
+            Some(i.base10_digits().to_string())
+        },
+        syn::Expr::Binary(bin) => {
+            if let syn::BinOp::Sub(_) = bin.op {
+                let left = reconstruct_dashed_name(&bin.left)?;
+                let right = reconstruct_dashed_name(&bin.right)?;
+                Some(format!("{}-{}", left, right))
+            } else {
+                None
+            }
+        },
+        _ => None
+    }
 }
 
 #[cfg(test)]
