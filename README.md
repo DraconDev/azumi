@@ -65,6 +65,7 @@ Azumi includes the **most comprehensive web framework education platform** with 
 | **13** | Form Patterns         | Live forms with server validation                  |
 | **14** | Component Composition | Complex UIs with live components                   |
 | **15** | Full Application      | Complete todo app pattern                          |
+| **16** | Async Database        | Real-world `sqlx` database integration             |
 
 ### 🎓 **Try the Interactive Learning Platform**
 
