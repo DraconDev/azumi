@@ -14,13 +14,13 @@ pub struct UserLoader {
 
 #[azumi::live_impl(component = "user_loader_view")]
 impl UserLoader {
-    pub fn load_users(&mut self) {
+    pub async fn load_users(&mut self) {
         // 1. Optimistic Update: Set loading=true instantly
         self.loading = true;
         self.error = None;
 
-        // 2. Simulate Server Delay (in real app, this would be DB call)
-        std::thread::sleep(std::time::Duration::from_secs(1));
+        // 2. Real Async Delay (non-blocking!)
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
         // 3. Update State
         self.users = vec![
@@ -31,11 +31,11 @@ impl UserLoader {
         self.loading = false;
     }
 
-    pub fn load_fail(&mut self) {
+    pub async fn load_fail(&mut self) {
         self.loading = true;
         self.error = None;
 
-        std::thread::sleep(std::time::Duration::from_secs(1));
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
         self.loading = false;
         self.error = Some("Network timeout: Could not reach user database.".to_string());
