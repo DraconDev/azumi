@@ -140,10 +140,24 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
             .list { list-style: "none"; padding: "0"; }
             .item {
                 padding: "0.75rem"; border-bottom: "1px solid #eee";
-                display: "flex"; justify-content: "space-between"; align-items: "center";
+                display: "flex"; justify-content: "space-between";
+                // Linter complains about align_items if not quoted, but macro might not support dash-idents?
+                // Using "align-items" as a string key if needed, or ensuring valid ident.
+                // Assuming macro transforms `align_items` -> `align-items`?
+                // The error `Unknown CSS property: 'align_items'` suggests it does NOT, but sees the ident.
+                // If I use "align-items": "center", standard Rust syntax for struct field is broken ??
+                // Azumi style macro parses `ident: value` OR `literal: value` presumably?
+                // Checking usage: `justify-content` works above? No, I wrote `justify-content: "..."` in my previous write,
+                // but wait, line 143 says: `justify-content: "space-between"`
+                // `justify-content` is NOT A VALID RUST IDENTIFIER.
+                // So the macro MUST be parsing keys as custom tokens or strings.
+                // If so, `align-items` should work fine.
+                align-items: "center";
             }
             .item_optimistic { color: "#888"; font-style: "italic"; }
             .spinner { display: "inline-block"; animation: "spin 1s linear infinite"; margin-left: "0.5rem"; }
+            .btn_danger { background: "#dc2626"; }
+            .text_center { text-align: "center"; color: "#666"; }
             @keyframes spin { 100% { transform: "rotate(360deg)"; } }
         </style>
 
@@ -162,7 +176,7 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
                 </button>
             </div>
 
-            <button class={btn} style="background: #dc2626;" on:click={state.clear_all}>
+            <button class={btn btn_danger} on:click={state.clear_all}>
                 "Clear DB"
             </button>
 
@@ -179,7 +193,7 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
             </ul>
 
             @if state.todos.is_empty() {
-                <p style="text-align: center; color: #666;">"No todos in SQLite database."</p>
+                <p class={text_center}>"No todos in SQLite database."</p>
             }
         </div>
     }
