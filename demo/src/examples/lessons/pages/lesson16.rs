@@ -135,30 +135,30 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
             <meta charset="utf-8" />
             <title>"Lesson 16: Async Database"</title>
             <style>
-                "body { font-family: system-ui; background: #fff; margin: 0; }"
-                ".container { max-width: '500px'; margin: '0 auto'; padding: '2rem'; }"
-                ".header { text-align: 'center'; color: '#333'; }"
-                ".input_group { display: 'flex'; gap: '0.5rem'; margin-bottom: '1rem'; }"
-                ".input { flex: '1'; padding: '0.5rem'; border: '1px solid #ccc'; border-radius: '4px'; }"
-                ".btn { padding: '0.5rem 1rem'; background: '#2563eb'; color: 'white'; border: 'none'; border-radius: '4px'; cursor: 'pointer'; }"
-                ".btn:disabled { background: '#93c5fd'; }"
-                ".list { list-style: 'none'; padding: '0'; }"
-                ".item { padding: '0.75rem'; border-bottom: '1px solid #eee'; display: 'flex'; justify-content: 'space-between'; align-items: 'center'; }"
-                ".item_optimistic { color: '#888'; font-style: 'italic'; }"
-                ".spinner { display: 'inline-block'; animation: 'spin 1s linear infinite'; margin-left: '0.5rem'; }"
-                ".btn_danger { background: '#dc2626'; }"
-                ".text_center { text-align: 'center'; color: '#666'; }"
-                "@keyframes spin { 100% { transform: 'rotate(360deg)'; } }"
+                .body { font-family: "system-ui"; background: "#fff"; margin: "0"; }
+                .container { max-width: "500px"; margin: "0 auto"; padding: "2rem"; }
+                .header { text-align: "center"; color: "#333"; }
+                .input_group { display: "flex"; gap: "0.5rem"; margin-bottom: "1rem"; }
+                .input { flex: "1"; padding: "0.5rem"; border: "1px solid #ccc"; border-radius: "4px"; }
+                .btn { padding: "0.5rem 1rem"; background: "#2563eb"; color: "white"; border: "none"; border-radius: "4px"; cursor: "pointer"; }
+                .btn:disabled { background: "#93c5fd"; }
+                .list { list-style: "none"; padding: "0"; }
+                .item { padding: "0.75rem"; border-bottom: "1px solid #eee"; display: "flex"; justify-content: "space-between"; align-items: "center"; }
+                .item_optimistic { color: "#888"; font-style: "italic"; }
+                .spinner { display: "inline-block"; animation: "spin 1s linear infinite"; margin-left: "0.5rem"; }
+                .btn_danger { background: "#dc2626"; }
+                .text_center { text-align: "center"; color: "#666"; }
+                @keyframes spin { 100% { transform: "rotate(360deg)"; } }
             </style>
         </head>
-        <body>
-            <div class="container">
-                <h2 class="header">"Async SQLite Todo List"</h2>
+        <body class={body}>
+            <div class={container}>
+                <h2 class={header}>"Async SQLite Todo List"</h2>
 
-                <div class="input_group">
-                    <input class="input" type="text" name="input" value={state.input} placeholder="Add persistent todo..." />
+                <div class={input_group}>
+                    <input class={input} type="text" name="input" value={state.input} placeholder="Add persistent todo..." />
 
-                    <button class="btn" on:click={state.add_todo} disabled={state.loading}>
+                    <button class={btn} on:click={state.add_todo} disabled={state.loading}>
                         @if state.loading {
                             "Saving..."
                         } else {
@@ -167,11 +167,11 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
                     </button>
                 </div>
 
-                <button class="btn btn_danger" on:click={state.clear_all}>
+                <button class={btn_danger} on:click={state.clear_all}>
                     "Clear DB"
                 </button>
 
-                <ul class="list">
+                <ul class={list}>
                     @for todo in &state.todos {
                         <li class={if todo.id == -1 { "item item_optimistic" } else { "item" }}>
                             <span>
@@ -184,7 +184,7 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
                 </ul>
 
                 @if state.todos.is_empty() {
-                    <p class="text_center">"No todos in SQLite database."</p>
+                    <p class={text_center}>"No todos in SQLite database."</p>
                 }
             </div>
             <script src="/static/idiomorph.js"></script>
