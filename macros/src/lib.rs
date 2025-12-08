@@ -167,7 +167,6 @@ fn extract_styles(nodes: Vec<token_parser::Node>) -> (Vec<token_parser::StyleBlo
     for node in nodes {
         match node {
             token_parser::Node::Block(token_parser::Block::Style(style)) => {
-                eprintln!("DEBUG: Found style block. Global: {}", style.is_global);
                 styles.push(style);
             }
             _ => other_nodes.push(node),
@@ -182,12 +181,12 @@ fn process_styles(nodes: &[token_parser::Node]) -> (proc_macro2::TokenStream, St
     let mut scoped_css = String::new();
     let mut global_css = String::new();
 
-    eprintln!("DEBUG: process_styles called with {} nodes", nodes.len());
+
 
     for node in nodes {
         match node {
             token_parser::Node::Block(token_parser::Block::Style(style_block)) => {
-                eprintln!("DEBUG: process_styles found style block");
+
                 if style_block.is_global {
                     // Global styles: validate but don't scope, but DO generate bindings
                     let output = style::process_global_style_macro(style_block.content.clone());

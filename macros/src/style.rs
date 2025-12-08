@@ -269,34 +269,17 @@ fn validate_css_value(property: &str, value: &str) -> Result<(), String> {
     // Check for spaces in single-word values (common typo)
     let trimmed = value.trim();
 
-    if value.contains("white") {
-        eprintln!(
-            "DEBUG: validate_css_value checking '{}' for property '{}'. contains space? {}",
-            value,
-            property,
-            value.contains(' ')
-        );
-    }
+    if value.contains("white") {}
 
     if !is_multi_word_property(property) {
         // Properties that should be single tokens (no spaces)
         if trimmed.contains(' ') && !is_valid_space_in_value(property, trimmed) {
-            if value.contains("white") {
-                eprintln!("DEBUG: validate_css_value RETURNING ERROR for '{}'", value);
-            }
             return Err(format!(
                 "Unexpected space in value '{}'. Did you mean '{}'?",
                 value,
                 trimmed.replace(' ', "")
             ));
         }
-    }
-
-    if value.contains("white") {
-        eprintln!(
-            "DEBUG: validate_css_value PASSED space check for '{}'",
-            value
-        );
     }
 
     // Check for invalid units
@@ -447,16 +430,10 @@ fn validate_hex_color(value: &str) -> Option<String> {
 
 /// Process global style macro - validates but doesn't scope or generate bindings
 pub fn process_global_style_macro(input: TokenStream) -> StyleOutput {
-    eprintln!("DEBUG GLOBAL: input tokens: {}", input);
-
     // 1. Parse the input
     let style_input: StyleInput = match parse2(input.clone()) {
-        Ok(input) => {
-            eprintln!("DEBUG GLOBAL: Parse SUCCESS");
-            input
-        }
+        Ok(input) => input,
         Err(err) => {
-            eprintln!("DEBUG GLOBAL: Parse FAILED: {}", err);
             return StyleOutput {
                 bindings: err.to_compile_error(),
                 css: String::new(),
@@ -465,11 +442,7 @@ pub fn process_global_style_macro(input: TokenStream) -> StyleOutput {
     };
 
     // 2. Generate raw CSS (validation happens during parsing above)
-    eprintln!(
-        "DEBUG GLOBAL: number of parsed rules: {}, at_rules: {}",
-        style_input.rules.len(),
-        style_input.at_rules.len()
-    );
+
     let mut raw_css = String::new();
 
     // Add @rules first
@@ -499,10 +472,6 @@ pub fn process_global_style_macro(input: TokenStream) -> StyleOutput {
     // 3. Extract classes and IDs for bindings (even though not scoped)
     let (classes, ids) = extract_selectors(&raw_css);
 
-    eprintln!("DEBUG GLOBAL: raw_css: '{}'", raw_css);
-    eprintln!("DEBUG GLOBAL: extracted classes: {:?}", classes);
-    eprintln!("DEBUG GLOBAL: extracted ids: {:?}", ids);
-
     // 4. Generate Bindings for both classes and IDs (without scoping)
     let mut bindings = TokenStream::new();
 
@@ -524,8 +493,6 @@ pub fn process_global_style_macro(input: TokenStream) -> StyleOutput {
             let #ident = #id;
         });
     }
-
-    eprintln!("DEBUG GLOBAL: bindings tokens: {}", bindings);
 
     // 5. Return unscoped CSS with bindings
     StyleOutput {
@@ -559,13 +526,8 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
     // 4. Extract classes and IDs for bindings
     let (classes, ids) = extract_selectors(&raw_css);
 
-    eprintln!("DEBUG: raw_css: '{}'", raw_css);
-    eprintln!("DEBUG: extracted classes: {:?}", classes);
-    eprintln!("DEBUG: extracted ids: {:?}", ids);
-
     // 5. Scope the CSS (rename classes)
     let scoped_css = rename_css_selectors(&raw_css, &scope_id);
-    eprintln!("DEBUG: scoped_css: '{}'", scoped_css);
 
     // 6. Generate Bindings for both classes and IDs
     let mut bindings = TokenStream::new();
@@ -574,7 +536,6 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
     for class in classes {
         // Skip dashed class names - they can only be used via class="..." syntax
         if class.contains('-') {
-            eprintln!("DEBUG: Skipping binding for dashed class '{}'", class);
             continue;
         }
         let snake_name = class.to_snake_case();
@@ -590,7 +551,6 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
     // Skip dashed IDs - they can only be used via id="..." syntax
     for id in ids {
         if id.contains('-') {
-            eprintln!("DEBUG: Skipping binding for dashed ID '{}'", id);
             continue;
         }
         let ident = format_ident!("{}", id);
@@ -599,8 +559,6 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
             let #ident = #id;
         });
     }
-
-    eprintln!("DEBUG: bindings tokens: {}", bindings);
 
     StyleOutput {
         bindings,
@@ -614,7 +572,6 @@ pub fn reconstruct_css_from_tokens(input: TokenStream) -> String {
     let style_input: StyleInput = match parse2(input) {
         Ok(input) => input,
         Err(e) => {
-            eprintln!("DEBUG: reconstruct_css_from_tokens failed to parse: {}", e);
             return String::new();
         }
     };
