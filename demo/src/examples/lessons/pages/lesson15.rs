@@ -159,73 +159,72 @@ pub fn todo_app_view<'a>(state: &'a TodoApp) -> impl Component + 'a {
     }
 }
 
+/// Full page component for Lesson 15
+#[azumi::component]
+pub fn lesson15_page<'a>(state: &'a TodoApp) -> impl Component + 'a {
+    html! {
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>"Lesson 15: Full Application"</title>
+            <style>
+                body {
+                    font-family: "system-ui, sans-serif";
+                    margin: "0";
+                    padding: "2rem";
+                    background: "#fafafa";
+                }
+                .container { max-width: "800px"; margin: "0 auto"; }
+                .header { text-align: "center"; margin-bottom: "2rem"; }
+                .main_title { font-size: "2rem"; color: "#333"; }
+                .subtitle { color: "#666"; }
+                .demo_area { display: "flex"; justify-content: "center"; margin: "2rem 0"; }
+                .explanation {
+                    background: "#e8f5e9";
+                    padding: "1.5rem";
+                    border-radius: "8px";
+                    margin: "2rem 0";
+                }
+                .filter_btn_g { padding: "0.5rem 1rem"; border: "1px solid #ddd"; border-radius: "4px"; background: "white"; cursor: "pointer"; }
+                .filter_active_g { background: "#2196f3"; color: "white"; border-color: "#2196f3"; }
+            </style>
+        </head>
+        <body>
+            <div class={container}>
+                <header class={header}>
+                    <h1 class={main_title}>"Lesson 15: Full Application"</h1>
+                    <p class={subtitle}>"Building a complete interactive todo app"</p>
+                </header>
+
+                <div class={explanation}>
+                    <h3>"🚀 Putting It All Together"</h3>
+                    <ul>
+                        <li><strong>"Multiple actions"</strong>" - add, toggle filter, clear"</li>
+                        <li><strong>"Conditional rendering"</strong>" - empty state vs items"</li>
+                        <li><strong>"Optimistic updates"</strong>" - instant count changes"</li>
+                    </ul>
+                </div>
+
+                <div class={demo_area}>
+                    @todo_app_view(state = state)
+                </div>
+            </div>
+            // Scripts injected automatically
+        </body>
+        </html>
+    }
+}
+
 // Handler for Axum
-pub async fn lesson15_handler() -> axum::response::Html<String> {
+pub async fn lesson15_handler() -> impl axum::response::IntoResponse {
     let app_state = TodoApp {
         show_completed: false,
         item_count: 0,
     };
-
-    use todo_app_view_component::Props;
-    let app_html = azumi::render_to_string(&todo_app_view_component::render(
-        Props::builder().state(&app_state).build().expect("props"),
-    ));
-
-    let html = format!(
-        r#"<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lesson 15: Full Application</title>
-    <style>
-        body {{ 
-            font-family: system-ui, sans-serif; 
-            margin: 0;
-            padding: 2rem;
-            background: #fafafa;
-        }}
-        .container {{ max-width: 800px; margin: 0 auto; }}
-        .header {{ text-align: center; margin-bottom: 2rem; }}
-        .main_title {{ font-size: 2rem; color: #333; }}
-        .subtitle {{ color: #666; }}
-        .demo_area {{ display: flex; justify-content: center; margin: 2rem 0; }}
-        .explanation {{
-            background: #e8f5e9;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 2rem 0;
-        }}
-        .filter_btn {{ padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer; }}
-        .filter_active {{ background: #2196f3; color: white; border-color: #2196f3; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1 class="main_title">Lesson 15: Full Application</h1>
-            <p class="subtitle">Building a complete interactive todo app</p>
-        </header>
-        
-        <div class="explanation">
-            <h3>🚀 Putting It All Together</h3>
-            <ul>
-                <li><strong>Multiple actions</strong> - add, toggle filter, clear</li>
-                <li><strong>Conditional rendering</strong> - empty state vs items</li>
-                <li><strong>Optimistic updates</strong> - instant count changes</li>
-            </ul>
-        </div>
-        
-        <div class="demo_area">
-            {}
-        </div>
-    </div>
-    <script src="/static/idiomorph.js"></script>
-    <script src="/static/azumi.js"></script>
-</body>
-</html>"#,
-        app_html
-    );
-
-    axum::response::Html(html)
+    use lesson15_page_component::Props;
+    let page =
+        lesson15_page_component::render(Props::builder().state(&app_state).build().expect("props"));
+    axum::response::Html(azumi::render_to_string(&page))
 }

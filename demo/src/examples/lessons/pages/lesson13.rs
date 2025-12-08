@@ -183,5 +183,9 @@ pub fn lesson13_page<'a>(state: &'a ContactForm) -> impl Component + 'a {
 // Handler for Axum
 pub async fn lesson13_handler() -> impl axum::response::IntoResponse {
     let form_state = ContactForm { submitted: false };
-    axum::response::Html(azumi::render_to_string(&lesson13_page(&form_state)))
+    use lesson13_page_component::Props;
+    let page = lesson13_page_component::render(
+        Props::builder().state(&form_state).build().expect("props"),
+    );
+    axum::response::Html(azumi::render_to_string(&page))
 }
