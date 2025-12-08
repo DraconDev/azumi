@@ -140,18 +140,6 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
             .list { list-style: "none"; padding: "0"; }
             .item {
                 padding: "0.75rem"; border-bottom: "1px solid #eee";
-                display: "flex"; justify-content: "space-between";
-                // Linter complains about align_items if not quoted, but macro might not support dash-idents?
-                // Using "align-items" as a string key if needed, or ensuring valid ident.
-                // Assuming macro transforms `align_items` -> `align-items`?
-                // The error `Unknown CSS property: 'align_items'` suggests it does NOT, but sees the ident.
-                // If I use "align-items": "center", standard Rust syntax for struct field is broken ??
-                // Azumi style macro parses `ident: value` OR `literal: value` presumably?
-                // Checking usage: `justify-content` works above? No, I wrote `justify-content: "..."` in my previous write,
-                // but wait, line 143 says: `justify-content: "space-between"`
-                // `justify-content` is NOT A VALID RUST IDENTIFIER.
-                // So the macro MUST be parsing keys as custom tokens or strings.
-                // If so, `align-items` should work fine.
                 align-items: "center";
             }
             .item_optimistic { color: "#888"; font-style: "italic"; }
