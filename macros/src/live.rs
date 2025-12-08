@@ -306,6 +306,13 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             // Keep original method
             original_methods.push(quote! { #method });
 
+            let is_async = method.sig.asyncness.is_some();
+            let method_call = if is_async {
+                quote! { state.#method_name().await; }
+            } else {
+                quote! { state.#method_name(); }
+            };
+
             // Generate Axum handler
             let handler = if let Some(comp_name) = &component_name {
                 let comp_mod = format_ident!("{}_component", comp_name);
@@ -313,7 +320,7 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                     pub async fn #handler_name(
                         axum::extract::Json(mut state): axum::extract::Json<#struct_name>
                     ) -> impl axum::response::IntoResponse {
-                        state.#method_name();
+                        #method_call
 
                         // Re-render the component with new state
                         let html = azumi::render_to_string(&#comp_mod::render(
@@ -336,7 +343,7 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                     pub async fn #handler_name(
                         axum::extract::Json(mut state): axum::extract::Json<#struct_name>
                     ) -> impl axum::response::IntoResponse {
-                        state.#method_name();
+                        #method_call
                         axum::response::Json(state)
                     }
 
