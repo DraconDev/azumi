@@ -482,7 +482,7 @@ pub fn like_view<'a>(state: &'a LikeButton) -> impl Component + 'a {
 
 ### Lesson 13: Form Handling
 
-**Goal:** Build forms with server actions
+**Goal:** Build forms with manual state management
 
 ```rust
 #[azumi::live]
