@@ -464,6 +464,38 @@ impl Counter {
     pub fn toggle(&mut self) {
         self.active = !self.active;
     }
+
+    // Async action (Optimistic + Server-Side)
+    pub async fn load_data(&mut self) {
+        self.active = true;
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await; // Non-blocking!
+        self.count = 42;
+    }
+}
+```
+
+### Async Database Integration
+
+You can use `sqlx` directly in your async live actions. The UI can update optimistically while the DB operation happens in the background.
+
+```rust
+impl TodoList {
+    pub async fn add_todo(&mut self) {
+        // 1. Optimistic Update (Instant feedback)
+        self.todos.push(Todo { id: -1, text: self.input.clone() });
+        let input_val = self.input.clone();
+        self.input.clear();
+
+        // 2. Real Async DB Operation
+        sqlx::query("INSERT INTO todos (text) VALUES (?)")
+            .bind(input_val)
+            .execute(&*POOL) // Use a global or injected pool
+            .await
+            .unwrap();
+
+        // 3. Re-fetch for consistency (updates IDs, etc.)
+        self.refresh_from_db().await;
+    }
 }
 ```
 
