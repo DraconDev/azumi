@@ -85,7 +85,6 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
                     "- Decrement"
                 </button>
                 <button class={btn btn_danger ml_md} on:click={state.toggle}>
-                // <button class={btn btn_danger "cake"} on:click={state.toggle} style={"margin-left: 1rem;"} id={toggle_button1}>
                     "Toggle Status"
                 </button>
             </div>

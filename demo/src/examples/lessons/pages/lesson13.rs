@@ -122,70 +122,66 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
     }
 }
 
+/// Full page component ensuring script injection
+#[azumi::component]
+pub fn lesson13_page(state: &ContactForm) -> impl Component {
+    html! {
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>"Lesson 13: Form Handling"</title>
+            <style>
+                body {
+                    font-family: "system-ui, sans-serif";
+                    margin: "0";
+                    padding: "2rem";
+                    background: "#fafafa";
+                }
+                .container { max-width: "800px"; margin: "0 auto"; }
+                .header { text-align: "center"; margin-bottom: "2rem"; }
+                .main_title { font-size: "2rem"; color: "#333"; }
+                .subtitle { color: "#666"; }
+                .demo_area { display: "flex"; justify-content: "center"; margin: "2rem 0"; }
+                .explanation {
+                    background: "#e3f2fd";
+                    padding: "1.5rem";
+                    border-radius: "8px";
+                    margin: "2rem 0";
+                }
+                .btn { padding: "0.75rem 1.5rem"; border: "none"; border-radius: "6px"; font-size: "1rem"; cursor: "pointer"; width: "100%"; }
+                .btn_secondary { background: "#757575"; color: "white"; }
+            </style>
+        </head>
+        <body>
+            <div class={container}>
+                <header class={header}>
+                    <h1 class={main_title}>"Lesson 13: Form Handling"</h1>
+                    <p class={subtitle}>"Building forms with Azumi Live"</p>
+                </header>
+
+                <div class={explanation}>
+                    <h3>"📝 Form Patterns"</h3>
+                    <ul>
+                        <li><strong>"Submit action"</strong>" - Toggles submitted state"</li>
+                        <li><strong>"Reset action"</strong>" - Clears form state"</li>
+                        <li><strong>"Conditional rendering"</strong>" - Shows form or success message"</li>
+                    </ul>
+                </div>
+
+                <div class={demo_area}>
+                    {contact_form_view(state)}
+                </div>
+            </div>
+            // Compiler will inject scripts here automatically
+        </body>
+        </html>
+    }
+}
+
 // Handler for Axum
-pub async fn lesson13_handler() -> axum::response::Html<String> {
+pub async fn lesson13_handler() -> impl axum::response::IntoResponse {
     let form_state = ContactForm { submitted: false };
-
-    use contact_form_view_component::Props;
-    let form_html = azumi::render_to_string(&contact_form_view_component::render(
-        Props::builder().state(&form_state).build().expect("props"),
-    ));
-
-    let html = format!(
-        r#"<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lesson 13: Form Handling</title>
-    <style>
-        body {{ 
-            font-family: system-ui, sans-serif; 
-            margin: 0;
-            padding: 2rem;
-            background: #fafafa;
-        }}
-        .container {{ max-width: 800px; margin: 0 auto; }}
-        .header {{ text-align: center; margin-bottom: 2rem; }}
-        .main_title {{ font-size: 2rem; color: #333; }}
-        .subtitle {{ color: #666; }}
-        .demo_area {{ display: flex; justify-content: center; margin: 2rem 0; }}
-        .explanation {{
-            background: #e3f2fd;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 2rem 0;
-        }}
-        .btn {{ padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; width: 100%; }}
-        .btn_secondary {{ background: #757575; color: white; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1 class="main_title">Lesson 13: Form Handling</h1>
-            <p class="subtitle">Building forms with Azumi Live</p>
-        </header>
-        
-        <div class="explanation">
-            <h3>📝 Form Patterns</h3>
-            <ul>
-                <li><strong>Submit action</strong> - Toggles submitted state</li>
-                <li><strong>Reset action</strong> - Clears form state</li>
-                <li><strong>Conditional rendering</strong> - Shows form or success message</li>
-            </ul>
-        </div>
-        
-        <div class="demo_area">
-            {}
-        </div>
-    </div>
-    <script src="/static/idiomorph.js"></script>
-    <script src="/static/azumi.js"></script>
-</body>
-</html>"#,
-        form_html
-    );
-
-    axum::response::Html(html)
+    axum::response::Html(azumi::render_to_string(&lesson13_page(&form_state)))
 }
