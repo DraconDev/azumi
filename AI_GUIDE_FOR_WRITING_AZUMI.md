@@ -618,7 +618,63 @@ pub fn LiveCounter(state: &Counter) -> impl Component {
 -   When a prediction updates `count`, the corresponding DOM element updates instantly
 -   Supports nested properties: `data-bind="user.profile.name"`
 
-// (Manual binding required - see Lesson 13)
+### Form Binding with Structs
+
+```rust
+struct UserRegistration {
+    username: String,
+    email: String,
+    password: String,
+}
+
+#[azumi::component]
+pub fn RegistrationForm() -> impl Component {
+    html! {
+        <style>
+            .form { display: "grid"; gap: "1rem"; max-width: "400px"; }
+            .input { padding: "0.5rem"; border: "1px solid #ddd"; }
+        </style>
+        <form class={form} bind={UserRegistration}>
+            <input class={input} name="username" type="text" placeholder="Username" />
+            <input class={input} name="email" type="email" placeholder="Email" />
+            <input class={input} name="password" type="password" placeholder="Password" />
+            <button type="submit">"Register"</button>
+        </form>
+    }
+}
+```
+
+### Nested Form Binding
+
+```rust
+struct UserProfile {
+    name: String,
+    address: Address,
+}
+
+struct Address {
+    street: String,
+    city: String,
+}
+
+#[azumi::component]
+pub fn ProfileForm() -> impl Component {
+    html! {
+        <form bind={UserProfile}>
+            <input name="name" type="text" placeholder="Full name" />
+            <input name="address.street" type="text" placeholder="Street address" />
+            <input name="address.city" type="text" placeholder="City" />
+        </form>
+    }
+}
+```
+
+**Form Binding Rules:**
+
+-   Field names must match struct field names (case-sensitive)
+-   Nested fields use dot notation: `address.street`
+-   Compile-time validation prevents typos in field names
+-   Supports all form elements: `<input>`, `<select>`, `<textarea>`
 
 ---
 

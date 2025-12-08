@@ -124,7 +124,7 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
 
 /// Full page component ensuring script injection
 #[azumi::component]
-pub fn lesson13_page(state: &ContactForm) -> impl Component {
+pub fn lesson13_page<'a>(state: &'a ContactForm) -> impl Component + 'a {
     html! {
         <!DOCTYPE html>
         <html>
@@ -171,7 +171,7 @@ pub fn lesson13_page(state: &ContactForm) -> impl Component {
                 </div>
 
                 <div class={demo_area}>
-                    {contact_form_view(state)}
+                    @contact_form_view(state = state)
                 </div>
             </div>
             // Compiler will inject scripts here automatically
