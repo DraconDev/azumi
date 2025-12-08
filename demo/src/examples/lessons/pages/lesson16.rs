@@ -140,7 +140,7 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
             .list { list-style: "none"; padding: "0"; }
             .item {
                 padding: "0.75rem"; border-bottom: "1px solid #eee";
-                display: "flex"; justify-content: "space-between"; align_items: "center";
+                display: "flex"; justify-content: "space-between"; align-items: "center";
             }
             .item_optimistic { color: "#888"; font-style: "italic"; }
             .spinner { display: "inline-block"; animation: "spin 1s linear infinite"; margin-left: "0.5rem"; }
