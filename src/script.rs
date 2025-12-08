@@ -8,6 +8,7 @@ pub const AZUMI_JS: &str = include_str!("client.min.js");
 ///
 /// Usage:
 /// ```rust
+/// use azumi::html;
 /// html! {
 ///     <head>
 ///         @AzumiScript
