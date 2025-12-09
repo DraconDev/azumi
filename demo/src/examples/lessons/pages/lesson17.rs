@@ -1,8 +1,8 @@
-use axum::response::IntoResponse;
+use axum::response::{Html, IntoResponse};
 use azumi::prelude::*;
 
 #[azumi::component]
-fn Lesson17() -> Html {
+fn Lesson17() -> Html<String> {
     let container_class = "lesson-container";
     let img_style = "border: 2px solid red; width: 100px;";
 
@@ -20,5 +20,5 @@ fn Lesson17() -> Html {
 }
 
 pub async fn handler() -> impl IntoResponse {
-    Lesson17::new().to_html()
+    Lesson17::render(Lesson17::Props::builder().build().unwrap())
 }
