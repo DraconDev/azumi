@@ -15,30 +15,6 @@ impl SecureCounter {
     }
 }
 
-#[azumi::component]
-fn secure_view<'a>(state: &'a SecureCounter) -> impl Component + 'a {
-    let count_class = "count";
-    let admin_status = if state.is_admin {
-        "Admin Mode"
-    } else {
-        "User Mode"
-    };
-
-    html! {
-        <div>
-            <h2>"Security Verification"</h2>
-            <p>"If you inspect the DOM, you will see a signature in the az-scope attribute."</p>
-            <p>"State: " {admin_status}</p>
-
-            <div class={count_class}>
-                "Count: " {state.count}
-            </div>
-
-            <button on:click={state.increment}>"Secure Increment"</button>
-        </div>
-    }
-}
-
 // -----------------------------------------------------------------------------
 // VERIFICATION TEST
 // -----------------------------------------------------------------------------
