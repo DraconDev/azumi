@@ -13,6 +13,7 @@ mod schema;
 mod style;
 mod test_spacing;
 mod token_parser;
+mod asset_rewriter;
 
 use proc_macro::TokenStream;
 use quote::{quote, quote_spanned};
