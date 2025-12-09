@@ -1,47 +1,16 @@
 use axum::{
-    extract::{Extension, Request},
-    http::StatusCode,
-    middleware::{self, Next},
-    response::{Html, IntoResponse, Redirect, Response},
+    response::{Html, IntoResponse, Redirect},
     RequestPartsExt,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use azumi::prelude::*;
 
-// -----------------------------------------------------------------------------
-// MOCK AUTH MIDDLEWARE
-// -----------------------------------------------------------------------------
-
-#[derive(Clone, Debug)]
-pub struct User {
-    pub username: String,
-}
-
-pub async fn auth_middleware(mut request: Request, next: Next) -> Result<Response, StatusCode> {
-    let headers = request.headers();
-
-    // In a real app, you would check a session cookie or JWT here.
-    // For this demo, we verify a simple query param ?login=true or a cookie.
-
-    let jar = CookieJar::from_headers(headers);
-    if let Some(user_cookie) = jar.get("azumi_user") {
-        // User is logged in via cookie
-        request.extensions_mut().insert(User {
-            username: user_cookie.value().to_string(),
-        });
-        Ok(next.run(request).await)
-    } else {
-        // User is NOT logged in. Redirect to login page?
-        // For this lesson, we just let them pass but without the User extension
-        // so the page can show a "Login" button.
-        Ok(next.run(request).await)
-    }
-}
+// Define where our auth logic lives (usually this is 'crate::auth')
+use super::super::components::auth_infra::{CurrentUser, User};
 
 // -----------------------------------------------------------------------------
-// LIVE COMPONENT
+// 1. LIVE STATE
 // -----------------------------------------------------------------------------
-
 #[azumi::live]
 pub struct AuthState {
     pub username: Option<String>,
@@ -50,20 +19,13 @@ pub struct AuthState {
 #[azumi::live_impl(component = "auth_view")]
 impl AuthState {
     pub fn logout(&mut self) {
-        // In a real app, this would clear the cookie via a server header.
-        // Since Azumi Live actions return HTML/JSON updates, we can't easily set headers *yet*
-        // on the response without the `Response` unification we did in macro.
-        // Actually, we can just clear the state, and the client side cookie management
-        // would need to happen via JS or a proper endpoint.
-        // For this demo, we'll simulate it by clearing state.
         self.username = None;
     }
 }
 
 // -----------------------------------------------------------------------------
-// VIEW
+// 2. COMPONENT
 // -----------------------------------------------------------------------------
-
 #[azumi::component]
 fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
     html! {
@@ -76,7 +38,6 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
              .status_box { background: "#f8fafc"; padding: "1.5rem"; border-radius: "8px"; text-align: "center"; margin-top: "1.5rem"; border: "1px solid #e2e8f0"; }
              .btn { background: "#2563eb"; color: "white"; border: "none"; padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "600"; cursor: "pointer"; text-decoration: "none"; display: "inline-block"; }
              .btn:hover { background: "#1d4ed8"; }
-             .btn_secondary { background: "#64748b"; margin-left: "1rem"; }
              .explanation { margin-top: "2rem"; color: "#666"; font-size: "0.9rem"; }
         </style>
 
@@ -84,20 +45,17 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
             <div class={card}>
                 <div class={header}>
                     <h1 class={title}>"Lesson 19: Authentication"</h1>
-                    <p class={subtitle}>"Integration with Axum Middleware"</p>
+                    <p class={subtitle}>"Simplified with Reusable Extractors"</p>
                 </div>
-
-                <p>"This page demonstrates how Azumi plays nicely with standard Axum middleware."</p>
 
                 <div class={status_box}>
                     @if let Some(user) = &state.username {
                         <h3>"Welcome back, " {user} "!"</h3>
-                        <p>"You are authenticated via Axum middleware."</p>
+                        <p>"Authenticated via shared middleware."</p>
                         <button class={btn} on:click={state.logout}>"Mock Logout"</button>
                     } else {
                         <h3>"You are Guest"</h3>
-                        <p>"The middleware did not find a session cookie."</p>
-                        // Link effectively acts as a login action by setting cookie
+                        <p>"No session found."</p>
                         <a href="/lesson-19-login" class={btn}>"Simulate Login"</a>
                     }
                 </div>
@@ -106,9 +64,9 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
             <div class={explanation}>
                 <p><strong>"How it works:"</strong></p>
                 <ol>
-                    <li>"Axum Middleware runs BEFORE the Azumi handler."</li>
-                    <li>"It checks for cookies/tokens and inserts a `User` struct into `req.extensions()`."</li>
-                    <li>"The Azumi handler extracts this `User` and initializes the LiveState."</li>
+                    <li>"Middleware validates cookies and sets `User` extension."</li>
+                    <li>"Handler uses `CurrentUser` extractor (zero boilerplate)."</li>
+                    <li>"State is initialized with user data."</li>
                 </ol>
             </div>
         </div>
@@ -116,65 +74,15 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
 }
 
 // -----------------------------------------------------------------------------
-// ARCHITECTURE EXPLANATION: THE BRIDGE PATTERN
-// -----------------------------------------------------------------------------
-//
-// Azumi components (The UI) are isolated from HTTP details.
-// Axum Middleware (The Guard) knows HTTP but doesn't know your UI.
-//
-// We use the HANDLER as the "Bridge" to pass data from Middleware -> UI.
-//
-// ┌──────────────────────┐      ┌─────────────────────────┐      ┌──────────────────────┐
-// │   1. Middleware      │      │       2. Handler        │      │    3. Component      │
-// │  (HTTP Layer)        │───►  │    (The Bridge)         │───►  │     (UI Layer)       │
-// │                      │      │                         │      │                      │
-// │ checks cookies       │      │ extracts User struct    │      │ receives User struct │
-// │ inserts User struct  │      │ via axum::Extension     │      │ via Props            │
-// │ into req.extensions  │      │ initializes State       │      │ renders welcome msg  │
-// └──────────────────────┘      └─────────────────────────┘      └──────────────────────┘
-
-// -----------------------------------------------------------------------------
-// CONVENIENCE PATTERN: AUTO-EXTRACTION
-// -----------------------------------------------------------------------------
-// Instead of extracting Extension manually in every handler,
-// we implement FromRequestParts for our State struct.
-//
-// This moves the "Bridge" logic into a reusable trait implementation.
-
-use axum::extract::FromRequestParts;
-use axum::http::request::Parts;
-
-#[axum::async_trait]
-impl<S> FromRequestParts<S> for AuthState
-where
-    S: Send + Sync,
-{
-    type Rejection = std::convert::Infallible;
-
-    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
-        // 1. We use standard Axum extraction logic here
-        // We look for the Extension<Option<User>> that middleware inserted
-        let Extension(user) = parts
-            .extract::<Extension<Option<User>>>()
-            .await
-            .unwrap_or(Extension(None));
-
-        // 2. We construct the Azumi State directly
-        Ok(AuthState {
-            username: user.map(|u| u.username),
-        })
-    }
-}
-
-// -----------------------------------------------------------------------------
-// HANDLERS (Now much cleaner!)
+// 3. HANDLER
 // -----------------------------------------------------------------------------
 
-pub async fn handler(
-    // MAGIC: The compiler calls from_request_parts automatically!
-    state: AuthState,
-) -> impl IntoResponse {
-    // Zero boilerplate! We just use the state.
+// Look how clean this is! No traits, no complex imports.
+// We just ask for `CurrentUser` from our infrastructure.
+pub async fn handler(CurrentUser(user): CurrentUser) -> impl IntoResponse {
+    let state = AuthState {
+        username: user.map(|u| u.username),
+    };
 
     use auth_view_component::*;
     let html = azumi::render_to_string(&render(Props::builder().state(&state).build().unwrap()));
@@ -186,11 +94,9 @@ pub async fn handler(
 }
 
 pub async fn login_handler(jar: CookieJar) -> impl IntoResponse {
-    // Set a cookie and redirect back
     let cookie = Cookie::build(("azumi_user", "Dracon"))
         .path("/")
         .http_only(true)
         .build();
-
     (jar.add(cookie), Redirect::to("/lesson-19-auth"))
 }
