@@ -24,11 +24,10 @@ pub fn layout_example() -> impl azumi::Component {
         </style>
         <div>
             <h2 class={layout_title}>"Container with Children"</h2>
-            
-                @container() {
-                    <p>"This content is passed as children"</p>
-                    <p>"Children can be any valid Azumi components"</p>
-                }
+
+            @container() {
+                <p>"This content is passed as children"</p>
+                <p>"Children can be any valid Azumi components"</p>
             }
         </div>
     }
