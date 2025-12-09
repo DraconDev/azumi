@@ -38,6 +38,7 @@ The server matches the Purists (SSOT), but compiles optimistic predictions into 
 | **Asset Pipeline**      | **Built-in** 🟢      | Built-in 🟢         | External (Trunk) 🟡 | Built-in 🟢         | External 🔴     | External 🔴       | Built-in 🟢      |
 | **Form Handling**       | **Struct Bind** 🟢   | Manual/RHF 🔴       | Manual/Signals 🟡   | Form Actions 🟢     | Standard 🟢     | Manual 🔴         | FormHelpers 🟡   |
 | **Image Opt.**          | **Automatic** 🟢     | `<Image/>` Prop. 🟡 | Manual 🔴           | Enhanced `<img>` 🟢 | Manual 🔴       | Manual 🔴         | Manual 🔴        |
+| **Testing Story**       | **Browserless** 🟢   | JSDOM/Cypress 🔴    | Wasm-bindgen 🟡     | Vitest/JSDOM 🟡     | E2E Only 🟡     | Standard Unit 🟢  | System Tests 🟢  |
 | **SEO**                 | **100%** 🟢          | Good 🟡             | Weak 🔴             | Good 🟡             | 100% 🟢         | 100% 🟢           | 100% 🟢          |
 | **Dev Complexity**      | Medium 🟡            | High 🔴             | High 🔴             | Medium 🟡           | Low 🟢          | Low 🟢            | Low 🟢           |
 | **Build Tooling**       | Cargo (Simple) 🟢    | Webpack (Hard) 🔴   | Cargo (Simple) 🟢   | Vite (Good) 🟢      | None 🟢         | Cargo (Simple) 🟢 | Bundler 🟡       |
