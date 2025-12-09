@@ -26,7 +26,7 @@ impl AuthState {
 // -----------------------------------------------------------------------------
 // 2. COMPONENT
 // -----------------------------------------------------------------------------
-use crate::examples::lessons::components::layout::DarkModernLayout;
+use crate::examples::lessons::components::layout::DarkModernLayout as Layout;
 
 #[azumi::component]
 fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
@@ -47,7 +47,7 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
              }
         </style>
 
-        @DarkModernLayout {
+        @Layout {
             <div class={auth_container}>
                 <div class={card}>
                     <div class={header}>
