@@ -34,7 +34,7 @@ Azumi is a **compiler-driven optimistic UI framework** that generates client-sid
 }
 ```
 
-### 1. **CSS Classes (`class={...}`)**
+### 2. CSS Classes (`class={...}`)
 
 -   **Strict Snake Case:** All CSS classes MUST be `snake_case`. Dashes (`-`) are **BANNED** in class names (e.g., Use `.my_card`, NOT `.my-card`).
 -   **Bracket Syntax ONLY:** You must use brackets with variables. Static strings usage (`class="..."`) is **BANNED**.
@@ -62,7 +62,7 @@ html! {
 }
 ```
 
-### 2. **IDs (`id={...}`)**
+### 3. IDs (`id={...}`)
 
 -   Same rules as classes: **Snake Case** and **Bracket Syntax ONLY**.
 -   `id="..."` is **BANNED**.
@@ -76,7 +76,7 @@ html! {
 }
 ```
 
-### 3. **Inline Styles (`style={...}`)**
+### 4. Inline Styles (`style={...}`)
 
 -   Use the **Style DSL** with brackets.
 -   `style="..."` string syntax is **BANNED**.
@@ -89,7 +89,7 @@ html! {
 // <div style="--color: red">...</div>
 ```
 
-### 3. Live State Requires Component Link
+### 5. Live State Requires Component Link
 
 ```rust
 // State definition

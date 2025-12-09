@@ -1,11 +1,8 @@
-use axum::{
-    response::{Html, IntoResponse, Redirect},
-    RequestPartsExt,
-};
+use axum::response::{Html, IntoResponse, Redirect};
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use azumi::prelude::*;
 
-use super::super::components::auth_infra::{CurrentUser, User};
+use super::super::components::auth_infra::CurrentUser;
 
 // -----------------------------------------------------------------------------
 // 1. LIVE STATE
