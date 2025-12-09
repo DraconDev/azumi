@@ -43,6 +43,7 @@ async fn main() {
         .route("/lesson-14", get(examples::lessons::pages::lesson14::lesson14_handler))
         .route("/lesson-15", get(examples::lessons::pages::lesson15::lesson15_handler))
         .route("/lesson-16", get(examples::lessons::pages::lesson16::lesson16_handler))
+        .route("/lesson-17", get(examples::lessons::pages::lesson17::Lesson17))
         .route("/unified-demo", get(examples::live_component_demo::unified_demo_handler))
 
         // 🎮 Interactive Demo Endpoints
