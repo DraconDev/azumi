@@ -100,7 +100,7 @@ pub fn lesson4() -> impl azumi::Component {
             .examples { display: "grid"; gap: "20px"; }
             .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
         </style>
-        @layout_mod::DarkModernLayout() {
+        @DarkModernLayout() {
             <div>
                 <header class={header}>
                     <h1 class={main_title}>"Lesson 5: Children Pattern"</h1>
