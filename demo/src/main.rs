@@ -8,6 +8,11 @@ use axum::{
 };
 use tower_http::services::ServeDir; 
 
+// Include the generated assets manifest
+pub mod assets {
+    include!(concat!(env!("OUT_DIR"), "/assets_manifest.rs"));
+} 
+
 #[tokio::main]
 async fn main() {
     // 🚀 Azumi Demo Server - Complete Learning Path
