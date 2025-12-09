@@ -1468,6 +1468,41 @@ pub struct MyState {
 }
 ```
 
+### The "Automatic" Pattern (Recommended)
+
+To avoid manually extracting `Extension` in every handler, you can implement `FromRequestParts` for your state struct. This makes auth feel "built-in".
+
+1.  **Implement the Trait**:
+
+    ```rust
+    use axum::extract::FromRequestParts;
+    use axum::http::request::Parts;
+
+    #[axum::async_trait]
+    impl<S> FromRequestParts<S> for MyState
+    where S: Send + Sync
+    {
+        type Rejection = std::convert::Infallible;
+
+        async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+            let Extension(user) = parts
+                .extract::<Extension<Option<User>>>()
+                .await
+                .unwrap_or(Extension(None));
+
+            Ok(MyState { user })
+        }
+    }
+    ```
+
+2.  **Use it cleanly**:
+    ```rust
+    // Look! No manual linking code. It just works.
+    pub async fn my_handler(state: MyState) -> impl IntoResponse {
+        azumi::render(&view(&state))
+    }
+    ```
+
 ### ❌ Missing State Reference in Component
 
 ```rust
