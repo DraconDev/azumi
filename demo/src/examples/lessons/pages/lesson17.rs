@@ -7,6 +7,12 @@ fn Lesson17() -> impl Component {
     let img_style = "border: 2px solid red; width: 100px;";
 
     html! {
+        <style>
+            .lesson-container {
+                border: 1px solid black;
+                padding: 20px;
+            }
+        </style>
         <div class={container_class}>
             <h1>"Lesson 17: Asset Pipeline"</h1>
             <p>"This image path should be rewritten to include a hash:"</p>
