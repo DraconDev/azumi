@@ -1523,10 +1523,10 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a { }
 
 ```rust
 // WRONG - direct CSS properties
-<div style="width: 50%; background: red;"></div>
+<div style={width: "50%"; background: "red"}></div>
 
 // CORRECT - only CSS custom properties
-<div style="--width: 0.5; --color: red;"></div>
+<div style={--width: "0.5"; --color: "red"}></div>
 ```
 
 ### ❌ Missing Script Include
@@ -1647,7 +1647,7 @@ Common error patterns and solutions:
 | Event         | `on:event={state.method}`              | `on:click={state.increment}`                         |
 | Class         | `class={class_name}`                   | `class={my_button}`                                  |
 | Style         | `<style>` or `<style global>`          | `<style> .btn { } </style>`                          |
-| Dynamic Style | `style="--var: {value}"`               | `style="--color: red"`                               |
+| Dynamic Style | `style={--var: value}`                 | `style={--color: "red"}`                             |
 | Conditional   | `{if cond { a } else { b }}`           | `{if active { "On" } else { "Off" }}`                |
 | Loop          | `@for item in items { }`               | `@for item in &list { <div>{item}</div> }`           |
 | Pattern Match | `@match value { }`                     | `@match status { "ok" => {} _ => {} }`               |
