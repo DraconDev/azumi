@@ -5,64 +5,7 @@ use axum::{
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use azumi::prelude::*;
 
-// -----------------------------------------------------------------------------
-// 1. INFRASTRUCTURE (The "Plumbing")
-// -----------------------------------------------------------------------------
-
-// The User Model
-#[derive(Clone, Debug)]
-pub struct User {
-    pub username: String,
-}
-
-// The Extractor (The "Bridge")
-// This allows us to ask for `CurrentUser` in our handler!
-pub struct CurrentUser(pub Option<User>);
-
-#[axum::async_trait]
-impl<S> axum::extract::FromRequestParts<S> for CurrentUser
-where
-    S: Send + Sync,
-{
-    type Rejection = std::convert::Infallible;
-
-    async fn from_request_parts(
-        parts: &mut axum::http::request::Parts,
-        _state: &S,
-    ) -> Result<Self, Self::Rejection> {
-        let axum::Extension(user) = parts
-            .extract::<axum::Extension<Option<User>>>()
-            .await
-            .unwrap_or(axum::Extension(None));
-        Ok(CurrentUser(user))
-    }
-}
-
-// The Middleware (The "Security Guard")
-use axum::{
-    body::Body,
-    http::{Request, StatusCode},
-    middleware::Next,
-    response::Response,
-};
-
-pub async fn auth_middleware(mut req: Request<Body>, next: Next) -> Response {
-    let jar = CookieJar::from_headers(req.headers());
-
-    // Check for "azumi_user" cookie
-    let user = if let Some(cookie) = jar.get("azumi_user") {
-        Some(User {
-            username: cookie.value().to_string(),
-        })
-    } else {
-        None
-    };
-
-    // Insert user into request extensions (The "Badge")
-    req.extensions_mut().insert(user);
-
-    next.run(req).await
-}
+use super::super::components::auth_infra::{CurrentUser, User};
 
 // -----------------------------------------------------------------------------
 // 1. LIVE STATE
