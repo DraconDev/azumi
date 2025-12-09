@@ -109,3 +109,69 @@ If you switch from **Cookies** to **JWT Tokens**:
 ### C. Testing
 
 Extractors are easier to unit test because they are self-contained logic units.
+
+## 4. Real World Examples (The "Why")
+
+Here are 3 scenarios where the Phase 3 (Extractor) pattern saves you massive headaches.
+
+### Scenario A: The "Paid Feature" Gate
+
+**Goal**: Only allow users with a "Pro" subscription.
+
+-   **Old Way (Manual)**:
+
+    ```rust
+    pub async fn generate_report(Extension(user): Extension<User>) -> Result<...> {
+        if !user.is_pro {
+             return Err(AppError::UpgradeRequired); // ⚠️ You must copy-paste this 20 times
+        }
+        // ... logic
+    }
+    ```
+
+-   **New Way (Extractor)**:
+
+    ```rust
+    pub struct ProUser(pub User); // The Extractor does the check!
+
+    pub async fn generate_report(ProUser(user): ProUser) -> Result<...> {
+        // 🔒 Guaranteed to be Pro. No if-statements needed.
+        // ... logic
+    }
+    ```
+
+### Scenario B: Multi-Tenant Data (SaaS)
+
+**Goal**: Ensure every DB query uses the correct Organization ID.
+
+-   **Old Way (Manual)**:
+
+    ```rust
+    pub async fn list_todos(Extension(user): Extension<User>) {
+        let org_id = user.org_id; // ⚠️ Easy to forget used "user.id" instead
+        db::query("SELECT * FROM todos WHERE org_id = ?", org_id)...
+    }
+    ```
+
+-   **New Way (Extractor)**:
+    ```rust
+    pub async fn list_todos(
+        Tenant(org_id): Tenant // 🔒 Extractor grabs Org ID from URL/Header/User automatically
+    ) {
+        db::query("SELECT * FROM todos WHERE org_id = ?", org_id)...
+    }
+    ```
+
+### Scenario C: Feature Flags
+
+**Goal**: Only show this page if "Beta 2.0" feature is enabled in Redis.
+
+-   **Old Way**:
+    Fetch Redis client -> Check Flag -> If false, 404. (Repeated in every new handler).
+
+-   **New Way**:
+    ```rust
+    pub async fn new_dashboard(
+        _gate: FeatureGate<"new_dashboard"> // 🔒 One line to protect the route!
+    ) { ... }
+    ```
