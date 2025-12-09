@@ -120,5 +120,48 @@ pub async fn handler(
 | **Why Change?**   | N/A                     | We need to know **who** is asking. |
 | **Best Practice** | `fn handler()`          | `fn handler(user: CurrentUser)`    |
 
-**Conclusion:**
-You weren't "ignoring" middleware before; you just didn't have any middleware running! Now that we added security features, we need a clean way to pipe that security context into your UI. The `CurrentUser` pattern is the cleanest pipe available.
+---
+
+## 4. The "Two Layers" of Security: Auth vs. Integrity
+
+You asked: _"I am not even sure if state could be changed on the client?"_ and _"Didn't Axum handle this?"_
+
+There are two completely different security problems we solved in Phase 3. It is crucial not to mix them up.
+
+### Layer 1: The Bouncer (Authentication - Lesson 19)
+
+-   **The Problem:** "Who acts?"
+-   **The Risk:** A stranger walks in and deletes data.
+-   **The Solution:** **Middleware** (Cookies/Sessions).
+-   **Why Axum didn't "just do it":** Axum is a framework (like a toolbox). It has the _tools_ to build a lock (middleware system), but it doesn't know _who_ has the key to your house. We had to write the logic to check _your_ specific cookies.
+
+### Layer 2: The Wax Seal (State Integrity - Lesson 18)
+
+-   **The Problem:** "Can I lie?"
+-   **The Risk:** A valid user (Dracon) is logged in, but they open the Browser Console and hack the state JSON:
+    ```js
+    // Malicious Client Logic
+    state.is_admin = true; // 😈 Trying to hack
+    ```
+    _Without_ protection, the server might believe this modified state!
+-   **The Solution:** **Signed State (HMAC)**.
+    -   Azumi now signs the state: `{"is_admin": false, "_sig": "d82...be1"}`.
+    -   If the user changes `false` to `true`, the signature `d82...` will no longer match.
+    -   The server rejects the request.
+
+### Summary: The Complete Shield
+
+| Layer         | Question                      | Protection Mechanism     | Lesson |
+| :------------ | :---------------------------- | :----------------------- | :----- |
+| **Integrity** | "Is this data tampered with?" | **Signed State** (HMAC)  | 18     |
+| **Auth**      | "Who is this person?"         | **Middleware** (Cookies) | 19     |
+
+**"Before" (Lessons 0-17):**
+
+-   We had **No Auth**: Anyone could see anything.
+-   We had **No Integrity**: A skilled hacker _could_ have modified the state Client-Side to trigger actions they shouldn't (if we had sensitive actions).
+
+**"Now":**
+
+-   **Lesson 18** ensures nobody can tamper with the data in the browser.
+-   **Lesson 19** ensures only the right people can see the page.
