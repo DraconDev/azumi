@@ -1,6 +1,6 @@
 use crate::css::{extract_selectors, rename_css_selectors};
 use heck::ToSnakeCase;
-use lightningcss::stylesheet::{ParserOptions, StyleSheet};
+use lightningcss::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
 use proc_macro2::{TokenStream, TokenTree};
 use quote::{format_ident, quote};
 use std::collections::hash_map::DefaultHasher;
@@ -496,8 +496,8 @@ pub fn process_global_style_macro(input: TokenStream) -> StyleOutput {
 
     // 5. Return unscoped CSS with bindings
     StyleOutput {
-        bindings,     // Now includes bindings for global styles!
-        css: raw_css, // Unscoped CSS
+        bindings,                  // Now includes bindings for global styles!
+        css: minify_css(&raw_css), // Unscoped CSS (minified)
     }
 }
 
@@ -562,7 +562,7 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
 
     StyleOutput {
         bindings,
-        css: scoped_css,
+        css: minify_css(&scoped_css),
     }
 }
 
@@ -914,4 +914,24 @@ fn is_valid_css_property(name: &str) -> bool {
     ];
 
     valid_properties.contains(&name)
+}
+
+/// Minify CSS using lightningcss
+fn minify_css(css: &str) -> String {
+    let parse_options = ParserOptions::default();
+    // We treat all CSS as a full stylesheet for parsing simplification
+    // For scoped CSS, this is fine as rename_css_selectors produces valid CSS.
+    if let Ok(stylesheet) = StyleSheet::parse(css, parse_options) {
+        let print_options = PrinterOptions {
+            minify: true,
+            // Keep original targets if possible, or use standard defaults
+            ..PrinterOptions::default()
+        };
+        if let Ok(minified) = stylesheet.to_css(print_options) {
+            return minified.code;
+        }
+    }
+
+    // Fallback: simple whitespace/cleanup if parsing (unexpectedly) fails
+    css.trim().to_string()
 }
