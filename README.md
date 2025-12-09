@@ -1,96 +1,168 @@
 # 🚀 Azumi: The Compiler-Driven Web Framework
 
-> **Zero JavaScript. 100% Rust. Instant UI.**
+> **Zero JavaScript. 100% Rust. Compile-Time Safe.**
 
-Azumi is a revolutionary web framework that brings **compile-time safety** to the entire frontend stack. It validates your HTML, scopes your CSS, and generates optimistic UI updates from your Rust code—all before you even run the app.
-
-[Start Learning (interactive demo)](http://localhost:3000) | [Documentation (docs.rs)](https://docs.rs/azumi)
+Azumi is a paradigm-shifting web framework that eliminates entire classes of runtime errors by moving them to compile-time. It validates your HTML structure, scopes your CSS automatically, and generates optimistic client-side predictions from your Rust code—all without you writing a single line of JavaScript.
 
 ---
 
-## ⚡ Why Azumi?
+## 📦 The Azumi Ecosystem
 
-### 1. Compiler-Driven Optimistic UI (Zero Latency)
+Azumi is more than just a crate. It is a complete ecosystem for building production-grade web applications.
 
-Write standard Rust struct methods. The compiler analyzes your mutations (`self.count += 1`) and generates the equivalent JavaScript for you.
+### 1. `azumi` (The Core Framework)
 
--   **Result**: Instant UI updates (0ms latency) without writing a single line of JS.
--   **Fallback**: The server always executes the logic. If the client prediction was wrong, it is corrected automatically.
+The engine powering everything. It includes the `html!` macro, the component system, local state management, and the `syn`-based compiler that generates client-side logic.
 
-### 2. The "Impossible Bug" Guarantee
+-   [Crate Documentation](https://docs.rs/azumi)
+-   [Source Code](https://github.com/DraconDev/azumi)
 
-Azumi catches errors at compile time that most frameworks miss until runtime:
+### 2. `azumi-starter` (The Production Template)
 
--   ✅ **HTML Validation**: `<img>` missing `alt`? Compile Error.
--   ✅ **CSS Co-Validation**: Used `.btn_primary` in HTML but forgot it in `<style>`? Compile Error.
--   ✅ **Type-Safe Forms**: Field names checked against Rust structs.
+**Start here for new apps.** A pre-configured, microservice-ready boilerplate.
 
-### 3. Production Ready (Phase 3 Complete)
+-   **Stack**: Azumi + Axum + SQLx (Postgres) + Redis.
+-   **Architecture**: gRPC-ready (includes clients for Auth/Payment services).
+-   **Security**: Pre-configured with the **Phase 3 Auth Extractor Pattern**.
+-   **Usage**:
+    ```bash
+    git clone https://github.com/azumi/azumi-starter my-app
+    cd my-app
+    cargo run
+    ```
 
--   🔒 **Signed State**: All client state is HMAC-SHA256 signed. Tampering is impossible.
--   📦 **Asset Pipeline**: Automatic content-hashing (`logo.a8b9c7d6.png`) for cache busting.
--   🔑 **Type-Safe Auth**: Extractors (`fn handler(user: AdminUser)`) enforce security at the type level.
+### 3. `demo` (The Learning Platform)
+
+An interactive educational platform built _with_ Azumi, _for_ learning Azumi.
+
+-   **Content**: 20 Interactive Lessons (Hello World → Advanced Auth).
+-   **Usage**:
+    ```bash
+    cd demo
+    cargo run
+    # Visit http://localhost:3000 to start learning.
+    ```
 
 ---
 
-## 🛠️ Quick Start
+## 🛡️ Core Pillars
 
-### 1. Define Live State
+### 1. CSS-HTML Co-Validation
+
+Azumi is the only framework that validates the relationship between your styles and your markup at compile time.
+
+```rust
+html! {
+    <style>
+        .btn_primary { ... }
+    </style>
+
+    // ✅ Compiles: Class exists in scope
+    <button class={btn_primary}>"Click Me"</button>
+
+    // ❌ Compile Error: 'btn_prmary' not found in style block!
+    // <button class={btn_prmary}>"Typo"</button>
+}
+```
+
+### 2. Compiler-Driven Optimistic UI (Zero-Latency)
+
+Write standard Rust methods. The compiler analyzes your code and generates instant client-side predictions.
 
 ```rust
 #[azumi::live]
-pub struct Counter {
-    pub count: i32,
-}
+pub struct Counter { count: i32 }
 
 #[azumi::live_impl(component = "counter_view")]
 impl Counter {
-    // This Rust code runs on the server AND allows the compiler
-    // to generate a client-side prediction!
     pub fn increment(&mut self) {
+        // compiler generates: `state.count = state.count + 1` (JS)
         self.count += 1;
     }
 }
 ```
 
-### 2. Build the UI
+**Result**: 0ms latency for the user. The server runs the real logic asynchronously and corrects the client if it was wrong (Smart Reconciliation).
 
-```rust
-#[azumi::component]
-fn counter_view(state: &Counter) -> impl Component {
-    html! {
-        <style>
-            .btn { @apply bg-blue-500 text-white p-2 rounded; }
-        </style>
+### 3. Signed State Security (HMAC-SHA256)
 
-        <div>
-            <h1>"Count: " {state.count}</h1>
-            // Declarative Event Binding
-            <button on:click={state.increment} class={btn}>
-                "Increment"
-            </button>
-        </div>
-    }
-}
-```
+Client-side state is cryptographically signed.
+
+-   Consumers cannot tamper with `is_admin` flags.
+-   Replay attacks are prevented via nonces.
+-   **Zero Config**: It works automatically out of the box.
 
 ---
 
-## 📚 Project Structure
+## 🎨 Styling System
 
--   **`azumi`**: The Core Framework (Macros + Runtime).
--   **`azumi-starter`**: A Microservice-ready template with generic Auth/Payment gRPC clients.
--   **`demo`**: The Interactive Learning Platform.
-    -   Run `cd demo && cargo run` to access **20 Interactive Lessons**.
+### Automatic Scoping
 
-## 🗺️ Roadmap (v0.2)
+Forget BEM. Forget CSS Modules.
 
--   **Refined CLI**: `cargo azumi new`
--   **Testing Suite**: Enhanced network simulation.
--   **Granular Performance**: Advanced diffing algorithms.
+```rust
+// In Rust: .card { ... }
+// Output:  .card-s7a9f2 { ... }
+```
+
+Styles defined in `<style>` blocks are automatically scoped to the component.
+
+### Dynamic Styles
+
+Pass Rust variables directly into CSS variables.
+
+```rust
+<div class={progress_bar} style="--width: {state.percent}%; --color: {state.color}">
+```
+
+_Note_: Inline `style="..."` strings are BANNED. You must use the typed `--var` syntax.
+
+---
+
+## 🔒 Authentication Patterns
+
+Azumi promotes the **Extractor Pattern** for type-safe security.
+
+**Old Way (Middleware manual check):**
+❌ `handler(Extension(user))` -> `if !user.is_admin { return Error }`
+
+**Azumi Way (Type-Driven):**
+✅ `handler(user: AdminUser)`
+
+The handler _cannot run_ unless the user is authenticated and authorized. This logic is centralized in reusable Extractors found in `azumi-starter`.
+
+---
+
+## 🚀 Production Features (Phase 3)
+
+### Asset Pipeline
+
+-   **Auto-Hashing**: `logo.png` -> `logo.a8b9c7d6.png` for immutable caching.
+-   **Auto-Rewriting**: `html! { <img src="/logo.png"> }` rewrites the path automatically.
+-   **Minification**: CSS in `<style>` blocks is stripped of whitespace at compile time.
+
+### Forms
+
+-   **Data Binding**: `bind={StructName}` ensures your form fields match your Rust server structs.
+-   **CSRF**: Built-in double-submit protection.
+
+---
+
+## 🔮 Roadmap (v0.2)
+
+1.  **CLI Tool**: `cargo azumi new` for instant scaffolding.
+2.  **Testing**: Expanded simulation suite (`azumi::test`) for slow-network rehearsal.
+3.  **Performance**: Granular DOM diffing algorithms.
 
 ---
 
 ## 📄 License
 
-MIT License. Built with ❤️ in Rust.
+MIT License.
+
+---
+
+**Ready to build?**
+
+-   **New App**: Clone [`azumi-starter`](./azumi-starter)
+-   **Learn**: Run [`demo`](./demo)
