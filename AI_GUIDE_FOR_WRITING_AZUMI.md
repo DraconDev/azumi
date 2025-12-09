@@ -1355,7 +1355,19 @@ impl Counter { /* ... */ }
 <button on:click={state.increment}>
 ```
 
-## 🔐 Authentication & Middleware
+## 🔐 Security & Authentication
+
+### Automatic State Signing (Anti-Tampering)
+
+Azumi protects all Live Component state with **HMAC-SHA256 signatures**.
+
+-   **Mechanism:** When state is serialized to the client, it is signed with a server-side secret.
+-   **Protection:** If a client manipulates the `az-scope` JSON (e.g. changing `is_admin: false` to `true`), the signature verification will fail on the next action.
+-   **Result:** The server rejects the action with `400 Bad Request`.
+
+You do not need to "enable" this; it is on by default for all `#[azumi::live]` components.
+
+### Authentication Middleware
 
 ### The Data Bridge Pattern
 
@@ -1578,6 +1590,86 @@ Common error patterns and solutions:
 2. **Component Link Errors**: Ensure `#[azumi::live_impl(component = "name")]` matches component name
 3. **Event Binding Errors**: Use `on:click={state.method}` not closures
 4. **HTML Validation Errors**: Check required attributes (alt, href, labels)
+
+---
+
+## 🧪 Testing Patterns
+
+Azumi provides a specialized `test` module for verifying components without a browser.
+
+### 1. Unit Testing Rendering
+
+Verify that your HTML structure and classes are correct.
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use azumi::test;
+
+    #[test]
+    fn test_card_render() {
+        let props = Card::Props::builder()
+            .title("Hello".into())
+            .build()
+            .unwrap();
+
+        let html = test::render(&Card::render(props));
+
+        // Assert existence of selectors and text content
+        test::assert_selector(&html, ".card_title", Some("Hello"));
+    }
+}
+```
+
+### 2. Simulating Live Logic
+
+Verify your state transitions and action logic.
+
+```rust
+#[test]
+fn test_counter_logic() {
+    // 1. Initialize simulation with state
+    let mut sim = test::simulate(Counter { count: 0 });
+
+    // 2. Perform actions directly
+    sim.act(Counter::increment);
+
+    // 3. Assert new state
+    assert_eq!(sim.state.count, 1);
+}
+```
+
+---
+
+## 🖼️ Image Optimization
+
+Azumi automatically optimizates images to improve Core Web Vitals (LCP).
+
+### Automatic Enhancements
+
+When you use a standard `<img>` tag, the compiler enhances it:
+
+```rust
+// Input
+<img src="/photo.jpg" alt="A photo" width="800" height="600" />
+
+// Output (Compiler Generated)
+<img
+    src="/photo.jpg"
+    alt="A photo"
+    width="800"
+    height="600"
+    loading="lazy"
+    decoding="async"
+/>
+```
+
+### Optimization Rules
+
+1.  **Lazy Loading:** Added by default unless `loading="eager"` is specified.
+2.  **Async Decoding:** Added by default for smoother scrolling.
+3.  **Asset Hashing:** `src` paths are rewritten to include content hashes for long-term caching (e.g. `/assets/photo.a1b2c3.jpg`).
 
 ---
 

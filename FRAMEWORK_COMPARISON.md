@@ -20,26 +20,28 @@ The server matches the Purists (SSOT), but compiles optimistic predictions into 
 
 ## 📊 The "Big Table": Comprehensive Framework Analysis
 
-| Feature Dimension       | **Azumi** 🦀         | **Next.js** ⚛️      | **Leptos** 🕸️       | **Svelte 5** 🟠 | **HTMX** 🔌     | **Maud** 📝       | **Rails** 💎     |
-| :---------------------- | :------------------- | :------------------ | :------------------ | :-------------- | :-------------- | :---------------- | :--------------- |
-| **Language**            | Rust                 | TypeScript          | Rust                | TypeScript      | HTML Refs       | Rust              | Ruby             |
-| **Primary Paradigm**    | Compiler-Driven      | Hybrid SSR          | WASM SPA            | Compiler SPA    | HTML-over-wire  | Pure SSR          | MVC SSR          |
-| **Initial JS Size**     | **< 3kb** 🟢         | ~80kb 🔴            | ~150kb 🔴           | ~15kb 🟡        | ~14kb 🟡        | **0kb** 🟢        | ~30kb 🟡         |
-| **Time to Interactive** | **Instant** 🟢       | Delayed (JS) 🔴     | Delayed (WASM) 🔴   | Fast 🟡         | **Instant** 🟢  | **Instant** 🟢    | **Instant** 🟢   |
-| **Interaction Latency** | **~0-16ms** 🟢       | Varies (React) 🟡   | ~0-16ms 🟢          | ~0-16ms 🟢      | Network RTT 🔴  | Full Refresh 🔴   | Full Refresh 🔴  |
-| **Hydration Cost**      | **Zero** 🟢          | High (O(n)) 🔴      | High (Init) 🔴      | Low 🟡          | Zero 🟢         | Zero 🟢           | Zero 🟢          |
-| **State Source**        | Server + Opt.        | Client + Sync       | Client + Sync       | Client (Runes)  | Server          | Server            | Server           |
-| **Type Safety**         | **100% E2E** 🟢      | ~80% (API Gap) 🟡   | 100% E2E 🟢         | ~90% 🟡         | 0% (String) 🔴  | 100% Server 🟡    | 0% (Dynamic) 🔴  |
-| **Mem Safety**          | **Guaranteed** 🟢    | N/A (GC) 🟡         | **Guaranteed** 🟢   | N/A (GC) 🟡     | N/A             | **Guaranteed** 🟢 | N/A              |
-| **Scaling Cost**        | **$ (Low)** 🟢       | $$$ (Node) 🔴       | $ (Static) 🟢       | $ (Static) 🟢   | $ (Low) 🟢      | $ (Low) 🟢        | $$ (Ruby) 🟡     |
-| **Security**            | **Signed State** 🟢  | Trust Client 🔴     | Trust Client 🔴     | Trust Client 🔴 | Signed (opt) 🟡 | N/A               | Signed Cookie 🟢 |
-| **CSS Strategy**        | **Co-Validated** 🟢  | Modules/Tailwind 🟡 | Scoped 🟡           | Scoped 🟢       | Global 🔴       | None 🔴           | Global/Sass 🟡   |
-| **API Layer**           | **None (Direct)** 🟢 | REST/tRPC 🔴        | Server Fn 🟡        | Server Load 🟡  | HATEOAS 🟢      | None 🟢           | REST/MVC 🟡      |
-| **Asset Pipeline**      | **Built-in** 🟢      | Built-in 🟢         | External (Trunk) 🟡 | Built-in 🟢     | External 🔴     | External 🔴       | Built-in 🟢      |
-| **SEO**                 | **100%** 🟢          | Good 🟡             | Weak 🔴             | Good 🟡         | 100% 🟢         | 100% 🟢           | 100% 🟢          |
-| **Dev Complexity**      | Medium 🟡            | High 🔴             | High 🔴             | Medium 🟡       | Low 🟢          | Low 🟢            | Low 🟢           |
-| **Build Tooling**       | Cargo (Simple) 🟢    | Webpack (Hard) 🔴   | Cargo (Simple) 🟢   | Vite (Good) 🟢  | None 🟢         | Cargo (Simple) 🟢 | Bundler 🟡       |
-| **Ecoyystem**           | Small (Growing) 🟡   | Massive 🟢          | Medium 🟡           | Large 🟢        | Medium 🟡       | Niche 🟡          | Massive 🟢       |
+| Feature Dimension       | **Azumi** 🦀         | **Next.js** ⚛️      | **Leptos** 🕸️       | **Svelte 5** 🟠     | **HTMX** 🔌     | **Maud** 📝       | **Rails** 💎     |
+| :---------------------- | :------------------- | :------------------ | :------------------ | :------------------ | :-------------- | :---------------- | :--------------- |
+| **Language**            | Rust                 | TypeScript          | Rust                | TypeScript          | HTML Refs       | Rust              | Ruby             |
+| **Primary Paradigm**    | Compiler-Driven      | Hybrid SSR          | WASM SPA            | Compiler SPA        | HTML-over-wire  | Pure SSR          | MVC SSR          |
+| **Initial JS Size**     | **< 3kb** 🟢         | ~80kb 🔴            | ~150kb 🔴           | ~15kb 🟡            | ~14kb 🟡        | **0kb** 🟢        | ~30kb 🟡         |
+| **Time to Interactive** | **Instant** 🟢       | Delayed (JS) 🔴     | Delayed (WASM) 🔴   | Fast 🟡             | **Instant** 🟢  | **Instant** 🟢    | **Instant** 🟢   |
+| **Interaction Latency** | **~0-16ms** 🟢       | Varies (React) 🟡   | ~0-16ms 🟢          | ~0-16ms 🟢          | Network RTT 🔴  | Full Refresh 🔴   | Full Refresh 🔴  |
+| **Hydration Cost**      | **Zero** 🟢          | High (O(n)) 🔴      | High (Init) 🔴      | Low 🟡              | Zero 🟢         | Zero 🟢           | Zero 🟢          |
+| **State Source**        | Server + Opt.        | Client + Sync       | Client + Sync       | Client (Runes)      | Server          | Server            | Server           |
+| **Type Safety**         | **100% E2E** 🟢      | ~80% (API Gap) 🟡   | 100% E2E 🟢         | ~90% 🟡             | 0% (String) 🔴  | 100% Server 🟡    | 0% (Dynamic) 🔴  |
+| **Mem Safety**          | **Guaranteed** 🟢    | N/A (GC) 🟡         | **Guaranteed** 🟢   | N/A (GC) 🟡         | N/A             | **Guaranteed** 🟢 | N/A              |
+| **Scaling Cost**        | **$ (Low)** 🟢       | $$$ (Node) 🔴       | $ (Static) 🟢       | $ (Static) 🟢       | $ (Low) 🟢      | $ (Low) 🟢        | $$ (Ruby) 🟡     |
+| **Security**            | **Signed State** 🟢  | Trust Client 🔴     | Trust Client 🔴     | Trust Client 🔴     | Signed (opt) 🟡 | N/A               | Signed Cookie 🟢 |
+| **CSS Strategy**        | **Co-Validated** 🟢  | Modules/Tailwind 🟡 | Scoped 🟡           | Scoped 🟢           | Global 🔴       | None 🔴           | Global/Sass 🟡   |
+| **API Layer**           | **None (Direct)** 🟢 | REST/tRPC 🔴        | Server Fn 🟡        | Server Load 🟡      | HATEOAS 🟢      | None 🟢           | REST/MVC 🟡      |
+| **Asset Pipeline**      | **Built-in** 🟢      | Built-in 🟢         | External (Trunk) 🟡 | Built-in 🟢         | External 🔴     | External 🔴       | Built-in 🟢      |
+| **Form Handling**       | **Struct Bind** 🟢   | Manual/RHF 🔴       | Manual/Signals 🟡   | Form Actions 🟢     | Standard 🟢     | Manual 🔴         | FormHelpers 🟡   |
+| **Image Opt.**          | **Automatic** 🟢     | `<Image/>` Prop. 🟡 | Manual 🔴           | Enhanced `<img>` 🟢 | Manual 🔴       | Manual 🔴         | Manual 🔴        |
+| **SEO**                 | **100%** 🟢          | Good 🟡             | Weak 🔴             | Good 🟡             | 100% 🟢         | 100% 🟢           | 100% 🟢          |
+| **Dev Complexity**      | Medium 🟡            | High 🔴             | High 🔴             | Medium 🟡           | Low 🟢          | Low 🟢            | Low 🟢           |
+| **Build Tooling**       | Cargo (Simple) 🟢    | Webpack (Hard) 🔴   | Cargo (Simple) 🟢   | Vite (Good) 🟢      | None 🟢         | Cargo (Simple) 🟢 | Bundler 🟡       |
+| **Ecoyystem**           | Small (Growing) 🟡   | Massive 🟢          | Medium 🟡           | Large 🟢            | Medium 🟡       | Niche 🟡          | Massive 🟢       |
 
 ---
 
