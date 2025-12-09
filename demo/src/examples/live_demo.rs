@@ -34,6 +34,7 @@ impl LiveCounter {
 }
 
 /// Demo view component
+#[allow(dead_code)]
 pub fn live_counter_view(state: &LiveCounter) -> impl azumi::Component + '_ {
     html! {
         <style>
@@ -115,6 +116,7 @@ pub fn live_demo() -> impl azumi::Component {
     }
 }
 
+#[allow(dead_code)]
 pub async fn live_demo_handler() -> impl axum::response::IntoResponse {
     axum::response::Html(azumi::render_to_string(&live_demo()))
 }

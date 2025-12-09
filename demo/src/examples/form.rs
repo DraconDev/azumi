@@ -1,5 +1,6 @@
 use azumi::html;
 
+#[allow(dead_code)]
 pub fn form() -> impl azumi::Component {
     html! {
         <form>
