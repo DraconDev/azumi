@@ -146,10 +146,13 @@ version = "0.7.1241"
 dependencies = [
  "axum",
  "azumi-macros",
+ "base64 0.21.7",
+ "hmac",
  "inventory",
  "scraper",
  "serde",
  "serde_json",
+ "sha2",
 ]
 
 [[package]]
