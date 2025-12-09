@@ -9,7 +9,7 @@ fn main() {
     println!("cargo:rerun-if-changed=static");
 
     let out_dir = env::var("OUT_DIR").unwrap();
-    let dest_path = Path::new(&out_dir).as_path();
+    let dest_path = Path::new(&out_dir);
     let assets_dir = dest_path.join("assets");
 
     // Create output directory for hashed assets
@@ -19,6 +19,7 @@ fn main() {
     fs::create_dir_all(&assets_dir).unwrap();
 
     let mut map = phf_codegen::Map::new();
+    let mut map_entries = Vec::new();
 
     // Walk through static directory
     for entry in WalkDir::new("static")
@@ -70,7 +71,7 @@ fn main() {
         "pub static ASSETS: phf::Map<&'static str, &'static str> = "
     )
     .unwrap();
-    map.build(&mut file).unwrap();
+    write!(&mut file, "{}", map.build()).unwrap();
     write!(&mut file, ";\n").unwrap();
 
     // ALSO generate assets_manifest.json in CRATE ROOT for azumi-macros to read at compile time
