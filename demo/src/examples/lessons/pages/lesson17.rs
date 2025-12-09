@@ -12,7 +12,7 @@ fn Lesson17() -> impl Component {
                 padding: "20px";
             }
         </style>
-        <div class="lesson_container">
+        <div class={lesson_container}>
             <h1>"Lesson 17: Asset Pipeline"</h1>
             <p>"This image path should be rewritten to include a hash:"</p>
 
