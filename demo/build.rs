@@ -1,0 +1,74 @@
+use sha2::{Digest, Sha256};
+use std::env;
+use std::fs;
+use std::io::Write;
+use std::path::{Path, PathBuf};
+use walkdir::WalkDir;
+
+fn main() {
+    println!("cargo:rerun-if-changed=static");
+
+    let out_dir = env::var("OUT_DIR").unwrap();
+    let dest_path = Path::new(&out_dir).as_path();
+    let assets_dir = dest_path.join("assets");
+
+    // Create output directory for hashed assets
+    if assets_dir.exists() {
+        fs::remove_dir_all(&assets_dir).unwrap();
+    }
+    fs::create_dir_all(&assets_dir).unwrap();
+
+    let mut map = phf_codegen::Map::new();
+
+    // Walk through static directory
+    for entry in WalkDir::new("static")
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().is_file())
+    {
+        let path = entry.path();
+        let relative_path = path.strip_prefix("static").unwrap();
+
+        let content = fs::read(path).expect("Failed to read file");
+
+        // Compute Hash
+        let mut hasher = Sha256::new();
+        hasher.update(&content);
+        let hash = hasher.finalize();
+        let hash_hex = hex::encode(hash);
+        let short_hash = &hash_hex[0..8];
+
+        // Construct new filename: name.hash.ext
+        let stem = path.file_stem().unwrap().to_str().unwrap();
+        let ext = path.extension().unwrap_or_default().to_str().unwrap_or("");
+
+        let new_filename = if ext.is_empty() {
+            format!("{}.{}", stem, short_hash)
+        } else {
+            format!("{}.{}.{}", stem, short_hash, ext)
+        };
+
+        let new_path = assets_dir.join(&new_filename);
+        fs::write(&new_path, &content).expect("Failed to write hashed file");
+
+        // Original request path (e.g., "/static/logo.png")
+        let original_key = format!("/static/{}", relative_path.display());
+        // Hashed path relative to where we will serve it (e.g., "/assets/logo.a8b9.png")
+        // NOTE: We will mount the `assets` dir at `/assets` uri in main.rs
+        let hashed_value = format!("/assets/{}", new_filename);
+
+        map.entry(original_key, &format!("\"{}\"", hashed_value));
+    }
+
+    // Generate manifest.rs
+    let manifest_path = dest_path.join("assets_manifest.rs");
+    let mut file = fs::File::create(&manifest_path).unwrap();
+
+    write!(
+        &mut file,
+        "pub static ASSETS: phf::Map<&'static str, &'static str> = "
+    )
+    .unwrap();
+    map.build(&mut file).unwrap();
+    write!(&mut file, ";\n").unwrap();
+}
