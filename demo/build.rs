@@ -19,9 +19,10 @@ fn main() {
     fs::create_dir_all(&assets_dir).unwrap();
 
     let mut map = phf_codegen::Map::new();
-    let mut map_entries = Vec::new();
+    // Store tuples of (key, value_code, raw_hashed_path)
+    let mut entries = Vec::new();
 
-    // Walk through static directory
+    // Walk through static directory & Collect entries
     for entry in WalkDir::new("static")
         .into_iter()
         .filter_map(|e| e.ok())
@@ -55,14 +56,19 @@ fn main() {
         // Original request path (e.g., "/static/logo.png")
         let original_key = format!("/static/{}", relative_path.display());
         // Hashed path relative to where we will serve it (e.g., "/assets/logo.a8b9.png")
-        // NOTE: We will mount the `assets` dir at `/assets` uri in main.rs
         let hashed_value = format!("/assets/{}", new_filename);
+        // Quoted value for PHF codegen (it expects an expression string)
+        let value_code = format!("\"{}\"", hashed_value);
 
-        map_entries.push((original_key.clone(), hashed_value.clone()));
-        map.entry(&original_key, &format!("\"{}\"", hashed_value));
+        entries.push((original_key, value_code, hashed_value));
     }
 
-    // Generate manifest.rs for runtime use (in OUT_DIR)
+    // Populate the PHF map with long-lived references from `entries`
+    for (key, value_code, _) in &entries {
+        map.entry(key, value_code);
+    }
+
+    // Generate manifest.rs for runtime use
     let manifest_path = dest_path.join("assets_manifest.rs");
     let mut file = fs::File::create(&manifest_path).unwrap();
 
@@ -74,10 +80,9 @@ fn main() {
     write!(&mut file, "{}", map.build()).unwrap();
     write!(&mut file, ";\n").unwrap();
 
-    // ALSO generate assets_manifest.json in CRATE ROOT for azumi-macros to read at compile time
-    // This allows the macro to perform the rewrite logic by reading this file.
-    let json_map: std::collections::HashMap<String, String> =
-        map_entries.into_iter().map(|(k, v)| (k, v)).collect();
+    // Generate JSON manifest for macros
+    let json_map: std::collections::HashMap<&String, &String> =
+        entries.iter().map(|(k, _, v_raw)| (k, v_raw)).collect();
 
     let manifest_json_path = Path::new("assets_manifest.json");
     let json_file = fs::File::create(&manifest_json_path).unwrap();
