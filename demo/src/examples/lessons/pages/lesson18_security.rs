@@ -45,56 +45,37 @@ fn secure_view<'a>(state: &'a SecureCounter) -> impl Component + 'a {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use axum::http::StatusCode;
 
-    #[test]
-    fn test_signed_state_generation() {
+    #[tokio::test]
+    async fn test_implicit_security_rejection() {
         let state = SecureCounter {
             count: 10,
             is_admin: false,
         };
+        let signed_scope = state.to_scope();
 
-        // This fails if the macro doesn't generate sign_state()
-        let scope = state.to_scope();
-
-        println!("Generated Scope: {}", scope);
-
-        // Structure should be JSON|BASE64
-        assert!(
-            scope.contains('|'),
-            "Scope string must contain signature separator '|'"
+        // 1. Verify normal request works (Implicitly signed)
+        let response = __azumi_live_handlers::increment_handler(signed_scope.clone()).await;
+        assert_eq!(
+            response.status(),
+            StatusCode::OK,
+            "Valid signed state should be accepted"
         );
 
-        let parts: Vec<&str> = scope.split('|').collect();
-        assert_eq!(parts.len(), 2, "Scope string must have exactly two parts");
+        // 2. Simulate Attacker trying to modify state client-side
+        // They try to change is_admin to true without updating the signature
+        let tampered_scope = signed_scope.replace("false", "true");
 
-        // Verify we can parse the JSON part
-        let json = parts[0];
-        assert!(json.contains("\"count\":10"));
+        println!("Tampered Scope: {}", tampered_scope);
 
-        // Verify the security module accepts it
-        let verified = azumi::security::verify_state(&scope);
-        assert!(verified.is_ok(), "Generated state failed verification");
-        assert_eq!(verified.unwrap(), json);
-    }
-
-    #[test]
-    fn test_tamper_attempt() {
-        let state = SecureCounter {
-            count: 10,
-            is_admin: false,
-        };
-        let signed = state.to_scope();
-
-        // Attacker tries to make themselves admin!
-        let tampered = signed.replace("false", "true");
-
-        println!("Tampered Scope: {}", tampered);
-
-        // Verification MUST fail
-        let verified = azumi::security::verify_state(&tampered);
-        assert!(
-            verified.is_err(),
-            "Tampered state was accepted! Security FAILED."
+        // 3. Verify the handler REJECTS it automatically
+        // We didn't write any verification code in SecureCounter, but the macro provided it.
+        let response = __azumi_live_handlers::increment_handler(tampered_scope).await;
+        assert_eq!(
+            response.status(),
+            StatusCode::BAD_REQUEST,
+            "Tampered state should be rejected automatically"
         );
     }
 }
