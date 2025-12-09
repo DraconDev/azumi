@@ -622,18 +622,6 @@ pub fn auto_detected_view<'a>(state: &'a MyState) -> impl Component + 'a {
 <form on:submit={state.submit_form}>"Submit"</form>
 ```
 
-### Legacy: az-on DSL
-
-For backward compatibility, the original `az-on` syntax still works:
-
-```rust
-<div az-scope={serde_json::to_string(&state).unwrap()}>
-    <button az-on="click call increment -> this">
-        "Increment"
-    </button>
-</div>
-```
-
 ---
 
 ## 📋 Form Handling
