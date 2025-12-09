@@ -19,7 +19,7 @@ It keeps the server as the brain (like The Purists) but compiles optimistic clie
 
 ## 📊 The "Big Table": Comprehensive Framework Analysis
 
-| Feature Dimension       | **Azumi** 🦀       | **Next.js** ⚛️    | **Leptos** 🕸️     | **Svelte 5** 🟠 | **HTMX** 🔌    | **Maud** 📝       | **Rails** �     |
+| Feature Dimension       | **Azumi** 🦀       | **Next.js** ⚛️    | **Leptos** 🕸️     | **Svelte 5** 🟠 | **HTMX** 🔌    | **Maud** 📝       | **Rails** 💎    |
 | :---------------------- | :----------------- | :---------------- | :---------------- | :-------------- | :------------- | :---------------- | :-------------- |
 | **Language**            | Rust               | TypeScript        | Rust              | TypeScript      | HTML Refs      | Rust              | Ruby            |
 | **Primary Paradigm**    | Compiler-Driven    | Hybrid SSR        | WASM SPA          | Compiler SPA    | HTML-over-wire | Pure SSR          | MVC SSR         |
@@ -40,7 +40,22 @@ It keeps the server as the brain (like The Purists) but compiles optimistic clie
 
 ## 🧠 Architectural Deep Dive
 
-### 1. The "Hydration Tax" (Next.js / Svelte / Remix)
+### 1. The "Approximation Limit" of Pure SSR (Maud / Askama)
+
+Pure templating libraries like Maud are often pitched as "simple" and "fast". **This is a deceptive simplicity.**
+
+-   **The Problem:** They are a dead end. You write your entire site in Maud. It's fast. Then your boss asks for a mobile sidebar toggle.
+-   **The Cliff:** You now have to:
+    1.  Introduce a build step for JS.
+    2.  Write an API endpoint.
+    3.  Write client-side fetch logic.
+    4.  Manually sync the DOM state.
+-   **Azumi's Superiority:** Azumi _is_ Maud (a Rust macro that outputs HTML), but it **scales**.
+    -   **Cost:** You pay ~3kb for the runtime (negligible).
+    -   **Benefit:** The moment you need interactivity, you just add `on:click`. No refactoring. No new architecture.
+    -   **Verdict:** **Maud is premature optimization.** Azumi is the correct default for 99% of projects.
+
+### 2. The "Hydration Tax" (Next.js / Svelte / Remix)
 
 Modern "meta-frameworks" pay a double tax:
 
@@ -54,7 +69,7 @@ Modern "meta-frameworks" pay a double tax:
 -   No client-side component tree is rebuilt.
 -   The "runtime" is just a tiny event delegator.
 
-### 2. The "WASM Tax" (Leptos / Dioxus)
+### 3. The "WASM Tax" (Leptos / Dioxus)
 
 WASM frameworks promise native speeds, but they front-load the cost:
 
@@ -62,19 +77,6 @@ WASM frameworks promise native speeds, but they front-load the cost:
 2.  **Bridge Tax:** WASM cannot touch the DOM directly. Every `<div>` creation has to go through a JS bridge, which adds overhead.
 
 **Azumi's Advantage:** Azumi respects the platform. It uses standard HTML for rendering and tiny, surgical JS for interactions. It starts instantly, even on 3G.
-
-### 3. The "Latency Tax" (HTMX / Rails / LiveView)
-
-Hypermedia systems are beautiful in their simplicity, but they are bound by the speed of light:
-
-1.  **Network Tax:** In New York, your interaction is 20ms. In Sydney, it's 200ms.
-2.  **Offline Tax:** If the connection drops, the app dies completely.
-
-**Azumi's Advantage:** Azumi uses **Compiler-Driven Optimistic UI**.
-
--   When you click "Like", Azumi doesn't wait for the server.
--   It executes a pre-compiled micro-instruction: `button.classList.toggle('liked'); count.innerText++`.
--   The user sees the result in **16ms**. The network request happens in the background.
 
 ---
 
@@ -118,7 +120,7 @@ Hypermedia systems are beautiful in their simplicity, but they are bound by the 
 -   ✅ You are building a SaaS, Content Platform, or E-commerce site.
 -   ✅ You prioritize **Performance (TTI/LCP)** above all else.
 -   ✅ You want the **Safety of Rust** without the complexity of WASM.
--   ✅ You want to minimize cloud costs.
+-   ✅ You understand that "Pure SSR" is a trap and want a framework that grows with you.
 
 **Choose Next.js if:**
 
