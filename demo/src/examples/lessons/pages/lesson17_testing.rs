@@ -4,10 +4,13 @@ use azumi::prelude::*;
 /// Component to be tested
 #[azumi::component]
 fn SimpleCard(title: String, content: String) -> impl Component {
+    let card = "card";
+    let title_class = "title";
+    let content_class = "content";
     html! {
-        <div class="card">
-            <h2 class="title">{title}</h2>
-            <p class="content">{content}</p>
+        <div class={card}>
+            <h2 class={title_class}>{title}</h2>
+            <p class={content_class}>{content}</p>
         </div>
     }
 }
@@ -27,9 +30,10 @@ impl Counter {
 
 #[azumi::component]
 fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
+    let count_class = "count";
     html! {
         <div>
-            <span class="count">{state.count}</span>
+            <span class={count_class}>{state.count}</span>
             <button on:click={state.increment}>"Inc"</button>
         </div>
     }
