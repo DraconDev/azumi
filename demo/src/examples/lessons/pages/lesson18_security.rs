@@ -45,7 +45,6 @@ fn secure_view<'a>(state: &'a SecureCounter) -> impl Component + 'a {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use azumi::test;
 
     #[test]
     fn test_signed_state_generation() {
