@@ -212,9 +212,9 @@ fn progress_meter(completion: f64, accent_color: &str) -> impl azumi::Component 
         </style>
 
         <div class={meter}>
-            // style="" ONLY allows CSS custom properties (--variables)
-            // Direct properties like "width: 50%" would be a compile error!
-            <div class={fill} style="--progress: {completion}; --accent: {accent_color}"></div>
+            // style={} ONLY allows CSS custom properties (--variables)
+            // Direct properties like style={width: "50%"} would be a compile error!
+            <div class={fill} style={--progress: completion; --accent: accent_color}></div>
         </div>
 
         // @let for computed values
@@ -228,7 +228,7 @@ fn progress_meter(completion: f64, accent_color: &str) -> impl azumi::Component 
 
 -   `@let name = expr;` for local variables inside templates
 -   CSS custom properties in `<style>`: `--my-var: value;` then `var(--my-var)`
--   Pass dynamic values via `style="--var: {value}"`
+-   Pass dynamic values via `style={--var: value}`
 -   **Only CSS variables allowed in style attribute** - direct properties cause compile errors
 
 ---
