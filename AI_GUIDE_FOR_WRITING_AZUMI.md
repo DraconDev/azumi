@@ -927,7 +927,7 @@ Azumi validates HTML structure at compile time:
 <input on:input={state.update} />
 
 // Skip links for keyboard users
-<a href="#main-content" class="skip-link">"Skip to main content"</a>
+<a href="#main-content" class={skip_link}>"Skip to main content"</a>
 ```
 
 ---
