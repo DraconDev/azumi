@@ -106,11 +106,12 @@ pub fn lesson18() -> impl Component {
         count: 0,
         is_admin: false,
     };
+    let container = "container";
     html! {
         <style>
              .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
         </style>
-        <div class="container">
+        <div class={container}>
             <h1>"Lesson 18: Security"</h1>
             <p>"Azumi automatically signs state to prevent client-side tampering."</p>
             { secure_view(&initial_state) }
