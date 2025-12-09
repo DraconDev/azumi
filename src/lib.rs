@@ -29,7 +29,8 @@ pub trait LiveState:
     serde::Serialize + for<'de> serde::de::Deserialize<'de> + Send + Sync + 'static
 {
     fn to_scope(&self) -> String {
-        serde_json::to_string(self).unwrap_or_default()
+        let json = serde_json::to_string(self).unwrap_or_default();
+        crate::security::sign_state(&json)
     }
     /// Returns predictions for optimistic UI (method_name -> dsl)
     fn predictions() -> &'static [(&'static str, &'static str)];
