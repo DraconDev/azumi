@@ -13,6 +13,9 @@ pub use inventory;
 
 pub use script::AzumiScript;
 
+#[cfg(feature = "test-utils")]
+pub mod test;
+
 pub trait Component {
     fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
 }
