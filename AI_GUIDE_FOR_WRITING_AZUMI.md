@@ -1413,32 +1413,58 @@ impl Counter { /* ... */ }
 
 ## 🔐 Authentication & Middleware
 
-Azumi integrates seamlessly with standard `axum` middleware. You can use any Axum-compatible auth library (like `axum-login`) or write your own.
+### The Data Bridge Pattern
 
-### The Middleware Extension Pattern
+Azumi components are pure Rust structs that know nothing about HTTP requests. Middleware is pure HTTP logic. You bridge them in your **Handler**.
 
-1.  **Middleware**: Checks cookies/headers and inserts a `User` struct into `request.extensions()`.
-2.  **Handler**: Extracts the `User` struct via `axum::Extension`.
-3.  **State**: Initializes the component state with user data.
+You don't need to change Azumi internals to support auth; you just need to **pass the data**.
+
+#### 1. The Guard (Middleware)
+
+Standard Axum middleware validates the request and puts a `User` object into the request's "pocket" (extensions).
 
 ```rust
-// 1. Middleware (Standard Axum)
-pub async fn auth_middleware(req: Request, next: Next) -> Result<Response, StatusCode> {
-    if let Some(user) = check_session(&req) {
-        req.extensions_mut().insert(user);
-    }
+async fn auth_middleware(req: Request, next: Next) -> Result<Response, StatusCode> {
+    // 1. Validate Session
+    let user = decode_session_cookie(&req)?;
+
+    // 2. data-passing: Put user in the request extensions
+    req.extensions_mut().insert(user);
+
     Ok(next.run(req).await)
 }
+```
 
-// 2. Azumi Handler
-pub async fn protected_page(
-    axum::Extension(user): axum::Extension<Option<User>>
+#### 2. The Bridge (Handler)
+
+Your handler extracts that `User` object and gives it to the Azumi state.
+
+```rust
+async fn my_page_handler(
+    // 3. Extract from request extensions
+    Extension(user): Extension<User>
 ) -> impl IntoResponse {
-    let state = MyPageState {
-        current_user: user // Pass to initial state
+    // 4. Initialize Azumi State
+    let state = MyState {
+        username: user.username,
+        role: user.role
     };
 
-    // Render component with state...
+    // 5. Render
+    azumi::render_to_string(&MyComponent::render(
+        MyComponent::Props::builder().state(&state).build().unwrap()
+    ))
+}
+```
+
+#### 3. The UI (Component)
+
+The component just receives data. It doesn't care if it came from a cookie, a JWT, or a mock.
+
+```rust
+#[azumi::live]
+pub struct MyState {
+    pub username: String, // Just data!
 }
 ```
 
