@@ -107,15 +107,22 @@ pub fn lesson18() -> impl Component {
     };
     let container = "container";
     html! {
-        <style>
-             .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
-        </style>
-        <div class={container}>
-            <h1>"Lesson 18: Security"</h1>
-            <p>"Azumi automatically signs state to prevent client-side tampering."</p>
-            { secure_view(&initial_state) }
-        </div>
+            <style>
+                 .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
+            </style>
+            <div class={container}>
+                <h1>"Lesson 18: Security"</h1>
+                <p>"Azumi automatically signs state to prevent client-side tampering."</p>
+                {
+        secure_view::render(
+            secure_view::Props::builder()
+                .state(&initial_state)
+                .build()
+                .unwrap()
+        )
     }
+            </div>
+        }
 }
 
 pub async fn handler() -> impl IntoResponse {
