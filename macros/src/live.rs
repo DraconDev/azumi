@@ -320,10 +320,10 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                 quote! {
                     pub async fn #handler_name(
                         body: String
-                    ) -> impl axum::response::IntoResponse {
+                    ) -> axum::response::Response {
                         let json = match azumi::security::verify_state(&body) {
                             Ok(j) => j,
-                            Err(e) => return (axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e)).into_response(),
+                            Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
                         };
                         let mut state: #struct_name = serde_json::from_str(&json).unwrap();
                         #method_call
@@ -336,7 +336,7 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                                 .expect("Live component re-render failed")
                         ));
 
-                        axum::response::Html(html)
+                        axum::response::IntoResponse::into_response(axum::response::Html(html))
                     }
 
                     #[allow(non_snake_case)]
@@ -348,14 +348,14 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                 quote! {
                     pub async fn #handler_name(
                         body: String
-                    ) -> impl axum::response::IntoResponse {
+                    ) -> axum::response::Response {
                         let json = match azumi::security::verify_state(&body) {
                             Ok(j) => j,
-                            Err(e) => return (axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e)).into_response(),
+                            Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
                         };
                         let mut state: #struct_name = serde_json::from_str(&json).unwrap();
                         #method_call
-                        axum::response::Json(state)
+                        axum::response::IntoResponse::into_response(axum::response::Json(state))
                     }
 
                     #[allow(non_snake_case)]
