@@ -338,7 +338,7 @@ pub fn StyledComponent() -> impl Component {
 
         <div class={container}>
             <h1 class={local_heading}>"Scoped (blue)"</h1>
-            <h2 class="global_heading">"Global (purple)"</h2>
+            <h2 class={global_heading}>"Global (purple)"</h2>
         </div>
     }
 }
