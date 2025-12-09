@@ -4,6 +4,7 @@ use axum::{
     middleware::{self, Next},
     response::{Html, IntoResponse, Redirect, Response},
     routing::get,
+    RequestPartsExt,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use azumi::prelude::*;
@@ -134,29 +135,49 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
 // └──────────────────────┘      └─────────────────────────┘      └──────────────────────┘
 
 // -----------------------------------------------------------------------------
-// HANDLERS
+// CONVENIENCE PATTERN: AUTO-EXTRACTION
+// -----------------------------------------------------------------------------
+// Instead of extracting Extension manually in every handler,
+// we implement FromRequestParts for our State struct.
+//
+// This moves the "Bridge" logic into a reusable trait implementation.
+
+use axum::extract::FromRequestParts;
+use axum::http::request::Parts;
+
+impl<S> FromRequestParts<S> for AuthState
+where
+    S: Send + Sync,
+{
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        // 1. We use standard Axum extraction logic here
+        // We look for the Extension<Option<User>> that middleware inserted
+        let Extension(user) = parts
+            .extract::<Extension<Option<User>>>()
+            .await
+            .unwrap_or(Extension(None));
+
+        // 2. We construct the Azumi State directly
+        Ok(AuthState {
+            username: user.map(|u| u.username),
+        })
+    }
+}
+
+// -----------------------------------------------------------------------------
+// HANDLERS (Now much cleaner!)
 // -----------------------------------------------------------------------------
 
 pub async fn handler(
-    // We can extract extensions inserted by middleware!
-    axum::Extension(user): axum::Extension<Option<User>>,
+    // MAGIC: The compiler calls from_request_parts automatically!
+    state: AuthState,
 ) -> impl IntoResponse {
-    let initial_state = AuthState {
-        username: user.map(|u| u.username),
-    };
+    // Zero boilerplate! We just use the state.
 
     use auth_view_component::*;
-    let html = azumi::render_to_string(&render(
-        Props::builder().state(&initial_state).build().unwrap(),
-    ));
-
-    // We must manually inject the script since we are rendering a fragment-like structure
-    // (though in this case we're lazy and just returning the div, relying on the user to imagine the layout or macro injecting it if we used <html>)
-    // To be proper let's wrap it in a minimal layout or just assume the demo layout wrapper handles it?
-    // Wait, the other lessons usually render full <html>. Let's do that for consistency if I want auto-injection.
-    // BUT, I didn't write <html> in the component above. Let me fix that in a sec or just accept it.
-    // Actually, `azumi::render_to_string` produces the string. If I don't have <html>, script isn't injected.
-    // I should probably return a layout.
+    let html = azumi::render_to_string(&render(Props::builder().state(&state).build().unwrap()));
 
     Html(format!(
         "<!DOCTYPE html><html><head><title>Lesson 19</title><meta charset='utf-8'></head><body>{}<script src='/static/azumi.js'></script><script src='/static/idiomorph.js'></script></body></html>",
