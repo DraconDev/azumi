@@ -1411,6 +1411,37 @@ impl Counter { /* ... */ }
 <button on:click={state.increment}>
 ```
 
+## 🔐 Authentication & Middleware
+
+Azumi integrates seamlessly with standard `axum` middleware. You can use any Axum-compatible auth library (like `axum-login`) or write your own.
+
+### The Middleware Extension Pattern
+
+1.  **Middleware**: Checks cookies/headers and inserts a `User` struct into `request.extensions()`.
+2.  **Handler**: Extracts the `User` struct via `axum::Extension`.
+3.  **State**: Initializes the component state with user data.
+
+```rust
+// 1. Middleware (Standard Axum)
+pub async fn auth_middleware(req: Request, next: Next) -> Result<Response, StatusCode> {
+    if let Some(user) = check_session(&req) {
+        req.extensions_mut().insert(user);
+    }
+    Ok(next.run(req).await)
+}
+
+// 2. Azumi Handler
+pub async fn protected_page(
+    axum::Extension(user): axum::Extension<Option<User>>
+) -> impl IntoResponse {
+    let state = MyPageState {
+        current_user: user // Pass to initial state
+    };
+
+    // Render component with state...
+}
+```
+
 ### ❌ Missing State Reference in Component
 
 ```rust

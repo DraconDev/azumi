@@ -47,25 +47,28 @@ impl Counter {
 
 Azumi includes the **most comprehensive web framework education platform** with hands-on lessons:
 
-| Lesson | Topic                 | What You'll Learn                                  |
-| ------ | --------------------- | -------------------------------------------------- |
-| **0**  | Components Basics     | `#[azumi::component]`, `html!` macro, basic syntax |
-| **1**  | CSS Scoping           | Automatic CSS scoping, no naming conflicts         |
-| **2**  | Global vs Scoped      | `<style>` vs `<style global>` patterns             |
-| **3**  | Component Composition | Building complex UIs from simple components        |
-| **4**  | Children Pattern      | `children: impl Component` parameter               |
-| **5**  | @let Variables        | Local variable declarations in templates           |
-| **6**  | Control Flow          | `@if`, `@for`, `@match` patterns                   |
-| **7**  | Form Handling         | Compile-time form validation                       |
-| **8**  | Server Actions        | `#[azumi::action]` for interactivity               |
-| **9**  | Azumi Live Intro      | Compiler-driven optimistic UI                      |
-| **10** | Live Components       | Auto-detecting live state in components            |
-| **11** | Event Binding         | `on:click={state.method}` declarative syntax       |
-| **12** | Optimistic UI Flow    | How predictions work → confirm                     |
-| **13** | Form Patterns         | Live forms with server validation                  |
-| **14** | Component Composition | Complex UIs with live components                   |
-| **15** | Full Application      | Complete todo app pattern                          |
-| **16** | Async Database        | Real-world `sqlx` database integration             |
+| Lesson | Topic                   | What You'll Learn                                  |
+| ------ | ----------------------- | -------------------------------------------------- |
+| **0**  | Components Basics       | `#[azumi::component]`, `html!` macro, basic syntax |
+| **1**  | CSS Scoping             | Automatic CSS scoping, no naming conflicts         |
+| **2**  | Global vs Scoped        | `<style>` vs `<style global>` patterns             |
+| **3**  | Component Composition   | Building complex UIs from simple components        |
+| **4**  | Children Pattern        | `children: impl Component` parameter               |
+| **5**  | @let Variables          | Local variable declarations in templates           |
+| **6**  | Control Flow            | `@if`, `@for`, `@match` patterns                   |
+| **7**  | Form Handling           | Compile-time form validation                       |
+| **8**  | Server Actions          | `#[azumi::action]` for interactivity               |
+| **9**  | Azumi Live Intro        | Compiler-driven optimistic UI                      |
+| **10** | Live Components         | Auto-detecting live state in components            |
+| **11** | Event Binding           | `on:click={state.method}` declarative syntax       |
+| **12** | Optimistic UI Flow      | How predictions work → confirm                     |
+| **13** | Form Patterns           | Live forms with server validation                  |
+| **14** | Component Composition   | Complex UIs with live components                   |
+| **15** | Full Application        | Complete todo app pattern                          |
+| **16** | Async Database          | Real-world `sqlx` database integration             |
+| **17** | Testing Infrastructure  | `azumi::test` for unit & simulation tests          |
+| **18** | Security (Signed State) | HMAC-SHA256 protecting client-side state           |
+| **19** | Authentication          | Axum middleware integration patterns               |
 
 ### 🎓 **Try the Interactive Learning Platform**
 
