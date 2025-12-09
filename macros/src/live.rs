@@ -238,7 +238,8 @@ pub fn expand_live(attr: TokenStream, item: TokenStream) -> TokenStream {
         impl #struct_generics #struct_name #struct_generics {
             /// Serialize state for az-scope attribute
             pub fn to_scope(&self) -> String {
-                serde_json::to_string(self).unwrap_or_default()
+                let json = serde_json::to_string(self).unwrap_or_default();
+                azumi::security::sign_state(&json)
             }
         }
     };
@@ -318,8 +319,13 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                 let comp_mod = format_ident!("{}_component", comp_name);
                 quote! {
                     pub async fn #handler_name(
-                        axum::extract::Json(mut state): axum::extract::Json<#struct_name>
+                        body: String
                     ) -> impl axum::response::IntoResponse {
+                        let json = match azumi::security::verify_state(&body) {
+                            Ok(j) => j,
+                            Err(e) => return (axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e)).into_response(),
+                        };
+                        let mut state: #struct_name = serde_json::from_str(&json).unwrap();
                         #method_call
 
                         // Re-render the component with new state
@@ -341,8 +347,13 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             } else {
                 quote! {
                     pub async fn #handler_name(
-                        axum::extract::Json(mut state): axum::extract::Json<#struct_name>
+                        body: String
                     ) -> impl axum::response::IntoResponse {
+                        let json = match azumi::security::verify_state(&body) {
+                            Ok(j) => j,
+                            Err(e) => return (axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e)).into_response(),
+                        };
+                        let mut state: #struct_name = serde_json::from_str(&json).unwrap();
                         #method_call
                         axum::response::Json(state)
                     }
