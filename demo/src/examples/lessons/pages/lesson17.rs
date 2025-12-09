@@ -2,7 +2,7 @@ use axum::response::{Html, IntoResponse};
 use azumi::prelude::*;
 
 #[azumi::component]
-fn Lesson17() -> Html<String> {
+fn Lesson17() -> impl Component {
     let container_class = "lesson-container";
     let img_style = "border: 2px solid red; width: 100px;";
 
@@ -20,5 +20,7 @@ fn Lesson17() -> Html<String> {
 }
 
 pub async fn handler() -> impl IntoResponse {
-    Lesson17::render(Lesson17::Props::builder().build().unwrap())
+    let component = Lesson17::render(Lesson17::Props::builder().build().unwrap());
+    let html_content = azumi::render_to_string(&component);
+    Html(html_content)
 }
