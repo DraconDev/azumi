@@ -10,6 +10,7 @@ pub mod lesson15;
 pub mod lesson16;
 pub mod lesson17_testing;
 pub mod lesson18_security;
+pub mod lesson19_auth;
 
 pub mod lesson2;
 pub mod lesson3;
