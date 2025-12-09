@@ -368,7 +368,7 @@ pub fn ProgressMeter(completion: f64, accent_color: &str) -> impl Component {
 
         <div class={meter}>
             // style="" ONLY allows CSS custom properties (--variables)
-            <div class={fill} style={--progress: {completion}; --accent: {accent_color}}></div>
+            <div class={fill} style={--progress: completion; --accent: accent_color}></div>
         </div>
     }
 }
