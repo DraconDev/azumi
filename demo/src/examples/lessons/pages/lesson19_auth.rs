@@ -1,10 +1,9 @@
 use axum::{
-    extract::{FromRequestParts, Request},
-    http::{request::Parts, StatusCode},
+    extract::{Extension, Request},
+    http::StatusCode,
     middleware::{self, Next},
     response::{Html, IntoResponse, Redirect, Response},
     routing::get,
-    RequestPartsExt,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use azumi::prelude::*;
@@ -78,6 +77,7 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
              .btn { background: "#2563eb"; color: "white"; border: "none"; padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "600"; cursor: "pointer"; text-decoration: "none"; display: "inline-block"; }
              .btn:hover { background: "#1d4ed8"; }
              .btn_secondary { background: "#64748b"; margin-left: "1rem"; }
+             .explanation { margin-top: "2rem"; color: "#666"; font-size: "0.9rem"; }
         </style>
 
         <div class={container}>
@@ -103,7 +103,7 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
                 </div>
             </div>
 
-            <div style="margin-top: 2rem; color: #666; font-size: 0.9rem;">
+            <div class={explanation}>
                 <p><strong>"How it works:"</strong></p>
                 <ol>
                     <li>"Axum Middleware runs BEFORE the Azumi handler."</li>
