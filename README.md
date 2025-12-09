@@ -769,47 +769,7 @@ pub fn ProfileForm() -> impl Component {
 
 ---
 
-## 🔄 Server Actions (Advanced)
-
-For complex server-side logic beyond simple predictions:
-
-```rust
-// State for server action
-#[derive(Serialize, Deserialize)]
-pub struct TodoState {
-    pub items: Vec<String>,
-    pub input: String,
-}
-
-// Server action handler
-#[azumi::action]
-async fn add_todo(mut state: TodoState) -> impl azumi::Component {
-    if !state.input.is_empty() {
-        state.items.push(state.input.clone());
-        state.input.clear();
-    }
-    todo_list(state)  // Return updated component
-}
-
-// Component using server action
-pub fn todo_list(state: TodoState) -> impl azumi::Component {
-    html! {
-        <script src="/static/azumi.js"></script>
-        <div az-scope={serde_json::to_string(&state).unwrap()}>
-            <input type="text" name="input" value={state.input} />
-            <button az-on="click call add_todo -> this">"Add"</button>
-
-            @for item in &state.items {
-                <div>{item}</div>
-            }
-        </div>
-    }
-}
-```
-
----
-
-## 🔐 Authentication & Middleware
+## Authentication & Middleware
 
 ### The Data Bridge Pattern
 
