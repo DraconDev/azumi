@@ -78,3 +78,34 @@ pub async fn profile_page(
 
 -   **Start with Manual**. It's easier to debug.
 -   **Switch to Extractors** when you have 5+ handlers using the same data.
+
+## 3. Scaling to Big Projects (Why Extractors Win)
+
+In a large project (50+ routes), **Extractors are essential**. Here is why:
+
+### A. Centralized Logic ("Type-Driven Security")
+
+Imagine you have an Admin section.
+
+-   **Manual**: You must remember to check `if !user.is_admin { return 403; }` in every single admin handler. If you forget one, you have a security hole.
+-   **Extractor**: You create a `AdminUser` extractor. If a non-admin tries to access the route, the _Extractor_ rejects them automatically. The handler _never even runs_.
+
+```rust
+// The Handler guarantees the user is an Admin
+pub async fn delete_database(
+    AdminUser(admin): AdminUser // <--- This fails automatically if not admin
+) {
+    // Safe to delete!
+}
+```
+
+### B. Refactoring Proof
+
+If you switch from **Cookies** to **JWT Tokens**:
+
+-   **Manual**: You might have to find-replace `Extension<User>` with `Extension<Claims>` everywhere if the type changes.
+-   **Extractor**: You just update the `impl FromRequestParts for CurrentUser` block. The 50 handlers don't even know anything changed.
+
+### C. Testing
+
+Extractors are easier to unit test because they are self-contained logic units.
