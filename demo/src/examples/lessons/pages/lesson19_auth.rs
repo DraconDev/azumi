@@ -115,14 +115,11 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
     }
 }
 
-    }
-}
-
 // -----------------------------------------------------------------------------
 // ARCHITECTURE EXPLANATION: THE BRIDGE PATTERN
 // -----------------------------------------------------------------------------
 //
-// Azumi components (The UI) are isolated from HTTP details. 
+// Azumi components (The UI) are isolated from HTTP details.
 // Axum Middleware (The Guard) knows HTTP but doesn't know your UI.
 //
 // We use the HANDLER as the "Bridge" to pass data from Middleware -> UI.
