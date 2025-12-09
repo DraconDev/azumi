@@ -169,6 +169,42 @@ This ensures your application always uses the matching runtime version for your 
 
 ---
 
+## 📦 Asset Pipeline & Optimization
+
+Azumi includes a production-ready asset pipeline that handles hashing, rewriting, and optimization automatically.
+
+### 1. Automatic Asset Hashing (Cache Busting)
+
+-   Place your static assets (images, fonts, etc.) in the `demo/static/` directory.
+-   At build time, Azumi moves them to `target/assets/` and renames them with a content hash:
+    -   `static/logo.png` -> `assets/logo.a8b9c7d6.png`
+-   This enables **immutable caching** (1 year cache lifetime), as file names change whenever content changes.
+
+### 2. Automatic Path Rewriting
+
+You do not need to manually import or reference hashed files. Just use the original path in your `html!` macro:
+
+```rust
+html! {
+    // Write this:
+    <img src="/static/logo.png" />
+
+    // Compiler outputs this automatically:
+    // <img src="/assets/logo.a8b9c7d6.png" />
+}
+```
+
+-   The macro reads `assets_manifest.json` at compile time to rewrite paths.
+-   Works for `src`, `href` (link tags), and `srcset`.
+
+### 3. CSS Minification
+
+-   Styles defined in `<style>` blocks are automatically parsed and minified at compile time.
+-   Comments and whitespace are removed to reduce payload size.
+-   No configuration needed.
+
+---
+
 ## 🏗️ Component Fundamentals
 
 ### Basic Component Structure
