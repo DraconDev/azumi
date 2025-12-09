@@ -964,7 +964,7 @@ pub fn OptimizedComponent(state: &'a MyState) -> impl Component + 'a {
 
 // ✅ Good - conditional rendering
 @if state.visible {
-    <ExpensiveComponent data={state.data} />
+    @ExpensiveComponent(data=state.data)
 }
 ```
 
