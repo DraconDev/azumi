@@ -81,15 +81,8 @@ pub fn lesson18() -> impl Component {
                 .info_text { margin: "0"; color: "#1e40af"; font-size: "0.95rem"; line-height: "1.5"; }
                 .code_snippet { font-family: "monospace"; background: "#1e293b"; color: "#e2e8f0"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-size: "0.9em"; }
 
-                .counter_display { text-align: "center"; margin: "2rem 0"; }
-                .count_val { font-size: "4rem"; font-weight: "bold"; color: "#0f172a"; line-height: "1"; }
-                .status_badge { display: "inline-block"; padding: "0.25rem 0.75rem"; border-radius: "9999px"; font-size: "0.875rem"; font-weight: "600"; margin-top: "1rem"; }
-                .status_user { background: "#f1f5f9"; color: "#475569"; }
-                .status_admin { background: "#dcfce7"; color: "#166534"; }
-
-                .btn { display: "inline-flex"; align-items: "center"; justify-content: "center"; padding: "0.75rem 1.5rem"; background: "#0f172a"; color: "white"; font-weight: "600"; border-radius: "8px"; border: "none"; cursor: "pointer"; transition: "all 0.2s"; width: "100%"; font-size: "1rem"; }
-                .btn:hover { background: "#1e293b"; transform: "translateY(-1px)"; }
-                .btn:active { transform: "translateY(0)"; }
+                .info_text { margin: "0"; color: "#1e40af"; font-size: "0.95rem"; line-height: "1.5"; }
+                .code_snippet { font-family: "monospace"; background: "#1e293b"; color: "#e2e8f0"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-size: "0.9em"; }
 
                 .verify_steps { background: "#f8fafc"; padding: "1.5rem"; border-radius: "8px"; margin-top: "2rem"; border: "1px solid #e2e8f0"; }
                 .verify_title { margin: "0 0 1rem 0"; font-size: "1rem"; color: "#0f172a"; }
@@ -143,33 +136,29 @@ pub fn lesson18() -> impl Component {
 }
 
 // Update secure_view to use new styles
+// Update secure_view with scoped styles
 #[azumi::component]
 fn secure_view<'a>(state: &'a SecureCounter) -> impl Component + 'a {
-    let counter_display = "counter_display";
-    let count_val = "count_val";
-    let btn = "btn";
-    let status_badge = "status_badge";
-    let status_user = "status_user";
-    let status_admin = "status_admin";
-
-    let badge_class = if state.is_admin {
-        format!("{} {}", status_badge, status_admin)
-    } else {
-        format!("{} {}", status_badge, status_user)
-    };
-
-    let status_text = if state.is_admin {
-        "Admin Access Unlocked"
-    } else {
-        "Standard User Access"
-    };
-
     html! {
+        <style>
+            .counter_display { text-align: "center"; margin: "2rem 0"; }
+            .count_val { font-size: "4rem"; font-weight: "bold"; color: "#0f172a"; line-height: "1"; }
+
+            .status_badge { display: "inline-block"; padding: "0.25rem 0.75rem"; border-radius: "9999px"; font-size: "0.875rem"; font-weight: "600"; margin-top: "1rem"; }
+            .status_user { background: "#f1f5f9"; color: "#475569"; }
+            .status_admin { background: "#dcfce7"; color: "#166534"; }
+
+            .btn { display: "inline-flex"; align-items: "center"; justify-content: "center"; padding: "0.75rem 1.5rem"; background: "#0f172a"; color: "white"; font-weight: "600"; border-radius: "8px"; border: "none"; cursor: "pointer"; transition: "all 0.2s"; width: "100%"; font-size: "1rem"; }
+            .btn:hover { background: "#1e293b"; transform: "translateY(-1px)"; }
+            .btn:active { transform: "translateY(0)"; }
+        </style>
+
         <div>
             <div class={counter_display}>
                 <div class={count_val}>{state.count}</div>
-                <span class={badge_class}>
-                    {status_text}
+                // Combine base badge class with conditional specific class
+                <span class={format!("{} {}", status_badge, if state.is_admin { status_admin } else { status_user })}>
+                    {if state.is_admin { "Admin Access Unlocked" } else { "Standard User Access" }}
                 </span>
             </div>
 
