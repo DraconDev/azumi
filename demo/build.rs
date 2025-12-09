@@ -57,10 +57,11 @@ fn main() {
         // NOTE: We will mount the `assets` dir at `/assets` uri in main.rs
         let hashed_value = format!("/assets/{}", new_filename);
 
-        map.entry(original_key, &format!("\"{}\"", hashed_value));
+        map_entries.push((original_key.clone(), hashed_value.clone()));
+        map.entry(&original_key, &format!("\"{}\"", hashed_value));
     }
 
-    // Generate manifest.rs
+    // Generate manifest.rs for runtime use (in OUT_DIR)
     let manifest_path = dest_path.join("assets_manifest.rs");
     let mut file = fs::File::create(&manifest_path).unwrap();
 
@@ -71,4 +72,13 @@ fn main() {
     .unwrap();
     map.build(&mut file).unwrap();
     write!(&mut file, ";\n").unwrap();
+
+    // ALSO generate assets_manifest.json in CRATE ROOT for azumi-macros to read at compile time
+    // This allows the macro to perform the rewrite logic by reading this file.
+    let json_map: std::collections::HashMap<String, String> =
+        map_entries.into_iter().map(|(k, v)| (k, v)).collect();
+
+    let manifest_json_path = Path::new("assets_manifest.json");
+    let json_file = fs::File::create(&manifest_json_path).unwrap();
+    serde_json::to_writer_pretty(json_file, &json_map).unwrap();
 }

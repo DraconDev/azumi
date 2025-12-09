@@ -17,3 +17,4 @@ nom = "7.1"
 regex = "1.10"
 heck = "0.5"
 lightningcss = "1.0.0-alpha.68"
+phf = { version = "0.13.1", features = ["macros"] }
