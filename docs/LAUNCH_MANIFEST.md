@@ -47,17 +47,15 @@ Azumi has successfully completed its initial 3-Phase Development Roadmap. The fr
 
 ### `demo` (The Learnings)
 
--   **Lessons 0-19**: A complete interactive tutorial from "Hello World" to "Complex Auth".
-
 ---
 
 ## 🔮 What's Next? (Post-Launch)
 
-While v0.1 is feature complete, the roadmap for v0.2 includes:
+While v0.1 is feature complete, the roadmap for v0.2 focuses on **Developer Quality of Life**:
 
-1.  **WASM Option**: Offloading complex predictions to WebAssembly.
-2.  **Advanced CLI**: `cargo azumi new` generator.
-3.  **LSP Server**: An official Language Server for even better IDE feedback.
+1.  **Refined CLI**: `cargo azumi new` generator to scaffold projects with one command.
+2.  **Testing Suite**: Expanding `azumi::test` with more simulation tools (e.g. simulating slow networks).
+3.  **Granular Performance**: Optimizing the compiler's diffing strategy even further.
 
 ## ✅ Conclusion
 
