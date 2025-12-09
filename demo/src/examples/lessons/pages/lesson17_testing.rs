@@ -3,7 +3,7 @@ use azumi::prelude::*;
 
 /// Component to be tested
 #[azumi::component]
-fn SimpleCard(title: &str, content: &str) -> impl Component {
+fn SimpleCard(title: String, content: String) -> impl Component {
     html! {
         <div class="card">
             <h2 class="title">{title}</h2>
@@ -26,7 +26,7 @@ impl Counter {
 }
 
 #[azumi::component]
-fn counter_view(state: &Counter) -> impl Component {
+fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
     html! {
         <div>
             <span class="count">{state.count}</span>
@@ -46,8 +46,8 @@ mod tests {
     #[test]
     fn test_simple_card_render() {
         let card = SimpleCard::Props::builder()
-            .title("Test Title")
-            .content("Test Content")
+            .title("Test Title".to_string())
+            .content("Test Content".to_string())
             .build()
             .unwrap();
 
