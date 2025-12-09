@@ -9,6 +9,7 @@ pub mod lesson14;
 pub mod lesson15;
 pub mod lesson16;
 pub mod lesson17_testing;
+pub mod lesson18_security;
 
 pub mod lesson2;
 pub mod lesson3;
