@@ -117,6 +117,9 @@ pub fn html(input: TokenStream) -> TokenStream {
     // Auto-inject Azumi Runtime (Single Pass: Head -> Body)
     token_parser::inject_azumi_script_once(&mut nodes);
 
+    // Auto-scope Asset Paths (Rewrites /img/logo.png -> /assets/logo.a8b9.png)
+    asset_rewriter::rewrite_nodes(&mut nodes);
+
     // 1. Process styles (hoist <style> tags)
     let (style_bindings, scoped_css, global_css) = process_styles(&nodes);
 
