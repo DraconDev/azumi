@@ -340,7 +340,7 @@ pub struct Counter {
 }
 
 // #[azumi::live_impl] analyzes mutations for predictions
-#[azumi::live_impl]
+#[azumi::live_impl(component = "counter_view")]
 impl Counter {
     // Compiler detects: self.count += 1 → Prediction: "count += 1"
     pub fn increment(&mut self) {
@@ -411,7 +411,7 @@ pub struct LikeButton {
     pub count: i32,
 }
 
-#[azumi::live_impl]
+#[azumi::live_impl(component = "view_name")]
 impl LikeButton {
     pub fn toggle(&mut self) {
         self.liked = !self.liked;
@@ -493,7 +493,7 @@ pub struct ContactForm {
     pub submitted: bool,
 }
 
-#[azumi::live_impl]
+#[azumi::live_impl(component = "contact_form_view")]
 impl ContactForm {
     pub fn submit(&mut self) {
         // Validation would happen here
@@ -557,7 +557,7 @@ pub struct Tab {
     pub active_index: usize,
 }
 
-#[azumi::live_impl]
+#[azumi::live_impl(component = "todo_list_view")]
 impl Tab {
     pub fn select_0(&mut self) { self.active_index = 0; }
     pub fn select_1(&mut self) { self.active_index = 1; }
