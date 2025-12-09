@@ -2,14 +2,16 @@ use axum::response::{Html, IntoResponse};
 use azumi::prelude::*;
 
 #[azumi::component]
-fn Lesson17() -> impl Component {
-    let img_style = "border: 2px solid red; width: 100px;";
-
+pub fn lesson17() -> impl Component {
     html! {
         <style>
             .lesson_container {
                 border: "1px solid black";
                 padding: "20px";
+            }
+            .logo_image {
+                border: "2px solid red";
+                width: "100px";
             }
         </style>
         <div class={lesson_container}>
@@ -17,7 +19,7 @@ fn Lesson17() -> impl Component {
             <p>"This image path should be rewritten to include a hash:"</p>
 
             // This should be rewritten to /assets/test_logo.<hash>.png
-            <img src="/static/test_logo.png" alt="Test Logo" style={img_style} />
+            <img src="/static/test_logo.png" alt="Test Logo" class={logo_image} />
 
             <p>"If you inspect the element, the src should start with /assets/..."</p>
         </div>
@@ -25,7 +27,5 @@ fn Lesson17() -> impl Component {
 }
 
 pub async fn handler() -> impl IntoResponse {
-    let component = Lesson17::render(Lesson17::Props::builder().build().unwrap());
-    let html_content = azumi::render_to_string(&component);
-    Html(html_content)
+    Html(azumi::render_to_string(&lesson17()))
 }
