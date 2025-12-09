@@ -62,7 +62,7 @@ async fn main() {
         // 🔒 Global Auth Middleware (Passive)
         // Applies to ALL routes above this line (Homepage, Lessons, APIs)
         // Safe because it only "checks" the cookie, doesn't "block" the request.
-        .layer(axum::middleware::from_fn(examples::lessons::pages::lesson19_auth::auth_middleware))
+        .layer(axum::middleware::from_fn(examples::lessons::components::auth_infra::auth_middleware))
         
         // 📁 Static files (Legacy)
         .nest_service("/static", ServeDir::new("static"))
