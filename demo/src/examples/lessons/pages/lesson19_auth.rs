@@ -144,6 +144,7 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
 
+#[axum::async_trait]
 impl<S> FromRequestParts<S> for AuthState
 where
     S: Send + Sync,
