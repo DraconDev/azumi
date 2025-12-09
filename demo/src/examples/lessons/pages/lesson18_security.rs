@@ -114,8 +114,8 @@ pub fn lesson18() -> impl Component {
                 <h1>"Lesson 18: Security"</h1>
                 <p>"Azumi automatically signs state to prevent client-side tampering."</p>
                 {
-        secure_view::render(
-            secure_view::Props::builder()
+        secure_view_component::render(
+            secure_view_component::Props::builder()
                 .state(&initial_state)
                 .build()
                 .unwrap()
