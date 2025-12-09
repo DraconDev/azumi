@@ -116,6 +116,7 @@ pub fn lesson18() -> impl Component {
                 .btn:active { transform: "translateY(0)"; }
 
                 .verify_steps { background: "#f8fafc"; padding: "1.5rem"; border-radius: "8px"; margin-top: "2rem"; border: "1px solid #e2e8f0"; }
+                .verify_title { margin: "0 0 1rem 0"; font-size: "1rem"; color: "#0f172a"; }
                 .step_list { margin: "0"; padding-left: "1.2rem"; }
                 .step_item { margin-bottom: "0.5rem"; color: "#475569"; }
             </style>
@@ -147,7 +148,7 @@ pub fn lesson18() -> impl Component {
                     }
 
                     <div class={verify_steps}>
-                        <h3 style="margin: 0 0 1rem 0; font-size: 1rem; color: #0f172a;">"How to Verify:"</h3>
+                        <h3 class={verify_title}>"How to Verify:"</h3>
                         <ol class={step_list}>
                             <li class={step_item}>"Inspect the button below in DevTools."</li>
                             <li class={step_item}>"Find the parent div with the <span class={code_snippet}>az-scope</span> attribute."</li>
