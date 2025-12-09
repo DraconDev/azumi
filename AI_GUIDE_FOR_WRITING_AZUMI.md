@@ -1468,37 +1468,41 @@ pub struct MyState {
 }
 ```
 
-### The "Automatic" Pattern (Recommended)
+### The Reusable Extractor Pattern (Recommended)
 
-To avoid manually extracting `Extension` in every handler, you can implement `FromRequestParts` for your state struct. This makes auth feel "built-in".
+Instead of manually extracting `Extension` or implementing complex traits in every handler, we recommend creating a shared `CurrentUser` extractor in your project's infrastructure.
 
-1.  **Implement the Trait**:
+1.  **Define Infrastructure (Once)**:
+    Create a reusable extractor in `auth.rs`:
 
     ```rust
-    use axum::extract::FromRequestParts;
-    use axum::http::request::Parts;
+    // auth.rs
+    pub struct CurrentUser(pub Option<User>);
 
-    #[axum::async_trait]
-    impl<S> FromRequestParts<S> for MyState
-    where S: Send + Sync
-    {
-        type Rejection = std::convert::Infallible;
-
+    #[async_trait]
+    impl<S> FromRequestParts<S> for CurrentUser where S: Send + Sync {
         async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
-            let Extension(user) = parts
-                .extract::<Extension<Option<User>>>()
-                .await
-                .unwrap_or(Extension(None));
-
-            Ok(MyState { user })
+            let Extension(user) = parts.extract::<Extension<Option<User>>>().await.unwrap_or(Extension(None));
+            Ok(CurrentUser(user))
         }
     }
     ```
 
-2.  **Use it cleanly**:
+2.  **Use it Everywhere**:
+    Now your handlers remain clean and Type-Safe:
+
     ```rust
-    // Look! No manual linking code. It just works.
-    pub async fn my_handler(state: MyState) -> impl IntoResponse {
+    // page.rs
+    use crate::auth::CurrentUser;
+
+    pub async fn my_handler(
+        // Look how clean this is!
+        CurrentUser(user): CurrentUser
+    ) -> impl IntoResponse {
+        // Initialize state directly from the user object
+        let state = MyState {
+            name: user.map(|u| u.name)
+        };
         azumi::render(&view(&state))
     }
     ```
