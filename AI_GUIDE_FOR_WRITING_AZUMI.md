@@ -109,7 +109,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 }
 ```
 
-### 4. Event Binding Syntax
+### 6. Event Binding Syntax
 
 ```rust
 // ✅ CORRECT - use on:event={state.method}
@@ -120,7 +120,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 <button on:click={state.increment()}>"Click"</button>
 ```
 
-### 5. Text Content Must Be Quoted
+### 7. Text Content Must Be Quoted
 
 ```rust
 // ✅ CORRECT - all text in quotes
@@ -133,11 +133,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 
 ---
 
----
-
 ## 🚀 Setup & Configuration
-
-### Injecting Client Runtime
 
 ### Injecting Client Runtime
 
