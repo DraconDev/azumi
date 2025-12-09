@@ -256,6 +256,12 @@ html! {
 -   **State management** - Serialization/deserialization handled automatically
 -   **Action composition** - Chain multiple actions together
 
+### **Production-Ready Asset Pipeline**
+
+-   **Automatic Hashing** - Cache-busting for all static assets (immutable caching)
+-   **Zero Config Rewriting** - `html!` macro automatically rewrites paths (e.g., `/img/logo.png` -> hashed path)
+-   **CSS Minification** - Built-in minification for `<style>` blocks
+
 ---
 
 ## 📊 Performance Characteristics
