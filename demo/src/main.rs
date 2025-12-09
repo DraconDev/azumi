@@ -56,8 +56,17 @@ async fn main() {
         // HTMX Todo handlers
         .route("/api/todos/delete", axum::routing::delete(|| async { "" }))
         
-        // 📁 Static files (CSS, JS)
-        .nest_service("/static", ServeDir::new("static"));
+        // 📁 Static files (Legacy)
+        .nest_service("/static", ServeDir::new("static"))
+
+        // 📦 Hashed Assets (Immutable Cache)
+        .nest_service("/assets", ServeDir::new(concat!(env!("OUT_DIR"), "/assets")))
+        .layer(
+            tower_http::set_header::SetResponseHeaderLayer::if_not_present(
+                axum::http::header::CACHE_CONTROL,
+                axum::http::HeaderValue::from_static("public, max-age=31536000, immutable"),
+            ),
+        );
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:8080")
         .await
