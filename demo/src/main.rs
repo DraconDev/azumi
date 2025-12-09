@@ -44,8 +44,8 @@ async fn main() {
         .route("/lesson-17-testing", get(examples::lessons::pages::lesson17_testing::handler))
         .route("/lesson-18-security", get(examples::lessons::pages::lesson18_security::handler))
         .route("/lesson-19-auth", get(examples::lessons::pages::lesson19_auth::handler))
+        .route_layer(axum::middleware::from_fn(examples::lessons::components::auth_infra::auth_middleware))
         .route("/lesson-19-login", get(examples::lessons::pages::lesson19_auth::login_handler))
-        .layer(axum::middleware::from_fn(examples::lessons::pages::lesson19_auth::auth_middleware))
         .route("/unified-demo", get(examples::live_component_demo::unified_demo_handler))
 
         // 🎮 Interactive Demo Endpoints
