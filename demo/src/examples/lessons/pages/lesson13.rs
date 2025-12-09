@@ -9,7 +9,7 @@ pub struct ContactForm {
     pub submitted: bool,
 }
 
-#[azumi::live_impl(component = "form_view")]
+#[azumi::live_impl(component = "contact_form_view")]
 impl ContactForm {
     pub fn submit(&mut self) {
         self.submitted = true;
