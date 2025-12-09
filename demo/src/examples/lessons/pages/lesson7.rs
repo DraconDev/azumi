@@ -4,6 +4,7 @@ use azumi::html;
 ///
 /// Form validation with compile-time checks
 #[derive(Debug)]
+#[allow(dead_code)]
 struct UserForm {
     name: String,
     email: String,

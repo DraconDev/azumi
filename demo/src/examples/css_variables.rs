@@ -31,7 +31,8 @@ pub fn css_variables_demo() -> impl azumi::Component {
     }
 }
 
-pub async fn css_variables_handler() -> axum::response::Html<String> {
+#[allow(dead_code)]
+pub async fn css_variables_handler() -> impl axum::response::IntoResponse {
     let component = css_variables_demo();
     axum::response::Html(azumi::render_to_string(&component))
 }
