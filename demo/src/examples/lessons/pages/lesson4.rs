@@ -1,4 +1,3 @@
-pub use crate::examples::lessons::components::layout as layout_mod;
 /// Lesson 5: Children Pattern
 ///
 /// Components with children parameter
@@ -25,14 +24,11 @@ pub fn layout_example() -> impl azumi::Component {
         </style>
         <div>
             <h2 class={layout_title}>"Container with Children"</h2>
-            {
-                container_component::render(
-                    container_component::Props::builder().build().unwrap(),
-                    html! {
-                        <p>"This content is passed as children"</p>
-                        <p>"Children can be any valid Azumi components"</p>
-                    }
-                )
+            
+                @container() {
+                    <p>"This content is passed as children"</p>
+                    <p>"Children can be any valid Azumi components"</p>
+                }
             }
         </div>
     }
