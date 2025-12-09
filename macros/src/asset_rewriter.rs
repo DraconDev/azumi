@@ -9,12 +9,32 @@ static MANIFEST: Lazy<Mutex<Option<HashMap<String, String>>>> =
     Lazy::new(|| Mutex::new(load_manifest()));
 
 fn load_manifest() -> Option<HashMap<String, String>> {
-    let content = match fs::read_to_string(path) {
-        Ok(c) => c,
-        Err(_) => return None,
-    };
+    let path = Path::new("assets_manifest.json");
+    eprintln!(
+        "ASSET_REWRITER: Loading manifest from {:?}",
+        std::env::current_dir().unwrap().join(path)
+    );
 
-    serde_json::from_str(&content).ok()
+    if let Ok(content) = fs::read_to_string(path) {
+        eprintln!(
+            "ASSET_REWRITER: Loaded manifest with {} bytes",
+            content.len()
+        );
+        return serde_json::from_str(&content).ok();
+    }
+
+    // Try looking in demo/ directory (common case if running from workspace root)
+    let demo_path = Path::new("demo/assets_manifest.json");
+    if let Ok(content) = fs::read_to_string(demo_path) {
+        eprintln!(
+            "ASSET_REWRITER: Loaded manifest from demo/ with {} bytes",
+            content.len()
+        );
+        return serde_json::from_str(&content).ok();
+    }
+
+    eprintln!("ASSET_REWRITER: Failed to load manifest");
+    None
 }
 
 use crate::token_parser::{self, AttributeValue, Block, Node};
