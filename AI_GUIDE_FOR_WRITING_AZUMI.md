@@ -328,14 +328,14 @@ pub fn ProgressMeter(completion: f64, accent_color: &str) -> impl Component {
         </style>
 
         <div class={meter}>
-            // style="" ONLY allows CSS custom properties (--variables)
-            <div class={fill} style="--progress: {completion}; --accent: {accent_color}"></div>
+            // style={} ONLY allows CSS custom properties (--variables)
+            <div class={fill} style={--progress: completion; --accent: accent_color}></div>
         </div>
     }
 }
 ```
 
-**⚠️ Important**: Only CSS custom properties (`--var-name`) are allowed in `style=""` attributes. Direct properties like `style="width: 50%"` cause compile errors.
+**⚠️ Important**: Only CSS custom properties (`--var-name`) are allowed in `style={}` attributes. Direct properties like `style={width: "50%"}` cause compile errors.
 
 ### CSS Validation Rules
 
