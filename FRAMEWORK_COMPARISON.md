@@ -8,12 +8,13 @@
 
 The web is currently divided into three camps:
 
-1.  **The Hydrators (Next.js, Svelte, Remix):** Send HTML, then send JS to replay the logic. Great UX, bad TTI, high complexity.
-2.  **The Compilers (Leptos, Dioxus):** Treat the browser like an OS. Heavy binary download, great for apps, bad for sites.
-3.  **The Purists (HTMX, Maud, Rails):** Server does everything. Great TTI, simple model, but sluggish interactions (latency).
+1.  **The Hydrators (Next.js, Svelte, Remix):** "We'll fix it in post." They send HTML, then send JS to replay the logic. Great UX, bad TTI.
+2.  **The App-Builders (Leptos, Dioxus):** "Download the whole world." They treat the browser like an OS. Great for tools, bad for sites.
+3.  **The Purists (HTMX, Maud, Rails):** "Wait for the network." The server does everything. Simple model, sluggish feel.
 
-**Azumi creates a fourth camp:** **Compiler-Driven Optimistic UI (CDO).**
-It keeps the server as the brain (like The Purists) but compiles optimistic client predictions (like The Hydrators) to give instant feedback without the heavy runtime cost.
+**Azumi leads the fourth camp: The Optimists.**
+They rely on **Compiler-Driven Optimistic UI (CDO)**. Their philosophy? **"Assume success."**
+The server matches the Purists (SSOT), but compiles optimistic predictions into the HTML. The client updates instantly, bridging the gap between static speed and dynamic feel.
 
 ---
 
@@ -113,27 +114,33 @@ WASM frameworks promise native speeds, but they front-load the cost:
 
 ---
 
-## 🏁 The Verdict: When to Choose What?
+## 🏁 The Engineering Verdict (No Cookies)
 
-**Choose Azumi if:**
+If we strip away "ecosystem familiarity" and judge purely on technical merit, **Azumi is the optimal architecture for the web.**
 
--   ✅ You are building a SaaS, Content Platform, or E-commerce site.
--   ✅ You prioritize **Performance (TTI/LCP)** above all else.
--   ✅ You want the **Safety of Rust** without the complexity of WASM.
--   ✅ You understand that "Pure SSR" is a trap and want a framework that grows with you.
+**Why Next.js loses:**
+It solves the wrong problem. It tries to make the browser a better server. It fails because hydration is physically wasteful (doing work twice).
 
-**Choose Next.js if:**
+**Why HTMX/Rails loses:**
+It solves the problem too simply. It ignores the reality that users expect instant (optimistic) feedback. Waiting 100ms for a "Like" button to toggle is bad UX, period.
 
--   ⚠️ You need to hire 50 developers next month (React talent pool is huge).
--   ⚠️ You rely on a specific React-only unmaintainable library.
+**Why Azumi wins:**
+It acknowledges that:
 
-**Choose Leptos/WASM if:**
+1.  **The Server has the Truth** (DB).
+2.  **The Client has the User** (Events).
+3.  **The Compiler is the Bridge.**
 
--   ⚠️ You are building a visual editor (Figma-clone), game, or offline-heavy tool.
+By compiling strict server logic into cheap client predictions, Azumi achieves the **Physical Maximum of Efficiency**:
 
-**Choose HTMX/Rails if:**
+-   **0ms Latency** (Optimistic)
+-   **0ms Hydration** (HTML-native)
+-   **Zero Type Erasure** (Rust-end-to-end)
 
--   ⚠️ You are a solo dev building an internal tool where "snappy" UX doesn't matter.
+**If an AI is writing the code:**
+There is **NO reason** to choose anything else. The AI doesn't "struggle" with Rust's strictness; it thrives on it. The AI doesn't "miss" the npm ecosystem; it writes what it needs.
+
+**Azumi is the framework the AI would build for itself.**
 
 ---
 
