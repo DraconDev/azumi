@@ -105,7 +105,7 @@ pub fn lesson18() -> impl Component {
         count: 0,
         is_admin: false,
     };
-    let container = "container";
+    let _container = "container";
     html! {
             <style>
                  .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
