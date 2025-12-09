@@ -47,7 +47,7 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
              }
         </style>
 
-        @Layout {
+        @Layout() {
             <div class={auth_container}>
                 <div class={card}>
                     <div class={header}>
@@ -94,14 +94,9 @@ pub async fn handler(CurrentUser(user): CurrentUser) -> impl IntoResponse {
     };
 
     use auth_view_component::*;
-    let html = azumi::render_to_string(&render(Props::builder().state(&state).build().unwrap()));
-
-    // Notice we removed <script> tags here because Layout includes AzumiScript!
-    // We still provide standard document structure.
-    Html(format!(
-        "<!DOCTYPE html><html><head><title>Lesson 19</title><meta charset='utf-8'></head><body>{}<script src='/static/idiomorph.js'></script></body></html>",
-        html
-    ))
+    Html(azumi::render_to_string(&render(
+        Props::builder().state(&state).build().unwrap(),
+    )))
 }
 
 pub async fn login_handler(jar: CookieJar) -> impl IntoResponse {
