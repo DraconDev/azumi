@@ -1,7 +1,8 @@
+use axum::response::IntoResponse;
 use azumi::prelude::*;
 
 #[azumi::component]
-pub fn Lesson17() -> Html {
+fn Lesson17() -> Html {
     html! {
         <div class="lesson-container">
             <h1>"Lesson 17: Asset Pipeline"</h1>
@@ -13,4 +14,8 @@ pub fn Lesson17() -> Html {
             <p>"If you inspect the element, the src should start with /assets/..."</p>
         </div>
     }
+}
+
+pub async fn handler() -> impl IntoResponse {
+    Lesson17::new().to_html()
 }
