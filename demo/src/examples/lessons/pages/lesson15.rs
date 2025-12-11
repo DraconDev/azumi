@@ -1,3 +1,4 @@
+use crate::examples::lessons::components::layout::DarkModernLayout;
 use azumi::prelude::*;
 
 /// Lesson 15: Full Application Pattern
@@ -29,7 +30,6 @@ impl TodoApp {
 #[azumi::component]
 pub fn todo_app_view<'a>(state: &'a TodoApp) -> impl Component + 'a {
     html! {
-
         <div class={todo_app}>
             <header class={app_header}>
                 <h1 class={app_title}>"📝 Azumi Todos"</h1>
@@ -42,20 +42,22 @@ pub fn todo_app_view<'a>(state: &'a TodoApp) -> impl Component + 'a {
             </div>
 
             <div class={filter_section}>
-                <div>
+                <div class={filter_group}>
                     <button
-                        class={if !state.show_completed { "filter_btn filter_active" } else { "filter_btn" }}
+                        class={if !state.show_completed { format!("{} {}", filter_btn, filter_active) } else { filter_btn.to_string() }}
                         on:click={state.toggle_filter}>
                         "Active"
                     </button>
                     <button
-                        class={if state.show_completed { "filter_btn filter_active" } else { "filter_btn" }}
+                        class={if state.show_completed { format!("{} {}", filter_btn, filter_active) } else { filter_btn.to_string() }}
                         on:click={state.toggle_filter}>
                         "Completed"
                     </button>
                 </div>
-                <span class={item_count} data-bind="item_count">{state.item_count}</span>
-                <button class={clear_btn} on:click={state.clear}>"Clear"</button>
+                <div class={status_group}>
+                     <span class={item_count} data-bind="item_count">{state.item_count}</span>
+                     <button class={clear_btn} on:click={state.clear}>"Clear"</button>
+                </div>
             </div>
 
             <div class={todo_list}>
@@ -65,9 +67,11 @@ pub fn todo_app_view<'a>(state: &'a TodoApp) -> impl Component + 'a {
                     </div>
                 }
                 @if state.item_count > 0 {
-                    <p>"You have " {state.item_count} " item(s) in your list."</p>
-                    <div style={ --bg-color: "#e0f7fa"; --padding: "1rem" }>
-                        "This box is styled with the new Style DSL!"
+                    <div class={list_content}>
+                        <p class={list_summary}>"You have " <strong class={count_highlight}>{state.item_count}</strong> " item(s) in your list."</p>
+                        <div class={dsl_box} style={ --bg_color: "rgba(59, 130, 246, 0.1)"; --padding: "1rem" }>
+                             "This box is styled with the new Style DSL!"
+                        </div>
                     </div>
                 }
             </div>
@@ -75,13 +79,15 @@ pub fn todo_app_view<'a>(state: &'a TodoApp) -> impl Component + 'a {
         <style>
             .todo_app {
                 max-width: "500px";
-                background: "white";
-                border-radius: "12px";
-                border: "1px solid #e0e0e0";
+                background: "rgba(30, 41, 59, 0.6)";
+                backdrop-filter: "blur(12px)";
+                border-radius: "16px";
+                border: "1px solid rgba(255,255,255,0.1)";
                 overflow: "hidden";
+                box-shadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)";
             }
             .app_header {
-                background: "linear-gradient(135deg,#667eea 0%,#764ba2 100%)";
+                background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)";
                 color: "white";
                 padding: "2rem";
                 text-align: "center";
@@ -89,72 +95,104 @@ pub fn todo_app_view<'a>(state: &'a TodoApp) -> impl Component + 'a {
             .app_title {
                 margin: "0";
                 font-size: "2rem";
+                font-weight: "800";
             }
             .app_subtitle {
                 opacity: "0.8";
                 margin-top: "0.5rem";
+                font-size: "0.9rem";
             }
             .input_section {
-                padding: "1rem";
+                padding: "1.5rem";
                 display: "flex";
-                gap: "0.5rem";
-                border-bottom: "1px solid #eee";
+                gap: "0.75rem";
+                border-bottom: "1px solid rgba(255,255,255,0.05)";
             }
             .todo_input {
                 flex: "1";
-                padding: "0.75rem";
-                border: "1px solid #ddd";
-                border-radius: "6px";
+                padding: "0.75rem 1rem";
+                background: "rgba(0, 0, 0, 0.2)";
+                border: "1px solid rgba(255,255,255,0.1)";
+                border-radius: "8px";
                 font-size: "1rem";
+                color: "white";
+                transition: "border 0.2s";
+            }
+            .todo_input:focus {
+                outline: "none";
+                border-color: "#818cf8";
             }
             .add_btn {
                 padding: "0.75rem 1.5rem";
-                background: "#4caf50";
+                background: "#10b981";
                 color: "white";
                 border: "none";
-                border-radius: "6px";
+                border-radius: "8px";
                 cursor: "pointer";
                 font-size: "1rem";
+                font-weight: "600";
+                transition: "opacity 0.2s";
             }
+            .add_btn:hover { opacity: "0.9"; }
+
             .filter_section {
-                padding: "1rem";
+                padding: "1rem 1.5rem";
                 display: "flex";
                 justify-content: "space-between";
                 align-items: "center";
-                background: "#f8f9fa";
+                background: "rgba(0,0,0,0.1)";
+                flex-wrap: "wrap";
+                gap: "1rem";
             }
+            .filter_group { display: "flex"; gap: "0.5rem"; }
+            .status_group { display: "flex"; align-items: "center"; gap: "1rem"; }
+
             .filter_btn {
-                padding: "0.5rem 1rem";
-                border: "1px solid #ddd";
-                border-radius: "4px";
-                background: "white";
+                padding: "0.4rem 0.8rem";
+                border: "1px solid rgba(255,255,255,0.1)";
+                border-radius: "6px";
+                background: "transparent";
+                color: "#94a3b8";
                 cursor: "pointer";
+                font-size: "0.9rem";
+                transition: "all 0.2s";
             }
+            .filter_btn:hover { background: "rgba(255,255,255,0.05)"; color: "white"; }
             .filter_active {
-                background: "#2196f3";
+                background: "#6366f1";
                 color: "white";
-                border-color: "#2196f3";
+                border-color: "#6366f1";
             }
             .item_count {
-                font-size: "1.5rem";
+                font-size: "1.2rem";
                 font-weight: "bold";
-                color: "#667eea";
+                color: "#e2e8f0";
             }
             .clear_btn {
-                padding: "0.5rem 1rem";
-                background: "#f44336";
-                color: "white";
-                border: "none";
-                border-radius: "4px";
+                padding: "0.4rem 0.8rem";
+                background: "rgba(239, 68, 68, 0.2)";
+                color: "#fca5a5";
+                border: "1px solid rgba(239, 68, 68, 0.3)";
+                border-radius: "6px";
                 cursor: "pointer";
+                font-size: "0.8rem";
+                transition: "all 0.2s";
             }
-            .todo_list {
-                padding: "1rem";
-            }
-            .empty_state {
-                text-align: "center";
-                padding: "2rem";
-                color: "#999";
+            .clear_btn:hover { background: "rgba(239, 68, 68, 0.3)"; color: "#fecaca"; }
+
+            .todo_list { padding: "1.5rem"; min-height: "150px"; }
+            .empty_state { text-align: "center"; padding: "2rem"; color: "#64748b"; font-style: "italic"; }
+
+            .list_content { display: "grid"; gap: "1rem"; text-align: "center"; }
+            .list_summary { color: "#cbd5e1"; }
+            .count_highlight { color: "#38bdf8"; }
+
+            .dsl_box {
+                background-color: "var(--bg_color)";
+                padding: "var(--padding)";
+                border-radius: "8px";
+                color: "#93c5fd";
+                border: "1px dashed rgba(59, 130, 246, 0.3)";
             }
         </style>
     }
@@ -162,37 +200,13 @@ pub fn todo_app_view<'a>(state: &'a TodoApp) -> impl Component + 'a {
 
 /// Full page component for Lesson 15
 #[azumi::component]
-pub fn lesson15_page<'a>(state: &'a TodoApp) -> impl Component + 'a {
+pub fn lesson15_page() -> impl Component {
+    let app_state = TodoApp {
+        show_completed: false,
+        item_count: 0,
+    };
     html! {
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>"Lesson 15: Full Application"</title>
-            <style>
-                body {
-                    font-family: "system-ui, sans-serif";
-                    margin: "0";
-                    padding: "2rem";
-                    background: "#fafafa";
-                }
-                .container { max-width: "800px"; margin: "0 auto"; }
-                .header { text-align: "center"; margin-bottom: "2rem"; }
-                .main_title { font-size: "2rem"; color: "#333"; }
-                .subtitle { color: "#666"; }
-                .demo_area { display: "flex"; justify-content: "center"; margin: "2rem 0"; }
-                .explanation {
-                    background: "#e8f5e9";
-                    padding: "1.5rem";
-                    border-radius: "8px";
-                    margin: "2rem 0";
-                }
-                .filter_btn_g { padding: "0.5rem 1rem"; border: "1px solid #ddd"; border-radius: "4px"; background: "white"; cursor: "pointer"; }
-                .filter_active_g { background: "#2196f3"; color: "white"; border-color: "#2196f3"; }
-            </style>
-        </head>
-        <body>
+        @DarkModernLayout() {
             <div class={container}>
                 <header class={header}>
                     <h1 class={main_title}>"Lesson 15: Full Application"</h1>
@@ -200,32 +214,50 @@ pub fn lesson15_page<'a>(state: &'a TodoApp) -> impl Component + 'a {
                 </header>
 
                 <div class={explanation}>
-                    <h3>"🚀 Putting It All Together"</h3>
-                    <ul>
-                        <li><strong>"Multiple actions"</strong>" - add, toggle filter, clear"</li>
-                        <li><strong>"Conditional rendering"</strong>" - empty state vs items"</li>
-                        <li><strong>"Optimistic updates"</strong>" - instant count changes"</li>
+                    <h3 class={exp_title}>"🚀 Putting It All Together"</h3>
+                    <ul class={exp_list}>
+                        <li class={exp_item}><strong class={strong}>"Multiple actions"</strong>" - add, toggle filter, clear"</li>
+                        <li class={exp_item}><strong class={strong}>"Conditional rendering"</strong>" - empty state vs items"</li>
+                        <li class={exp_item}><strong class={strong}>"Optimistic updates"</strong>" - instant count changes"</li>
                     </ul>
                 </div>
 
                 <div class={demo_area}>
-                    @todo_app_view(state = state)
+                    @todo_app_view(state = &app_state)
                 </div>
             </div>
-            // Scripts injected automatically
-        </body>
-        </html>
+            <style>
+                .container { max-width: "800px"; margin: "0 auto"; }
+                .header { text-align: "center"; margin-bottom: "3rem"; }
+                .main_title {
+                    font-size: "3rem";
+                    font-weight: "800";
+                    background: "linear-gradient(to right, #a855f7, #ec4899)";
+                    -webkit-background-clip: "text";
+                    -webkit-text-fill-color: "transparent";
+                    margin-bottom: "1rem";
+                }
+                .subtitle { color: "#94a3b8"; font-size: "1.2rem"; }
+
+                .explanation {
+                    background: "rgba(168, 85, 247, 0.1)";
+                    padding: "1.5rem";
+                    border-radius: "12px";
+                    margin: "2rem 0";
+                    border: "1px solid rgba(168, 85, 247, 0.2)";
+                }
+                .exp_title { color: "#d8b4fe"; margin-bottom: "1rem"; font-size: "1.2rem"; }
+                .exp_list { padding-left: "1.5rem"; display: "grid"; gap: "0.5rem"; }
+                .exp_item { color: "#cbd5e1"; }
+                .strong { color: "#f0abfc"; }
+
+                .demo_area { display: "flex"; justify-content: "center"; margin: "2rem 0"; }
+            </style>
+        }
     }
 }
 
 // Handler for Axum
 pub async fn lesson15_handler() -> impl axum::response::IntoResponse {
-    let app_state = TodoApp {
-        show_completed: false,
-        item_count: 0,
-    };
-    use lesson15_page_component::Props;
-    let page =
-        lesson15_page_component::render(Props::builder().state(&app_state).build().expect("props"));
-    axum::response::Html(azumi::render_to_string(&page))
+    axum::response::Html(azumi::render_to_string(&lesson15_page()))
 }
