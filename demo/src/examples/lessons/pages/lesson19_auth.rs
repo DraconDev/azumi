@@ -162,7 +162,10 @@ pub async fn handler(CurrentUser(user): CurrentUser) -> impl IntoResponse {
         username: user.map(|u| u.username),
     };
 
-    axum::response::Html(azumi::render_to_string(&lesson19_page(&state)))
+    use lesson19_page_component::*;
+    axum::response::Html(azumi::render_to_string(&render(
+        Props::builder().state(&state).build().unwrap(),
+    )))
 }
 
 pub async fn login_handler(jar: CookieJar) -> impl IntoResponse {
