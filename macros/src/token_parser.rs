@@ -299,7 +299,6 @@ impl Parse for Element {
         let start_span = input.span();
         input.parse::<Token![<]>()?;
         let (name, name_span) = parse_html_name(input, false)?; // false = don't allow double dash in tag names
-        eprintln!("Parsing element: {}", name);
 
         let mut attrs = Vec::new();
         let mut bind_struct = None;
@@ -394,7 +393,6 @@ For dynamic styles: use style attribute with expressions"
         let mut children = Vec::new();
         if input.peek(Token![/]) {
             // Self-closing
-            // Self-closing
             input.parse::<Token![/]>()?;
             let end_token = input.parse::<Token![>]>()?;
             if let Some(joined) = start_span.join(end_token.span()) {
@@ -417,14 +415,9 @@ For dynamic styles: use style attribute with expressions"
 
                 // Expect closing tag
                 if input.peek(Token![<]) && input.peek2(Token![/]) {
-                    eprintln!("Element::parse: Found closing tag sequence");
                     input.parse::<Token![<]>()?;
                     input.parse::<Token![/]>()?;
                     let (closing_name, _) = parse_html_name(input, false)?;
-                    eprintln!(
-                        "Found closing tag: </{}>  (expected </{}>)",
-                        closing_name, name
-                    );
                     if closing_name != name {
                         return Err(Error::new(
                             input.span(),
