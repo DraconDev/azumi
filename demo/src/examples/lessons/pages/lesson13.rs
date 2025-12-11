@@ -155,7 +155,7 @@ pub fn lesson13_page<'a>(state: &'a ContactForm) -> impl Component + 'a {
             .header { text-align: "center"; margin-bottom: "3rem"; }
             .main_title {
                 font-size: "3rem";
-                weight: "800";
+                font-weight: "800";
                 color: "#e2e8f0";
                 background: "linear-gradient(to right, #fbbf24, #f59e0b)";
                 -webkit-background-clip: "text";
