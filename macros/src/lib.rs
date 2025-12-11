@@ -146,12 +146,9 @@ pub fn html(input: TokenStream) -> TokenStream {
             // Runtime HTML generation
             azumi::from_fn(move |f| {
                 // Inject global CSS first (unscoped)
-                if !#global_css.is_empty() {
-                    write!(f, "<style>{}</style>", #global_css)?;
-                }
-                // Inject scoped CSS
-                if !#scoped_css.is_empty() {
-                     write!(f, "<style data-azumi-internal=\"true\">{}</style>", #scoped_css)?;
+                // CSS Injection is now handled by generated code (smart injection into <head>)
+                if false {
+                   // Legacy code removed
                 }
                 #html_construction
             })
@@ -573,49 +570,94 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
 
-        // Generate body
-        let body = if has_scoped {
-            // Generate scope ID from scoped CSS only
+        // Generate scoped CSS and ID
+        let (scoped_output, scope_id) = if has_scoped {
             let mut hasher = DefaultHasher::new();
             scoped_css.hash(&mut hasher);
             let hash = hasher.finish();
             let scope_id = format!("s{:x}", hash);
-
-            // Scope the CSS
-            let scoped_output = crate::css::scope_css(&scoped_css, &scope_id);
-
-            // Generate body with scope context (pass valid_classes/ids for auto-scoping)
-            let ctx = GenerationContext::with_scope(scope_id.clone(), valid_classes.clone(), valid_ids.clone());
-            let body_content = generate_body_with_context(nodes, &ctx);
-
-            // Inject global CSS first (unscoped), then scoped CSS
-            if has_global {
-                quote! {
-                    write!(f, "<style>{}</style>", #global_css)?;
-                    write!(f, "<style>{}</style>", #scoped_output)?;
-                    #body_content
-                }
-            } else {
-                quote! {
-                    write!(f, "<style>{}</style>", #scoped_output)?;
-                    #body_content
-                }
-            }
+            (crate::css::scope_css(&scoped_css, &scope_id), Some(scope_id))
         } else {
-            // Only global CSS, no scoping needed
-            let ctx = GenerationContext::normal();
-            let body_content = generate_body_with_context(nodes, &ctx);
-
-            quote! {
-                write!(f, "<style>{}</style>", #global_css)?;
-                #body_content
-            }
+            (String::new(), None)
         };
 
-        body
+        // Construct CSS string to inject
+        let css_to_inject = if has_global {
+            if has_scoped {
+                format!("<style>{}</style><style data-azumi-internal=\"true\">{}</style>", global_css, scoped_output)
+            } else {
+                format!("<style>{}</style>", global_css)
+            }
+        } else {
+             format!("<style data-azumi-internal=\"true\">{}</style>", scoped_output)
+        };
+
+        // Attempt to inject into AST (find <head>)
+        // We need a mutable nodes vector
+        let mut working_nodes = nodes.to_vec();
+        let injected = inject_css_into_head(&mut working_nodes, &css_to_inject);
+
+        // Generate body with context (scope ID etc)
+        // If injected, working_nodes has the styles. If not, we prepend.
+        let ctx = if let Some(sid) = scope_id {
+            GenerationContext::with_scope(sid, valid_classes.clone(), valid_ids.clone())
+        } else {
+            GenerationContext::normal()
+        };
+        
+        let body_content = generate_body_with_context(&working_nodes, &ctx);
+
+        if injected {
+            // CSS successfully injected into <head>
+            body_content
+        } else {
+            // Fallback: Prepend (only for fragments/components without head)
+            quote! {
+                write!(f, "{}", #css_to_inject)?;
+                #body_content
+            }
+        }
     } else {
         generate_body_with_context(nodes, &GenerationContext::normal())
     }
+}
+
+// Helper to inject CSS into <head>
+fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool {
+    for node in nodes.iter_mut() {
+        match node {
+            token_parser::Node::Element(elem) => {
+                if elem.name == "head" {
+                    // Found <head>! Inject CSS as first child
+                    // Create Node::Text with quoted string for generate_body_with_context
+                    let content = format!("{:?}", css); // quote the string
+                    let text_node = token_parser::Node::Text(token_parser::Text {
+                        content,
+                        span: elem.span,
+                    });
+                    elem.children.insert(0, text_node);
+                    return true;
+                }
+                // Recurse
+                if inject_css_into_head(&mut elem.children, css) {
+                    return true;
+                }
+            }
+            token_parser::Node::Fragment(frag) => {
+                 if inject_css_into_head(&mut frag.children, css) {
+                    return true;
+                }
+            }
+            token_parser::Node::Block(token_parser::Block::If(if_block)) => {
+                 if inject_css_into_head(&mut if_block.then_branch, css) { return true; }
+                 if let Some(else_branch) = &mut if_block.else_branch {
+                     if inject_css_into_head(else_branch, css) { return true; }
+                 }
+            }
+            _ => {}
+        }
+    }
+    false
 }
 
 fn validate_nodes(
