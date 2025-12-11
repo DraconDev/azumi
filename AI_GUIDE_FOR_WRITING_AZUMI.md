@@ -156,15 +156,16 @@ pub fn RootLayout(children: impl Component) -> impl Component {
                 {children}
 
                 // ⚠️ REQUIRED: Manually include the runtime for interactivity
-                @azumi::prelude::AzumiScript
+                // This magic script is intercepted by the server to serve the correct runtime/hot-reload logic.
+                <script src="azumi.js" />
             </body>
         </html>
     }
 }
 ```
 
-> [!IMPORTANT] > **Always use `@azumi::prelude::AzumiScript`.**
-> Do not attempt to manually inject script tags or bake `azumi.js` into the head/body yourself. The `AzumiScript` component handles asset paths, hashing, and loading initialization correctly for both dev and prod environments.
+> [!IMPORTANT] > **Use `<script src="azumi.js" />`.**
+> Azumi intercepts requests for this specific file. You do not need to create this file manually; it is a virtual file served by the framework. Place this ONCE in your root layout, and it will be inherited by all pages dealing with that layout.
 
 This ensures explicit control over when the 12kb runtime is included.
 
