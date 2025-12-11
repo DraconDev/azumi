@@ -18,9 +18,10 @@ pub struct CompositionState {
     pub step: i32,
 }
 
+use crate::examples::lessons::components::layout::DarkModernLayout;
+
 /// Lesson 8: Action System Deep Dive
 ///
-/// Server-side interactivity patterns
 /// Server-side interactivity patterns
 pub fn counter_display(state: CounterState) -> impl azumi::Component {
     html! {
@@ -32,10 +33,26 @@ pub fn counter_display(state: CounterState) -> impl azumi::Component {
             <div class={timestamp}>"Last updated: 12:00:00"</div>
         </div>
         <style>
-            .counter { padding: "2rem"; text-align: "center"; border: "1px solid #eee"; }
-            .count_display { font-size: "3rem"; margin: "1rem 0"; }
-            .counter_button { padding: "1rem 2rem"; background: "#4caf50"; color: "white"; border: "none"; cursor: "pointer"; }
-            .timestamp { font-size: "0.8rem"; color: "#666"; }
+            .counter {
+                padding: "2rem";
+                text-align: "center";
+                border: "1px solid rgba(255,255,255,0.05)";
+                background: "rgba(15, 23, 42, 0.4)";
+                border-radius: "12px";
+                color: "white";
+            }
+            .count_display { font-size: "3rem"; margin: "1rem 0"; color: "#38bdf8"; font-weight: "bold"; }
+            .counter_button {
+                padding: "1rem 2rem";
+                background: "linear-gradient(to right, #3b82f6, #2563eb)";
+                color: "white";
+                border: "none";
+                cursor: "pointer";
+                border-radius: "8px";
+                font-weight: "600";
+                transition: "opacity 0.2s";
+            }
+            .timestamp { font-size: "0.8rem"; color: "#94a3b8"; margin-top: "1rem"; }
             #counter_box { display: "block"; }
         </style>
     }
@@ -50,16 +67,15 @@ pub async fn increment_counter(state: CounterState) -> impl azumi::Component {
 }
 
 /// Example: Action with state management
-/// Example: Action with state management
 pub fn state_management_example(state: ManagementState) -> impl azumi::Component {
     html! {
 
         <div id={state_box} class={state_container} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
-            <h3>"State Management"</h3>
+            <h3 class={title}>"State Management"</h3>
 
             <div class={state_info}>
-                <p>"Current State: " {state.status}</p>
-                <p>"Counter: " {state.count}</p>
+                <p>"Current State: " <span class={highlight}>{state.status}</span></p>
+                <p>"Counter: " <span class={highlight}>{state.count}</span></p>
             </div>
 
             <button class={action_button} az-on={click call update_state -> #state_box}>
@@ -67,9 +83,31 @@ pub fn state_management_example(state: ManagementState) -> impl azumi::Component
             </button>
         </div>
         <style>
-            .state_container { padding: "1.5rem"; background: "#f9f9f9"; }
-            .state_info { margin: "0.5rem 0"; padding: "0.5rem"; background: "white"; }
-            .action_button { padding: "0.75rem 1.5rem"; background: "#2196f3"; color: "white"; border: "none"; cursor: "pointer"; }
+            .state_container {
+                padding: "1.5rem";
+                background: "rgba(20, 184, 166, 0.1)";
+                border-radius: "12px";
+                border: "1px solid rgba(20, 184, 166, 0.2)";
+                color: "#e2e8f0";
+            }
+            .title { color: "#2dd4bf"; margin-bottom: "1rem"; font-size: "1.25rem"; }
+            .state_info {
+                margin: "1rem 0";
+                padding: "1rem";
+                background: "rgba(0,0,0,0.2)";
+                border-radius: "8px";
+                color: "#cbd5e1";
+            }
+            .highlight { color: "#5eead4"; font-weight: "bold"; }
+            .action_button {
+                padding: "0.75rem 1.5rem";
+                background: "linear-gradient(to right, #0d9488, #0f766e)";
+                color: "white";
+                border: "none";
+                cursor: "pointer";
+                border-radius: "8px";
+                font-weight: "600";
+            }
             #state_box { display: "block"; }
         </style>
     }
@@ -91,16 +129,15 @@ pub async fn update_state(state: ManagementState) -> impl azumi::Component {
 }
 
 /// Example: Action composition
-/// Example: Action composition
 pub fn action_composition_example(state: CompositionState) -> impl azumi::Component {
     html! {
 
         <div id={composition_box} class={composition_container} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
-            <h3>"Action Composition"</h3>
+            <h3 class={title}>"Action Composition"</h3>
 
             <div class={action_card}>
-                <p>"Message: " {state.message}</p>
-                <p>"Step: " {state.step}</p>
+                <p>"Message: " <span class={msg_text}>{state.message}</span></p>
+                <p>"Step: " <span class={step_text}>{state.step}</span></p>
             </div>
 
             <button class={compose_button} az-on={click call compose_actions -> #composition_box}>
@@ -108,9 +145,27 @@ pub fn action_composition_example(state: CompositionState) -> impl azumi::Compon
             </button>
         </div>
         <style>
-            .composition_container { padding: "1.5rem"; }
-            .action_card { margin: "0.5rem 0"; padding: "1rem"; background: "#f5f5f5"; border: "1px solid #eee"; }
-            .compose_button { padding: "0.75rem 1.5rem"; background: "#ff4081"; color: "white"; border: "none"; cursor: "pointer"; }
+            .composition_container { padding: "1.5rem"; color: "#e2e8f0"; }
+            .title { color: "#e2e8f0"; margin-bottom: "1rem"; font-size: "1.25rem"; }
+            .action_card {
+                margin: "1rem 0";
+                padding: "1rem";
+                background: "rgba(30, 41, 59, 0.6)";
+                border-radius: "8px";
+                border: "1px solid rgba(255,255,255,0.05)";
+                color: "#cbd5e1";
+            }
+            .msg_text { color: "#f472b6"; }
+            .step_text { color: "#fb7185"; font-weight: "bold"; }
+            .compose_button {
+                padding: "0.75rem 1.5rem";
+                background: "linear-gradient(to right, #db2777, #be185d)";
+                color: "white";
+                border: "none";
+                cursor: "pointer";
+                border-radius: "8px";
+                font-weight: "600";
+            }
             #composition_box { display: "block"; }
         </style>
     }
@@ -141,49 +196,82 @@ pub fn lesson8() -> impl azumi::Component {
     };
 
     html! {
-        <script src="/static/azumi.js"></script>
+        @DarkModernLayout() {
+            <div class={container}>
+                <header class={header}>
+                    <h1 class={main_title}>"Lesson 8: Action System Deep Dive"</h1>
+                    <p class={subtitle}>"Server-side interactivity patterns"</p>
+                </header>
 
-        <div class={container}>
-            <header class={header}>
-                <h1 class={main_title}>"Lesson 8: Action System Deep Dive"</h1>
-                <p class={subtitle}>"Server-side interactivity patterns"</p>
-            </header>
+                <section class={key_points}>
+                    <h2 class={section_title}>"Key Concepts"</h2>
+                    <ul class={points_list}>
+                        <li class={point}>"✅ Server-side actions for interactivity"</li>
+                        <li class={point}>"✅ State management patterns"</li>
+                        <li class={point}>"✅ Action composition"</li>
+                        <li class={point}>"✅ Type-safe action parameters"</li>
+                        <li class={point}>"✅ Compile-time action validation"</li>
+                    </ul>
+                </section>
 
-            <section class={key_points}>
-                <h2 class={section_title}>"Key Concepts"</h2>
-                <ul class={points_list}>
-                    <li class={point}>"✅ Server-side actions for interactivity"</li>
-                    <li class={point}>"✅ State management patterns"</li>
-                    <li class={point}>"✅ Action composition"</li>
-                    <li class={point}>"✅ Type-safe action parameters"</li>
-                    <li class={point}>"✅ Compile-time action validation"</li>
-                </ul>
-            </section>
+                <section class={examples}>
+                    <div class={example_card}>
+                        { counter_display(counter_state) }
+                    </div>
+                    <div class={example_card}>
+                        { state_management_example(management_state.clone()) }
+                    </div>
+                    <div class={example_card}>
+                        { action_composition_example(composition_state.clone()) }
+                    </div>
+                </section>
+            </div>
+            <style>
+                .container { max-width: "900px"; margin: "0 auto"; }
+                .header { text-align: "center"; margin-bottom: "3rem"; }
+                .main_title {
+                    font-size: "3rem";
+                    font-weight: "800";
+                    background: "linear-gradient(to right, #f472b6, #fb7185)";
+                    -webkit-background-clip: "text";
+                    -webkit-text-fill-color: "transparent";
+                    margin-bottom: "1rem";
+                }
+                .subtitle { font-size: "1.25rem"; color: "#94a3b8"; }
 
-            <section class={examples}>
-                <div class={example_card}>
-                    { counter_display(counter_state) }
-                </div>
-                <div class={example_card}>
-                    { state_management_example(management_state.clone()) }
-                </div>
-                <div class={example_card}>
-                    { action_composition_example(composition_state.clone()) }
-                </div>
-            </section>
-        </div>
-        <style>
-            .container { padding: "20px"; }
-            .header { text-align: "center"; margin-bottom: "30px"; }
-            .main_title { font-size: "32px"; color: "#333"; }
-            .subtitle { font-size: "18px"; color: "#666"; }
-            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
-            .section_title { font-size: "20px"; margin-bottom: "15px"; }
-            .points_list { list-style: "none"; padding: "0"; }
-            .point { margin-bottom: "10px"; }
-            .examples { display: "grid"; gap: "20px"; }
-            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
-        </style>
+                .key_points {
+                    background: "rgba(30, 41, 59, 0.5)";
+                    padding: "2rem";
+                    border-radius: "16px";
+                    margin-bottom: "3rem";
+                    border: "1px solid rgba(255,255,255,0.05)";
+                    backdrop-filter: "blur(10px)";
+                }
+                .section_title {
+                    font-size: "1.5rem";
+                    color: "#f1f5f9";
+                    margin-bottom: "1.5rem";
+                    border-bottom: "1px solid rgba(255,255,255,0.1)";
+                    padding-bottom: "0.5rem";
+                }
+                .points_list { list-style: "none"; padding: "0"; display: "grid"; gap: "1rem"; }
+                .point {
+                    color: "#e2e8f0";
+                    padding: "0.75rem";
+                    background: "rgba(255,255,255,0.03)";
+                    border-radius: "8px";
+                    font-size: "1.1rem";
+                }
+
+                .examples { display: "grid"; gap: "2rem"; }
+                .example_card {
+                    border: "1px solid rgba(255,255,255,0.1)";
+                    padding: "2rem";
+                    border-radius: "16px";
+                    background: "rgba(15, 23, 42, 0.6)";
+                }
+            </style>
+        }
     }
 }
 
