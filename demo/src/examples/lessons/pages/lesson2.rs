@@ -6,10 +6,15 @@ use azumi::html;
 #[azumi::component]
 pub fn global_css_example() -> impl azumi::Component {
     html! {
-        // Global styles - not scoped to component
         <style global>
             body { font-family: "Arial, sans-serif"; }
         </style>
+        <div class={component_class}>
+            <h2 class={local_class}>"Scoped Style"</h2>
+            <p class={global_demo}>"Global Style Effect (simulated)"</p>
+            <p>"This component demonstrates CSS scoping concepts"</p>
+        </div>
+        // Global styles - not scoped to component
 
         // Component-scoped styles - automatically scoped
         <style>
@@ -17,12 +22,6 @@ pub fn global_css_example() -> impl azumi::Component {
             .local_class { color: "blue"; }
             .global_demo { color: "purple"; font-style: "italic"; }
         </style>
-
-        <div class={component_class}>
-            <h2 class={local_class}>"Scoped Style"</h2>
-            <p class={global_demo}>"Global Style Effect (simulated)"</p>
-            <p>"This component demonstrates CSS scoping concepts"</p>
-        </div>
     }
 }
 
@@ -30,6 +29,11 @@ pub fn global_css_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn mixed_scoping_example() -> impl azumi::Component {
     html! {
+        <div class={container}>
+            <h3 class={scoped_title}>"Scoping Concepts"</h3>
+            <p class={global_simulation}>"Global styles affect everything"</p>
+            <p class={scoped_title}>"Scoped styles are component-specific"</p>
+        </div>
         <style global>
             /* This would affect the entire app */
             /* body { font-family: "Arial, sans-serif"; } */
@@ -40,12 +44,6 @@ pub fn mixed_scoping_example() -> impl azumi::Component {
             .scoped_title { color: "#2196f3"; }
             .global_simulation { font-size: "1.1rem"; font-weight: "bold"; }
         </style>
-
-        <div class={container}>
-            <h3 class={scoped_title}>"Scoping Concepts"</h3>
-            <p class={global_simulation}>"Global styles affect everything"</p>
-            <p class={scoped_title}>"Scoped styles are component-specific"</p>
-        </div>
     }
 }
 
@@ -53,13 +51,6 @@ pub fn mixed_scoping_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn scoping_best_practices() -> impl azumi::Component {
     html! {
-        <style>
-            .best_practices { padding: "1.5rem"; background: "#f9f9f9"; }
-            .practice_item { margin: "0.5rem 0"; padding: "0.5rem"; background: "white"; }
-            .do_class { color: "green"; font-weight: "bold"; }
-            .dont_class { color: "red"; font-weight: "bold"; }
-        </style>
-
         <div class={best_practices}>
             <h3>"CSS Scoping Best Practices"</h3>
 
@@ -79,6 +70,12 @@ pub fn scoping_best_practices() -> impl azumi::Component {
                 <span class={do_class}>"DO:"</span> " Let Azumi handle scoping automatically"
             </div>
         </div>
+        <style>
+            .best_practices { padding: "1.5rem"; background: "#f9f9f9"; }
+            .practice_item { margin: "0.5rem 0"; padding: "0.5rem"; background: "white"; }
+            .do_class { color: "green"; font-weight: "bold"; }
+            .dont_class { color: "red"; font-weight: "bold"; }
+        </style>
     }
 }
 
@@ -86,18 +83,6 @@ pub fn scoping_best_practices() -> impl azumi::Component {
 #[azumi::component]
 pub fn lesson2() -> impl azumi::Component {
     html! {
-        <style>
-            .container { padding: "20px"; }
-            .header { text-align: "center"; margin-bottom: "30px"; }
-            .main_title { font-size: "32px"; color: "#333"; }
-            .subtitle { font-size: "18px"; color: "#666"; }
-            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
-            .section_title { font-size: "20px"; margin-bottom: "15px"; }
-            .points_list { list-style: "none"; padding: "0"; }
-            .point { margin-bottom: "10px"; }
-            .examples { display: "grid"; gap: "20px"; }
-            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
-        </style>
         <div class={container}>
             <header class={header}>
                 <h1 class={main_title}>"Lesson 3: Global vs Component CSS"</h1>
@@ -127,6 +112,18 @@ pub fn lesson2() -> impl azumi::Component {
                 </div>
             </section>
         </div>
+        <style>
+            .container { padding: "20px"; }
+            .header { text-align: "center"; margin-bottom: "30px"; }
+            .main_title { font-size: "32px"; color: "#333"; }
+            .subtitle { font-size: "18px"; color: "#666"; }
+            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
+            .section_title { font-size: "20px"; margin-bottom: "15px"; }
+            .points_list { list-style: "none"; padding: "0"; }
+            .point { margin-bottom: "10px"; }
+            .examples { display: "grid"; gap: "20px"; }
+            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
+        </style>
     }
 }
 
