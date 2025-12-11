@@ -4,6 +4,13 @@ use azumi::html;
 #[azumi::component]
 pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Component {
     html! {
+        <div class={dark_layout}>
+            <div class={content_container}>
+                {children}
+            </div>
+            // Scripts for Hot Reload and Interactivity
+            @azumi::prelude::AzumiScript
+        </div>
         <style global>
             :root {
                 --azumi-bg: "#1e1e1e";
@@ -186,12 +193,6 @@ pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Componen
             }
         </style>
 
-        <div class={dark_layout}>
-            <div class={content_container}>
-                {children}
-            </div>
-            // Scripts for Hot Reload and Interactivity
-            @azumi::prelude::AzumiScript
-        </div>
+
     }
 }

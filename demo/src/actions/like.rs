@@ -10,20 +10,7 @@ pub struct LikeState {
 /// Dynamic fragment - this is what gets swapped by actions
 pub fn like_button(state: LikeState) -> impl Component {
     html! {
-        <style>
-            .btn {
-                padding: "0.5rem 1rem";
-                border: "none";
-                border-radius: "4px";
-                cursor: "pointer";
-                background: "#eee";
-            }
-            .btn.liked {
-                background: "#ff4081";
-                color: "white";
-            }
-            #like_box {}
-        </style>
+
         <div id={like_box} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
             <h2>"Server-Side Action"</h2>
             <p>
@@ -40,6 +27,21 @@ pub fn like_button(state: LikeState) -> impl Component {
                 </span>
             </button>
         </div>
+
+        <style>
+            .btn {
+                padding: "0.5rem 1rem";
+                border: "none";
+                border-radius: "4px";
+                cursor: "pointer";
+                background: "#eee";
+            }
+            .btn.liked {
+                background: "#ff4081";
+                color: "white";
+            }
+            #like_box {}
+        </style>
     }
 }
 
