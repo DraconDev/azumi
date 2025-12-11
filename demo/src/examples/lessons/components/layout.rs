@@ -25,8 +25,8 @@ pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Componen
                 {children}
             </div>
             // Scripts for Hot Reload and Interactivity
-            // We use a manual script tag with Raw injection as requested
-            <script>@{azumi::Raw(azumi::AZUMI_JS)}</script>
+            // We use the simplified "azumi.js" magic source
+            <script src="azumi.js" />
         </div>
         </body>
         </html>
