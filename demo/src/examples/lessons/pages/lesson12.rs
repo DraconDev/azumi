@@ -1,4 +1,4 @@
-// use crate::components::{Image, ResponsiveImage};
+use crate::examples::lessons::components::layout::DarkModernLayout;
 use azumi::prelude::*;
 
 /// Lesson 12: Image Optimization
@@ -7,114 +7,131 @@ use azumi::prelude::*;
 #[azumi::component]
 pub fn lesson12_page() -> impl Component {
     html! {
+        @DarkModernLayout() {
+            <div class={container}>
+                <header class={header}>
+                    <h1 class={main_title}>"Lesson 12: Image Optimization"</h1>
+                    <p class={explanation}>
+                        "Azumi automatically optimizes standard " <strong class={strong}>"<img>"</strong> " tags with lazy loading and async decoding."
+                    </p>
+                </header>
 
-
-        <div class={container}>
-            <h1>"Lesson 12: Image Optimization"</h1>
-            <p>"Azumi automatically optimizes standard <img> tags with lazy loading and async decoding."</p>
-
-            <div class={section}>
-                <h2>"1. Basic Optimized Image"</h2>
-                <div class={code}>
-                    "<img src=\"/static/photo.jpg\" width=\"800\" height=\"600\" alt=\"Photo\" />"
-                </div>
-                <div class={card}>
-                    <div class={label}>"Output HTML"</div>
-                    <div class={code_comment}>
-                        "&lt;img src=\"...\" loading=\"lazy\" decoding=\"async\" width=\"800\" ...&gt;"
+                <div class={section}>
+                    <h2 class={section_title}>"1. Basic Optimized Image"</h2>
+                    <div class={code}>
+                        "<img src=\"/static/photo.jpg\" width=\"800\" height=\"600\" alt=\"Photo\" />"
                     </div>
+                    <div class={card}>
+                        <div class={label}>"Output HTML"</div>
+                        <div class={code_comment}>
+                            "&lt;img src=\"...\" loading=\"lazy\" decoding=\"async\" width=\"800\" ...&gt;"
+                        </div>
 
-                    // Usage of the component
-                    <img
-                        src="/static/photo.jpg"
-                        width="800"
-                        height="600"
-                        alt="Photo"
-                    />
+                        // Usage of the component
+                        <div class={image_wrapper}>
+                            <img
+                                src="/static/photo.jpg"
+                                width="800"
+                                height="600"
+                                alt="Photo"
+                                class={demo_img}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div class={section}>
+                    <h2 class={section_title}>"2. Eager Loading (Above the Fold)"</h2>
+                    <p class={subtext}>"For hero images at the top of the page, use eager loading."</p>
+                    <div class={code}>
+                        "<img ... loading=\"eager\" />"
+                    </div>
+                    <div class={card}>
+                        <div class={image_wrapper}>
+                            <img
+                                src="https://images.unsplash.com/photo-1682687221038-404670e01d46?w=800&q=80"
+                                alt="Hero mountain"
+                                width="800"
+                                height="600"
+                                loading="eager"
+                                class={demo_img}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div class={section}>
+                    <h2 class={section_title}>"3. Responsive Images (srcset)"</h2>
+                    <p class={subtext}>"Automatically serve the right size for the device."</p>
+                    <div class={code}>
+                        "<img srcset=\"...\" sizes=\"...\" />"
+                    </div>
+                    <div class={card}>
+                        <div class={label}>"Try resizing window"</div>
+
+                        // We use a placeholder service that supports width parameter
+                        // In real app, you'd have photo-400.jpg, photo-800.jpg on disk
+                        <div class={image_wrapper}>
+                            <img
+                                src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800"
+                                srcset="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600 600w,
+                                        https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200 1200w"
+                                sizes="(max-width: 600px) 100vw, 800px"
+                                alt="Responsive nature"
+                                class={responsive_img}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
+            <style>
+                .container { max-width: "800px"; margin: "0 auto"; }
+                .header { text-align: "center"; margin-bottom: "3rem"; }
+                .main_title {
+                    font-size: "3rem";
+                    font-weight: "800";
+                    background: "linear-gradient(to right, #14b8a6, #0d9488)";
+                    -webkit-background-clip: "text";
+                    -webkit-text-fill-color: "transparent";
+                    margin-bottom: "1rem";
+                }
+                .explanation { color: "#94a3b8"; line-height: "1.6"; margin-bottom: "2rem"; font-size: "1.1rem"; }
+                .strong { color: "#2dd4bf"; }
 
-            <div class={section}>
-                <h2>"2. Eager Loading (Above the Fold)"</h2>
-                <p>"For hero images at the top of the page, use eager loading."</p>
-                <div class={code}>
-                    "<img ... loading=\"eager\" />"
-                </div>
-                <div class={card}>
-                    <img
-                        src="https://images.unsplash.com/photo-1682687221038-404670e01d46?w=800&q=80"
-                        alt="Hero mountain"
-                        width="800"
-                        height="600"
-                        loading="eager"
-                    />
-                </div>
-            </div>
+                .section { margin-bottom: "3rem"; }
+                .section_title { color: "#e2e8f0"; margin-bottom: "1rem"; font-size: "1.5rem"; border-bottom: "1px solid rgba(255,255,255,0.1)"; padding-bottom: "0.5rem"; }
+                .subtext { color: "#94a3b8"; margin-bottom: "1rem"; }
 
-            <div class={section}>
-                <h2>"3. Responsive Images (srcset)"</h2>
-                <p>"Automatically serve the right size for the device."</p>
-                <div class={code}>
-                    "<img srcset=\"...\" sizes=\"...\" />"
-                </div>
-                <div class={card}>
-                    <div class={label}>"Try resizing window"</div>
+                .code { background: "rgba(0,0,0,0.3)"; padding: "1rem"; border-radius: "8px"; font-family: "monospace"; color: "#cbd5e1"; margin-bottom: "1rem"; border: "1px solid rgba(255,255,255,0.05)"; }
 
-                    // We use a placeholder service that supports width parameter
-                    // In real app, you'd have photo-400.jpg, photo-800.jpg on disk
-                    <img
-                        src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800"
-                        srcset="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600 600w,
-                                https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200 1200w"
-                        sizes="(max-width: 600px) 100vw, 800px"
-                        alt="Responsive nature"
-                        class={responsive_img}
-                    />
-                </div>
-            </div>
-        </div>
-        <style>
-            .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
-            .section { margin-bottom: "3rem"; }
-            .grid { display: "grid"; grid-template-columns: "repeat(auto-fit, minmax(300px, 1fr))"; gap: "1rem"; }
-            .card {
-                border: "1px solid #eee"; padding: "1rem"; border-radius: "8px";
-                background: "white";
-            }
-            .code {
-                background: "#1e1e1e"; color: "#d4d4d4";
-                padding: "1rem"; border-radius: "6px";
-                overflow-x: "auto"; font-family: "monospace"; margin: "1rem 0";
-            }
-            // img { max-width: "100%"; height: "auto"; border-radius: "4px"; }
-            .label {
-                display: "inline-block"; background: "#e0e7ff"; color: "#4338ca";
-                padding: "0.25rem 0.5rem"; border-radius: "4px"; font-size: "0.8rem";
-                margin-bottom: "0.5rem"; font-weight: "bold";
-            }
-            .code_comment { color: "#666"; font-family: "monospace"; font-size: "0.9rem"; margin-bottom: "1rem"; }
-            .responsive_img { width: "100%"; height: "auto"; }
-        </style>
+                .card {
+                    border: "1px solid rgba(255,255,255,0.1)";
+                    border-radius: "16px";
+                    padding: "2rem";
+                    background: "rgba(30, 41, 59, 0.6)";
+                    backdrop-filter: "blur(10px)";
+                }
+
+                .label {
+                    display: "inline-block"; background: "rgba(20, 184, 166, 0.2)"; color: "#5eead4";
+                    padding: "0.25rem 0.5rem"; border-radius: "4px"; font-size: "0.8rem";
+                    margin-bottom: "0.5rem"; font-weight: "600";
+                }
+                .code_comment { color: "#64748b"; font-family: "monospace"; font-size: "0.9rem"; margin-bottom: "1rem"; }
+
+                .image_wrapper {
+                    border-radius: "8px";
+                    overflow: "hidden";
+                    border: "1px solid rgba(255,255,255,0.1)";
+                    box-shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.2)";
+                }
+                .demo_img { max-width: "100%"; height: "auto"; display: "block"; }
+                .responsive_img { width: "100%"; height: "auto"; display: "block"; }
+            </style>
+        }
     }
 }
 
-pub async fn lesson12_handler() -> axum::response::Html<String> {
-    let component_html = azumi::render_to_string(&lesson12_page());
-    let html = format!(
-        r#"<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Lesson 12: Image Optimization</title>
-    <style>body {{ font-family: system-ui; background: #f3f4f6; margin: 0; }}</style>
-</head>
-<body>
-    {}
-    <script src="/static/idiomorph.js"></script>
-    <script src="/static/azumi.js"></script>
-</body>
-</html>"#,
-        component_html
-    );
-    axum::response::Html(html)
+pub async fn lesson12_handler() -> impl axum::response::IntoResponse {
+    axum::response::Html(azumi::render_to_string(&lesson12_page()))
 }
