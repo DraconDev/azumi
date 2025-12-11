@@ -9,7 +9,7 @@ fn main() {
 
         <style>
             /* Style at bottom is OK */
-            .foo { color: green; }
+            .foo { color: "green"; }
         </style>
 
         <div>"Content in middle is OK"</div>
