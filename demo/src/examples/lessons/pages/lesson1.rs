@@ -102,15 +102,15 @@ pub fn lesson1() -> impl azumi::Component {
 
                 <section class={examples}>
                     <div class={example_card}>
-                         <div class={card_label}>"Example 1: Scoped Styles"</div>
+                         <h3 class={card_label}>"Example 1: Scoped Styles"</h3>
                         @scoped_component()
                     </div>
                     <div class={example_card}>
-                         <div class={card_label}>"Example 2: Conflict Prevention"</div>
+                         <h3 class={card_label}>"Example 2: Conflict Prevention"</h3>
                         @multiple_scoped_components()
                     </div>
                     <div class={example_card}>
-                         <div class={card_label}>"Example 3: Validation"</div>
+                         <h3 class={card_label}>"Example 3: Validation"</h3>
                         @valid_css_example()
                     </div>
                 </section>
