@@ -186,7 +186,6 @@ pub fn Lessons() -> impl Component {
                 to { opacity: "1"; transform: "translateY(0)"; }
             }
         </style>
-        </div>
 
     }
 }
