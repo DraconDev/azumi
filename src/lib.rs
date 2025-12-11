@@ -145,6 +145,12 @@ impl<T: std::fmt::Display> FallbackRender for RenderWrapper<T> {
 /// ```
 pub struct Raw<T: std::fmt::Display>(pub T);
 
+impl<T: std::fmt::Display> std::fmt::Display for Raw<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 impl<T: std::fmt::Display> Component for Raw<T> {
     fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
