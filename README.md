@@ -1270,6 +1270,7 @@ git clone https://github.com/DraconDev/azumi
 cd azumi
 cargo run -p demo
 # Visit: http://localhost:3000
+# Now featuring the "Deep Space" premium dark theme!
 ```
 
 ### **Option 2: Create a New Project**
