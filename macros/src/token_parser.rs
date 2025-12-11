@@ -474,7 +474,7 @@ impl Parse for Element {
              if let Some(pos) = attrs.iter().position(|attr: &Attribute| {
                 if attr.name == "src" {
                     if let AttributeValue::Static(v) = &attr.value {
-                        return v.trim() == "azumi.js";
+                        return v.trim().trim_matches('"').trim_matches('\'') == "azumi.js";
                     }
                 }
                 false
