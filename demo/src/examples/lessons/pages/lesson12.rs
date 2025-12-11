@@ -49,7 +49,7 @@ pub fn lesson12_page() -> impl Component {
                     <div class={card}>
                         <div class={image_wrapper}>
                             <img
-                                src="https://images.unsplash.com/photo-1682687221038-404670e01d46?w=800&q=80"
+                                src="/static/hero.jpg"
                                 alt="Hero mountain"
                                 width="800"
                                 height="600"
@@ -73,9 +73,9 @@ pub fn lesson12_page() -> impl Component {
                         // In real app, you'd have photo-400.jpg, photo-800.jpg on disk
                         <div class={image_wrapper}>
                             <img
-                                src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800"
-                                srcset="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600 600w,
-                                        https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200 1200w"
+                                src="/static/nature.jpg"
+                                srcset="/static/nature.jpg 600w,
+                                        /static/nature.jpg 1200w"
                                 sizes="(max-width: 600px) 100vw, 800px"
                                 alt="Responsive nature"
                                 class={responsive_img}
