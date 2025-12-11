@@ -1,3 +1,4 @@
+use crate::examples::lessons::components::layout::DarkModernLayout;
 use azumi::prelude::*;
 
 /// Lesson 9: Introducing Azumi Live
@@ -31,121 +32,120 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
     html! {
 
         <div class={counter_box}>
-            <h2>"🚀 Azumi Live Counter"</h2>
+            <h2 class={counter_title}>"🚀 Azumi Live Counter"</h2>
 
             <div class={value} data-bind="count">{state.count}</div>
             <div class={status}>
                 "Status: "
-                <span data-bind="active">{if state.active { "Active ✓" } else { "Inactive ✗" }}</span>
+                <span data-bind="active" class={status_text}>{if state.active { "Active ✓" } else { "Inactive ✗" }}</span>
             </div>
 
             <div class={btn_row}>
-                <button class={btn btn_primary} on:click={state.increment}>
+                <button class={btn_primary} on:click={state.increment}>
                     "+ Increment"
                 </button>
-                <button class={btn btn_secondary} on:click={state.decrement}>
+                <button class={btn_secondary} on:click={state.decrement}>
                     "- Decrement"
                 </button>
-                <button class={btn btn_danger ml_md} on:click={state.toggle}>
+                <button class={btn_danger} on:click={state.toggle}>
                     "Toggle Status"
                 </button>
             </div>
         </div>
-        
+
         <style>
             .counter_box {
                 padding: "2rem";
-                border: "2px solid #e0e0e0";
-                border-radius: "12px";
-                background: "linear-gradient(135deg,#667eea 0%,#764ba2 100%)";
+                border: "1px solid rgba(255,255,255,0.1)";
+                border-radius: "16px";
+                background: "rgba(30, 41, 59, 0.6)";
+                backdrop-filter: "blur(10px)";
                 color: "white";
                 text-align: "center";
-                max-width: "400px";
+                max-width: "450px";
+                margin: "0 auto";
+                box-shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
+            }
+            .counter_title {
+                font-size: "1.5rem";
+                margin-bottom: "1.5rem";
+                color: "#e2e8f0";
             }
             .value {
-                font-size: "4rem";
-                font-weight: "bold";
+                font-size: "5rem";
+                font-weight: "800";
                 margin: "1rem 0";
+                background: "linear-gradient(to right, #818cf8, #c084fc)";
+                -webkit-background-clip: "text";
+                -webkit-text-fill-color: "transparent";
             }
             .status {
-                font-size: "1.2rem";
-                opacity: "0.9";
-                margin-bottom: "1.5rem";
+                font-size: "1.1rem";
+                color: "#cbd5e1";
+                margin-bottom: "2rem";
+            }
+            .status_text {
+                font-weight: "bold";
+                color: "#a5f3fc";
             }
             .btn_row {
                 display: "flex";
-                gap: "0.5rem";
+                gap: "0.75rem";
                 justify-content: "center";
                 flex-wrap: "wrap";
             }
-            .btn {
+            .btn_primary {
                 padding: "0.75rem 1.5rem";
-                font-size: "1rem";
+                background: "linear-gradient(to right, #3b82f6, #2563eb)";
+                color: "white";
                 border: "none";
                 border-radius: "8px";
                 cursor: "pointer";
-                font-weight: "bold";
+                font-weight: "600";
+                transition: "opacity 0.2s";
             }
-            .btn_primary { background: "#4caf50"; color: "white"; }
-            .btn_secondary { background: "#ff9800"; color: "white"; }
-            .btn_danger { background: "#f44336"; color: "white"; }
-            .ml_md { margin-left: "1rem"; }
+            .btn_secondary {
+                padding: "0.75rem 1.5rem";
+                background: "rgba(255, 255, 255, 0.1)";
+                color: "white";
+                border: "1px solid rgba(255, 255, 255, 0.1)";
+                border-radius: "8px";
+                cursor: "pointer";
+                font-weight: "600";
+            }
+            .btn_danger {
+                padding: "0.75rem 1.5rem";
+                background: "linear-gradient(to right, #ef4444, #dc2626)";
+                color: "white";
+                border: "none";
+                border-radius: "8px";
+                cursor: "pointer";
+                font-weight: "600";
+            }
         </style>
     }
 }
 
-// Handler for Axum
-pub async fn lesson9_handler() -> axum::response::Html<String> {
+/// Main lesson demonstration component
+#[azumi::component]
+pub fn lesson9() -> impl azumi::Component {
     let state = Counter {
         count: 0,
         active: true,
     };
 
-    use counter_view_component::*;
-    let component_node = render(Props::builder().state(&state).build().expect("props"));
-
-    let page = html! {
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>"Lesson 9: Introducing Azumi Live"</title>
-            <style>
-                body {
-                    font-family: "system-ui, sans-serif";
-                    margin: "0";
-                    padding: "2rem";
-                    background: "#fafafa";
-                }
-                .container { max-width: "800px"; margin: "0 auto"; }
-                .header { text-align: "center"; margin-bottom: "2rem"; }
-                .main_title { font-size: "2.5rem"; color: "#333"; margin-bottom: "0.5rem"; }
-                .subtitle { font-size: "1.2rem"; color: "#666"; }
-                .concepts {
-                    background: "#f8f9fa";
-                    padding: "1.5rem";
-                    border-radius: "8px";
-                    margin-top: "2rem";
-                }
-                .concept_title { color: "#333"; margin-bottom: "1rem"; }
-                .concept_list { list-style: "none"; padding: "0"; }
-                .concept_item {
-                    padding: "0.75rem";
-                    margin: "0.5rem 0";
-                    background: "white";
-                    border-left: "4px solid #667eea";
-                    border-radius: "0 4px 4px 0";
-                }
-            </style>
-        </head>
-        <body>
+    html! {
+        @DarkModernLayout() {
             <div class={container}>
                 <header class={header}>
                     <h1 class={main_title}>"Lesson 9: Introducing Azumi Live"</h1>
                     <p class={subtitle}>"Compiler-driven optimistic UI"</p>
                 </header>
-                {component_node}
+
+                <div class={live_demo_section}>
+                    @counter_view(&state)
+                </div>
+
                 <div class={concepts}>
                     <h3 class={concept_title}>"🎯 Key Concepts"</h3>
                     <ul class={concept_list}>
@@ -156,12 +156,45 @@ pub async fn lesson9_handler() -> axum::response::Html<String> {
                     </ul>
                 </div>
             </div>
-            // Script is Auto-Injected into <head> now!
-        </body>
-        </html>
-    };
+            <style>
+                .container { max-width: "900px"; margin: "0 auto"; }
+                .header { text-align: "center"; margin-bottom: "3rem"; }
+                .main_title {
+                    font-size: "3rem";
+                    font-weight: "800";
+                    background: "linear-gradient(to right, #818cf8, #c084fc)";
+                    -webkit-background-clip: "text";
+                    -webkit-text-fill-color: "transparent";
+                    margin-bottom: "1rem";
+                }
+                .subtitle { font-size: "1.25rem"; color: "#94a3b8"; }
 
-    let html = azumi::render_to_string(&page);
+                .live_demo_section { margin-bottom: "4rem"; }
 
-    axum::response::Html(html)
+                .concepts {
+                    background: "rgba(30, 41, 59, 0.5)";
+                    padding: "2rem";
+                    border-radius: "16px";
+                    margin-top: "2rem";
+                    border: "1px solid rgba(255,255,255,0.05)";
+                    backdrop-filter: "blur(10px)";
+                }
+                .concept_title { color: "#f1f5f9"; margin-bottom: "1.5rem"; font-size: "1.5rem"; }
+                .concept_list { list-style: "none"; padding: "0"; display: "grid"; gap: "1rem"; }
+                .concept_item {
+                    padding: "1rem";
+                    background: "rgba(255,255,255,0.03)";
+                    border-radius: "8px";
+                    color: "#e2e8f0";
+                    font-size: "1.1rem";
+                    border-left: "4px solid #818cf8";
+                }
+            </style>
+        }
+    }
+}
+
+// Handler for Axum
+pub async fn lesson9_handler() -> impl axum::response::IntoResponse {
+    axum::response::Html(azumi::render_to_string(&lesson9()))
 }
