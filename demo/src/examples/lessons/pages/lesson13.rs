@@ -24,6 +24,38 @@ impl ContactForm {
 #[azumi::component]
 pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
     html! {
+
+        <div class={form_container}>
+            <h2 class={form_title}>"📧 Contact Form"</h2>
+
+            @if state.submitted {
+                <div class={success_box}>
+                    <div class={success_icon}>"✅"</div>
+                    <div class={success_text}>"Thank you for your message!"</div>
+                </div>
+                <button class={btn btn_secondary} on:click={state.reset} >
+                    "Send Another"
+                </button>
+            }
+
+            @if !state.submitted {
+                <div class={field}>
+                    <label class={label}>"Name"</label>
+                    <input class={input} type="text" name="name" placeholder="Your name" />
+                </div>
+                <div class={field}>
+                    <label class={label}>"Email"</label>
+                    <input class={input} type="email" name="email" placeholder="your@email.com" />
+                </div>
+                <div class={field}>
+                    <label class={label}>"Message"</label>
+                    <textarea class={textarea} name="message" placeholder="Your message..."></textarea>
+                </div>
+                <button class={btn} type="button" on:click={state.submit}>
+                    "Submit"
+                </button>
+            }
+        </div>
         <style>
             .form_container {
                 max-width: "400px";
@@ -88,37 +120,6 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
                 font-weight: "bold";
             }
         </style>
-        <div class={form_container}>
-            <h2 class={form_title}>"📧 Contact Form"</h2>
-
-            @if state.submitted {
-                <div class={success_box}>
-                    <div class={success_icon}>"✅"</div>
-                    <div class={success_text}>"Thank you for your message!"</div>
-                </div>
-                <button class={btn btn_secondary} on:click={state.reset} >
-                    "Send Another"
-                </button>
-            }
-
-            @if !state.submitted {
-                <div class={field}>
-                    <label class={label}>"Name"</label>
-                    <input class={input} type="text" name="name" placeholder="Your name" />
-                </div>
-                <div class={field}>
-                    <label class={label}>"Email"</label>
-                    <input class={input} type="email" name="email" placeholder="your@email.com" />
-                </div>
-                <div class={field}>
-                    <label class={label}>"Message"</label>
-                    <textarea class={textarea} name="message" placeholder="Your message..."></textarea>
-                </div>
-                <button class={btn} type="button" on:click={state.submit}>
-                    "Submit"
-                </button>
-            }
-        </div>
     }
 }
 

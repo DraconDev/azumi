@@ -24,7 +24,6 @@ pub struct CompositionState {
 /// Server-side interactivity patterns
 pub fn counter_display(state: CounterState) -> impl azumi::Component {
     html! {
-
         <div id={counter_box} class={counter} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
             <div class={count_display}>{state.count}</div>
             <button class={counter_button} az-on={click call increment_counter -> #counter_box}>

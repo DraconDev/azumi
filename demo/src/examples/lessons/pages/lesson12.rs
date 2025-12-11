@@ -7,28 +7,7 @@ use azumi::prelude::*;
 #[azumi::component]
 pub fn lesson12_page() -> impl Component {
     html! {
-        <style>
-            .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
-            .section { margin-bottom: "3rem"; }
-            .grid { display: "grid"; grid-template-columns: "repeat(auto-fit, minmax(300px, 1fr))"; gap: "1rem"; }
-            .card {
-                border: "1px solid #eee"; padding: "1rem"; border-radius: "8px";
-                background: "white";
-            }
-            .code {
-                background: "#1e1e1e"; color: "#d4d4d4";
-                padding: "1rem"; border-radius: "6px";
-                overflow-x: "auto"; font-family: "monospace"; margin: "1rem 0";
-            }
-            // img { max-width: "100%"; height: "auto"; border-radius: "4px"; }
-            .label {
-                display: "inline-block"; background: "#e0e7ff"; color: "#4338ca";
-                padding: "0.25rem 0.5rem"; border-radius: "4px"; font-size: "0.8rem";
-                margin-bottom: "0.5rem"; font-weight: "bold";
-            }
-            .code_comment { color: "#666"; font-family: "monospace"; font-size: "0.9rem"; margin-bottom: "1rem"; }
-            .responsive_img { width: "100%"; height: "auto"; }
-        </style>
+
 
         <div class={container}>
             <h1>"Lesson 12: Image Optimization"</h1>
@@ -94,6 +73,28 @@ pub fn lesson12_page() -> impl Component {
                 </div>
             </div>
         </div>
+        <style>
+            .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
+            .section { margin-bottom: "3rem"; }
+            .grid { display: "grid"; grid-template-columns: "repeat(auto-fit, minmax(300px, 1fr))"; gap: "1rem"; }
+            .card {
+                border: "1px solid #eee"; padding: "1rem"; border-radius: "8px";
+                background: "white";
+            }
+            .code {
+                background: "#1e1e1e"; color: "#d4d4d4";
+                padding: "1rem"; border-radius: "6px";
+                overflow-x: "auto"; font-family: "monospace"; margin: "1rem 0";
+            }
+            // img { max-width: "100%"; height: "auto"; border-radius: "4px"; }
+            .label {
+                display: "inline-block"; background: "#e0e7ff"; color: "#4338ca";
+                padding: "0.25rem 0.5rem"; border-radius: "4px"; font-size: "0.8rem";
+                margin-bottom: "0.5rem"; font-weight: "bold";
+            }
+            .code_comment { color: "#666"; font-family: "monospace"; font-size: "0.9rem"; margin-bottom: "1rem"; }
+            .responsive_img { width: "100%"; height: "auto"; }
+        </style>
     }
 }
 

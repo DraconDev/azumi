@@ -52,6 +52,68 @@ impl UserLoader {
 #[azumi::component]
 pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
     html! {
+
+
+        <div class={container}>
+            <div class={card}>
+                <div class={header}>
+                    <h1>"Async Data Loading"</h1>
+                    <p>"Click actions to see optimistic loading states."</p>
+                </div>
+
+                // ===============================================
+                // The Pattern: Logic-less View Switching
+                // ===============================================
+
+                @if state.loading {
+                    <div class={loading_state}>
+                        <div class={spinner}></div>
+                        <p>"Fetching users from database..."</p>
+                    </div>
+                } else {
+                    @if state.error.is_some() {
+                        <div class={error_state}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <div>
+                                <strong>"Error Occurred"</strong>
+                                <p>{state.error.as_ref().unwrap()}</p>
+                            </div>
+                        </div>
+                    } else {
+                        @if state.users.is_empty() {
+                            <div class={empty_state}>
+                                "No users loaded. Ready to fetch."
+                            </div>
+                        } else {
+                            <ul class={user_list}>
+                                @for user in &state.users {
+                                    <li class={user_item}>
+                                        <div class={avatar}>{&user[0..1]}</div>
+                                        {user}
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    }
+                }
+
+                <div class={controls}>
+                    <button class={btn_primary} on:click={state.load_users}>
+                        "Load Users (Success)"
+                    </button>
+                    <button class={btn_danger} on:click={state.load_fail}>
+                        "Load Users (Fail)"
+                    </button>
+                    <button class={btn_outline} on:click={state.reset}>
+                        "Reset"
+                    </button>
+                </div>
+            </div>
+        </div>
         <style>
             .container { max-width: "600px"; margin: "2rem auto"; padding: "2rem"; }
             .card {
@@ -118,67 +180,6 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
             .btn_outline:hover { background: "#f9fafb"; }
             .empty_state { text-align: "center"; color: "#6b7280"; padding: "2rem"; }
         </style>
-
-        <div class={container}>
-            <div class={card}>
-                <div class={header}>
-                    <h1>"Async Data Loading"</h1>
-                    <p>"Click actions to see optimistic loading states."</p>
-                </div>
-
-                // ===============================================
-                // The Pattern: Logic-less View Switching
-                // ===============================================
-
-                @if state.loading {
-                    <div class={loading_state}>
-                        <div class={spinner}></div>
-                        <p>"Fetching users from database..."</p>
-                    </div>
-                } else {
-                    @if state.error.is_some() {
-                        <div class={error_state}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                            <div>
-                                <strong>"Error Occurred"</strong>
-                                <p>{state.error.as_ref().unwrap()}</p>
-                            </div>
-                        </div>
-                    } else {
-                        @if state.users.is_empty() {
-                            <div class={empty_state}>
-                                "No users loaded. Ready to fetch."
-                            </div>
-                        } else {
-                            <ul class={user_list}>
-                                @for user in &state.users {
-                                    <li class={user_item}>
-                                        <div class={avatar}>{&user[0..1]}</div>
-                                        {user}
-                                    </li>
-                                }
-                            </ul>
-                        }
-                    }
-                }
-
-                <div class={controls}>
-                    <button class={btn_primary} on:click={state.load_users}>
-                        "Load Users (Success)"
-                    </button>
-                    <button class={btn_danger} on:click={state.load_fail}>
-                        "Load Users (Fail)"
-                    </button>
-                    <button class={btn_outline} on:click={state.reset}>
-                        "Reset"
-                    </button>
-                </div>
-            </div>
-        </div>
     }
 }
 
