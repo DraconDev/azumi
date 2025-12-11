@@ -7,12 +7,12 @@ fn main() {
         //     console.log("ok");
         // </script>
 
+        <div>"Content in middle is OK"</div>
+
         <style>
             /* Style at bottom is OK */
             .foo { color: "green"; }
         </style>
-
-        <div>"Content in middle is OK"</div>
 
     };
 }
