@@ -232,6 +232,19 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
                 transform: "translateY(0)";
             }
 
+            .skeleton_row {
+                height: "40px";
+                margin-bottom: "10px";
+                background: "linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%)";
+                background-size: "200% 100%";
+                border-radius: "8px";
+                animation: "shimmer 1.5s infinite";
+            }
+            @keyframes shimmer {
+                "0%" { background-position: "200% 0"; }
+                "100%" { background-position: "-200% 0"; }
+            }
+
             .empty_state { text-align: "center"; color: "var(--azumi-text-dim)"; padding: "2rem"; font-style: "italic"; }
         </style>
     }
