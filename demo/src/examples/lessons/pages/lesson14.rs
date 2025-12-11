@@ -26,41 +26,7 @@ impl TabState {
 #[azumi::component]
 pub fn tabs_view<'a>(state: &'a TabState) -> impl Component + 'a {
     html! {
-        <style>
-            .tabs_container {
-                background: "white";
-                border-radius: "12px";
-                border: "1px solid #e0e0e0";
-                overflow: "hidden";
-            }
-            .tab_buttons {
-                display: "flex";
-                background: "#f5f5f5";
-                border-bottom: "1px solid #e0e0e0";
-            }
-            .tab_btn {
-                flex: "1";
-                padding: "1rem";
-                border: "none";
-                background: "transparent";
-                cursor: "pointer";
-                font-size: "1rem";
-                transition: "background 0.2s";
-            }
-            .tab_btn_active {
-                background: "white";
-                color: "#2196f3";
-                font-weight: "bold";
-                border-bottom: "2px solid #2196f3";
-            }
-            .tab_content {
-                padding: "1.5rem";
-                min-height: "150px";
-            }
-            .tab_panel {
-                animation: "fadeIn 0.3s ease";
-            }
-        </style>
+
         <div class={tabs_container}>
             <div class={tab_buttons}>
                 <button
@@ -105,6 +71,41 @@ pub fn tabs_view<'a>(state: &'a TabState) -> impl Component + 'a {
                 }
             </div>
         </div>
+        <style>
+            .tabs_container {
+                background: "white";
+                border-radius: "12px";
+                border: "1px solid #e0e0e0";
+                overflow: "hidden";
+            }
+            .tab_buttons {
+                display: "flex";
+                background: "#f5f5f5";
+                border-bottom: "1px solid #e0e0e0";
+            }
+            .tab_btn {
+                flex: "1";
+                padding: "1rem";
+                border: "none";
+                background: "transparent";
+                cursor: "pointer";
+                font-size: "1rem";
+                transition: "background 0.2s";
+            }
+            .tab_btn_active {
+                background: "white";
+                color: "#2196f3";
+                font-weight: "bold";
+                border-bottom: "2px solid #2196f3";
+            }
+            .tab_content {
+                padding: "1.5rem";
+                min-height: "150px";
+            }
+            .tab_panel {
+                animation: "fadeIn 0.3s ease";
+            }
+        </style>
     }
 }
 

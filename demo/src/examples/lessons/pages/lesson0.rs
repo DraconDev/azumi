@@ -6,10 +6,10 @@ use azumi::html;
 #[azumi::component]
 pub fn hello_world() -> impl azumi::Component {
     html! {
+        <div class={greeting}>"Hello, Azumi!"</div>
         <style>
             .greeting { color: "#1976d2"; font-size: "1.5rem"; }
         </style>
-        <div class={greeting}>"Hello, Azumi!"</div>
     }
 }
 
@@ -17,14 +17,14 @@ pub fn hello_world() -> impl azumi::Component {
 #[azumi::component]
 pub fn basic_component() -> impl azumi::Component {
     html! {
-        <style>
-            .container { padding: "1rem"; border: "1px solid #ddd"; }
-            .title { color: "#2196f3"; }
-        </style>
         <div class={container}>
             <h1 class={title}>"Basic Azumi Component"</h1>
             <p>"This demonstrates the basic component structure"</p>
         </div>
+        <style>
+            .container { padding: "1rem"; border: "1px solid #ddd"; }
+            .title { color: "#2196f3"; }
+        </style>
     }
 }
 
@@ -32,16 +32,16 @@ pub fn basic_component() -> impl azumi::Component {
 #[azumi::component]
 pub fn multi_element_component() -> impl azumi::Component {
     html! {
-        <style>
-            .card { padding: "1.5rem"; margin: "1rem 0"; border: "1px solid #eee"; border-radius: "8px"; }
-            .card_title { font-size: "1.2rem"; color: "#1976d2"; margin-bottom: "0.5rem"; }
-            .card_content { color: "#666"; }
-        </style>
         <div class={card}>
             <h2 class={card_title}>"Multi-Element Component"</h2>
             <p class={card_content}>"Components can contain multiple elements with proper styling"</p>
             <p class={card_content}>"All CSS is automatically scoped to this component"</p>
         </div>
+        <style>
+            .card { padding: "1.5rem"; margin: "1rem 0"; border: "1px solid #eee"; border-radius: "8px"; }
+            .card_title { font-size: "1.2rem"; color: "#1976d2"; margin-bottom: "0.5rem"; }
+            .card_content { color: "#666"; }
+        </style>
     }
 }
 
@@ -49,18 +49,6 @@ pub fn multi_element_component() -> impl azumi::Component {
 #[azumi::component]
 pub fn lesson0() -> impl azumi::Component {
     html! {
-        <style>
-            .container { padding: "20px"; }
-            .header { text-align: "center"; margin-bottom: "30px"; }
-            .main_title { font-size: "32px"; color: "#333"; }
-            .subtitle { font-size: "18px"; color: "#666"; }
-            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
-            .section_title { font-size: "20px"; margin-bottom: "15px"; }
-            .points_list { list-style: "none"; padding: "0"; }
-            .point { margin-bottom: "10px"; }
-            .examples { display: "grid"; gap: "20px"; }
-            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
-        </style>
         <div class={container}>
             <header class={header}>
                 <h1 class={main_title}>"Lesson 1: Introduction to Azumi Components"</h1>
@@ -90,6 +78,19 @@ pub fn lesson0() -> impl azumi::Component {
                 </div>
             </section>
         </div>
+        <style>
+            .container { padding: "20px"; }
+            .header { text-align: "center"; margin-bottom: "30px"; }
+            .main_title { font-size: "32px"; color: "#333"; }
+            .subtitle { font-size: "18px"; color: "#666"; }
+            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
+            .section_title { font-size: "20px"; margin-bottom: "15px"; }
+            .points_list { list-style: "none"; padding: "0"; }
+            .point { margin-bottom: "10px"; }
+            .examples { display: "grid"; gap: "20px"; }
+            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
+        </style>
+
     }
 }
 

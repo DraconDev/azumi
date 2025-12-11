@@ -29,6 +29,49 @@ impl TodoApp {
 #[azumi::component]
 pub fn todo_app_view<'a>(state: &'a TodoApp) -> impl Component + 'a {
     html! {
+
+        <div class={todo_app}>
+            <header class={app_header}>
+                <h1 class={app_title}>"📝 Azumi Todos"</h1>
+                <p class={app_subtitle}>"Built with Azumi Live"</p>
+            </header>
+
+            <div class={input_section}>
+                <input class={todo_input} placeholder="What needs to be done?" />
+                <button class={add_btn} on:click={state.add_item}>"Add"</button>
+            </div>
+
+            <div class={filter_section}>
+                <div>
+                    <button
+                        class={if !state.show_completed { "filter_btn filter_active" } else { "filter_btn" }}
+                        on:click={state.toggle_filter}>
+                        "Active"
+                    </button>
+                    <button
+                        class={if state.show_completed { "filter_btn filter_active" } else { "filter_btn" }}
+                        on:click={state.toggle_filter}>
+                        "Completed"
+                    </button>
+                </div>
+                <span class={item_count} data-bind="item_count">{state.item_count}</span>
+                <button class={clear_btn} on:click={state.clear}>"Clear"</button>
+            </div>
+
+            <div class={todo_list}>
+                @if state.item_count == 0 {
+                    <div class={empty_state}>
+                        "🎉 No todos! Add one above."
+                    </div>
+                }
+                @if state.item_count > 0 {
+                    <p>"You have " {state.item_count} " item(s) in your list."</p>
+                    <div style={ --bg-color: "#e0f7fa"; --padding: "1rem" }>
+                        "This box is styled with the new Style DSL!"
+                    </div>
+                }
+            </div>
+        </div>
         <style>
             .todo_app {
                 max-width: "500px";
@@ -114,48 +157,6 @@ pub fn todo_app_view<'a>(state: &'a TodoApp) -> impl Component + 'a {
                 color: "#999";
             }
         </style>
-        <div class={todo_app}>
-            <header class={app_header}>
-                <h1 class={app_title}>"📝 Azumi Todos"</h1>
-                <p class={app_subtitle}>"Built with Azumi Live"</p>
-            </header>
-
-            <div class={input_section}>
-                <input class={todo_input} placeholder="What needs to be done?" />
-                <button class={add_btn} on:click={state.add_item}>"Add"</button>
-            </div>
-
-            <div class={filter_section}>
-                <div>
-                    <button
-                        class={if !state.show_completed { "filter_btn filter_active" } else { "filter_btn" }}
-                        on:click={state.toggle_filter}>
-                        "Active"
-                    </button>
-                    <button
-                        class={if state.show_completed { "filter_btn filter_active" } else { "filter_btn" }}
-                        on:click={state.toggle_filter}>
-                        "Completed"
-                    </button>
-                </div>
-                <span class={item_count} data-bind="item_count">{state.item_count}</span>
-                <button class={clear_btn} on:click={state.clear}>"Clear"</button>
-            </div>
-
-            <div class={todo_list}>
-                @if state.item_count == 0 {
-                    <div class={empty_state}>
-                        "🎉 No todos! Add one above."
-                    </div>
-                }
-                @if state.item_count > 0 {
-                    <p>"You have " {state.item_count} " item(s) in your list."</p>
-                    <div style={ --bg-color: "#e0f7fa"; --padding: "1rem" }>
-                        "This box is styled with the new Style DSL!"
-                    </div>
-                }
-            </div>
-        </div>
     }
 }
 
