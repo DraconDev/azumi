@@ -10,8 +10,8 @@ pub fn lesson10_page() -> impl Component {
         @DarkModernLayout() {
             <div class={container}>
                 <header class={header}>
-                    <h1 class="modern_h1">"Lesson 10: Client-Side State"</h1>
-                    <p class="text_dim" style="font-size: 1.1rem; max-width: 600px; margin: 0 auto 2rem auto;">
+                    <h1 class={modern_h1}>"Lesson 10: Client-Side State"</h1>
+                    <p class={explanation}>
                         "Azumi is server-first, but sometimes you need pure client-side interactivity for "
                         "ephemeral UI state like tabs, accordions, and toggles. "
                         "For this, we use the "<span class={code}>"set"</span>" command."
@@ -23,9 +23,9 @@ pub fn lesson10_page() -> impl Component {
                 // ==========================================
                 // JSON fix: Use single quotes for keys/values inside style/data attributes where possible or cleaner escaping
                 // az-scope expects JSON matching: { "key": "value" }
-                <div class="modern_card" az-scope="{ \"active_tab\": \"rust\" }">
-                    <h2 class="modern_h2" style="margin-top: 0">"Example 1: Tabs"</h2>
-                    <p class="text_dim" style="margin-bottom: 1.5rem">"State is local to the browser. Refreshing resets it."</p>
+                <div class={modern_card} az-scope="{ \"active_tab\": \"rust\" }">
+                    <h2 class={modern_h2}>"Example 1: Tabs"</h2>
+                    <p class={text_dim_mb}>"State is local to the browser. Refreshing resets it."</p>
 
                     <div class={tabs}>
                         <button
@@ -70,8 +70,8 @@ pub fn lesson10_page() -> impl Component {
                 // ==========================================
                 // Example 2: Accordion
                 // ==========================================
-                <div class="modern_card" az-scope="{ \"acc1\": false, \"acc2\": false }">
-                    <h2 class="modern_h2" style="margin-top: 0">"Example 2: Accordion"</h2>
+                <div class={modern_card} az-scope="{ \"acc1\": false, \"acc2\": false }">
+                    <h2 class={modern_h2}>"Example 2: Accordion"</h2>
 
                     <div class={accordion_item}>
                         <div
@@ -101,8 +101,8 @@ pub fn lesson10_page() -> impl Component {
                     </div>
                 </div>
 
-                <div class="modern_card">
-                    <h2 class="modern_h2" style="margin-top: 0">"When to use what?"</h2>
+                <div class={modern_card}>
+                    <h2 class={modern_h2}>"When to use what?"</h2>
                     <ul class={info_list}>
                         <li class={info_item}><strong class={strong}>"Client 'set':"</strong>" UI state (tabs, modals, toggles). Data that can be lost on refresh."</li>
                         <li class={info_item}><strong class={strong}>"Server Actions:"</strong>" Business data (user profile, shopping cart, database records). Data that must persist."</li>
@@ -112,6 +112,48 @@ pub fn lesson10_page() -> impl Component {
             <style>
                 .container { max-width: "800px"; margin: "0 auto"; }
                 .header { text-align: "center"; margin-bottom: "3rem"; }
+
+                .modern_h1 {
+                    font-size: "3rem";
+                    font-weight: "800";
+                    background: "linear-gradient(to right, #facc15, #f59e0b)";
+                    -webkit-background-clip: "text";
+                    -webkit-text-fill-color: "transparent";
+                    margin-bottom: "1rem";
+                }
+
+                .modern_h2 {
+                    margin-top: "0";
+                    color: "var(--azumi-text)";
+                    margin-bottom: "0.5rem";
+                    font-size: "1.8rem";
+                    font-weight: "600";
+                }
+
+                .explanation {
+                    color: "var(--azumi-text-dim)";
+                    line-height: "1.6";
+                    margin-bottom: "2rem";
+                    font-size: "1.1rem";
+                    max-width: "600px";
+                    margin-left: "auto";
+                    margin-right: "auto";
+                }
+
+                .text_dim_mb {
+                    color: "var(--azumi-text-dim)";
+                    margin-bottom: "1.5rem";
+                }
+
+                .modern_card {
+                    border: "1px solid rgba(255,255,255,0.05)";
+                    border-radius: "16px";
+                    padding: "2rem";
+                    margin-bottom: "2rem";
+                    background: "rgba(30, 41, 59, 0.6)";
+                    backdrop-filter: "blur(10px)";
+                    color: "#cbd5e1";
+                }
 
                 .code { background: "rgba(255,255,255,0.1)"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-family: "monospace"; color: "var(--azumi-primary-hover)"; }
 
