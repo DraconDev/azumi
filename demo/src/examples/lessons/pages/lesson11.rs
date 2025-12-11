@@ -1,3 +1,4 @@
+use crate::examples::lessons::components::layout::DarkModernLayout;
 use azumi::prelude::*;
 
 /// Lesson 11: Async Loading Patterns
@@ -52,54 +53,54 @@ impl UserLoader {
 #[azumi::component]
 pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
     html! {
-
-
         <div class={container}>
             <div class={card}>
                 <div class={header}>
-                    <h1>"Async Data Loading"</h1>
-                    <p>"Click actions to see optimistic loading states."</p>
+                    <h1 class={title}>"Async Data Loading"</h1>
+                    <p class={subtitle}>"Click actions to see optimistic loading states."</p>
                 </div>
 
                 // ===============================================
                 // The Pattern: Logic-less View Switching
                 // ===============================================
 
-                @if state.loading {
-                    <div class={loading_state}>
-                        <div class={spinner}></div>
-                        <p>"Fetching users from database..."</p>
-                    </div>
-                } else {
-                    @if state.error.is_some() {
-                        <div class={error_state}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                            <div>
-                                <strong>"Error Occurred"</strong>
-                                <p>{state.error.as_ref().unwrap()}</p>
-                            </div>
+                <div class={content_area}>
+                    @if state.loading {
+                        <div class={loading_state}>
+                            <div class={spinner}></div>
+                            <p>"Fetching users from database..."</p>
                         </div>
                     } else {
-                        @if state.users.is_empty() {
-                            <div class={empty_state}>
-                                "No users loaded. Ready to fetch."
+                        @if state.error.is_some() {
+                            <div class={error_state}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                                <div>
+                                    <strong>"Error Occurred"</strong>
+                                    <p>{state.error.as_ref().unwrap()}</p>
+                                </div>
                             </div>
                         } else {
-                            <ul class={user_list}>
-                                @for user in &state.users {
-                                    <li class={user_item}>
-                                        <div class={avatar}>{&user[0..1]}</div>
-                                        {user}
-                                    </li>
-                                }
-                            </ul>
+                            @if state.users.is_empty() {
+                                <div class={empty_state}>
+                                    "No users loaded. Ready to fetch."
+                                </div>
+                            } else {
+                                <ul class={user_list}>
+                                    @for user in &state.users {
+                                        <li class={user_item}>
+                                            <div class={avatar}>{&user[0..1]}</div>
+                                            {user}
+                                        </li>
+                                    }
+                                </ul>
+                            }
                         }
                     }
-                }
+                </div>
 
                 <div class={controls}>
                     <button class={btn_primary} on:click={state.load_users}>
@@ -115,20 +116,26 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
             </div>
         </div>
         <style>
-            .container { max-width: "600px"; margin: "2rem auto"; padding: "2rem"; }
+            .container { max-width: "700px"; margin: "0 auto"; }
             .card {
-                background: "white"; border-radius: "12px";
-                background: "white"; border-radius: "12px";
-                // box_shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
-                padding: "2rem"; border: "1px solid #e5e7eb";
+                border: "1px solid rgba(255,255,255,0.05)";
+                border-radius: "16px";
+                padding: "2rem";
+                background: "rgba(30, 41, 59, 0.6)";
+                backdrop-filter: "blur(10px)";
+                color: "#e2e8f0";
             }
             .header { text-align: "center"; margin-bottom: "2rem"; }
+            .title { color: "#e2e8f0"; margin-bottom: "0.5rem"; font-size: "2rem"; }
+            .subtitle { color: "#94a3b8"; font-size: "1rem"; }
+
+            .content_area { min-height: "200px"; display: "flex"; flex-direction: "column"; justify-content: "center"; }
 
             /* Loading State */
-            .loading_state { text-align: "center"; padding: "3rem"; color: "#6b7280"; }
+            .loading_state { text-align: "center"; padding: "2rem"; color: "#94a3b8"; }
             .spinner {
                 display: "inline-block"; width: "40px"; height: "40px";
-                border: "3px solid #e5e7eb"; border-top-color: "#4f46e5";
+                border: "3px solid rgba(255,255,255,0.1)"; border-top-color: "#818cf8";
                 border-radius: "50%"; animation: "spin 1s linear infinite";
                 margin-bottom: "1rem";
             }
@@ -136,80 +143,69 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
 
             /* Error State */
             .error_state {
-                background: "#fef2f2"; color: "#991b1b";
-                padding: "1rem"; border-radius: "8px";
-                display: "flex"; align_items: "center"; gap: "0.5rem";
+                background: "rgba(220, 38, 38, 0.2)"; color: "#fca5a5";
+                padding: "1rem"; border-radius: "8px"; border: "1px solid rgba(220, 38, 38, 0.3)";
+                display: "flex"; align_items: "center"; gap: "1rem";
                 margin-bottom: "1rem";
             }
 
             /* Data State */
-            .user_list { list-style: "none"; padding: "0"; }
+            .user_list { list-style: "none"; padding: "0"; display: "grid"; gap: "0.5rem"; }
             .user_item {
                 display: "flex"; align_items: "center"; gap: "1rem";
-                padding: "1rem"; border-bottom: "1px solid #f3f4f6";
+                padding: "1rem"; border-bottom: "1px solid rgba(255,255,255,0.05)";
+                background: "rgba(255,255,255,0.02)"; border-radius: "8px";
             }
             .avatar {
-                width: "40px"; height: "40px"; background: "#e0e7ff";
-                color: "#4f46e5"; border-radius: "50%";
+                width: "40px"; height: "40px"; background: "linear-gradient(to right, #6366f1, #818cf8)";
+                color: "white"; border-radius: "50%";
                 display: "flex"; align-items: "center"; justify-content: "center";
-                font-weight: "bold";
+                font-weight: "bold"; font-size: "1.2rem";
             }
 
             /* Controls */
             .controls {
-                display: "flex"; gap: "1rem"; justify-content: "center";
-                margin-top: "2rem"; padding-top: "2rem"; border-top: "1px solid #e5e7eb";
+                display: "flex"; gap: "1rem"; justify-content: "center"; flex-wrap: "wrap";
+                margin-top: "2rem"; padding-top: "2rem"; border-top: "1px solid rgba(255,255,255,0.1)";
             }
             .btn_primary {
-                padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "500";
+                padding: "0.75rem 1.5rem"; border-radius: "8px"; font-weight: "600";
                 border: "none"; cursor: "pointer"; transition: "all 0.2s";
-                background: "#4f46e5"; color: "white";
+                background: "linear-gradient(to right, #4f46e5, #4338ca)"; color: "white";
             }
-            .btn_primary:hover { background: "#4338ca"; }
+            .btn_primary:hover { opacity: "0.9"; }
             .btn_danger {
-                padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "500";
+                padding: "0.75rem 1.5rem"; border-radius: "8px"; font-weight: "600";
                 border: "none"; cursor: "pointer"; transition: "all 0.2s";
-                background: "#ef4444"; color: "white";
+                background: "linear-gradient(to right, #ef4444, #dc2626)"; color: "white";
             }
-            .btn_danger:hover { background: "#dc2626"; }
+            .btn_danger:hover { opacity: "0.9"; }
             .btn_outline {
-                padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "500";
-                border: "none"; cursor: "pointer"; transition: "all 0.2s";
-                background: "white"; border: "1px solid #d1d5db"; color: "#374151";
+                padding: "0.75rem 1.5rem"; border-radius: "8px"; font-weight: "600";
+                border: "1px solid rgba(255,255,255,0.1)"; cursor: "pointer"; transition: "all 0.2s";
+                background: "transparent"; color: "#cbd5e1";
             }
-            .btn_outline:hover { background: "#f9fafb"; }
-            .empty_state { text-align: "center"; color: "#6b7280"; padding: "2rem"; }
+            .btn_outline:hover { background: "rgba(255,255,255,0.05)"; color: "white"; }
+            .empty_state { text-align: "center"; color: "#64748b"; padding: "2rem"; font-style: "italic"; }
         </style>
     }
 }
 
-pub async fn lesson11_handler() -> axum::response::Html<String> {
+#[azumi::component]
+pub fn lesson11() -> impl azumi::Component {
     let state = UserLoader {
         loading: false,
         error: None,
         users: vec![],
     };
 
-    use user_loader_view_component::*;
-    let component_html = azumi::render_to_string(&render(
-        Props::builder().state(&state).build().expect("props"),
-    ));
+    html! {
+        @DarkModernLayout() {
+            @user_loader_view(state=&state)
+        }
+    }
+}
 
-    let html = format!(
-        r#"<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Lesson 11: Loading Patterns</title>
-    <style>body {{ font-family: system-ui; background: #f3f4f6; margin: 0; }}</style>
-</head>
-<body>
-    {}
-    <script src="/static/idiomorph.js"></script>
-    <script src="/static/azumi.js"></script>
-</body>
-</html>"#,
-        component_html
-    );
-    axum::response::Html(html)
+pub async fn lesson11_handler() -> impl axum::response::IntoResponse {
+    axum::response::Html(azumi::render_to_string(&lesson11()))
 }
