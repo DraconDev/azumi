@@ -304,6 +304,27 @@ pub fn StyledComponent() -> impl Component {
         </style>
     }
 }
+
+### 🎨 Theme Standards ("Deep Space")
+
+Azumi applications should follow the "Deep Space" premium aesthetic. Use these standard CSS variables instead of hardcoded colors.
+
+| Variable | Purpose | Default Value (Dark) |
+| :--- | :--- | :--- |
+| `--azumi-bg-app` | Main app background | `#0f172a` (Dark Slate) |
+| `--azumi-bg-card` | Card background | `rgba(30, 41, 59, 0.7)` |
+| `--azumi-text` | Primary text | `#f8fafc` |
+| `--azumi-text-dim` | Secondary text | `#94a3b8` |
+| `--azumi-primary` | Primary action | `#8b5cf6` (Violet) |
+| `--azumi-border` | Borders/Separators | `rgba(148, 163, 184, 0.1)` |
+| `--radius-lg` | Card border radius | `12px` |
+
+**Best Practices:**
+
+1.  **Glassmorphism**: Use `backdrop-filter: blur(12px)` combined with semi-transparent backgrounds.
+2.  **Gradients**: Use subtle gradients for backgrounds and primary buttons.
+3.  **Inter Font**: Use the "Inter" font family for clean, modern typography.
+
 ```
 
 ### Dynamic CSS with Custom Properties
