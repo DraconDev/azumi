@@ -48,7 +48,7 @@ pub fn Lessons() -> impl Component {
                 @LessonCard(num="15", title="Full Application", desc="A complete Todo App demo.", link="/lesson-15")
             </div>
             </div>
-            <style>
+        <style>
             .hero_section {
                 text-align: "center";
                 padding: "4rem 1rem";
