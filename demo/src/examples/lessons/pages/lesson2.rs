@@ -6,16 +6,16 @@ use azumi::html;
 #[azumi::component]
 pub fn global_css_example() -> impl azumi::Component {
     html! {
-        <style global>
-            body { font-family: "Arial, sans-serif"; }
-        </style>
         <div class={component_class}>
-            <h2 class={local_class}>"Scoped Style"</h2>
-            <p class={global_demo}>"Global Style Effect (simulated)"</p>
+        <h2 class={local_class}>"Scoped Style"</h2>
+        <p class={global_demo}>"Global Style Effect (simulated)"</p>
             <p>"This component demonstrates CSS scoping concepts"</p>
         </div>
         // Global styles - not scoped to component
-
+        <style global>
+            body { font-family: "Arial, sans-serif"; }
+        </style>
+        
         // Component-scoped styles - automatically scoped
         <style>
             .component_class { background: "#f5f5f5"; padding: "1rem"; }
