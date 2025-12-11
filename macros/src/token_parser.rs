@@ -27,6 +27,7 @@ pub struct Element {
     pub children: Vec<Node>,
     pub bind_struct: Option<syn::Path>,
     pub span: Span,
+    pub full_span: Span,
 }
 
 #[derive(Debug, Clone)]
@@ -392,8 +393,14 @@ For dynamic styles: use style attribute with expressions"
         let mut children = Vec::new();
         if input.peek(Token![/]) {
             // Self-closing
+            // Self-closing
             input.parse::<Token![/]>()?;
-            input.parse::<Token![>]>()?;
+            let end_token = input.parse::<Token![>]>()?;
+            if let Some(joined) = start_span.join(end_token.span()) {
+                full_span = joined;
+            } else {
+                full_span = start_span;
+            }
         } else {
             input.parse::<Token![>]>()?;
 
@@ -426,7 +433,12 @@ For dynamic styles: use style attribute with expressions"
                             ),
                         ));
                     }
-                    input.parse::<Token![>]>()?;
+                    let end_token = input.parse::<Token![>]>()?;
+                    if let Some(joined) = start_span.join(end_token.span()) {
+                        full_span = joined;
+                    } else {
+                        full_span = start_span;
+                    }
                 } else {
                     return Err(Error::new(
                         start_span,
@@ -442,6 +454,7 @@ For dynamic styles: use style attribute with expressions"
             children,
             bind_struct,
             span: start_span,
+            full_span,
         })
     }
 }
