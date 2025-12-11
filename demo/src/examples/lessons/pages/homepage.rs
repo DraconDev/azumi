@@ -47,7 +47,7 @@ pub fn Lessons() -> impl Component {
                 @LessonCard(num="14", title="Composition", desc="Building complex Live UIs.", link="/lesson-14")
                 @LessonCard(num="15", title="Full Application", desc="A complete Todo App demo.", link="/lesson-15")
             </div>
-            </div>
+
         <style>
             .hero_section {
                 text-align: "center";
