@@ -517,19 +517,13 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
     // 2. Reconstruct CSS string (with quotes removed from values)
     let raw_css = reconstruct_css_from_tokens(input_clone);
 
-    // 3. Generate Scope ID
-    let mut hasher = DefaultHasher::new();
-    raw_css.hash(&mut hasher);
-    let hash = hasher.finish();
-    let scope_id = format!("s{:x}", hash);
-
-    // 4. Extract classes and IDs for bindings
+    // 3. Extract classes and IDs for bindings
     let (classes, ids) = extract_selectors(&raw_css);
 
-    // 5. Scope the CSS (rename classes)
-    let scoped_css = rename_css_selectors(&raw_css, &scope_id);
-
-    // 6. Generate Bindings for both classes and IDs
+    // 4. Generate Bindings for both classes and IDs
+    // Note: We do NOT rename classes here (e.g. .class-s123).
+    // Instead, we use Attribute Scoping in generate_body (macros/src/lib.rs).
+    // So we just bind `let class = "class";` and the runtime adds `[data-sID]` to the CSS and element.
     let mut bindings = TokenStream::new();
 
     // Generate class bindings (only for valid Rust identifiers - no dashes)
@@ -540,10 +534,9 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
         }
         let snake_name = class.to_snake_case();
         let ident = format_ident!("{}", snake_name);
-        let scoped_class = format!("{}-{}", class, scope_id);
 
         bindings.extend(quote! {
-            let #ident = #scoped_class;
+            let #ident = #class;
         });
     }
 
@@ -562,7 +555,7 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
 
     StyleOutput {
         bindings,
-        css: minify_css(&scoped_css),
+        css: minify_css(&raw_css),
     }
 }
 
