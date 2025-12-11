@@ -113,7 +113,7 @@ pub fn valid_css_example() -> impl azumi::Component {
                 width: "32px"; height: "32px"; border-radius: "50%";
                 display: "flex"; align-items: "center"; justify-content: "center"; font-weight: "bold";
             }
-            .valid_title { color: "#f00"; font-size: "1.25rem"; margin: "0"; font-weight: "700"; }
+            .valid_title { color: "#34d399"; font-size: "1.25rem"; margin: "0"; font-weight: "700"; }
             .valid_text { color: "#d1fae5"; margin-bottom: "1.5rem"; }
             .valid_list { list-style: "none"; padding: "0"; margin: "0"; display: "grid"; gap: "0.5rem"; }
             .item { color: "#e2e8f0"; display: "flex"; align-items: "center"; gap: "0.5rem"; }
