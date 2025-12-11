@@ -544,6 +544,16 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         return css_validation_errors;
     }
 
+    // Pass 0.1: Validate Node Order (Script -> HTML -> Style) - Enforced at top level
+    let order_errors = html_structure_validator::validate_node_order(nodes);
+    if !order_errors.is_empty() {
+        let mut tokens = proc_macro2::TokenStream::new();
+        for err in order_errors {
+            tokens.extend(err);
+        }
+        return tokens;
+    }
+
     // Collect all CSS content first (needed for validation and scoping)
     let (global_css, scoped_css) = collect_all_styles(nodes);
 
