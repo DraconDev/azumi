@@ -15,15 +15,13 @@ pub struct UserLoader {
 
 #[azumi::live_impl(component = "user_loader_view")]
 impl UserLoader {
+    // Optimistic Update: Set loading=true instantly on the client
+    #[predict(loading = true, error = None)]
     pub async fn load_users(&mut self) {
-        // 1. Optimistic Update: Set loading=true instantly
-        self.loading = true;
-        self.error = None;
-
-        // 2. Real Async Delay (non-blocking!)
+        // 1. Server-side delay (simulating DB)
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
-        // 3. Update State
+        // 2. Update State
         self.users = vec![
             "Alice Chen".to_string(),
             "Bob Smith".to_string(),
@@ -32,10 +30,9 @@ impl UserLoader {
         self.loading = false;
     }
 
+    // Optimistic Update: Set loading=true instantly
+    #[predict(loading = true, error = None)]
     pub async fn load_fail(&mut self) {
-        self.loading = true;
-        self.error = None;
-
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
         self.loading = false;
@@ -43,6 +40,8 @@ impl UserLoader {
         self.users.clear();
     }
 
+    // Optimistic Update: Clear everything instantly
+    #[predict(loading = false, error = None, users = vec![])]
     pub fn reset(&mut self) {
         self.loading = false;
         self.error = None;
@@ -103,13 +102,14 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
                 </div>
 
                 <div class={controls}>
-                    <button class={btn_primary} on:click={state.load_users}>
+                    // Use on:click syntax which auto-generates the correct az-on attribute
+                    <button class="modern_btn" on:click={state.load_users}>
                         "Load Users (Success)"
                     </button>
-                    <button class={btn_danger} on:click={state.load_fail}>
+                    <button class="modern_btn" style="--azumi-primary: #ef4444; --azumi-primary-hover: #dc2626;" on:click={state.load_fail}>
                         "Load Users (Fail)"
                     </button>
-                    <button class={btn_outline} on:click={state.reset}>
+                    <button class="modern_btn" style="--azumi-primary: transparent; --azumi-primary-hover: var(--azumi-bg-subtle); border: 1px solid var(--azumi-border);" on:click={state.reset}>
                         "Reset"
                     </button>
                 </div>
@@ -118,91 +118,83 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
         <style>
             .container { max-width: "700px"; margin: "0 auto"; }
             .card {
-                border: "1px solid rgba(255,255,255,0.05)";
-                border-radius: "16px";
-                padding: "2rem";
-                background: "rgba(30, 41, 59, 0.6)";
-                backdrop-filter: "blur(10px)";
-                color: "#e2e8f0";
+                /* Use Theme Variables */
+                border: "1px solid var(--azumi-border)";
+                border-radius: "var(--radius-lg)";
+                padding: "var(--spacing-xl)";
+                background: "var(--azumi-bg-card)";
+                backdrop-filter: "blur(12px)";
+                color: "var(--azumi-text)";
+                box-shadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)";
             }
-            .header { text-align: "center"; margin-bottom: "2rem"; }
-            .title { color: "#e2e8f0"; margin-bottom: "0.5rem"; font-size: "2rem"; }
-            .subtitle { color: "#94a3b8"; font-size: "1rem"; }
+            .header { text-align: "center"; margin-bottom: "var(--spacing-xl)"; }
+            .title { color: "var(--azumi-text)"; margin-bottom: "var(--spacing-xs)"; font-size: "2rem"; }
+            .subtitle { color: "var(--azumi-text-dim)"; font-size: "1rem"; }
 
-            .content_area { min-height: "200px"; display: "flex"; flex-direction: "column"; justify-content: "center"; }
+            .content_area {
+                min-height: "240px";
+                display: "flex";
+                flex-direction: "column";
+                justify-content: "center";
+                background: "rgba(0, 0, 0, 0.2)";
+                border-radius: "var(--radius-md)";
+                margin-bottom: "var(--spacing-lg)";
+                border: "1px solid var(--azumi-border)";
+            }
 
             /* Loading State */
-            .loading_state { text-align: "center"; padding: "2rem"; color: "#94a3b8"; }
+            .loading_state { text-align: "center"; padding: "2rem"; color: "var(--azumi-text-dim)"; }
             .spinner {
                 display: "inline-block"; width: "40px"; height: "40px";
-                border: "3px solid rgba(255,255,255,0.1)"; border-top-color: "#818cf8";
-                border-radius: "50%"; animation: "spin 1s linear infinite";
-                margin-bottom: "1rem";
+                border: "3px solid var(--azumi-border)";
+                border-top-color: "var(--azumi-primary)";
+                border-radius: "50%";
+                animation: "spin 1s linear infinite";
+                margin-bottom: "var(--spacing-md)";
             }
             @keyframes spin { to { transform: "rotate(360deg)"; } }
 
             /* Error State */
             .error_state {
-                background: "rgba(220, 38, 38, 0.2)"; color: "#fca5a5";
-                padding: "1rem"; border-radius: "8px"; border: "1px solid rgba(220, 38, 38, 0.3)";
-                display: "flex"; align_items: "center"; gap: "1rem";
-                margin-bottom: "1rem";
+                background: "rgba(220, 38, 38, 0.1)"; color: "#fca5a5";
+                padding: "var(--spacing-lg)";
+                border-radius: "var(--radius-md)";
+                border: "1px solid rgba(220, 38, 38, 0.2)";
+                display: "flex"; align_items: "center"; gap: "var(--spacing-md)";
+                margin: "var(--spacing-lg)";
             }
 
             /* Data State */
-            .user_list { list-style: "none"; padding: "0"; display: "grid"; gap: "0.5rem"; }
+            .user_list { list-style: "none"; padding: "var(--spacing-lg)"; display: "grid"; gap: "var(--spacing-sm)"; margin: "0"; }
             .user_item {
-                display: "flex"; align_items: "center"; gap: "1rem";
-                padding: "1rem"; border-bottom: "1px solid rgba(255,255,255,0.05)";
-                background: "rgba(255,255,255,0.02)"; border-radius: "8px";
+                display: "flex"; align_items: "center"; gap: "var(--spacing-md)";
+                padding: "var(--spacing-md)";
+                border-bottom: "1px solid var(--azumi-border)";
+                background: "rgba(255,255,255,0.02)";
+                border-radius: "var(--radius-md)";
+                transition: "background 0.2s";
             }
+            .user_item:hover { background: "rgba(255,255,255,0.05)"; }
+            .user_item:last-child { border-bottom: "none"; }
+
             .avatar {
-                width: "40px"; height: "40px"; background: "linear-gradient(to right, #6366f1, #818cf8)";
+                width: "40px"; height: "40px";
+                background: "linear-gradient(135deg, var(--azumi-primary), var(--azumi-accent))";
                 color: "white"; border-radius: "50%";
                 display: "flex"; align-items: "center"; justify-content: "center";
                 font-weight: "bold"; font-size: "1.2rem";
+                box-shadow: "0 2px 4px rgba(0,0,0,0.2)";
             }
 
             /* Controls */
             .controls {
-                display: "flex"; gap: "1rem"; justify-content: "center"; flex-wrap: "wrap";
-                margin-top: "2rem"; padding-top: "2rem"; border-top: "1px solid rgba(255,255,255,0.1)";
+                display: "flex"; gap: "var(--spacing-md)"; justify-content: "center"; flex-wrap: "wrap";
+                padding-top: "var(--spacing-lg)";
+                border-top: "1px solid var(--azumi-border)";
             }
-            .btn_primary {
-                padding: "0.75rem 1.5rem"; border-radius: "8px"; font-weight: "600";
-                border: "none"; cursor: "pointer"; transition: "all 0.2s";
-                background: "linear-gradient(to right, #4f46e5, #4338ca)"; color: "white";
-            }
-            .btn_primary:hover { opacity: "0.9"; }
-            .btn_danger {
-                padding: "0.75rem 1.5rem"; border-radius: "8px"; font-weight: "600";
-                border: "none"; cursor: "pointer"; transition: "all 0.2s";
-                background: "linear-gradient(to right, #ef4444, #dc2626)"; color: "white";
-            }
-            .btn_danger:hover { opacity: "0.9"; }
-            .btn_outline {
-                padding: "0.75rem 1.5rem"; border-radius: "8px"; font-weight: "600";
-                border: "1px solid rgba(255,255,255,0.1)"; cursor: "pointer"; transition: "all 0.2s";
-                background: "transparent"; color: "#cbd5e1";
-            }
-            .btn_outline:hover { background: "rgba(255,255,255,0.05)"; color: "white"; }
-            .empty_state { text-align: "center"; color: "#64748b"; padding: "2rem"; font-style: "italic"; }
+
+            .empty_state { text-align: "center"; color: "var(--azumi-text-dim)"; padding: "2rem"; font-style: "italic"; }
         </style>
-    }
-}
-
-#[azumi::component]
-pub fn lesson11() -> impl azumi::Component {
-    let state = UserLoader {
-        loading: false,
-        error: None,
-        users: vec![],
-    };
-
-    html! {
-        @DarkModernLayout() {
-            @user_loader_view(state=&state)
-        }
     }
 }
 
