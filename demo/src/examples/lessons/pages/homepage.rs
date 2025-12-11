@@ -46,6 +46,10 @@ pub fn Lessons() -> impl Component {
                 @LessonCard(num="13", title="Live Forms", desc="Real-time validation and feedback.", link="/lesson-13")
                 @LessonCard(num="14", title="Composition", desc="Building complex Live UIs.", link="/lesson-14")
                 @LessonCard(num="15", title="Full Application", desc="A complete Todo App demo.", link="/lesson-15")
+                @LessonCard(num="16", title="Async Database", desc="SQLite integration with optimistic UI.", link="/lesson-16-async-db")
+                @LessonCard(num="17", title="Testing", desc="Unit and Integration testing strategies.", link="/lesson-17-testing")
+                @LessonCard(num="18", title="Security", desc="XSS prevention and safe practices.", link="/lesson-18-security")
+                @LessonCard(num="19", title="Authentication", desc="User sessions and login flows.", link="/lesson-19-auth")
             </div>
 
         <style>
