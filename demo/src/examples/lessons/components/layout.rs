@@ -2,9 +2,16 @@ use azumi::html;
 
 /// Modern dark layout component that uses global CSS variables
 #[azumi::component]
-pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Component {
+#[allow(non_snake_case)]
+pub fn DarkModernLayout(children: azumi::Children) -> impl azumi::Component {
     html! {
+        <!DOCTYPE html>
+        <html lang="en" class="h-full antialiased selection:bg-indigo-500 selection:text-white">
         <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>"Azumi Lesson"</title>
+
             // Preconnect for performance
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true" />
@@ -17,9 +24,7 @@ pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Componen
             </div>
             // Scripts for Hot Reload and Interactivity
             // We use a manual script tag with Raw injection as requested
-            <script>
-                <script>@{azumi::Raw(azumi::AZUMI_JS)}</script>
-            </script>
+            <script>@{azumi::Raw(azumi::AZUMI_JS)}</script>
         </div>
         <style global>
             /* Reset & Variables */
