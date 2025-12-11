@@ -8,12 +8,7 @@ pub fn SyntaxReference() -> impl Component {
     let is_active = true;
 
     html! {
-        <style>
-            .valid_class { color: "green"; }
-            .second_class { font-weight: "bold"; }
-            .error_state { color: "red"; }
-            #valid_id { border: "1px solid black"; }
-        </style>
+
 
         <div class={valid_class}>
             <h1>"Azumi Syntax Reference"</h1>
@@ -79,5 +74,11 @@ pub fn SyntaxReference() -> impl Component {
             // ❌ BANNED: Dynamic style string
             // <div style={"color: blue"}>"Dynamic String Style"</div>
         </div>
+        <style>
+            .valid_class { color: "green"; }
+            .second_class { font-weight: "bold"; }
+            .error_state { color: "red"; }
+            #valid_id { border: "1px solid black"; }
+        </style>
     }
 }
