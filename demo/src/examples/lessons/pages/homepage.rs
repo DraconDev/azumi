@@ -15,7 +15,7 @@ pub fn Lessons() -> impl Component {
     html! {
         <div class={page_wrapper}>
             <div class={bg_glow}></div>
-            
+
             // Hero Section
             <header class={hero}>
                 <div class={hero_badge}>"🚀 The Future of Rust Web Development"</div>
@@ -24,7 +24,7 @@ pub fn Lessons() -> impl Component {
                     "A comprehensive, interactive journey through the Azumi framework.
                     From basic components to production-ready applications."
                 </p>
-                
+
                 <div class={hero_actions}>
                     <a href="/lesson-0" class={btn_primary}>"Start Learning"</a>
                     <a href="https://github.com/azumi-rs/azumi" class={btn_secondary}>"View on GitHub"</a>
@@ -105,7 +105,7 @@ pub fn Lessons() -> impl Component {
                 padding-bottom: "6rem";
                 position: "relative";
             }
-            
+
             .bg_glow {
                 position: "absolute";
                 top: "-10%";
@@ -159,7 +159,7 @@ pub fn Lessons() -> impl Component {
                 line-height: "1.6";
                 animation: "fadeInUp 0.6s ease-out 0.2s both";
             }
-            
+
             // Hero Actions
             .hero_actions {
                 display: "flex";
@@ -261,7 +261,7 @@ pub fn Lessons() -> impl Component {
             // Grid
             .grid {
                 display: "grid";
-                grid-template-columns: "repeat(auto-fill, minmax(280px, 1fr))";
+                grid-template-columns: "repeat(auto-fill, minmax(450px, 1fr))";
                 gap: "1.5rem";
             }
 
@@ -335,7 +335,7 @@ fn LessonCard<'a>(
                 flex-direction: "column";
                 z-index: "1";
             }
-            
+
             .lesson_card:hover {
                 transform: "translateY(-4px)";
                 background: "rgba(30, 41, 59, 0.8)";
@@ -385,7 +385,7 @@ fn LessonCard<'a>(
                 flex-grow: "1";
                 line-height: "1.6";
             }
-            
+
             .card_footer {
                 margin-top: "auto";
             }
