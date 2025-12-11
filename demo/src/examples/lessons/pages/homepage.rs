@@ -100,7 +100,7 @@ pub fn Lessons() -> impl Component {
                 border-color: "#60a5fa";
                 box-shadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)";
             }
-            // Glow effect on hover 
+            // Glow effect on hover
             .lesson_card::before {
                 content: "''";
                 position: "absolute";
@@ -167,6 +167,12 @@ fn LessonCard<'a>(
     link: &'a str,
 ) -> impl Component + 'a {
     html! {
+        <div class={lesson_card}>
+            <div class={card_number}>"LESSON " {num}</div>
+            <h3 class={card_title}>{title}</h3>
+            <p class={card_desc}>{desc}</p>
+            <a href={link} class={card_link}>"Start Lesson →"</a>
+        </div>
         <style>
             .lesson_card {
                 display: "flex";
@@ -212,14 +218,7 @@ fn LessonCard<'a>(
                 transition: "all 0.2s";
                 align-self: "start";
             }
-
         </style>
-        <div class={lesson_card}>
-            <div class={card_number}>"LESSON " {num}</div>
-            <h3 class={card_title}>{title}</h3>
-            <p class={card_desc}>{desc}</p>
-            <a href={link} class={card_link}>"Start Lesson →"</a>
-        </div>
     }
 }
 
