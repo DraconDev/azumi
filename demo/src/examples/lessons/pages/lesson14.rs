@@ -188,7 +188,7 @@ pub fn lesson14_page() -> impl Component {
                 }
                 .code { color: "#67e8f9"; font-family: "monospace"; }
 
-                .demo_area { margin: 2rem 0; }
+                .demo_area { margin: "2rem 0"; }
             </style>
         }
     }
