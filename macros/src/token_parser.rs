@@ -323,6 +323,89 @@ impl Parse for Element {
             attrs.push(input.parse()?);
         }
 
+        // Azumi: Enforce component-scoped CSS - block <link rel="stylesheet"> for local files
+        if name == "link" {
+            let has_rel_stylesheet = attrs.iter().any(|attr: &Attribute| {
+                attr.name == "rel"
+                    && matches!(&attr.value, AttributeValue::Static(v) if v == "stylesheet")
+            });
+
+            if has_rel_stylesheet {
+                if let Some(href_attr) = attrs.iter().find(|attr| attr.name == "href") {
+                    if let AttributeValue::Static(href) = &href_attr.value {
+                        // Allow external URLs (http/https), block local paths
+                        if !href.starts_with("http://") && !href.starts_with("https://") {
+                            return Err(Error::new(
+                                start_span,
+                                format!(
+                                    "Local CSS must use component-scoped <style src> instead of <link>:\n\n\
+                                     ✅ <style src=\"{}\" />  (auto-scoped to component)\n\
+                                     ❌ <link rel=\"stylesheet\" href=\"{}\" />\n\n\
+                                     Why? All local CSS is component-scoped in Azumi.\n\
+                                     External CDN stylesheets (https://...) are allowed with <link>.",
+                                    href, href
+                                ),
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        let mut children = Vec::new();
+        if input.peek(Token![/]) {
+            // Self-closing
+            input.parse::<Token![/]>()?;
+            let end_token = input.parse::<Token![>]>()?;
+            if let Some(joined) = start_span.join(end_token.span()) {
+                full_span = joined;
+            } else {
+                // Fallback to name_span (e.g. "div") if we can't span the whole element
+                full_span = name_span;
+            }
+        } else {
+            input.parse::<Token![>]>()?;
+
+            // Parse children
+            if is_void_element(&name) {
+                // Void element, no children, no closing tag
+            } else {
+                if name == "script" || name == "style" {
+                    children = parse_script_content(input, &name)?;
+                } else {
+                    children = parse_nodes(input)?;
+                }
+
+                // Expect closing tag
+                if input.peek(Token![<]) && input.peek2(Token![/]) {
+                    input.parse::<Token![<]>()?;
+                    input.parse::<Token![/]>()?;
+                    let (closing_name, _) = parse_html_name(input, false)?;
+                    if closing_name != name {
+                        return Err(Error::new(
+                            input.span(),
+                            format!(
+                                "Mismatched closing tag: expected </{}>, found </{}>",
+                                name, closing_name
+                            ),
+                        ));
+                    }
+                    let end_token = input.parse::<Token![>]>()?;
+                    if let Some(joined) = start_span.join(end_token.span()) {
+                        full_span = joined;
+                    } else {
+                        // Fallback to name_span
+                        full_span = name_span;
+                    }
+                } else {
+                    return Err(Error::new(
+                        start_span,
+                        format!("Unclosed element <{}>", name),
+                    ));
+                }
+            }
+        }
+
 
 
         // Azumi 2.0: Block inline <style> and <script> tags
