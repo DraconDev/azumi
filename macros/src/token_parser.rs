@@ -303,6 +303,7 @@ impl Parse for Element {
 
         let mut attrs = Vec::new();
         let mut bind_struct = None;
+        let mut full_span = start_span;
 
         while !input.peek(Token![>]) && !input.peek(Token![/]) {
             // Check for bind={Struct} on <form> tags
