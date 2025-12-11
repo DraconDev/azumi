@@ -10,8 +10,8 @@ pub fn lesson10_page() -> impl Component {
         @DarkModernLayout() {
             <div class={container}>
                 <header class={header}>
-                    <h1 class={main_title}>"Lesson 10: Client-Side State"</h1>
-                    <p class={explanation}>
+                    <h1 class="modern_h1">"Lesson 10: Client-Side State"</h1>
+                    <p class="text_dim" style="font-size: 1.1rem; max-width: 600px; margin: 0 auto 2rem auto;">
                         "Azumi is server-first, but sometimes you need pure client-side interactivity for "
                         "ephemeral UI state like tabs, accordions, and toggles. "
                         "For this, we use the "<span class={code}>"set"</span>" command."
@@ -21,9 +21,11 @@ pub fn lesson10_page() -> impl Component {
                 // ==========================================
                 // Example 1: Tabs
                 // ==========================================
-                <div class={card} az-scope="{ \"active_tab\": \"rust\" }">
-                    <h2 class={title}>"Example 1: Tabs"</h2>
-                    <p class={subtitle}>"State is local to the browser. Refreshing resets it."</p>
+                // JSON fix: Use single quotes for keys/values inside style/data attributes where possible or cleaner escaping
+                // az-scope expects JSON matching: { "key": "value" }
+                <div class="modern_card" az-scope="{ \"active_tab\": \"rust\" }">
+                    <h2 class="modern_h2" style="margin-top: 0">"Example 1: Tabs"</h2>
+                    <p class="text_dim" style="margin-bottom: 1.5rem">"State is local to the browser. Refreshing resets it."</p>
 
                     <div class={tabs}>
                         <button
@@ -68,8 +70,8 @@ pub fn lesson10_page() -> impl Component {
                 // ==========================================
                 // Example 2: Accordion
                 // ==========================================
-                <div class={card} az-scope="{ \"acc1\": false, \"acc2\": false }">
-                    <h2 class={title}>"Example 2: Accordion"</h2>
+                <div class="modern_card" az-scope="{ \"acc1\": false, \"acc2\": false }">
+                    <h2 class="modern_h2" style="margin-top: 0">"Example 2: Accordion"</h2>
 
                     <div class={accordion_item}>
                         <div
@@ -99,8 +101,8 @@ pub fn lesson10_page() -> impl Component {
                     </div>
                 </div>
 
-                <div class={card}>
-                    <h2 class={title}>"When to use what?"</h2>
+                <div class="modern_card">
+                    <h2 class="modern_h2" style="margin-top: 0">"When to use what?"</h2>
                     <ul class={info_list}>
                         <li class={info_item}><strong class={strong}>"Client 'set':"</strong>" UI state (tabs, modals, toggles). Data that can be lost on refresh."</li>
                         <li class={info_item}><strong class={strong}>"Server Actions:"</strong>" Business data (user profile, shopping cart, database records). Data that must persist."</li>
@@ -110,54 +112,34 @@ pub fn lesson10_page() -> impl Component {
             <style>
                 .container { max-width: "800px"; margin: "0 auto"; }
                 .header { text-align: "center"; margin-bottom: "3rem"; }
-                .main_title {
-                    font-size: "3rem";
-                    font-weight: "800";
-                    background: "linear-gradient(to right, #facc15, #f59e0b)";
-                    -webkit-background-clip: "text";
-                    -webkit-text-fill-color: "transparent";
-                    margin-bottom: "1rem";
-                }
-                .explanation { color: "#94a3b8"; line-height: "1.6"; margin-bottom: "2rem"; font-size: "1.1rem"; }
-                .code { background: "rgba(255,255,255,0.1)"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-family: "monospace"; color: "#facc15"; }
 
-                .card {
-                    border: "1px solid rgba(255,255,255,0.05)";
-                    border-radius: "16px";
-                    padding: "2rem";
-                    margin-bottom: "2rem";
-                    background: "rgba(30, 41, 59, 0.6)";
-                    backdrop-filter: "blur(10px)";
-                    color: "#cbd5e1";
-                }
-                .title { color: "#e2e8f0"; margin-bottom: "0.5rem"; font-size: "1.5rem"; }
-                .subtitle { color: "#94a3b8"; margin-bottom: "1.5rem"; font-size: "0.9rem"; }
+                .code { background: "rgba(255,255,255,0.1)"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-family: "monospace"; color: "var(--azumi-primary-hover)"; }
 
                 /* Tabs Styling */
-                .tabs { display: "flex"; border-bottom: "1px solid rgba(255,255,255,0.1)"; margin-bottom: "1.5rem"; gap: "0.5rem"; }
+                .tabs { display: "flex"; border-bottom: "1px solid var(--azumi-border)"; margin-bottom: "1.5rem"; gap: "0.5rem"; }
                 .tab_btn {
                     padding: "0.75rem 1.5rem";
                     border: "none";
                     background: "transparent";
                     cursor: "pointer";
                     font-weight: "600";
-                    color: "#94a3b8";
+                    color: "var(--azumi-text-dim)";
                     border-bottom: "2px solid transparent";
                     margin-bottom: "-1px";
                     transition: "all 0.2s";
                 }
-                .tab_btn:hover { color: "#e2e8f0"; }
-                .tab_btn.active { color: "#facc15"; border-bottom-color: "#facc15"; }
+                .tab_btn:hover { color: "var(--azumi-text)"; }
+                .tab_btn.active { color: "var(--azumi-primary)"; border-bottom-color: "var(--azumi-primary)"; }
                 .tab_content { display: "none"; padding: "1rem 0"; animation: "fadeIn 0.3s ease-out"; }
                 .tab_content.active { display: "block"; }
-                .content_title { color: "#fde047"; margin-bottom: "0.5rem"; font-size: "1.25rem"; }
+                .content_title { color: "var(--azumi-primary)"; margin-bottom: "0.5rem"; font-size: "1.25rem"; }
 
                 @keyframes fadeIn { from { opacity: "0"; transform: "translateY(5px)"; } to { opacity: "1"; transform: "translateY(0)"; } }
 
                 /* Accordion Styling */
                 .accordion_item {
-                    border: "1px solid rgba(255,255,255,0.1)";
-                    border-radius: "8px";
+                    border: "1px solid var(--azumi-border)";
+                    border-radius: "var(--radius-md)";
                     margin-bottom: "1rem";
                     overflow: "hidden";
                     background: "rgba(15, 23, 42, 0.3)";
@@ -170,17 +152,18 @@ pub fn lesson10_page() -> impl Component {
                     display: "flex";
                     justify-content: "space-between";
                     align-items: "center";
-                    color: "#e2e8f0";
+                    color: "var(--azumi-text)";
                     transition: "background 0.2s";
+                    user-select: "none";
                 }
                 .accordion_header:hover { background: "rgba(255,255,255,0.05)"; }
-                .toggle_icon { color: "#facc15"; font-weight: "bold"; font-size: "1.2rem"; }
-                .accordion_body { display: "none"; padding: "1.5rem"; border-top: "1px solid rgba(255,255,255,0.05)"; color: "#cbd5e1"; }
+                .toggle_icon { color: "var(--azumi-primary)"; font-weight: "bold"; font-size: "1.2rem"; }
+                .accordion_body { display: "none"; padding: "1.5rem"; border-top: "1px solid var(--azumi-border)"; color: "var(--azumi-text-dim)"; }
                 .accordion_body.open { display: "block"; }
 
                 .info_list { list-style: "none"; padding: "0"; display: "grid"; gap: "1rem"; }
-                .info_item { padding: "1rem"; background: "rgba(0,0,0,0.2)"; border-radius: "8px"; color: "#cbd5e1"; }
-                .strong { color: "#facc15"; margin-right: "0.5rem"; }
+                .info_item { padding: "1rem"; background: "rgba(0,0,0,0.2)"; border-radius: "8px"; color: "var(--azumi-text)"; border: "1px solid var(--azumi-border)"; }
+                .strong { color: "var(--azumi-primary)"; margin-right: "0.5rem"; }
             </style>
         }
     }
