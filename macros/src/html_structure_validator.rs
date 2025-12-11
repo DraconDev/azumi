@@ -83,4 +83,3 @@ pub fn validate_node_order(nodes: &[Node]) -> Vec<TokenStream> {
 
 /// Rule 1: Tables can only contain specific children
 pub fn validate_table_children(elem: &Element) -> Vec<TokenStream> {
-// ... existing code ...
