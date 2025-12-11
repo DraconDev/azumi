@@ -1,5 +1,5 @@
 use quote::quote;
-use syn::{parse_macro_input, FnArg, Item, ItemFn, Pat, PatType, Stmt};
+use syn::{parse_macro_input, FnArg, ItemFn, Pat, PatType};
 
 pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(item as ItemFn);

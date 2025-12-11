@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, FnArg, ItemFn, PatType};
+use syn::{parse_macro_input, FnArg, ItemFn};
 
 pub fn expand_action(item: TokenStream) -> TokenStream {
     let input_fn = parse_macro_input!(item as ItemFn);
@@ -48,7 +48,7 @@ pub fn expand_action(item: TokenStream) -> TokenStream {
 
     let wrapper_name = quote::format_ident!("{}_handler", fn_name);
 
-    let (payload_type, payload_pat) = if let Some(arg) = payload_arg {
+    let (payload_type, _payload_pat) = if let Some(arg) = payload_arg {
         (&arg.ty, &arg.pat)
     } else {
         // No payload
