@@ -236,6 +236,12 @@ fn process_styles(nodes: &[token_parser::Node]) -> (proc_macro2::TokenStream, St
                         global_css.push_str(&g);
                     }
                 }
+                token_parser::Block::Call(call_block) => {
+                    let (b, s, g) = process_styles(&call_block.children);
+                    bindings.extend(b);
+                    scoped_css.push_str(&s);
+                    global_css.push_str(&g);
+                }
                 _ => {}
             },
             _ => {}
