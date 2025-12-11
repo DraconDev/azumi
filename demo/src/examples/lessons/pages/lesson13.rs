@@ -123,39 +123,13 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
     }
 }
 
+use crate::examples::lessons::components::layout::DarkModernLayout;
+
 /// Full page component ensuring script injection
 #[azumi::component]
 pub fn lesson13_page<'a>(state: &'a ContactForm) -> impl Component + 'a {
     html! {
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>"Lesson 13: Form Handling"</title>
-            <style>
-                body {
-                    font-family: "system-ui, sans-serif";
-                    margin: "0";
-                    padding: "2rem";
-                    background: "#fafafa";
-                }
-                .container { max-width: "800px"; margin: "0 auto"; }
-                .header { text-align: "center"; margin-bottom: "2rem"; }
-                .main_title { font-size: "2rem"; color: "#333"; }
-                .subtitle { color: "#666"; }
-                .demo_area { display: "flex"; justify-content: "center"; margin: "2rem 0"; }
-                .explanation {
-                    background: "#e3f2fd";
-                    padding: "1.5rem";
-                    border-radius: "8px";
-                    margin: "2rem 0";
-                }
-                .btn { padding: "0.75rem 1.5rem"; border: "none"; border-radius: "6px"; font-size: "1rem"; cursor: "pointer"; width: "100%"; }
-                .btn_secondary { background: "#757575"; color: "white"; }
-            </style>
-        </head>
-        <body>
+        @DarkModernLayout() {
             <div class={container}>
                 <header class={header}>
                     <h1 class={main_title}>"Lesson 13: Form Handling"</h1>
@@ -163,11 +137,11 @@ pub fn lesson13_page<'a>(state: &'a ContactForm) -> impl Component + 'a {
                 </header>
 
                 <div class={explanation}>
-                    <h3>"📝 Form Patterns"</h3>
-                    <ul>
-                        <li><strong>"Submit action"</strong>" - Toggles submitted state"</li>
-                        <li><strong>"Reset action"</strong>" - Clears form state"</li>
-                        <li><strong>"Conditional rendering"</strong>" - Shows form or success message"</li>
+                    <h3 class={exp_title}>"📝 Form Patterns"</h3>
+                    <ul class={exp_list}>
+                        <li class={exp_item}><strong>"Submit action"</strong>" - Toggles submitted state"</li>
+                        <li class={exp_item}><strong>"Reset action"</strong>" - Clears form state"</li>
+                        <li class={exp_item}><strong>"Conditional rendering"</strong>" - Shows form or success message"</li>
                     </ul>
                 </div>
 
@@ -175,9 +149,35 @@ pub fn lesson13_page<'a>(state: &'a ContactForm) -> impl Component + 'a {
                     @contact_form_view(state = state)
                 </div>
             </div>
-            // Compiler will inject scripts here automatically
-        </body>
-        </html>
+        }
+        <style>
+            .container { max-width: "800px"; margin: "0 auto"; }
+            .header { text-align: "center"; margin-bottom: "3rem"; }
+            .main_title {
+                font-size: "3rem";
+                weight: "800";
+                color: "#e2e8f0";
+                background: "linear-gradient(to right, #fbbf24, #f59e0b)";
+                -webkit-background-clip: "text";
+                -webkit-text-fill-color: "transparent";
+                margin-bottom: "1rem";
+            }
+            .subtitle { font-size: "1.25rem"; color: "#94a3b8"; }
+
+            .explanation {
+                background: "rgba(30, 41, 59, 0.4)";
+                padding: "2rem";
+                border-radius: "16px";
+                margin: "0 auto 3rem";
+                border: "1px solid rgba(255,255,255,0.05)";
+                max-width: "600px";
+            }
+            .exp_title { color: "#f59e0b"; font-size: "1.25rem"; margin-bottom: "1rem"; }
+            .exp_list { color: "#cbd5e1"; padding-left: "1.5rem"; display: "flex"; flex-direction: "column"; gap: "0.5rem"; }
+            .exp_item { line-height: "1.6"; }
+
+            .demo_area { display: "flex"; justify-content: "center"; margin: "2rem 0"; }
+        </style>
     }
 }
 
