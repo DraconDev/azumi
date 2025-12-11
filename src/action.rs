@@ -1,6 +1,6 @@
 use crate::Component;
 use axum::response::IntoResponse;
-use serde::de::DeserializeOwned;
+
 use std::future::Future;
 
 /// Trait for Azumi Actions

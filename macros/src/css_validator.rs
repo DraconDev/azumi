@@ -13,6 +13,7 @@ use crate::token_parser::{Node, AttributeValue, Block};
 
 
 /// Parse CSS content and extract all defined class names - FAST VERSION using regex
+#[allow(dead_code)]
 pub fn parse_css_classes(css_content: &str, _file_path: &str) -> HashSet<String> {
     let mut defined_classes = HashSet::new();
     
@@ -33,6 +34,7 @@ pub fn parse_css_classes(css_content: &str, _file_path: &str) -> HashSet<String>
 
 /// Create a better span for class validation by pointing to the class attribute value
 /// This gives a more precise error location than the generic attribute span
+#[allow(dead_code)]
 fn create_class_span(class_attr: &crate::token_parser::Attribute, _class_name: &str) -> proc_macro2::Span {
     // For class attributes, use the value span if available (points to string literal)
     // Otherwise fall back to the attribute span (points to attribute name)
@@ -44,12 +46,14 @@ fn create_class_span(class_attr: &crate::token_parser::Attribute, _class_name: &
 }
 
 /// Extract all class names used in HTML attributes with their spans
+#[allow(dead_code)]
 pub fn extract_html_classes(nodes: &[Node]) -> HashMap<String, Vec<proc_macro2::Span>> {
     let mut used_classes = HashMap::new();
     extract_html_classes_recursive(nodes, &mut used_classes);
     used_classes
 }
 
+#[allow(dead_code)]
 fn extract_html_classes_recursive(nodes: &[Node], used_classes: &mut HashMap<String, Vec<proc_macro2::Span>>) {
     for node in nodes {
         match node {
@@ -114,6 +118,7 @@ fn extract_html_classes_recursive(nodes: &[Node], used_classes: &mut HashMap<Str
 }
 
 /// Validate that all HTML classes exist in CSS files
+#[allow(dead_code)]
 pub fn validate_css_classes(
     used_classes: &HashMap<String, Vec<proc_macro2::Span>>,
     defined_classes: &HashSet<String>,
@@ -139,6 +144,7 @@ pub fn validate_css_classes(
 
 /// Validation error types
 #[derive(Debug)]
+#[allow(dead_code)]
 pub enum ValidationError {
     UndefinedClass {
         class_name: String,

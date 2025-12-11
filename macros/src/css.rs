@@ -47,6 +47,7 @@ pub fn scope_css(css: &str, scope_id: &str) -> String {
 
 /// Transform CSS selectors by renaming classes with a suffix (CSS Modules style)
 /// e.g. .container -> .container-xyz
+#[allow(dead_code)]
 pub fn rename_css_selectors(css: &str, suffix: &str) -> String {
     let mut result = String::new();
     let mut in_rule = false;
