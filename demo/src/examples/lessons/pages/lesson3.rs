@@ -1,3 +1,5 @@
+use crate::examples::lessons::components::layout::DarkModernLayout;
+
 /// Lesson 4: Component Composition Patterns
 ///
 /// Building complex UIs from simple components
@@ -6,11 +8,23 @@ pub fn card<'a>(title: &'a str, content: &'a str) -> impl azumi::Component + 'a 
     azumi::html! {
         <div class={card}>
             <h3 class={card_title}>{title}</h3>
-            <p>{content}</p>
+            <p class={card_content}>{content}</p>
         </div>
         <style>
-            .card { border: "1px solid #eee"; padding: "1rem"; margin: "0.5rem"; }
-            .card_title { font-weight: "bold"; margin-bottom: "0.5rem"; }
+            .card {
+                border: "1px solid rgba(255,255,255,0.1)";
+                padding: "1.5rem";
+                margin: "0.5rem";
+                background: "rgba(30, 41, 59, 0.6)";
+                border-radius: "12px";
+            }
+            .card_title {
+                font-weight: "bold";
+                margin-bottom: "0.5rem";
+                color: "#e2e8f0";
+                font-size: "1.1rem";
+            }
+            .card_content { color: "#cbd5e1"; }
         </style>
     }
 }
@@ -29,7 +43,12 @@ pub fn dashboard() -> impl azumi::Component {
         </div>
         <style>
             .dashboard_container { display: "grid"; gap: "1rem"; }
-            .dashboard_title { font-size: "1.5rem"; color: "#2196f3"; margin-bottom: "1rem"; }
+            .dashboard_title {
+                font-size: "1.5rem";
+                color: "#818cf8";
+                margin-bottom: "1rem";
+                font-weight: "600";
+            }
         </style>
     }
 }
@@ -40,25 +59,45 @@ pub fn complex_layout() -> impl azumi::Component {
     azumi::html! {
         <div class={layout_container}>
             <div class={header_section}>
-                <h2>"Complex Layout Composition"</h2>
-                <p>"Multiple components working together"</p>
+                <h2 class={header_title}>"Complex Layout Composition"</h2>
+                <p class={header_desc}>"Multiple components working together"</p>
             </div>
             <div class={main_section}>
-                <div>
+                <div class={content_area}>
                     @card(title="Main Content", content="This is the primary content area")
                     @card(title="Additional Info", content="More information here")
                 </div>
                 <div class={sidebar}>
-                    <h3>"Sidebar"</h3>
+                    <h3 class={sidebar_title}>"Sidebar"</h3>
                     @card(title="Quick Links", content="Navigation and tools")
                 </div>
             </div>
         </div>
         <style>
-            .layout_container { display: "grid"; gap: "1rem"; }
-            .header_section { background: "#f0f0f0"; padding: "1rem"; }
-            .main_section { display: "grid"; grid-template-columns: "2fr1fr"; gap: "1rem"; }
-            .sidebar { background: "#f9f9f9"; padding: "1rem"; }
+            .layout_container { display: "grid"; gap: "1.5rem"; }
+            .header_section {
+                background: "rgba(99, 102, 241, 0.1)";
+                padding: "1.5rem";
+                border-radius: "12px";
+                border: "1px solid rgba(99, 102, 241, 0.2)";
+                text-align: "center";
+            }
+            .header_title { color: "#818cf8"; margin-bottom: "0.5rem"; font-size: "1.5rem"; }
+            .header_desc { color: "#cbd5e1"; }
+
+            .main_section {
+                display: "grid";
+                grid-template-columns: "2fr 1fr";
+                gap: "1.5rem";
+            }
+            .content_area { display: "grid"; gap: "1rem"; }
+            .sidebar {
+                background: "rgba(15, 23, 42, 0.3)";
+                padding: "1.5rem";
+                border-radius: "12px";
+                border: "1px solid rgba(255,255,255,0.05)";
+            }
+            .sidebar_title { color: "#94a3b8"; margin-bottom: "1rem"; font-size: "1.1rem"; border-bottom: "1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem"; }
         </style>
     }
 }
@@ -67,44 +106,89 @@ pub fn complex_layout() -> impl azumi::Component {
 #[azumi::component]
 pub fn lesson3() -> impl azumi::Component {
     azumi::html! {
-        <div class={container}>
-            <header class={header}>
-                <h1 class={main_title}>"Lesson 4: Component Composition Patterns"</h1>
-                <p class={subtitle}>"Building complex UIs from simple components"</p>
-            </header>
+        @DarkModernLayout() {
+            <div class={container}>
+                <header class={header}>
+                    <h1 class={main_title}>"Lesson 4: Component Composition Patterns"</h1>
+                    <p class={subtitle}>"Building complex UIs from simple components"</p>
+                </header>
 
-            <section class={key_points}>
-                <h2 class={section_title}>"Key Concepts"</h2>
-                <ul class={points_list}>
-                    <li class={point}>"✅ Create simple, focused components"</li>
-                    <li class={point}>"✅ Compose them together to build complex UIs"</li>
-                    <li class={point}>"✅ Reuse components across your application"</li>
-                    <li class={point}>"✅ Pass props to customize component behavior"</li>
-                    <li class={point}>"✅ Maintain clean separation of concerns"</li>
-                </ul>
-            </section>
+                <section class={key_points}>
+                    <h2 class={section_title}>"Key Concepts"</h2>
+                    <ul class={points_list}>
+                        <li class={point}>"✅ Create simple, focused components"</li>
+                        <li class={point}>"✅ Compose them together to build complex UIs"</li>
+                        <li class={point}>"✅ Reuse components across your application"</li>
+                        <li class={point}>"✅ Pass props to customize component behavior"</li>
+                        <li class={point}>"✅ Maintain clean separation of concerns"</li>
+                    </ul>
+                </section>
 
-            <section class={examples}>
-                <div class={example_card}>
-                    @dashboard()
-                </div>
-                <div class={example_card}>
-                    @complex_layout()
-                </div>
-            </section>
-        </div>
-        <style>
-            .container { padding: "20px"; }
-            .header { text-align: "center"; margin-bottom: "30px"; }
-            .main_title { font-size: "32px"; color: "#333"; }
-            .subtitle { font-size: "18px"; color: "#666"; }
-            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
-            .section_title { font-size: "20px"; margin-bottom: "15px"; }
-            .points_list { list-style: "none"; padding: "0"; }
-            .point { margin-bottom: "10px"; }
-            .examples { display: "grid"; gap: "20px"; }
-            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
-        </style>
+                <section class={examples}>
+                    <div class={example_card}>
+                        <div class={card_label}>"Example 1: Dashboard"</div>
+                        @dashboard()
+                    </div>
+                    <div class={example_card}>
+                        <div class={card_label}>"Example 2: Complex Layout"</div>
+                        @complex_layout()
+                    </div>
+                </section>
+            </div>
+            <style>
+                .container { max-width: "900px"; margin: "0 auto"; }
+                .header { text-align: "center"; margin-bottom: "3rem"; }
+                .main_title {
+                    font-size: "3rem";
+                    font-weight: "800";
+                    background: "linear-gradient(to right, #818cf8, #60a5fa)";
+                    -webkit-background-clip: "text";
+                    -webkit-text-fill-color: "transparent";
+                    margin-bottom: "1rem";
+                }
+                .subtitle { font-size: "1.25rem"; color: "#94a3b8"; }
+
+                .key_points {
+                    background: "rgba(30, 41, 59, 0.5)";
+                    padding: "2rem";
+                    border-radius: "16px";
+                    margin-bottom: "3rem";
+                    border: "1px solid rgba(255,255,255,0.05)";
+                    backdrop-filter: "blur(10px)";
+                }
+                .section_title {
+                    font-size: "1.5rem";
+                    color: "#f1f5f9";
+                    margin-bottom: "1.5rem";
+                    border-bottom: "1px solid rgba(255,255,255,0.1)";
+                    padding-bottom: "0.5rem";
+                }
+                .points_list { list-style: "none"; padding: "0"; display: "grid"; gap: "1rem"; }
+                .point {
+                    color: "#e2e8f0";
+                    padding: "0.75rem";
+                    background: "rgba(255,255,255,0.03)";
+                    border-radius: "8px";
+                    font-size: "1.1rem";
+                }
+
+                .examples { display: "grid"; gap: "2rem"; }
+                .example_card {
+                    border: "1px solid rgba(255,255,255,0.1)";
+                    padding: "2rem";
+                    border-radius: "16px";
+                    background: "rgba(15, 23, 42, 0.6)";
+                }
+                .card_label {
+                    font-size: "0.875rem";
+                    color: "#64748b";
+                    text-transform: "uppercase";
+                    letter-spacing: "0.05em";
+                    margin-bottom: "1.5rem";
+                    font-weight: "600";
+                }
+            </style>
+        }
     }
 }
 
