@@ -325,11 +325,14 @@ pub async fn lesson16_handler() -> axum::response::Html<String> {
     // Initial fetch
     state.load_todos().await;
 
-    // We still import the live component (for the struct), but we render the Page
-    use database_todo_view_component::*;
-
+    // Use the page component wrapper
+    use Lesson16Page_component::*;
+    
     // RENDER THE PAGE WRAPPER, NOT THE VIEW DIRECTLY
-    let component_html = azumi::render_to_string(&Lesson16Page(&state));
+    let component_html = azumi::render_to_string(&render(
+        Props::builder().state(&state).build().expect("props"),
+    ));
 
     axum::response::Html(component_html)
 }
+```
