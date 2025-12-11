@@ -461,14 +461,12 @@ impl Parse for Element {
              if let Some(pos) = attrs.iter().position(|attr: &Attribute| {
                 if attr.name == "src" {
                      if let AttributeValue::Static(v) = &attr.value {
-                        eprintln!("DEBUG: Script attr src value: {:?}", v);
                         return v.trim().trim_matches('"').trim_matches('\'') == "azumi.js";
                     }
                 }
                 false
              }) {
                  attrs.remove(pos);
-                 eprintln!("DEBUG: Removed magic src attribute!");
                  // Using syn::parse_str to create the expression
                  let expr: syn::Expr = syn::parse_str("azumi::Raw(azumi::AZUMI_JS)").unwrap();
                  children.push(Node::Expression(Expression {
