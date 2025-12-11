@@ -1636,7 +1636,7 @@ pub fn InteractivePage() -> impl Component {
         <head>
             // No manual script tags needed!
             // Manually include the runtime for interactivity
-            @azumi::prelude::AzumiScript
+            <script src="azumi.js" />
         </head>
         <body>
             // Your components here
@@ -1646,7 +1646,7 @@ pub fn InteractivePage() -> impl Component {
 }
 ```
 
-If you ever need to manually place it (e.g. for specific ordering), use `{azumi::azumi_script()}`.
+If you ever need to manually place it (e.g. for specific ordering), use `<script src="azumi.js" />`.
 
 ### CSS ID Handling
 
