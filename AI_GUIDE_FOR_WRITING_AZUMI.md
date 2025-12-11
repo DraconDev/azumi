@@ -137,10 +137,10 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 
 ### Injecting Client Runtime
 
-Azumi automatically injects the necessary client runtime (`azumi.js` and `idiomorph.js`) into your page.
+Azumi is **Static by Default**. It does NOT automatically inject the client runtime. You must explicitly opt-in to interactivity by including the `AzumiScript` component.
 
--   **Automatic Injection**: If you use `html!` to render the **entire page** (including `<html><head><body>`), the compiler automatically injects the runtime script (`azumi.js`) into the `<head>` or `<body>`.
--   **Manual Control**: If you are rendering a **fragment** (partial HTML) or generating the outer shell manually (e.g., using `format!`), you MUST manually inject the script using `{azumi::azumi_script()}`.
+-   **Manual Injection (Required for Live Features)**: Add `@azumi::prelude::AzumiScript` to your root layout or page component if you want interactivity (Signals, SPA navigation, etc.).
+-   **Static Defaults**: If you omit the script, the page renders as pure static HTML (perfect for landing pages, blogs, etc.).
 
 ```rust
 #[azumi::component]
@@ -151,17 +151,19 @@ pub fn RootLayout(children: impl Component) -> impl Component {
             <head>
                 <meta charset="utf-8" />
                 <title>"My Azumi App"</title>
-                // Runtime is automatically injected here if missing!
             </head>
             <body>
                 {children}
+
+                // ⚠️ REQUIRED: Manually include the runtime for interactivity
+                @azumi::prelude::AzumiScript
             </body>
         </html>
     }
 }
 ```
 
-This ensures your application always uses the matching runtime version for your compiled crate, and prevents duplicate injections.
+This ensures explicit control over when the 12kb runtime is included.
 
 ---
 
@@ -1553,7 +1555,8 @@ pub fn InteractivePage() -> impl Component {
         <html>
         <head>
             // No manual script tags needed!
-            // The compiler injects the runtime here automatically.
+            // Manually include the runtime for interactivity
+            @azumi::prelude::AzumiScript
         </head>
         <body>
             // Your components here

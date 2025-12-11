@@ -180,10 +180,10 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 
 ### Injecting Client Runtime
 
-Azumi automatically injects the necessary client runtime (`azumi.js` and `idiomorph.js`) into your page.
+Azumi is **Static by Default**. It does NOT automatically inject the client runtime.
 
--   **Automatic Injection**: If you use `html!` to render the **entire page** (including `<html><head><body>`), the compiler automatically injects the runtime script (`azumi.js`) into the `<head>` or `<body>`.
--   **Manual Control**: If you are rendering a **fragment** (partial HTML) or generating the outer shell manually (e.g., using `format!`), you MUST manually inject the script using `{azumi::azumi_script()}`.
+-   **Manual Injection (Required)**: You must manually include `@azumi::prelude::AzumiScript` in your layout if you want interactivity.
+-   **Static Optimized**: Pages without the script are pure, zero-JS static HTML.
 
 ```rust
 #[azumi::component]
@@ -194,17 +194,17 @@ pub fn RootLayout(children: impl Component) -> impl Component {
             <head>
                 <meta charset="utf-8" />
                 <title>"My Azumi App"</title>
-                // Runtime is automatically injected here if missing!
             </head>
             <body>
                 {children}
+
+                // ⚠️ REQUIRED for Signals/SPA/Events
+                @azumi::prelude::AzumiScript
             </body>
         </html>
     }
 }
 ```
-
-This ensures your application always uses the matching runtime version for your compiled crate, and prevents duplicate injections.
 
 ---
 
