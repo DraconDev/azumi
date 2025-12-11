@@ -34,12 +34,12 @@ Azumi is a **compiler-driven optimistic UI framework** that generates client-sid
 }
 ```
 
-### 2. CSS Classes (`class={...}`)
+### 2. CSS Classes (`class={...}`) - **STRICT MODE**
 
--   **Strict Snake Case:** All CSS classes MUST be `snake_case`. Dashes (`-`) are **BANNED** in class names (e.g., Use `.my_card`, NOT `.my-card`).
--   **Bracket Syntax ONLY:** You must use brackets with variables. Static strings usage (`class="..."`) is **BANNED**.
+-   **Strict Snake Case:** All CSS classes MUST be `snake_case`. Dashes (`-`) are **BANNED** in class names (e.g., Use `.my_card`, NOT `.my-card`). The compiler will reject dashed names.
+-   **Bracket Syntax ONLY:** You must use brackets with variables `class={my_class}`. Static strings usage (`class="my_class"`) is **BANNED** and will cause a compile error.
 -   **No Magic:** Automatic scoping handles everything via variables.
--   **Expression Lists:** You can combine multiple class variables.
+-   **Expression Lists:** You can combine multiple class variables: `class={card active}`.
 
 ```rust
 html! {
