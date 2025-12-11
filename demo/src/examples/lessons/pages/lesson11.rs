@@ -224,6 +224,21 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
     }
 }
 
+#[azumi::component]
+pub fn lesson11() -> impl azumi::Component {
+    let state = UserLoader {
+        loading: false,
+        error: None,
+        users: Vec::new(),
+    };
+
+    html! {
+        @DarkModernLayout() {
+            @user_loader_view(state=&state)
+        }
+    }
+}
+
 pub async fn lesson11_handler() -> impl axum::response::IntoResponse {
     axum::response::Html(azumi::render_to_string(&lesson11()))
 }
