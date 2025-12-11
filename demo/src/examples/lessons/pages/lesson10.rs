@@ -6,50 +6,7 @@ use azumi::prelude::*;
 #[azumi::component]
 pub fn lesson10_page() -> impl Component {
     html! {
-        <style>
-            .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
-            .card {
-                border: "1px solid #e0e0e0";
-                border-radius: "8px";
-                padding: "2rem";
-                margin-bottom: "2rem";
-                background: "white";
-                box-shadow: "0 2px 4px rgba(0,0,0,0.05)";
-            }
-            .title { color: "#333"; margin-bottom: "1rem"; }
-            .explanation { color: "#666"; line-height: "1.6"; margin-bottom: "2rem"; }
 
-            /* Tabs Styling */
-            .tabs { display: "flex"; border-bottom: "2px solid #eee"; margin-bottom: "1rem"; }
-            .tab_btn {
-                padding: "0.75rem 1.5rem";
-                border: "none";
-                background: "transparent";
-                cursor: "pointer";
-                font-weight: "bold";
-                color: "#666";
-                border-bottom: "2px solid transparent";
-                margin-bottom: "-2px";
-            }
-            .tab_btn.active { color: "#667eea"; border-bottom-color: "#667eea"; }
-            .tab_content { display: "none"; padding: "1rem 0"; }
-            .tab_content.active { display: "block"; }
-
-            /* Accordion Styling */
-            .accordion_item { border: "1px solid #eee"; border-radius: "4px"; margin-bottom: "0.5rem"; }
-            .accordion_header {
-                padding: "1rem";
-                background: "#f8f9fa";
-                cursor: "pointer";
-                font-weight: "bold";
-                display: "flex";
-                justify-content: "space-between";
-            }
-            .accordion_body { display: "none"; padding: "1rem"; border-top: "1px solid #eee"; }
-            .accordion_body.open { display: "block"; }
-
-            .code { background: "#f5f5f5"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-family: "monospace"; }
-        </style>
 
         <div class={container}>
             <h1>"Lesson 10: Client-Side State"</h1>
@@ -148,6 +105,50 @@ pub fn lesson10_page() -> impl Component {
                 </ul>
             </div>
         </div>
+        <style>
+            .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
+            .card {
+                border: "1px solid #e0e0e0";
+                border-radius: "8px";
+                padding: "2rem";
+                margin-bottom: "2rem";
+                background: "white";
+                box-shadow: "0 2px 4px rgba(0,0,0,0.05)";
+            }
+            .title { color: "#333"; margin-bottom: "1rem"; }
+            .explanation { color: "#666"; line-height: "1.6"; margin-bottom: "2rem"; }
+
+            /* Tabs Styling */
+            .tabs { display: "flex"; border-bottom: "2px solid #eee"; margin-bottom: "1rem"; }
+            .tab_btn {
+                padding: "0.75rem 1.5rem";
+                border: "none";
+                background: "transparent";
+                cursor: "pointer";
+                font-weight: "bold";
+                color: "#666";
+                border-bottom: "2px solid transparent";
+                margin-bottom: "-2px";
+            }
+            .tab_btn.active { color: "#667eea"; border-bottom-color: "#667eea"; }
+            .tab_content { display: "none"; padding: "1rem 0"; }
+            .tab_content.active { display: "block"; }
+
+            /* Accordion Styling */
+            .accordion_item { border: "1px solid #eee"; border-radius: "4px"; margin-bottom: "0.5rem"; }
+            .accordion_header {
+                padding: "1rem";
+                background: "#f8f9fa";
+                cursor: "pointer";
+                font-weight: "bold";
+                display: "flex";
+                justify-content: "space-between";
+            }
+            .accordion_body { display: "none"; padding: "1rem"; border-top: "1px solid #eee"; }
+            .accordion_body.open { display: "block"; }
+
+            .code { background: "#f5f5f5"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-family: "monospace"; }
+        </style>
     }
 }
 

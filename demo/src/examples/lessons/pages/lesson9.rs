@@ -29,6 +29,28 @@ impl Counter {
 #[azumi::component]
 pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
     html! {
+
+        <div class={counter_box}>
+            <h2>"🚀 Azumi Live Counter"</h2>
+
+            <div class={value} data-bind="count">{state.count}</div>
+            <div class={status}>
+                "Status: "
+                <span data-bind="active">{if state.active { "Active ✓" } else { "Inactive ✗" }}</span>
+            </div>
+
+            <div class={btn_row}>
+                <button class={btn btn_primary} on:click={state.increment}>
+                    "+ Increment"
+                </button>
+                <button class={btn btn_secondary} on:click={state.decrement}>
+                    "- Decrement"
+                </button>
+                <button class={btn btn_danger ml_md} on:click={state.toggle}>
+                    "Toggle Status"
+                </button>
+            </div>
+        </div>
         <style>
             .counter_box {
                 padding: "2rem";
@@ -68,27 +90,6 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
             .btn_danger { background: "#f44336"; color: "white"; }
             .ml_md { margin-left: "1rem"; }
         </style>
-        <div class={counter_box}>
-            <h2>"🚀 Azumi Live Counter"</h2>
-
-            <div class={value} data-bind="count">{state.count}</div>
-            <div class={status}>
-                "Status: "
-                <span data-bind="active">{if state.active { "Active ✓" } else { "Inactive ✗" }}</span>
-            </div>
-
-            <div class={btn_row}>
-                <button class={btn btn_primary} on:click={state.increment}>
-                    "+ Increment"
-                </button>
-                <button class={btn btn_secondary} on:click={state.decrement}>
-                    "- Decrement"
-                </button>
-                <button class={btn btn_danger ml_md} on:click={state.toggle}>
-                    "Toggle Status"
-                </button>
-            </div>
-        </div>
     }
 }
 
