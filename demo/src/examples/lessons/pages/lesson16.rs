@@ -251,7 +251,7 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
             }
         </style>
 
-        @use crate::examples::lessons::components::layout::DarkModernLayout;
+
 
         @DarkModernLayout() {
             <div class={card}>
