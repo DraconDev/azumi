@@ -8,28 +8,28 @@ use azumi::html;
 #[azumi::component]
 pub fn hello_world() -> impl azumi::Component {
     html! {
-
+        
         <div class={hello_container}>
-            <h1 class={hello_title}>
-                "Hello Azumi!"
+        <h1 class={hello_title}>
+        "Hello Azumi!"
             </h1>
             <h2 class={hello_title}>
                 "Hello World!"
-            </h2>
-        </div>
-        <style>
-            .hello_container {
-                background-color: "#f5f5f5";
-                padding: "20px";
-                border-radius: "8px";
-                box-shadow: "0 2px 4px rgba(0, 0, 0, 0.1)";
-            }
-            .hello_title {
-                color: "#333";
-                font-size: "1.5em";
-                font-weight: "bold";
-            }
-        </style>
+                </h2>
+                </div>
+                <style>
+                    .hello_container {
+                        background-color: "#f5f5f5";
+                        padding: "20px";
+                        border-radius: "8px";
+                        box-shadow: "0 2px 4px rgba(0, 0, 0, 0.1)";
+                    }
+                    .hello_title {
+                        color: "#333";
+                        font-size: "1.5em";
+                        font-weight: "bold";
+                    }
+                </style>
     }
 }
 
