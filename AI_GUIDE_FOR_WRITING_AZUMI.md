@@ -163,6 +163,20 @@ pub fn RootLayout(children: impl Component) -> impl Component {
 }
 ```
 
+                // ⚠️ REQUIRED: Manually include the runtime for interactivity
+                @azumi::prelude::AzumiScript
+            </body>
+        </html>
+    }
+
+}
+
+````
+
+> [!IMPORTANT]
+> **Always use `@azumi::prelude::AzumiScript`.**
+> Do not attempt to manually inject script tags or bake `azumi.js` into the head/body yourself. The `AzumiScript` component handles asset paths, hashing, and loading initialization correctly for both dev and prod environments.
+
 This ensures explicit control over when the 12kb runtime is included.
 
 ---
@@ -190,7 +204,7 @@ html! {
     // Compiler outputs this automatically:
     // <img src="/assets/logo.a8b9c7d6.png" />
 }
-```
+````
 
 -   The macro reads `assets_manifest.json` at compile time to rewrite paths.
 -   Works for `src`, `href` (link tags), and `srcset`.
