@@ -199,7 +199,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 
 Azumi is **Static by Default**. It does NOT automatically inject the client runtime.
 
--   **Manual Injection (Required)**: You must manually include `@azumi::prelude::AzumiScript` in your layout if you want interactivity.
+-   **Manual Injection (Required)**: You must manually include `<script src="azumi.js" />` in your layout if you want interactivity.
 -   **Static Optimized**: Pages without the script are pure, zero-JS static HTML.
 
 ```rust
