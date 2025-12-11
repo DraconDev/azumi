@@ -325,19 +325,7 @@ impl Parse for Element {
 
         // Azumi 2.0: Magic "src" attributes
         // <script src="azumi.js"> -> <script>{azumi::Raw(azumi::AZUMI_JS)}</script>
-        if name == "script" {
-             if let Some(pos) = attrs.iter().position(|attr: &Attribute| {
-                if attr.name == "src" {
-                    if let AttributeValue::Static(v) = &attr.value {
-                        return v == "azumi.js";
-                    }
-                }
-                false
-             }) {
-                 // Remove the magic src attribute
-                 attrs.remove(pos);
-             }
-        }
+
 
         // Azumi: Enforce component-scoped CSS - block <link rel="stylesheet"> for local files
         if name == "link" {
