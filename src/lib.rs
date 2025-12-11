@@ -1,11 +1,12 @@
 pub mod prelude {
     pub use crate::action::Action;
     pub use crate::{
-        action, azumi_script, component, head, html, live, live_impl, AzumiScript, Component,
+        action, azumi_script, component, head, html, live, live_impl, predict, AzumiScript,
+        Component,
     };
 }
 
-pub use azumi_macros::{action, component, head, html, live, live_impl};
+pub use azumi_macros::{action, component, head, html, live, live_impl, predict};
 pub mod action;
 pub mod hot_reload;
 pub mod script;

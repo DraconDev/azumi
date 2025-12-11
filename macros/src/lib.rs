@@ -69,6 +69,14 @@ pub fn live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     live::expand_live_impl(attr, item)
 }
 
+/// Helper attribute for optimistic UI predictions
+/// Used inside #[azumi::live_impl] blocks.
+/// This is a marker attribute that is read by `live_impl` but needs to exist for the compiler.
+#[proc_macro_attribute]
+pub fn predict(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
 #[allow(dead_code)]
 struct NodesWrapper(Vec<token_parser::Node>);
 
