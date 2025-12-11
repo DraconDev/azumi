@@ -14,6 +14,8 @@ pub fn homepage() -> impl Component {
 pub fn Lessons() -> impl Component {
     html! {
         <div class={page_wrapper}>
+            <div class={bg_glow}></div>
+            
             // Hero Section
             <header class={hero}>
                 <div class={hero_badge}>"🚀 The Future of Rust Web Development"</div>
@@ -22,15 +24,23 @@ pub fn Lessons() -> impl Component {
                     "A comprehensive, interactive journey through the Azumi framework.
                     From basic components to production-ready applications."
                 </p>
+                
+                <div class={hero_actions}>
+                    <a href="/lesson-0" class={btn_primary}>"Start Learning"</a>
+                    <a href="https://github.com/azumi-rs/azumi" class={btn_secondary}>"View on GitHub"</a>
+                </div>
+
                 <div class={hero_stats}>
                     <div class={stat}>
                         <span class={stat_number}>"20"</span>
                         <span class={stat_label}>"Lessons"</span>
                     </div>
+                    <div class={stat_divider}></div>
                     <div class={stat}>
                         <span class={stat_number}>"∞"</span>
                         <span class={stat_label}>"Possibilities"</span>
                     </div>
+                    <div class={stat_divider}></div>
                     <div class={stat}>
                         <span class={stat_number}>"0"</span>
                         <span class={stat_label}>"JS Required"</span>
@@ -93,63 +103,134 @@ pub fn Lessons() -> impl Component {
         <style>
             .page_wrapper {
                 padding-bottom: "6rem";
+                position: "relative";
+            }
+            
+            .bg_glow {
+                position: "absolute";
+                top: "-10%";
+                left: "50%";
+                transform: "translateX(-50%)";
+                width: "120%";
+                height: "600px";
+                background: "radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, rgba(15, 23, 42, 0) 70%)";
+                pointer-events: "none";
+                z-index: "-1";
             }
 
             // Hero
             .hero {
                 text-align: "center";
-                padding: "5rem 1rem 4rem";
+                padding: "6rem 1rem 5rem";
                 position: "relative";
             }
             .hero_badge {
-                display: "inline-block";
+                display: "inline-flex";
+                align-items: "center";
                 padding: "0.5rem 1rem";
-                background: "rgba(99, 102, 241, 0.15)";
-                border: "1px solid rgba(99, 102, 241, 0.3)";
+                background: "rgba(99, 102, 241, 0.1)";
+                border: "1px solid rgba(99, 102, 241, 0.2)";
                 border-radius: "9999px";
                 font-size: "0.875rem";
                 font-weight: "500";
-                color: "#a5b4fc";
-                margin-bottom: "1.5rem";
+                color: "#818cf8";
+                margin-bottom: "2rem";
                 animation: "fadeInDown 0.6s ease-out";
+                box-shadow: "0 0 20px -5px rgba(99, 102, 241, 0.2)";
             }
             .hero_title {
-                font-size: "clamp(2.5rem, 8vw, 5rem)";
+                font-size: "clamp(3rem, 8vw, 6rem)";
                 font-weight: "800";
-                margin: "0 0 1.5rem";
-                background: "linear-gradient(135deg, #fff 0%, #60a5fa 50%, #a78bfa 100%)";
+                line-height: "1.1";
+                margin: "0 auto 1.5rem";
+                max-width: "1000px";
+                background: "linear-gradient(to right bottom, #fff 30%, #a5b4fc 100%)";
                 -webkit-background-clip: "text";
                 -webkit-text-fill-color: "transparent";
                 animation: "fadeInUp 0.6s ease-out 0.1s both";
-                letter-spacing: "-0.03em";
+                letter-spacing: "-0.04em";
+                text-shadow: "0 20px 40px rgba(0,0,0,0.2)";
             }
             .hero_subtitle {
                 font-size: "1.25rem";
                 color: "#94a3b8";
-                max-width: "600px";
+                max-width: "640px";
                 margin: "0 auto 2.5rem";
-                line-height: "1.7";
+                line-height: "1.6";
                 animation: "fadeInUp 0.6s ease-out 0.2s both";
             }
-            .hero_stats {
+            
+            // Hero Actions
+            .hero_actions {
                 display: "flex";
+                gap: "1rem";
                 justify-content: "center";
-                gap: "3rem";
+                margin-bottom: "4rem";
                 animation: "fadeInUp 0.6s ease-out 0.3s both";
+            }
+            .btn_primary {
+                background: "#6366f1";
+                color: "white";
+                padding: "0.875rem 2rem";
+                border-radius: "0.5rem";
+                font-weight: "600";
+                text-decoration: "none";
+                transition: "all 0.2s";
+                box-shadow: "0 4px 12px rgba(99, 102, 241, 0.3)";
+            }
+            .btn_primary:hover {
+                background: "#4f46e5";
+                transform: "translateY(-2px)";
+                box-shadow: "0 8px 16px rgba(99, 102, 241, 0.4)";
+            }
+            .btn_secondary {
+                background: "rgba(30, 41, 59, 0.5)";
+                color: "#e2e8f0";
+                padding: "0.875rem 2rem";
+                border-radius: "0.5rem";
+                font-weight: "600";
+                text-decoration: "none";
+                border: "1px solid rgba(255,255,255,0.1)";
+                transition: "all 0.2s";
+            }
+            .btn_secondary:hover {
+                background: "rgba(30, 41, 59, 0.8)";
+                border-color: "rgba(255,255,255,0.2)";
+            }
+
+            .hero_stats {
+                display: "inline-flex";
+                align-items: "center";
+                justify-content: "center";
+                gap: "2rem";
+                animation: "fadeInUp 0.6s ease-out 0.4s both";
+                background: "rgba(15, 23, 42, 0.5)";
+                padding: "1.5rem 3rem";
+                border-radius: "1rem";
+                border: "1px solid rgba(255,255,255,0.05)";
+                backdrop-filter: "blur(10px)";
             }
             .stat {
                 display: "flex";
                 flex-direction: "column";
                 align-items: "center";
             }
+            .stat_divider {
+                width: "1px";
+                height: "40px";
+                background: "rgba(255,255,255,0.1)";
+            }
             .stat_number {
-                font-size: "2.5rem";
+                font-size: "2rem";
                 font-weight: "700";
-                color: "#f1f5f9";
+                color: "#f8fafc";
+                line-height: "1";
+                margin-bottom: "0.25rem";
             }
             .stat_label {
                 font-size: "0.875rem";
                 color: "#64748b";
+                font-weight: "600";
                 text-transform: "uppercase";
                 letter-spacing: "0.05em";
             }
@@ -157,16 +238,24 @@ pub fn Lessons() -> impl Component {
             // Sections
             .section {
                 max-width: "1200px";
-                margin: "0 auto 3rem";
+                margin: "0 auto 4rem";
                 padding: "0 1.5rem";
             }
             .section_title {
                 font-size: "1.5rem";
-                font-weight: "600";
-                color: "#e2e8f0";
-                margin-bottom: "1.5rem";
-                padding-bottom: "0.75rem";
-                border-bottom: "1px solid rgba(255,255,255,0.1)";
+                font-weight: "700";
+                color: "#f1f5f9";
+                margin-bottom: "2rem";
+                display: "flex";
+                align-items: "center";
+                gap: "0.75rem";
+            }
+            .section_title::after {
+                content: "''";
+                flex-grow: "1";
+                height: "1px";
+                background: "linear-gradient(to right, rgba(255,255,255,0.1), transparent)";
+                margin-left: "1rem";
             }
 
             // Grid
@@ -200,83 +289,113 @@ fn LessonCard<'a>(
     accent: &'a str,
 ) -> impl Component + 'a {
     html! {
-        <div class={lesson_card} style={format!("--accent: {}", accent)}>
-            <div class={card_accent}></div>
-            <div class={card_number}>"LESSON " {num}</div>
-            <h3 class={card_title}>{title}</h3>
-            <p class={card_desc}>{desc}</p>
-            <a href={link} class={card_link}>"Start Lesson →"</a>
-        </div>
+        <a href={link} class={lesson_card} style={format!("--accent: {}", accent)}>
+            <div class={card_glow}></div>
+            <div class={card_content}>
+                <div class={card_header}>
+                    <span class={card_number}>{num}</span>
+                    <div class={card_icon}>"→"</div>
+                </div>
+                <h3 class={card_title}>{title}</h3>
+                <p class={card_desc}>{desc}</p>
+                <div class={card_footer}>
+                    <span class={learn_more}>"Start Lesson"</span>
+                </div>
+            </div>
+        </a>
         <style>
             .lesson_card {
-                background: "rgba(30, 41, 59, 0.6)";
-                border: "1px solid rgba(255, 255, 255, 0.08)";
-                border-radius: "12px";
-                padding: "1.5rem";
-                display: "flex";
-                flex-direction: "column";
+                display: "block";
                 position: "relative";
+                background: "rgba(30, 41, 59, 0.4)";
+                border: "1px solid rgba(255, 255, 255, 0.05)";
+                border-radius: "16px";
+                text-decoration: "none";
                 overflow: "hidden";
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
-                backdrop-filter: "blur(8px)";
+                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+                height: "100%";
             }
-            .lesson_card:hover {
-                transform: "translateY(-4px)";
-                background: "rgba(30, 41, 59, 0.85)";
-                border-color: "var(--accent, #60a5fa)";
-                box-shadow: "0 20px 40px -12px rgba(0, 0, 0, 0.35)";
-            }
-            .card_accent {
+            .card_glow {
                 position: "absolute";
                 top: "0";
                 left: "0";
                 right: "0";
-                height: "3px";
-                background: "var(--accent, #60a5fa)";
-                opacity: "0.7";
-                transition: "opacity 0.3s";
+                height: "100%";
+                background: "radial-gradient(circle at top right, var(--accent), transparent 60%)";
+                opacity: "0";
+                transition: "opacity 0.4s";
+                mix-blend-mode: "screen";
+                pointer-events: "none";
             }
-            .lesson_card:hover .card_accent {
-                opacity: "1";
+            .card_content {
+                position: "relative";
+                padding: "1.75rem";
+                height: "100%";
+                display: "flex";
+                flex-direction: "column";
+                z-index: "1";
+            }
+            
+            .lesson_card:hover {
+                transform: "translateY(-4px)";
+                background: "rgba(30, 41, 59, 0.8)";
+                border-color: "rgba(255,255,255,0.1)";
+                box-shadow: "0 20px 40px -10px rgba(0, 0, 0, 0.5)";
+            }
+            .lesson_card:hover .card_glow {
+                opacity: "0.15";
+            }
+
+            .card_header {
+                display: "flex";
+                justify-content: "space-between";
+                align-items: "center";
+                margin-bottom: "1rem";
             }
             .card_number {
-                font-size: "0.75rem";
-                font-weight: "600";
-                color: "var(--accent, #60a5fa)";
-                margin-bottom: "0.5rem";
-                text-transform: "uppercase";
-                letter-spacing: "0.08em";
+                font-family: "monospace";
+                font-size: "0.875rem";
+                color: "var(--accent)";
+                background: "rgba(255,255,255,0.05)";
+                padding: "0.25rem 0.5rem";
+                border-radius: "4px";
             }
+            .card_icon {
+                color: "var(--accent)";
+                opacity: "0";
+                transform: "translateX(-10px)";
+                transition: "all 0.3s ease";
+            }
+            .lesson_card:hover .card_icon {
+                opacity: "1";
+                transform: "translateX(0)";
+            }
+
             .card_title {
                 font-size: "1.25rem";
-                font-weight: "600";
+                font-weight: "700";
                 color: "#f1f5f9";
-                margin: "0 0 0.75rem";
+                margin: "0 0 0.5rem";
                 line-height: "1.3";
             }
             .card_desc {
                 color: "#94a3b8";
-                font-size: "0.9rem";
-                margin-bottom: "1.25rem";
+                font-size: "0.95rem";
+                margin-bottom: "1.5rem";
                 flex-grow: "1";
-                line-height: "1.5";
+                line-height: "1.6";
             }
-            .card_link {
-                display: "inline-flex";
-                align-items: "center";
-                color: "#fff";
-                text-decoration: "none";
-                font-weight: "500";
+            
+            .card_footer {
+                margin-top: "auto";
+            }
+            .learn_more {
                 font-size: "0.875rem";
-                padding: "0.6rem 1.25rem";
-                background: "var(--accent, #3b82f6)";
-                border-radius: "6px";
-                transition: "all 0.2s";
-                align-self: "start";
-            }
-            .card_link:hover {
-                filter: "brightness(1.1)";
-                transform: "translateX(2px)";
+                font-weight: "600";
+                color: "var(--accent)";
+                display: "flex";
+                align-items: "center";
+                gap: "0.5rem";
             }
         </style>
     }
