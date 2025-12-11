@@ -480,10 +480,10 @@ impl Parse for Element {
                 false
              }) {
                  attrs.remove(pos);
-                 // Inject the raw script
+                 // Using syn::parse_str to create the expression
                  let expr: syn::Expr = syn::parse_str("azumi::Raw(azumi::AZUMI_JS)").unwrap();
                  children.push(Node::Expression(Expression {
-                     expr,
+                     content: expr.to_token_stream(),
                      span: Span::call_site(),
                  }));
              }
