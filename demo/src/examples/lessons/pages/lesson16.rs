@@ -173,7 +173,7 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
                 }
 
                 <div class={action_bar}>
-                    <button class="btn btn_danger" on:click={state.clear_all}>
+                    <button class={format!("{} {}", btn, btn_danger)} on:click={state.clear_all}>
                         "Clear Database"
                     </button>
                 </div>
