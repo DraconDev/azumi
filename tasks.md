@@ -1,7 +1,6 @@
 
 
-- ? dont bake in azumi js into html but make it optional, like live demo?
-
+- make a guide to azumi.js assuming we might share it seperately or someone wants to use it without azumi-rs, or maybe they ever needed super fine control over the client side
 
 # Done
 
