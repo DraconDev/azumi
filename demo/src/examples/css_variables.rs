@@ -7,9 +7,6 @@ pub fn css_variables_demo() -> impl azumi::Component {
         <div class={progress_bar} --width={percentage}>
             <div class={progress_value}></div>
         </div>
-        <div --static-var="100px">
-            "Static Var"
-        </div>
         <style>
             .progress_bar {
                 background-color: "#e0e0e0";
@@ -25,6 +22,9 @@ pub fn css_variables_demo() -> impl azumi::Component {
                 transition: "width 0.5s ease-in-out";
             }
         </style>
+        <div --static-var="100px">
+            "Static Var"
+        </div>
         <style>
             .progress_bar {
                 background-color: "#e0e0e0";

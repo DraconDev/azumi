@@ -23,7 +23,7 @@ pub fn validate_node_order(nodes: &[Node]) -> Vec<TokenStream> {
             Node::Element(elem) if elem.name == "script" => {
                 if phase > Phase::Script {
                     let msg = "Order Error: <script> tags must be placed at the top of the component, before any HTML content.";
-                    errors.push(quote_spanned! { elem.span =>
+                    errors.push(quote_spanned! { elem.full_span =>
                         compile_error!(#msg);
                     });
                 }
@@ -47,7 +47,7 @@ pub fn validate_node_order(nodes: &[Node]) -> Vec<TokenStream> {
                     // but we can match individual types if needed or just use a generic span if available.
                     // For now, let's try to get a span from the node if possible
                     let span = match node {
-                        Node::Element(e) => e.span,
+                        Node::Element(e) => e.full_span,
                         Node::Text(t) => t.span,
                         Node::Expression(e) => e.span,
                         Node::Doctype(d) => d.span,
