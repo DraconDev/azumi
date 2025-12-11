@@ -107,7 +107,7 @@ pub fn valid_css_example() -> impl azumi::Component {
                 border: "1px solid rgba(16, 185, 129, 0.2)";
                 border-radius: "12px";
             }
-            .header { display: "flex"; justify_content: "space-between"; align-items: "center"; margin-bottom: "1rem"; }
+            .header { display: "flex"; justify-content: "space-between"; align-items: "center"; margin-bottom: "1rem"; }
             .check_icon {
                 background: "rgba(16, 185, 129, 0.2)"; color: "#34d399";
                 width: "32px"; height: "32px"; border-radius: "50%";
