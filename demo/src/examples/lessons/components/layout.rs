@@ -12,6 +12,10 @@ pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Componen
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1" />
             <title>"Azumi Lesson"</title>
+            // Prevent caching during development
+            <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+            <meta http-equiv="Pragma" content="no-cache" />
+            <meta http-equiv="Expires" content="0" />
 
             // Preconnect for performance
             <link rel="preconnect" href="https://fonts.googleapis.com" />
