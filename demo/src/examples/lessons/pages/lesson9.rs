@@ -143,7 +143,7 @@ pub fn lesson9() -> impl azumi::Component {
                 </header>
 
                 <div class={live_demo_section}>
-                    @counter_view(&state)
+                    @counter_view(state=&state)
                 </div>
 
                 <div class={concepts}>
