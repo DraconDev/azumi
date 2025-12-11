@@ -395,7 +395,6 @@ For dynamic styles: use style attribute with expressions"
             // Self-closing
             input.parse::<Token![/]>()?;
             let end_token = input.parse::<Token![>]>()?;
-            let end_token = input.parse::<Token![>]>()?;
             if let Some(joined) = start_span.join(end_token.span()) {
                 full_span = joined;
             } else {
@@ -429,7 +428,6 @@ For dynamic styles: use style attribute with expressions"
                             ),
                         ));
                     }
-                    let end_token = input.parse::<Token![>]>()?;
                     let end_token = input.parse::<Token![>]>()?;
                     if let Some(joined) = start_span.join(end_token.span()) {
                         full_span = joined;
