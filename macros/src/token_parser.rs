@@ -323,6 +323,19 @@ impl Parse for Element {
             attrs.push(input.parse()?);
         }
 
+        // Azumi 2.0: Magic "src" attributes
+        // <script src="azumi.js"> -> <script>{azumi::Raw(azumi::AZUMI_JS)}</script>
+        if name == "script" {
+             if let Some(pos) = attrs.iter().position(|attr| {
+                attr.name == "src" && matches!(&attr.value, AttributeValue::Static(v) if v == "azumi.js")
+             }) {
+                 // Remove the magic src attribute
+                 attrs.remove(pos);
+                 
+                 // We will inject the content later if children are empty
+             }
+        }
+
         // Azumi: Enforce component-scoped CSS - block <link rel="stylesheet"> for local files
         if name == "link" {
             let has_rel_stylesheet = attrs.iter().any(|attr: &Attribute| {
@@ -354,13 +367,23 @@ impl Parse for Element {
 
         let mut children = Vec::new();
         if input.peek(Token![/]) {
-            // Self-closing
+            // Self-closing <script src="azumi.js" />
+            
+            // Check if we just removed the magic src attribute (and thus should inject content)
+            // We know we did if name is script and src is missing (since we removed it)
+            // But wait, user might have just written <script /> which is invalid.
+            // Let's rely on a flag or check.
+            // Actually, we can check if we *should* inject.
+            
+            // Simplification: logic above removed the attr. 
+            // If it was "azumi.js", we want to basically turn this into a non-self-closing tag with content.
+            // BUT, `Element` struct doesn't care if it was self-closing in source, only children matter.
+            
             input.parse::<Token![/]>()?;
             let end_token = input.parse::<Token![>]>()?;
             if let Some(joined) = start_span.join(end_token.span()) {
                 full_span = joined;
             } else {
-                // Fallback to name_span (e.g. "div") if we can't span the whole element
                 full_span = name_span;
             }
         } else {
@@ -404,6 +427,26 @@ impl Parse for Element {
                     ));
                 }
             }
+        }
+        
+        // Post-processing for magic scripts
+        if name == "script" && children.is_empty() {
+             // We can't easily know if we removed the attribute from here without re-checking or flag.
+             // Let's move the check/remove logic HERE.
+             
+             if let Some(pos) = attrs.iter().position(|attr| {
+                attr.name == "src" && matches!(&attr.value, AttributeValue::Static(v) if v == "azumi.js")
+             }) {
+                 attrs.remove(pos);
+                 // Inject the raw script
+                 // We need to construct a Node::Expression containing "azumi::Raw(azumi::AZUMI_JS)"
+                 // Since we don't have easy access to `parse_quote!`, we might need to parse from string?
+                 // Or better, just construct the tokens.
+                 
+                 // Using syn::parse_str to create the expression
+                 let expr: syn::Expr = syn::parse_str("azumi::Raw(azumi::AZUMI_JS)").unwrap();
+                 children.push(Node::Expression(expr));
+             }
         }
 
 
