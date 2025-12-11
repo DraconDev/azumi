@@ -133,6 +133,24 @@ impl<T: std::fmt::Display> FallbackRender for RenderWrapper<T> {
     }
 }
 
+/// A wrapper to inject raw HTML/JS content without escaping.
+///
+/// Usage:
+/// ```rust
+/// html! {
+///     <script>
+///         {azumi::Raw("console.log('Hello');")}
+///     </script>
+/// }
+/// ```
+pub struct Raw<T: std::fmt::Display>(pub T);
+
+impl<T: std::fmt::Display> Component for Raw<T> {
+    fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 pub fn js<T: std::fmt::Debug>(v: T) -> String {
     format!("{:?}", v)
 }
