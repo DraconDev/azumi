@@ -647,7 +647,7 @@ Azumi includes built-in tools to improve the developer experience.
 
 ### Prevention of Browser Caching
 
-During development, browsers may aggressively cache your WASM or static assets. Azumi provides a middleware to prevent this.
+During development, browsers may aggressively cache your JavaScript or static assets. Azumi provides a middleware to prevent this.
 
 **Usage:**
 
