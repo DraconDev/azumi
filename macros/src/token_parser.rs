@@ -467,19 +467,20 @@ impl Parse for Element {
              
              // 2. Just check for the attribute HERE (L406+) and remove it + inject children.
              // BUT parsing logic for children L354+ might choke on empty script? No.
-             
-             // I will use the L406 block to do BOTH remove and inject. It's safer.
+            // I will use the L406 block to do BOTH remove and inject. It's safer.
              // So I undo the L325 block removal (make it empty) and put logic here.
              
              if let Some(pos) = attrs.iter().position(|attr: &Attribute| {
                 if attr.name == "src" {
-                    if let AttributeValue::Static(v) = &attr.value {
+                     if let AttributeValue::Static(v) = &attr.value {
+                        eprintln!("DEBUG: Script attr src value: {:?}", v);
                         return v.trim().trim_matches('"').trim_matches('\'') == "azumi.js";
                     }
                 }
                 false
              }) {
                  attrs.remove(pos);
+                 eprintln!("DEBUG: Removed magic src attribute!");
                  // Using syn::parse_str to create the expression
                  let expr: syn::Expr = syn::parse_str("azumi::Raw(azumi::AZUMI_JS)").unwrap();
                  children.push(Node::Expression(Expression {
