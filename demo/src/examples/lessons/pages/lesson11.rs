@@ -16,12 +16,15 @@ pub struct UserLoader {
 #[azumi::live_impl(component = "user_loader_view")]
 impl UserLoader {
     // Optimistic Update: Set loading=true instantly on the client
-    #[predict(loading = true, error = None)]
+    // Optimistic Update: Set preview=true instantly. Azumi predicts this!
     pub async fn load_users(&mut self) {
-        // 1. Server-side delay (simulating DB)
+        // 1. Optimistic Prediction (Azumi detects this assignment)
+        self.loading = true;
+
+        // 2. Server-side delay (simulating DB)
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
-        // 2. Update State
+        // 3. Update State (Server Response)
         self.users = vec![
             "Alice Chen".to_string(),
             "Bob Smith".to_string(),
@@ -31,8 +34,8 @@ impl UserLoader {
     }
 
     // Optimistic Update: Set loading=true instantly
-    #[predict(loading = true, error = None)]
     pub async fn load_fail(&mut self) {
+        self.loading = true;
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
         self.loading = false;
@@ -41,7 +44,6 @@ impl UserLoader {
     }
 
     // Optimistic Update: Clear everything instantly
-    #[predict(loading = false, error = None, users = vec![])]
     pub fn reset(&mut self) {
         self.loading = false;
         self.error = None;
@@ -56,7 +58,7 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
             <div class={card}>
                 <div class={header}>
                     <h1 class={title}>"Async Data Loading"</h1>
-                    <p class={subtitle}>"Click actions to see optimistic loading states."</p>
+                    <p class={subtitle}>"Click to see optimistic state updates."</p>
                 </div>
 
                 // ===============================================
@@ -65,9 +67,12 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
 
                 <div class={content_area}>
                     @if state.loading {
-                        <div class={loading_state}>
-                            <div class={spinner}></div>
-                            <p>"Fetching users from database..."</p>
+                         <div class={loading_state}>
+                            <h3 style={ --color: "var(--azumi-text)"; --margin-bottom: "1rem" }>"Optimistic Loading..."</h3>
+                            // Skeleton UI Pattern
+                            <div class={skeleton_row}></div>
+                            <div class={skeleton_row}></div>
+                            <div class={skeleton_row}></div>
                         </div>
                     } else {
                         @if state.error.is_some() {
