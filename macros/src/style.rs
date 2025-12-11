@@ -694,11 +694,6 @@ fn is_valid_css_property(name: &str) -> bool {
         "animation-play-state",
         "animation-timing-function",
         "backdrop-filter",
-        "-webkit-backdrop-filter",
-        "-webkit-background-clip",
-        "-webkit-font-smoothing",
-        "-moz-osx-font-smoothing",
-        "-webkit-text-fill-color",
         "backface-visibility",
         "background",
         "background-attachment",
@@ -913,6 +908,13 @@ fn is_valid_css_property(name: &str) -> bool {
         "word-wrap",
         "writing-mode",
         "z-index",
+        // Vendor prefixes
+        "-webkit-backdrop-filter",
+        "-webkit-background-clip",
+        "-webkit-font-smoothing",
+        "-webkit-overflow-scrolling",
+        "-webkit-text-fill-color",
+        "-moz-osx-font-smoothing",
     ];
 
     valid_properties.contains(&name)
