@@ -4,6 +4,26 @@ use azumi::prelude::*;
 pub fn azumi_plus_demo() -> impl Component {
     html! {
         <script src="/static/azumi.js"></script>
+
+        <div class={demo_container}>
+            <h1>"Azumi+ Demo"</h1>
+
+            // Local State (Client-side only)
+            <div az-scope="{ \"count\": 0 }">
+                <h2>"Client-Side Counter"</h2>
+                <p>
+                    "Count: " <span az-bind:text="count">"0"</span>
+                </p>
+                <button class={btn} az-on="click set count = count + 1">
+                    "Increment"
+                </button>
+            </div>
+
+            <hr />
+
+            // Server Action - pure fragment, styles defined above
+            {like_button(LikeState { liked: false, count: 10 })}
+        </div>
         <style>
         .demo_container {
             padding: "2rem";
@@ -27,25 +47,6 @@ pub fn azumi_plus_demo() -> impl Component {
             margin-top: "2rem";
         }
         </style>
-        <div class={demo_container}>
-            <h1>"Azumi+ Demo"</h1>
-
-            // Local State (Client-side only)
-            <div az-scope="{ \"count\": 0 }">
-                <h2>"Client-Side Counter"</h2>
-                <p>
-                    "Count: " <span az-bind:text="count">"0"</span>
-                </p>
-                <button class={btn} az-on="click set count = count + 1">
-                    "Increment"
-                </button>
-            </div>
-
-            <hr />
-
-            // Server Action - pure fragment, styles defined above
-            {like_button(LikeState { liked: false, count: 10 })}
-        </div>
     }
 }
 
