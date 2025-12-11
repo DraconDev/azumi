@@ -283,7 +283,7 @@ pub fn Dashboard() -> impl Component {
 
 ### CSS Scoping: Component vs Global
 
-```rust
+````rust
 #[azumi::component]
 pub fn StyledComponent() -> impl Component {
     html! {
@@ -306,29 +306,28 @@ pub fn StyledComponent() -> impl Component {
     }
 }
 
-### 🎨 Reference Theme (Used in Examples)
+### 🎨 Integrating Design Systems
 
-The examples in this guide follow a "Deep Space" aesthetic for consistency. **Azumi is opinionated about *architecture*, not *design*.** You are free to use any design system, CSS framework, or variables you prefer.
+Azumi is unopinionated about design. You can use any CSS methodology, but **CSS Variables (Custom Properties)** are highly recommended for theming.
 
-However, if you are generating code for the Azumi Demo or Tutorials, please adhere to these variables to match the existing UI:
+**Recommended Pattern:**
 
-| Variable | Purpose | Default Value (Dark) |
-| :--- | :--- | :--- |
-| `--azumi-bg-app` | Main app background | `#0f172a` (Dark Slate) |
-| `--azumi-bg-card` | Card background | `rgba(30, 41, 59, 0.7)` |
-| `--azumi-text` | Primary text | `#f8fafc` |
-| `--azumi-text-dim` | Secondary text | `#94a3b8` |
-| `--azumi-primary` | Primary action | `#8b5cf6` (Violet) |
-| `--azumi-border` | Borders/Separators | `rgba(148, 163, 184, 0.1)` |
-| `--radius-lg` | Card border radius | `12px` |
+1.  Define your variables in a `global` style block (usually in your root layout).
+2.  Use them in your components via `var(--my-var)`.
 
-**Reference Pattern:**
+```rust
+// In your root layout
+<style global>
+    :root {
+        --primary-color: "#3b82f6";
+        --spacing-md: "1rem";
+    }
+</style>
+````
 
-1.  **Glassmorphism**: `backdrop-filter: blur(12px)`
-2.  **Gradients**: Subtle gradients for primary actions
-3.  **Font**: System sans-serif or Inter
+**Note:** The examples in this guide may use arbitrary variable names for demonstration. Always check the project's specific CSS definition before hallucinating variable names.
 
-```
+````
 
 ### Dynamic CSS with Custom Properties
 
@@ -357,7 +356,7 @@ pub fn ProgressMeter(completion: f64, accent_color: &str) -> impl Component {
         </style>
     }
 }
-```
+````
 
 **⚠️ Important**: Only CSS custom properties (`--var-name`) are allowed in `style={}` attributes. Direct properties like `style={width: "50%"}` cause compile errors.
 
