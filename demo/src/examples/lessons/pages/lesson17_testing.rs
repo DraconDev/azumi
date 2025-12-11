@@ -17,19 +17,19 @@ fn SimpleCard(title: String, content: String) -> impl Component {
 
 /// Live component to be tested
 #[azumi::live]
-pub struct Counter {
+pub struct TestCounter {
     pub count: i32,
 }
 
 #[azumi::live_impl(component = "counter_view")]
-impl Counter {
+impl TestCounter {
     pub fn increment(&mut self) {
         self.count += 1;
     }
 }
 
 #[azumi::component]
-fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
+fn counter_view<'a>(state: &'a TestCounter) -> impl Component + 'a {
     let count_class = "count";
     html! {
         <div>
@@ -64,13 +64,13 @@ mod tests {
 
     #[test]
     fn test_counter_logic() {
-        let mut simulator = test::simulate(Counter { count: 0 });
+        let mut simulator = test::simulate(TestCounter { count: 0 });
 
         // Initial state
         assert_eq!(simulator.state.count, 0);
 
         // Perform action
-        simulator.act(Counter::increment);
+        simulator.act(TestCounter::increment);
 
         // Verify state change
         assert_eq!(simulator.state.count, 1);
