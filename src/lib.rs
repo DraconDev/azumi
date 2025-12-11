@@ -11,6 +11,7 @@ pub mod hot_reload;
 pub mod script;
 pub mod security;
 pub use inventory;
+pub mod devtools;
 
 pub use script::AzumiScript;
 
