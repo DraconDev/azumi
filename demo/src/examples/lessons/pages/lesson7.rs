@@ -14,13 +14,7 @@ struct UserForm {
 #[azumi::component]
 pub fn user_form_component() -> impl azumi::Component {
     html! {
-        <style>
-            .form { display: "grid"; gap: "1rem"; max-width: "400px"; }
-            .form_field { display: "grid"; gap: "0.5rem"; }
-            .form_label { font-weight: "bold"; }
-            .form_input { padding: "0.5rem"; border: "1px solid #ddd"; }
-            .form_button { padding: "0.75rem"; background: "#2196f3"; color: "white"; border: "none"; cursor: "pointer"; }
-        </style>
+
         <form class={form}>
             <div class={form_field}>
                 <label class={form_label} for="name">"Name"</label>
@@ -36,6 +30,13 @@ pub fn user_form_component() -> impl azumi::Component {
             </div>
             <button class={form_button} type="submit">"Submit"</button>
         </form>
+        <style>
+            .form { display: "grid"; gap: "1rem"; max-width: "400px"; }
+            .form_field { display: "grid"; gap: "0.5rem"; }
+            .form_label { font-weight: "bold"; }
+            .form_input { padding: "0.5rem"; border: "1px solid #ddd"; }
+            .form_button { padding: "0.75rem"; background: "#2196f3"; color: "white"; border: "none"; cursor: "pointer"; }
+        </style>
     }
 }
 
@@ -43,11 +44,7 @@ pub fn user_form_component() -> impl azumi::Component {
 #[azumi::component]
 pub fn validation_example() -> impl azumi::Component {
     html! {
-        <style>
-            .validation_container { padding: "1rem"; }
-            .error_message { color: "red"; font-size: "0.9rem"; margin-top: "0.5rem"; }
-            .success_message { color: "green"; font-size: "0.9rem"; margin-top: "0.5rem"; }
-        </style>
+
         <div class={validation_container}>
             <h3>"Form Validation"</h3>
 
@@ -62,6 +59,11 @@ pub fn validation_example() -> impl azumi::Component {
             <p class={success_message}>"✅ Valid form structure"</p>
             <p class={error_message}>"❌ Invalid patterns caught at compile time"</p>
         </div>
+        <style>
+            .validation_container { padding: "1rem"; }
+            .error_message { color: "red"; font-size: "0.9rem"; margin-top: "0.5rem"; }
+            .success_message { color: "green"; font-size: "0.9rem"; margin-top: "0.5rem"; }
+        </style>
     }
 }
 
@@ -69,13 +71,7 @@ pub fn validation_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn complex_form_example() -> impl azumi::Component {
     html! {
-        <style>
-            .complex_form { display: "grid"; gap: "1rem"; max-width: "500px"; }
-            .form_section { border: "1px solid #eee"; padding: "1rem"; margin-bottom: "1rem"; }
-            .section_title { font-weight: "bold"; margin-bottom: "0.5rem"; }
-            .form_grid { display: "grid"; gap: "0.5rem"; }
-            .save_button { padding: "0.75rem"; background: "#4caf50"; color: "white"; border: "none"; }
-        </style>
+
         <form class={complex_form}>
             <div class={form_section}>
                 <h3 class={section_title}>"Personal Information"</h3>
@@ -112,6 +108,13 @@ pub fn complex_form_example() -> impl azumi::Component {
 
             <button class={save_button} type="submit">"Save Preferences"</button>
         </form>
+        <style>
+            .complex_form { display: "grid"; gap: "1rem"; max-width: "500px"; }
+            .form_section { border: "1px solid #eee"; padding: "1rem"; margin-bottom: "1rem"; }
+            .section_title { font-weight: "bold"; margin-bottom: "0.5rem"; }
+            .form_grid { display: "grid"; gap: "0.5rem"; }
+            .save_button { padding: "0.75rem"; background: "#4caf50"; color: "white"; border: "none"; }
+        </style>
     }
 }
 
@@ -119,18 +122,7 @@ pub fn complex_form_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn lesson7() -> impl azumi::Component {
     html! {
-        <style>
-            .container { padding: "20px"; }
-            .header { text-align: "center"; margin-bottom: "30px"; }
-            .main_title { font-size: "32px"; color: "#333"; }
-            .subtitle { font-size: "18px"; color: "#666"; }
-            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
-            .section_title { font-size: "20px"; margin-bottom: "15px"; }
-            .points_list { list-style: "none"; padding: "0"; }
-            .point { margin-bottom: "10px"; }
-            .examples { display: "grid"; gap: "20px"; }
-            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
-        </style>
+
         <div class={container}>
             <header class={header}>
                 <h1 class={main_title}>"Lesson 7: Form Handling with Validation"</h1>
@@ -160,6 +152,18 @@ pub fn lesson7() -> impl azumi::Component {
                 </div>
             </section>
         </div>
+        <style>
+            .container { padding: "20px"; }
+            .header { text-align: "center"; margin-bottom: "30px"; }
+            .main_title { font-size: "32px"; color: "#333"; }
+            .subtitle { font-size: "18px"; color: "#666"; }
+            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
+            .section_title { font-size: "20px"; margin-bottom: "15px"; }
+            .points_list { list-style: "none"; padding: "0"; }
+            .point { margin-bottom: "10px"; }
+            .examples { display: "grid"; gap: "20px"; }
+            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
+        </style>
     }
 }
 
