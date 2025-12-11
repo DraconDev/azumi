@@ -22,7 +22,7 @@ pub fn let_pattern_example() -> impl azumi::Component {
             // Derived values from calculations
             @let base_price = 100.0;
             @let tax_rate = 0.08;
-            @let total_price = base_price * (1.0 + tax_rate);
+            @let _total_price = base_price * (1.0 + tax_rate);
             <div class={derived}>
                 <p>"Base Price: ${base_price}"</p>
                 <p>"Tax Rate: {tax_rate * 100}%"</p>

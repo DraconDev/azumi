@@ -12,7 +12,7 @@ pub struct AuthState {
     pub username: Option<String>,
 }
 
-#[azumi::live_impl(component = "auth_view")]
+#[azumi::live_impl(component = "lesson19_page")]
 impl AuthState {
     pub fn logout(&mut self) {
         self.username = None;
