@@ -696,6 +696,7 @@ fn is_valid_css_property(name: &str) -> bool {
         "backdrop-filter",
         "-webkit-backdrop-filter",
         "-webkit-background-clip",
+        "-webkit-font-smoothing",
         "-webkit-text-fill-color",
         "backface-visibility",
         "background",
