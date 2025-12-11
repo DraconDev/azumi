@@ -474,7 +474,7 @@ impl Parse for Element {
              if let Some(pos) = attrs.iter().position(|attr: &Attribute| {
                 if attr.name == "src" {
                     if let AttributeValue::Static(v) = &attr.value {
-                        return v == "azumi.js";
+                        return v.trim() == "azumi.js";
                     }
                 }
                 false
@@ -486,8 +486,6 @@ impl Parse for Element {
                      content: expr.to_token_stream(),
                      span: Span::call_site(),
                  }));
-             }
-        }
              }
         }
 
