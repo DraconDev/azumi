@@ -306,9 +306,11 @@ pub fn StyledComponent() -> impl Component {
     }
 }
 
-### 🎨 Theme Standards ("Deep Space")
+### 🎨 Reference Theme (Used in Examples)
 
-Azumi applications should follow the "Deep Space" premium aesthetic. Use these standard CSS variables instead of hardcoded colors.
+The examples in this guide follow a "Deep Space" aesthetic for consistency. **Azumi is opinionated about *architecture*, not *design*.** You are free to use any design system, CSS framework, or variables you prefer.
+
+However, if you are generating code for the Azumi Demo or Tutorials, please adhere to these variables to match the existing UI:
 
 | Variable | Purpose | Default Value (Dark) |
 | :--- | :--- | :--- |
@@ -320,11 +322,11 @@ Azumi applications should follow the "Deep Space" premium aesthetic. Use these s
 | `--azumi-border` | Borders/Separators | `rgba(148, 163, 184, 0.1)` |
 | `--radius-lg` | Card border radius | `12px` |
 
-**Best Practices:**
+**Reference Pattern:**
 
-1.  **Glassmorphism**: Use `backdrop-filter: blur(12px)` combined with semi-transparent backgrounds.
-2.  **Gradients**: Use subtle gradients for backgrounds and primary buttons.
-3.  **Inter Font**: Use the "Inter" font family for clean, modern typography.
+1.  **Glassmorphism**: `backdrop-filter: blur(12px)`
+2.  **Gradients**: Subtle gradients for primary actions
+3.  **Font**: System sans-serif or Inter
 
 ```
 
