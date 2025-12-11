@@ -25,17 +25,7 @@ impl AuthState {
 #[azumi::component]
 fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
     html! {
-        <style>
-             .container { max-width: "600px"; margin: "4rem auto"; padding: "2rem"; font-family: "system-ui"; color: "#333"; }
-             .card { background: "white"; border-radius: "12px"; box-shadow: "0 4px 6px -1px rgba(0,0,0,0.1)"; padding: "2rem"; border: "1px solid #e2e8f0"; }
-             .header { text-align: "center"; margin-bottom: "2rem"; }
-             .title { font-size: "1.8rem"; margin: "0 0 0.5rem 0"; color: "#1e293b"; }
-             .subtitle { color: "#64748b"; }
-             .status_box { background: "#f8fafc"; padding: "1.5rem"; border-radius: "8px"; text-align: "center"; margin-top: "1.5rem"; border: "1px solid #e2e8f0"; }
-             .btn { background: "#2563eb"; color: "white"; border: "none"; padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "600"; cursor: "pointer"; text-decoration: "none"; display: "inline-block"; }
-             .btn:hover { background: "#1d4ed8"; }
-             .explanation { margin-top: "2rem"; color: "#666"; font-size: "0.9rem"; }
-        </style>
+
 
         <div class={container}>
             <div class={card}>
@@ -66,6 +56,17 @@ fn auth_view<'a>(state: &'a AuthState) -> impl Component + 'a {
                 </ol>
             </div>
         </div>
+        <style>
+             .container { max-width: "600px"; margin: "4rem auto"; padding: "2rem"; font-family: "system-ui"; color: "#333"; }
+             .card { background: "white"; border-radius: "12px"; box-shadow: "0 4px 6px -1px rgba(0,0,0,0.1)"; padding: "2rem"; border: "1px solid #e2e8f0"; }
+             .header { text-align: "center"; margin-bottom: "2rem"; }
+             .title { font-size: "1.8rem"; margin: "0 0 0.5rem 0"; color: "#1e293b"; }
+             .subtitle { color: "#64748b"; }
+             .status_box { background: "#f8fafc"; padding: "1.5rem"; border-radius: "8px"; text-align: "center"; margin-top: "1.5rem"; border: "1px solid #e2e8f0"; }
+             .btn { background: "#2563eb"; color: "white"; border: "none"; padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "600"; cursor: "pointer"; text-decoration: "none"; display: "inline-block"; }
+             .btn:hover { background: "#1d4ed8"; }
+             .explanation { margin-top: "2rem"; color: "#666"; font-size: "0.9rem"; }
+        </style>
     }
 }
 

@@ -68,27 +68,7 @@ pub fn lesson18() -> impl Component {
         <head>
             <meta charset="utf-8" />
             <title>"Lesson 18: Security"</title>
-            <style>
-                .body { font-family: "system-ui"; background: "#f8fafc"; margin: "0"; color: "#334155"; }
-                .container { max-width: "600px"; margin: "0 auto"; padding: "4rem 2rem"; }
-                .card { background: "white"; padding: "2rem"; border-radius: "12px"; box-shadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)"; border: "1px solid #e2e8f0"; }
-                .header { text-align: "center"; margin-bottom: "2rem"; }
-                .title { font-size: "2rem"; font-weight: "800"; color: "#0f172a"; margin: "0 0 0.5rem 0"; }
-                .subtitle { color: "#64748b"; font-size: "1.1rem"; }
 
-                .demo_section { margin-top: "2rem"; padding-top: "2rem"; border-top: "1px solid #e2e8f0"; }
-                .info_box { background: "#eff6ff"; border-left: "4px solid #3b82f6"; padding: "1rem"; margin-bottom: "1.5rem"; border-radius: "4px"; }
-                .info_text { margin: "0"; color: "#1e40af"; font-size: "0.95rem"; line-height: "1.5"; }
-                .code_snippet { font-family: "monospace"; background: "#1e293b"; color: "#e2e8f0"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-size: "0.9em"; }
-
-                .info_text { margin: "0"; color: "#1e40af"; font-size: "0.95rem"; line-height: "1.5"; }
-                .code_snippet { font-family: "monospace"; background: "#1e293b"; color: "#e2e8f0"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-size: "0.9em"; }
-
-                .verify_steps { background: "#f8fafc"; padding: "1.5rem"; border-radius: "8px"; margin-top: "2rem"; border: "1px solid #e2e8f0"; }
-                .verify_title { margin: "0 0 1rem 0"; font-size: "1rem"; color: "#0f172a"; }
-                .step_list { margin: "0"; padding-left: "1.2rem"; }
-                .step_item { margin-bottom: "0.5rem"; color: "#475569"; }
-            </style>
         </head>
         <body class={body}>
             <div class={container}>
@@ -132,6 +112,27 @@ pub fn lesson18() -> impl Component {
             <script src="/static/azumi.js"></script>
         </body>
         </html>
+            <style>
+                .body { font-family: "system-ui"; background: "#f8fafc"; margin: "0"; color: "#334155"; }
+                .container { max-width: "600px"; margin: "0 auto"; padding: "4rem 2rem"; }
+                .card { background: "white"; padding: "2rem"; border-radius: "12px"; box-shadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)"; border: "1px solid #e2e8f0"; }
+                .header { text-align: "center"; margin-bottom: "2rem"; }
+                .title { font-size: "2rem"; font-weight: "800"; color: "#0f172a"; margin: "0 0 0.5rem 0"; }
+                .subtitle { color: "#64748b"; font-size: "1.1rem"; }
+
+                .demo_section { margin-top: "2rem"; padding-top: "2rem"; border-top: "1px solid #e2e8f0"; }
+                .info_box { background: "#eff6ff"; border-left: "4px solid #3b82f6"; padding: "1rem"; margin-bottom: "1.5rem"; border-radius: "4px"; }
+                .info_text { margin: "0"; color: "#1e40af"; font-size: "0.95rem"; line-height: "1.5"; }
+                .code_snippet { font-family: "monospace"; background: "#1e293b"; color: "#e2e8f0"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-size: "0.9em"; }
+
+                .info_text { margin: "0"; color: "#1e40af"; font-size: "0.95rem"; line-height: "1.5"; }
+                .code_snippet { font-family: "monospace"; background: "#1e293b"; color: "#e2e8f0"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-size: "0.9em"; }
+
+                .verify_steps { background: "#f8fafc"; padding: "1.5rem"; border-radius: "8px"; margin-top: "2rem"; border: "1px solid #e2e8f0"; }
+                .verify_title { margin: "0 0 1rem 0"; font-size: "1rem"; color: "#0f172a"; }
+                .step_list { margin: "0"; padding-left: "1.2rem"; }
+                .step_item { margin-bottom: "0.5rem"; color: "#475569"; }
+            </style>
     }
 }
 
@@ -140,18 +141,7 @@ pub fn lesson18() -> impl Component {
 #[azumi::component]
 fn secure_view<'a>(state: &'a SecureCounter) -> impl Component + 'a {
     html! {
-        <style>
-            .counter_display { text-align: "center"; margin: "2rem 0"; }
-            .count_val { font-size: "4rem"; font-weight: "bold"; color: "#0f172a"; line-height: "1"; }
 
-            .status_badge { display: "inline-block"; padding: "0.25rem 0.75rem"; border-radius: "9999px"; font-size: "0.875rem"; font-weight: "600"; margin-top: "1rem"; }
-            .status_user { background: "#f1f5f9"; color: "#475569"; }
-            .status_admin { background: "#dcfce7"; color: "#166534"; }
-
-            .btn { display: "inline-flex"; align-items: "center"; justify-content: "center"; padding: "0.75rem 1.5rem"; background: "#0f172a"; color: "white"; font-weight: "600"; border-radius: "8px"; border: "none"; cursor: "pointer"; transition: "all 0.2s"; width: "100%"; font-size: "1rem"; }
-            .btn:hover { background: "#1e293b"; transform: "translateY(-1px)"; }
-            .btn:active { transform: "translateY(0)"; }
-        </style>
 
         <div>
             <div class={counter_display}>
@@ -166,6 +156,18 @@ fn secure_view<'a>(state: &'a SecureCounter) -> impl Component + 'a {
                 "Secure Increment"
             </button>
         </div>
+        <style>
+            .counter_display { text-align: "center"; margin: "2rem 0"; }
+            .count_val { font-size: "4rem"; font-weight: "bold"; color: "#0f172a"; line-height: "1"; }
+
+            .status_badge { display: "inline-block"; padding: "0.25rem 0.75rem"; border-radius: "9999px"; font-size: "0.875rem"; font-weight: "600"; margin-top: "1rem"; }
+            .status_user { background: "#f1f5f9"; color: "#475569"; }
+            .status_admin { background: "#dcfce7"; color: "#166534"; }
+
+            .btn { display: "inline-flex"; align-items: "center"; justify-content: "center"; padding: "0.75rem 1.5rem"; background: "#0f172a"; color: "white"; font-weight: "600"; border-radius: "8px"; border: "none"; cursor: "pointer"; transition: "all 0.2s"; width: "100%"; font-size: "1rem"; }
+            .btn:hover { background: "#1e293b"; transform: "translateY(-1px)"; }
+            .btn:active { transform: "translateY(0)"; }
+        </style>
     }
 }
 
