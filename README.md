@@ -215,8 +215,10 @@ pub fn RootLayout(children: impl Component) -> impl Component {
             <body>
                 {children}
 
-                // ⚠️ REQUIRED for Signals/SPA/Events
-                @azumi::prelude::AzumiScript
+                // ⚠️ REQUIRED: Manually include the runtime for interactivity
+                // This magic script is intercepted by the server.
+                // Place this in your ROOT layout to inherit it across all pages.
+                <script src="azumi.js" />
             </body>
         </html>
     }
