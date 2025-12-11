@@ -3,7 +3,7 @@ use azumi::html;
 /// Modern dark layout component that uses global CSS variables
 #[azumi::component]
 #[allow(non_snake_case)]
-pub fn DarkModernLayout(children: azumi::Children) -> impl azumi::Component {
+pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Component {
     html! {
         <!DOCTYPE html>
         <html lang="en" class="h-full antialiased selection:bg-indigo-500 selection:text-white">
@@ -18,6 +18,7 @@ pub fn DarkModernLayout(children: azumi::Children) -> impl azumi::Component {
             // Import Inter font
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         </head>
+        <body>
         <div class={dark_layout}>
             <div class={content_container}>
                 {children}
@@ -26,6 +27,8 @@ pub fn DarkModernLayout(children: azumi::Children) -> impl azumi::Component {
             // We use a manual script tag with Raw injection as requested
             <script>@{azumi::Raw(azumi::AZUMI_JS)}</script>
         </div>
+        </body>
+        </html>
         <style global>
             /* Reset & Variables */
             :root {
