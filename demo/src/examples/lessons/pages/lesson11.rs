@@ -206,18 +206,26 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
             }
 
             .modern_btn {
-                padding: "0.75rem 1.5rem";
-                border-radius: "8px";
+                padding: "0.85rem 1.75rem";
+                border-radius: "12px";
                 font-weight: "600";
-                border: "var(--border-color, none)";
+                border: "var(--border-color, 1px solid rgba(255,255,255,0.1))";
                 cursor: "pointer";
-                transition: "all 0.2s";
-                background: "linear-gradient(to right, #4f46e5, #4338ca)";
-                background: "linear-gradient(to right, var(--azumi-primary), var(--azumi-primary-hover))";
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)";
+                background: "linear-gradient(135deg, var(--azumi-primary), var(--azumi-primary-hover))";
                 color: "white";
-                /* Allow overriding via CSS variables in style={} attribute */
+                box-shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
+                text-shadow: "0 1px 2px rgba(0,0,0,0.2)";
+                letter-spacing: "0.025em";
             }
-            .modern_btn:hover { opacity: "0.9"; }
+            .modern_btn:hover {
+                transform: "translateY(-2px)";
+                box-shadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
+                filter: "brightness(1.1)";
+            }
+            .modern_btn:active {
+                transform: "translateY(0)";
+            }
 
             .empty_state { text-align: "center"; color: "var(--azumi-text-dim)"; padding: "2rem"; font-style: "italic"; }
         </style>
