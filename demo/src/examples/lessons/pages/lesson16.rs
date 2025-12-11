@@ -129,56 +129,63 @@ impl DatabaseTodo {
 }
 
 #[azumi::component]
-pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
+pub fn Lesson16Page<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
     html! {
         @DarkModernLayout() {
-            <div class={card}>
-                <h2 class={header_title}>"Async SQLite Todo List"</h2>
-
-                <div class={input_group}>
-                    <input
-                        class={input}
-                        type="text"
-                        name="input"
-                        value={state.input}
-                        placeholder="Add persistent todo..."
-                        autofocus
-                    />
-
-                    <button class={btn} on:click={state.add_todo} disabled={state.loading}>
-                        @if state.loading {
-                            <span>"Saving..."</span>
-                        } else {
-                            <span>"Add Task"</span>
-                        }
-                    </button>
-                </div>
-
-                <ul class={list}>
-                    @for todo in &state.todos {
-                        <li class={if todo.id == -1 { "item item_optimistic" } else { "item" }}>
-                            <span>
-                                {if todo.id == -1 { "⏳ " } else { "✅ " }}
-                                {&todo.text}
-                            </span>
-                            <span class={meta}>"ID: " {todo.id}</span>
-                        </li>
-                    }
-                </ul>
-
-                @if state.todos.is_empty() {
-                    <div class={empty_state}>
-                        "No tasks in SQLite database yet."
-                    </div>
-                }
-
-                <div class={action_bar}>
-                    <button class={btn btn_danger} on:click={state.clear_all}>
-                        "Clear Database"
-                    </button>
-                </div>
-            </div>
+            @database_todo_view(state=state)
         }
+    }
+}
+
+#[azumi::component]
+pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
+    html! {
+        <div class={card}>
+            <h2 class={header_title}>"Async SQLite Todo List"</h2>
+
+            <div class={input_group}>
+                <input
+                    class={input}
+                    type="text"
+                    name="input"
+                    value={state.input}
+                    placeholder="Add persistent todo..."
+                    autofocus
+                />
+
+                <button class={btn} on:click={state.add_todo} disabled={state.loading}>
+                    @if state.loading {
+                        <span>"Saving..."</span>
+                    } else {
+                        <span>"Add Task"</span>
+                    }
+                </button>
+            </div>
+
+            <ul class={list}>
+                @for todo in &state.todos {
+                    <li class={if todo.id == -1 { "item item_optimistic" } else { "item" }}>
+                        <span>
+                            {if todo.id == -1 { "⏳ " } else { "✅ " }}
+                            {&todo.text}
+                        </span>
+                        <span class={meta}>"ID: " {todo.id}</span>
+                    </li>
+                }
+            </ul>
+
+            @if state.todos.is_empty() {
+                <div class={empty_state}>
+                    "No tasks in SQLite database yet."
+                </div>
+            }
+
+            <div class={action_bar}>
+                <button class={format!("{} {}", btn, btn_danger)} on:click={state.clear_all}>
+                    "Clear Database"
+                </button>
+            </div>
+        </div>
 
         <style>
              .card {
@@ -318,10 +325,11 @@ pub async fn lesson16_handler() -> axum::response::Html<String> {
     // Initial fetch
     state.load_todos().await;
 
+    // We still import the live component (for the struct), but we render the Page
     use database_todo_view_component::*;
-    let component_html = azumi::render_to_string(&render(
-        Props::builder().state(&state).build().expect("props"),
-    ));
+
+    // RENDER THE PAGE WRAPPER, NOT THE VIEW DIRECTLY
+    let component_html = azumi::render_to_string(&Lesson16Page(&state));
 
     axum::response::Html(component_html)
 }
