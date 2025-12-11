@@ -191,14 +191,17 @@ pub fn Lessons() -> impl Component {
 }
 
 #[azumi::component]
+#[allow(non_snake_case)]
 fn LessonCard<'a>(
     num: &'a str,
     title: &'a str,
     desc: &'a str,
     link: &'a str,
+    accent: &'a str,
 ) -> impl Component + 'a {
     html! {
-        <div class={lesson_card}>
+        <div class={lesson_card} style={format!("--accent: {}", accent)}>
+            <div class={card_accent}></div>
             <div class={card_number}>"LESSON " {num}</div>
             <h3 class={card_title}>{title}</h3>
             <p class={card_desc}>{desc}</p>
@@ -206,52 +209,76 @@ fn LessonCard<'a>(
         </div>
         <style>
             .lesson_card {
+                background: "rgba(30, 41, 59, 0.6)";
+                border: "1px solid rgba(255, 255, 255, 0.08)";
+                border-radius: "12px";
+                padding: "1.5rem";
                 display: "flex";
                 flex-direction: "column";
-                align-items: "center";
-                justify-content: "center";
-                width: "200px";
-                height: "200px";
-                border-radius: "8px";
-                background: "#1e293b";
-                color: "#f3f4f6";
-                box-shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
-                transition: "all 0.2s";
+                position: "relative";
+                overflow: "hidden";
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+                backdrop-filter: "blur(8px)";
+            }
+            .lesson_card:hover {
+                transform: "translateY(-4px)";
+                background: "rgba(30, 41, 59, 0.85)";
+                border-color: "var(--accent, #60a5fa)";
+                box-shadow: "0 20px 40px -12px rgba(0, 0, 0, 0.35)";
+            }
+            .card_accent {
+                position: "absolute";
+                top: "0";
+                left: "0";
+                right: "0";
+                height: "3px";
+                background: "var(--accent, #60a5fa)";
+                opacity: "0.7";
+                transition: "opacity 0.3s";
+            }
+            .lesson_card:hover .card_accent {
+                opacity: "1";
             }
             .card_number {
-                font-size: "1.5rem";
-                font-weight: "700";
-                color: "#60a5fa";
+                font-size: "0.75rem";
+                font-weight: "600";
+                color: "var(--accent, #60a5fa)";
                 margin-bottom: "0.5rem";
                 text-transform: "uppercase";
-                letter-spacing: "0.05em";
+                letter-spacing: "0.08em";
             }
             .card_title {
-                font-size: "1.5rem";
-                font-weight: "700";
-                color: "#f3f4f6";
-                margin-bottom: "1rem";
-                line-height: "1.2";
+                font-size: "1.25rem";
+                font-weight: "600";
+                color: "#f1f5f9";
+                margin: "0 0 0.75rem";
+                line-height: "1.3";
             }
             .card_desc {
-                color: "#9ca3af";
-                margin-bottom: "1rem";
+                color: "#94a3b8";
+                font-size: "0.9rem";
+                margin-bottom: "1.25rem";
+                flex-grow: "1";
+                line-height: "1.5";
             }
             .card_link {
                 display: "inline-flex";
                 align-items: "center";
                 color: "#fff";
                 text-decoration: "none";
-                font-weight: "600";
-                padding: "0.75rem 1.5rem";
-                background: "linear-gradient(135deg, #3b82f6, #2563eb)";
-                border-radius: "8px";
+                font-weight: "500";
+                font-size: "0.875rem";
+                padding: "0.6rem 1.25rem";
+                background: "var(--accent, #3b82f6)";
+                border-radius: "6px";
                 transition: "all 0.2s";
                 align-self: "start";
             }
-
+            .card_link:hover {
+                filter: "brightness(1.1)";
+                transform: "translateX(2px)";
+            }
         </style>
-
     }
 }
 
