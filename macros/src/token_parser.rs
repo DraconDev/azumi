@@ -296,8 +296,8 @@ pub fn parse_nodes(input: ParseStream) -> Result<Vec<Node>> {
 
 impl Parse for Element {
     fn parse(input: ParseStream) -> Result<Self> {
-        let start_token: Token![<] = input.parse()?;
-        let start_span = start_token.span();
+        let start_span = input.span();
+        input.parse::<Token![<]>()?;
         let (name, name_span) = parse_html_name(input, false)?; // false = don't allow double dash in tag names
 
         let mut attrs = Vec::new();
@@ -395,17 +395,12 @@ For dynamic styles: use style attribute with expressions"
             // Self-closing
             input.parse::<Token![/]>()?;
             let end_token = input.parse::<Token![>]>()?;
-            let mut span_to_join = start_span;
-             // Try joining with name first as a sanity check
-            if let Some(s) = span_to_join.join(name_span) {
-                span_to_join = s;
-            }
-
-            if let Some(joined) = span_to_join.join(end_token.span()) {
+            let end_token = input.parse::<Token![>]>()?;
+            if let Some(joined) = start_span.join(end_token.span()) {
                 full_span = joined;
             } else {
-                eprintln!("Span join FAILED for self-closing element! Falling back to start+name span");
-                full_span = span_to_join;
+                // Fallback to name_span (e.g. "div") if we can't span the whole element
+                full_span = name_span;
             }
         } else {
             input.parse::<Token![>]>()?;
@@ -435,17 +430,12 @@ For dynamic styles: use style attribute with expressions"
                         ));
                     }
                     let end_token = input.parse::<Token![>]>()?;
-                    let mut span_to_join = start_span;
-                    // Try joining with name first
-                    if let Some(s) = span_to_join.join(name_span) {
-                         span_to_join = s;
-                    }
-
-                    if let Some(joined) = span_to_join.join(end_token.span()) {
+                    let end_token = input.parse::<Token![>]>()?;
+                    if let Some(joined) = start_span.join(end_token.span()) {
                         full_span = joined;
                     } else {
-                         eprintln!("Span join FAILED for element {}. Falling back to start+name", name);
-                        full_span = span_to_join;
+                        // Fallback to name_span
+                        full_span = name_span;
                     }
                 } else {
                     return Err(Error::new(
