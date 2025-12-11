@@ -32,16 +32,16 @@ pub fn basic_component() -> impl azumi::Component {
 #[azumi::component]
 pub fn multi_element_component() -> impl azumi::Component {
     html! {
-        <style>
-            .card { padding: "1.5rem"; margin: "1rem 0"; border: "1px solid #eee"; border-radius: "8px"; }
-            .card_title { font-size: "1.2rem"; color: "#1976d2"; margin-bottom: "0.5rem"; }
-            .card_content { color: "#666"; }
-        </style>
         <div class={card}>
             <h2 class={card_title}>"Multi-Element Component"</h2>
             <p class={card_content}>"Components can contain multiple elements with proper styling"</p>
             <p class={card_content}>"All CSS is automatically scoped to this component"</p>
         </div>
+        <style>
+            .card { padding: "1.5rem"; margin: "1rem 0"; border: "1px solid #eee"; border-radius: "8px"; }
+            .card_title { font-size: "1.2rem"; color: "#1976d2"; margin-bottom: "0.5rem"; }
+            .card_content { color: "#666"; }
+        </style>
     }
 }
 
