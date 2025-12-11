@@ -103,13 +103,25 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
 
                 <div class={controls}>
                     // Use on:click syntax which auto-generates the correct az-on attribute
-                    <button class="modern_btn" on:click={state.load_users}>
+                    <button class={modern_btn} on:click={state.load_users}>
                         "Load Users (Success)"
                     </button>
-                    <button class="modern_btn" style="--azumi-primary: #ef4444; --azumi-primary-hover: #dc2626;" on:click={state.load_fail}>
+                    <button
+                        class={modern_btn}
+                        style={ --azumi-primary: "#ef4444"; --azumi-primary-hover: "#dc2626" }
+                        on:click={state.load_fail}
+                    >
                         "Load Users (Fail)"
                     </button>
-                    <button class="modern_btn" style="--azumi-primary: transparent; --azumi-primary-hover: var(--azumi-bg-subtle); border: 1px solid var(--azumi-border);" on:click={state.reset}>
+                    <button
+                        class={modern_btn}
+                        style={
+                            --azumi-primary: "transparent";
+                            --azumi-primary-hover: "var(--azumi-bg-subtle)";
+                            --border-color: "var(--azumi-border)"
+                        }
+                        on:click={state.reset}
+                    >
                         "Reset"
                     </button>
                 </div>
@@ -192,6 +204,20 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
                 padding-top: "var(--spacing-lg)";
                 border-top: "1px solid var(--azumi-border)";
             }
+
+            .modern_btn {
+                padding: "0.75rem 1.5rem";
+                border-radius: "8px";
+                font-weight: "600";
+                border: "var(--border-color, none)";
+                cursor: "pointer";
+                transition: "all 0.2s";
+                background: "linear-gradient(to right, #4f46e5, #4338ca)";
+                background: "linear-gradient(to right, var(--azumi-primary), var(--azumi-primary-hover))";
+                color: "white";
+                /* Allow overriding via CSS variables in style={} attribute */
+            }
+            .modern_btn:hover { opacity: "0.9"; }
 
             .empty_state { text-align: "center"; color: "var(--azumi-text-dim)"; padding: "2rem"; font-style: "italic"; }
         </style>
