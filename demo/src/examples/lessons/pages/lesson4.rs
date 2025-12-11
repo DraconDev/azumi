@@ -6,12 +6,12 @@ use azumi::html;
 #[azumi::component]
 pub fn container(children: impl azumi::Component) -> impl azumi::Component {
     html! {
-        <style>
-            .content_box { padding: "2rem"; border: "1px solid #ddd"; border-radius: "8px"; }
-        </style>
         <div class={content_box}>
             {children}
         </div>
+        <style>
+            .content_box { padding: "2rem"; border: "1px solid #ddd"; border-radius: "8px"; }
+        </style>
     }
 }
 
@@ -19,9 +19,6 @@ pub fn container(children: impl azumi::Component) -> impl azumi::Component {
 #[azumi::component]
 pub fn layout_example() -> impl azumi::Component {
     html! {
-        <style>
-            .layout_title { font-size: "1.5rem"; color: "#2196f3"; margin-bottom: "1rem"; }
-        </style>
         <div>
             <h2 class={layout_title}>"Container with Children"</h2>
 
@@ -30,6 +27,9 @@ pub fn layout_example() -> impl azumi::Component {
                 <p>"Children can be any valid Azumi components"</p>
             }
         </div>
+        <style>
+            .layout_title { font-size: "1.5rem"; color: "#2196f3"; margin-bottom: "1rem"; }
+        </style>
     }
 }
 
@@ -37,10 +37,6 @@ pub fn layout_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn nested_children() -> impl azumi::Component {
     html! {
-        <style>
-            .outer_container { background: "#f0f0f0"; padding: "1.5rem"; }
-            .inner_container { background: "white"; padding: "1rem"; margin-top: "1rem"; }
-        </style>
         <div>
             <h3>"Nested Children Example"</h3>
             @container() {
@@ -53,6 +49,10 @@ pub fn nested_children() -> impl azumi::Component {
                 </div>
             }
         </div>
+        <style>
+            .outer_container { background: "#f0f0f0"; padding: "1.5rem"; }
+            .inner_container { background: "white"; padding: "1rem"; margin-top: "1rem"; }
+        </style>
     }
 }
 
@@ -60,10 +60,6 @@ pub fn nested_children() -> impl azumi::Component {
 #[azumi::component]
 pub fn multiple_children_example() -> impl azumi::Component {
     html! {
-        <style>
-            .children_demo { display: "grid"; gap: "1rem"; }
-            .child_item { padding: "0.5rem"; background: "#f9f9f9"; border: "1px solid #eee"; }
-        </style>
         <div>
             @container() {
                 <div class={children_demo}>
@@ -82,6 +78,10 @@ pub fn multiple_children_example() -> impl azumi::Component {
                 <p>"Multiple children example"</p>
             }
         </div>
+        <style>
+            .children_demo { display: "grid"; gap: "1rem"; }
+            .child_item { padding: "0.5rem"; background: "#f9f9f9"; border: "1px solid #eee"; }
+        </style>
     }
 }
 
@@ -89,17 +89,6 @@ pub fn multiple_children_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn lesson4() -> impl azumi::Component {
     html! {
-        <style>
-            .header { text-align: "center"; margin-bottom: "30px"; }
-            .main_title { font-size: "32px"; color: "#333"; }
-            .subtitle { font-size: "18px"; color: "#666"; }
-            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
-            .section_title { font-size: "20px"; margin-bottom: "15px"; }
-            .points_list { list-style: "none"; padding: "0"; }
-            .point { margin-bottom: "10px"; }
-            .examples { display: "grid"; gap: "20px"; }
-            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
-        </style>
         @crate::examples::lessons::components::layout::DarkModernLayout() {
             <div>
                 <header class={header}>
@@ -131,6 +120,17 @@ pub fn lesson4() -> impl azumi::Component {
                 </section>
             </div>
         }
+        <style>
+            .header { text-align: "center"; margin-bottom: "30px"; }
+            .main_title { font-size: "32px"; color: "#333"; }
+            .subtitle { font-size: "18px"; color: "#666"; }
+            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
+            .section_title { font-size: "20px"; margin-bottom: "15px"; }
+            .points_list { list-style: "none"; padding: "0"; }
+            .point { margin-bottom: "10px"; }
+            .examples { display: "grid"; gap: "20px"; }
+            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
+        </style>
     }
 }
 

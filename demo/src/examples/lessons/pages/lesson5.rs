@@ -6,11 +6,6 @@ use azumi::html;
 #[azumi::component]
 pub fn let_pattern_example() -> impl azumi::Component {
     html! {
-        <style>
-            .let_demo { padding: "1rem"; }
-            .calculated { font-weight: "bold"; color: "#2196f3"; }
-            .derived { background: "#f0f0f0"; padding: "0.5rem"; }
-        </style>
         <div class={let_demo}>
             <h2>"@let Pattern Examples"</h2>
 
@@ -47,6 +42,11 @@ pub fn let_pattern_example() -> impl azumi::Component {
                 }
             </div>
         </div>
+        <style>
+            .let_demo { padding: "1rem"; }
+            .calculated { font-weight: "bold"; color: "#2196f3"; }
+            .derived { background: "#f0f0f0"; padding: "0.5rem"; }
+        </style>
     }
 }
 
@@ -54,10 +54,6 @@ pub fn let_pattern_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn let_with_conditions() -> impl azumi::Component {
     html! {
-        <style>
-            .conditions_demo { padding: "1rem"; background: "#f9f9f9"; }
-            .result { font-weight: "bold"; }
-        </style>
         <div class={conditions_demo}>
             <h3>"@let with Conditions"</h3>
 
@@ -75,6 +71,10 @@ pub fn let_with_conditions() -> impl azumi::Component {
             <p>"Score: " <span class={result}>{score}</span></p>
             <p>"Grade: " <span class={result}>{grade}</span></p>
         </div>
+        <style>
+            .conditions_demo { padding: "1rem"; background: "#f9f9f9"; }
+            .result { font-weight: "bold"; }
+        </style>
     }
 }
 
@@ -82,10 +82,6 @@ pub fn let_with_conditions() -> impl azumi::Component {
 #[azumi::component]
 pub fn let_composition_example() -> impl azumi::Component {
     html! {
-        <style>
-            .composition_demo { padding: "1rem"; }
-            .component_container { margin: "0.5rem 0"; padding: "0.5rem"; background: "#f5f5f5"; }
-        </style>
         <div class={composition_demo}>
             <h3>"@let for Composition"</h3>
 
@@ -97,6 +93,10 @@ pub fn let_composition_example() -> impl azumi::Component {
                 <p>{content}</p>
             </div>
         </div>
+        <style>
+            .composition_demo { padding: "1rem"; }
+            .component_container { margin: "0.5rem 0"; padding: "0.5rem"; background: "#f5f5f5"; }
+        </style>
     }
 }
 
@@ -104,18 +104,6 @@ pub fn let_composition_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn lesson5() -> impl azumi::Component {
     html! {
-        <style>
-            .container { padding: "20px"; }
-            .header { text-align: "center"; margin-bottom: "30px"; }
-            .main_title { font-size: "32px"; color: "#333"; }
-            .subtitle { font-size: "18px"; color: "#666"; }
-            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
-            .section_title { font-size: "20px"; margin-bottom: "15px"; }
-            .points_list { list-style: "none"; padding: "0"; }
-            .point { margin-bottom: "10px"; }
-            .examples { display: "grid"; gap: "20px"; }
-            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
-        </style>
         <div class={container}>
             <header class={header}>
                 <h1 class={main_title}>"Lesson 6.5: @let Pattern for Local Variables"</h1>
@@ -145,6 +133,18 @@ pub fn lesson5() -> impl azumi::Component {
                 </div>
             </section>
         </div>
+        <style>
+            .container { padding: "20px"; }
+            .header { text-align: "center"; margin-bottom: "30px"; }
+            .main_title { font-size: "32px"; color: "#333"; }
+            .subtitle { font-size: "18px"; color: "#666"; }
+            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
+            .section_title { font-size: "20px"; margin-bottom: "15px"; }
+            .points_list { list-style: "none"; padding: "0"; }
+            .point { margin-bottom: "10px"; }
+            .examples { display: "grid"; gap: "20px"; }
+            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
+        </style>
     }
 }
 
