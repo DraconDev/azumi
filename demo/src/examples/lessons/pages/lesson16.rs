@@ -130,46 +130,151 @@ impl DatabaseTodo {
 #[azumi::component]
 pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
     html! {
-        <html>
-        <head>
-            <meta charset="utf-8" />
-            <title>"Lesson 16: Async Database"</title>
-            <style>
-                .body { font-family: "system-ui"; background: "#fff"; margin: "0"; }
-                .container { max-width: "500px"; margin: "0 auto"; padding: "2rem"; }
-                .header { text-align: "center"; color: "#333"; }
-                .input_group { display: "flex"; gap: "0.5rem"; margin-bottom: "1rem"; }
-                .input { flex: "1"; padding: "0.5rem"; border: "1px solid #ccc"; border-radius: "4px"; }
-                .btn { padding: "0.5rem 1rem"; background: "#2563eb"; color: "white"; border: "none"; border-radius: "4px"; cursor: "pointer"; }
-                .btn:disabled { background: "#93c5fd"; }
-                .list { list-style: "none"; padding: "0"; }
-                .item { padding: "0.75rem"; border-bottom: "1px solid #eee"; display: "flex"; justify-content: "space-between"; align-items: "center"; }
-                .item_optimistic { color: "#888"; font-style: "italic"; }
-                .spinner { display: "inline-block"; animation: "spin 1s linear infinite"; margin-left: "0.5rem"; }
-                .btn_danger { background: "#dc2626"; }
-                .text_center { text-align: "center"; color: "#666"; }
-                @keyframes spin { 100% { transform: "rotate(360deg)"; } }
-            </style>
-        </head>
-        <body class={body}>
-            <div class={container}>
-                <h2 class={header}>"Async SQLite Todo List"</h2>
+        <style>
+             .card {
+                background: "rgba(30, 41, 59, 0.7)";
+                backdrop-filter: "blur(12px)";
+                -webkit-backdrop-filter: "blur(12px)";
+                border: "1px solid rgba(255, 255, 255, 0.1)";
+                box-shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
+                padding: "2rem";
+                border-radius: "1rem";
+                max-width: "600px";
+                margin: "4rem auto";
+            }
+            .header_title {
+                text-align: "center";
+                color: "#f8fafc";
+                font-size: "1.875rem";
+                font-weight: "700";
+                margin-bottom: "1.5rem";
+                letter-spacing: "-0.025em";
+            }
+            .input_group {
+                display: "flex";
+                gap: "0.75rem";
+                margin-bottom: "2rem";
+            }
+            .input {
+                flex: "1";
+                padding: "0.75rem 1rem";
+                background: "rgba(15, 23, 42, 0.6)";
+                border: "1px solid rgba(255, 255, 255, 0.1)";
+                border-radius: "0.5rem";
+                color: "#e2e8f0";
+                font-family: "inherit";
+                font-size: "0.95rem";
+                transition: "all 0.2s";
+            }
+            .input:focus {
+                outline: "none";
+                border-color: "#3b82f6";
+                box-shadow: "0 0 0 2px rgba(59, 130, 246, 0.2)";
+                background: "rgba(15, 23, 42, 0.8)";
+            }
+            .btn {
+                padding: "0.75rem 1.5rem";
+                background: "#3b82f6";
+                color: "white";
+                border: "none";
+                border-radius: "0.5rem";
+                font-weight: "500";
+                cursor: "pointer";
+                transition: "all 0.2s";
+                display: "flex";
+                align-items: "center";
+                gap: "0.5rem";
+            }
+            .btn:hover {
+                background: "#2563eb";
+                transform: "translateY(-1px)";
+            }
+            .btn:disabled {
+                background: "#475569";
+                cursor: "not-allowed";
+                transform: "none";
+                opacity: "0.7";
+            }
+            .list {
+                list-style: "none";
+                padding: "0";
+                margin: "0";
+                display: "flex";
+                flex-direction: "column";
+                gap: "0.5rem";
+            }
+            .item {
+                padding: "1rem";
+                background: "rgba(255, 255, 255, 0.03)";
+                border: "1px solid rgba(255, 255, 255, 0.05)";
+                border-radius: "0.5rem";
+                display: "flex";
+                justify-content: "space-between";
+                align-items: "center";
+                color: "#cbd5e1";
+                transition: "all 0.2s";
+            }
+            .item:hover {
+                 background: "rgba(255, 255, 255, 0.05)";
+            }
+            .item_optimistic {
+                opacity: "0.5";
+                background: "rgba(59, 130, 246, 0.1)";
+                border-color: "rgba(59, 130, 246, 0.2)";
+            }
+            .meta {
+                font-size: "0.75rem";
+                color: "#64748b";
+                font-family: "ui-monospace, monospace";
+            }
+            .empty_state {
+                text-align: "center";
+                padding: "3rem 1rem";
+                color: "#64748b";
+                font-style: "italic";
+            }
+            .action_bar {
+                margin-top: "2rem";
+                display: "flex";
+                justify-content: "flex-end";
+                border-top: "1px solid rgba(255, 255, 255, 0.1)";
+                padding-top: "1rem";
+            }
+            .btn_danger {
+                background: "transparent";
+                color: "#ef4444";
+                border: "1px solid rgba(239, 68, 68, 0.2)";
+            }
+            .btn_danger:hover {
+                background: "rgba(239, 68, 68, 0.1)";
+                border-color: "#ef4444";
+            }
+        </style>
+
+        @use crate::examples::lessons::components::layout::DarkModernLayout;
+
+        @DarkModernLayout() {
+            <div class={card}>
+                <h2 class={header_title}>"Async SQLite Todo List"</h2>
 
                 <div class={input_group}>
-                    <input class={input} type="text" name="input" value={state.input} placeholder="Add persistent todo..." />
+                    <input
+                        class={input}
+                        type="text"
+                        name="input"
+                        value={state.input}
+                        placeholder="Add persistent todo..."
+                        autofocus
+                    />
 
                     <button class={btn} on:click={state.add_todo} disabled={state.loading}>
                         @if state.loading {
-                            "Saving..."
+                            <span>"Saving..."</span>
                         } else {
-                            "Add Async"
+                            <span>"Add Task"</span>
                         }
                     </button>
                 </div>
-
-                <button class={btn_danger} on:click={state.clear_all}>
-                    "Clear DB"
-                </button>
 
                 <ul class={list}>
                     @for todo in &state.todos {
@@ -178,19 +283,24 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
                                 {if todo.id == -1 { "⏳ " } else { "✅ " }}
                                 {&todo.text}
                             </span>
-                            <small>"ID: " {todo.id}</small>
+                            <span class={meta}>"ID: " {todo.id}</span>
                         </li>
                     }
                 </ul>
 
                 @if state.todos.is_empty() {
-                    <p class={text_center}>"No todos in SQLite database."</p>
+                    <div class={empty_state}>
+                        "No tasks in SQLite database yet."
+                    </div>
                 }
+
+                <div class={action_bar}>
+                    <button class="btn btn_danger" on:click={state.clear_all}>
+                        "Clear Database"
+                    </button>
+                </div>
             </div>
-            <script src="/static/idiomorph.js"></script>
-            <script src="/static/azumi.js"></script>
-        </body>
-        </html>
+        }
     }
 }
 
