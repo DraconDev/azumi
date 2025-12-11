@@ -24,13 +24,7 @@ pub struct CompositionState {
 /// Server-side interactivity patterns
 pub fn counter_display(state: CounterState) -> impl azumi::Component {
     html! {
-        <style>
-            .counter { padding: "2rem"; text-align: "center"; border: "1px solid #eee"; }
-            .count_display { font-size: "3rem"; margin: "1rem 0"; }
-            .counter_button { padding: "1rem 2rem"; background: "#4caf50"; color: "white"; border: "none"; cursor: "pointer"; }
-            .timestamp { font-size: "0.8rem"; color: "#666"; }
-            #counter_box { display: "block"; }
-        </style>
+
         <div id={counter_box} class={counter} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
             <div class={count_display}>{state.count}</div>
             <button class={counter_button} az-on={click call increment_counter -> #counter_box}>
@@ -38,6 +32,13 @@ pub fn counter_display(state: CounterState) -> impl azumi::Component {
             </button>
             <div class={timestamp}>"Last updated: 12:00:00"</div>
         </div>
+        <style>
+            .counter { padding: "2rem"; text-align: "center"; border: "1px solid #eee"; }
+            .count_display { font-size: "3rem"; margin: "1rem 0"; }
+            .counter_button { padding: "1rem 2rem"; background: "#4caf50"; color: "white"; border: "none"; cursor: "pointer"; }
+            .timestamp { font-size: "0.8rem"; color: "#666"; }
+            #counter_box { display: "block"; }
+        </style>
     }
 }
 
@@ -53,12 +54,7 @@ pub async fn increment_counter(state: CounterState) -> impl azumi::Component {
 /// Example: Action with state management
 pub fn state_management_example(state: ManagementState) -> impl azumi::Component {
     html! {
-        <style>
-            .state_container { padding: "1.5rem"; background: "#f9f9f9"; }
-            .state_info { margin: "0.5rem 0"; padding: "0.5rem"; background: "white"; }
-            .action_button { padding: "0.75rem 1.5rem"; background: "#2196f3"; color: "white"; border: "none"; cursor: "pointer"; }
-            #state_box { display: "block"; }
-        </style>
+
         <div id={state_box} class={state_container} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
             <h3>"State Management"</h3>
 
@@ -71,6 +67,12 @@ pub fn state_management_example(state: ManagementState) -> impl azumi::Component
                 "Update State"
             </button>
         </div>
+        <style>
+            .state_container { padding: "1.5rem"; background: "#f9f9f9"; }
+            .state_info { margin: "0.5rem 0"; padding: "0.5rem"; background: "white"; }
+            .action_button { padding: "0.75rem 1.5rem"; background: "#2196f3"; color: "white"; border: "none"; cursor: "pointer"; }
+            #state_box { display: "block"; }
+        </style>
     }
 }
 
@@ -93,12 +95,7 @@ pub async fn update_state(state: ManagementState) -> impl azumi::Component {
 /// Example: Action composition
 pub fn action_composition_example(state: CompositionState) -> impl azumi::Component {
     html! {
-        <style>
-            .composition_container { padding: "1.5rem"; }
-            .action_card { margin: "0.5rem 0"; padding: "1rem"; background: "#f5f5f5"; border: "1px solid #eee"; }
-            .compose_button { padding: "0.75rem 1.5rem"; background: "#ff4081"; color: "white"; border: "none"; cursor: "pointer"; }
-            #composition_box { display: "block"; }
-        </style>
+
         <div id={composition_box} class={composition_container} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
             <h3>"Action Composition"</h3>
 
@@ -111,6 +108,12 @@ pub fn action_composition_example(state: CompositionState) -> impl azumi::Compon
                 "Compose Actions"
             </button>
         </div>
+        <style>
+            .composition_container { padding: "1.5rem"; }
+            .action_card { margin: "0.5rem 0"; padding: "1rem"; background: "#f5f5f5"; border: "1px solid #eee"; }
+            .compose_button { padding: "0.75rem 1.5rem"; background: "#ff4081"; color: "white"; border: "none"; cursor: "pointer"; }
+            #composition_box { display: "block"; }
+        </style>
     }
 }
 
@@ -140,18 +143,7 @@ pub fn lesson8() -> impl azumi::Component {
 
     html! {
         <script src="/static/azumi.js"></script>
-        <style>
-            .container { padding: "20px"; }
-            .header { text-align: "center"; margin-bottom: "30px"; }
-            .main_title { font-size: "32px"; color: "#333"; }
-            .subtitle { font-size: "18px"; color: "#666"; }
-            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
-            .section_title { font-size: "20px"; margin-bottom: "15px"; }
-            .points_list { list-style: "none"; padding: "0"; }
-            .point { margin-bottom: "10px"; }
-            .examples { display: "grid"; gap: "20px"; }
-            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
-        </style>
+
         <div class={container}>
             <header class={header}>
                 <h1 class={main_title}>"Lesson 8: Action System Deep Dive"</h1>
@@ -181,6 +173,18 @@ pub fn lesson8() -> impl azumi::Component {
                 </div>
             </section>
         </div>
+        <style>
+            .container { padding: "20px"; }
+            .header { text-align: "center"; margin-bottom: "30px"; }
+            .main_title { font-size: "32px"; color: "#333"; }
+            .subtitle { font-size: "18px"; color: "#666"; }
+            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
+            .section_title { font-size: "20px"; margin-bottom: "15px"; }
+            .points_list { list-style: "none"; padding: "0"; }
+            .point { margin-bottom: "10px"; }
+            .examples { display: "grid"; gap: "20px"; }
+            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
+        </style>
     }
 }
 
