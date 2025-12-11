@@ -64,21 +64,16 @@ pub fn lesson18() -> impl Component {
     };
 
     html! {
-        <html>
-        <head>
-            <meta charset="utf-8" />
-            <title>"Lesson 18: Security"</title>
-
-        </head>
-        <body class={body}>
+        @crate::examples::lessons::components::layout::DarkModernLayout() {
             <div class={container}>
-                <div class={card}>
-                    <div class={header}>
-                        <h1 class={title}>"Automatic Security"</h1>
-                        <p class={subtitle}>"Signed State & Anti-Tampering"</p>
-                    </div>
+                <header class={header}>
+                    <h1 class={main_title}>"Lesson 18: Security"</h1>
+                    <p class={subtitle}>"Signed State & Anti-Tampering"</p>
+                </header>
 
-                    <div class={info_box}>
+                <div class={info_card}>
+                    <div class={info_content}>
+                        <div class={info_icon}>"🔒"</div>
                         <p class={info_text}>
                             "Azumi automatically signs all component state with HMAC-SHA256. "
                             "If a malicious user tries to modify the JSON in "
@@ -86,68 +81,82 @@ pub fn lesson18() -> impl Component {
                             ", the server will reject the action."
                         </p>
                     </div>
+                </div>
 
-                    {
-                        secure_view_component::render(
-                            secure_view_component::Props::builder()
-                                .state(&initial_state)
-                                .build()
-                                .unwrap()
-                        )
-                    }
+                <div class={demo_wrapper}>
+                    @secure_view(state=&initial_state)
+                </div>
 
-                    <div class={verify_steps}>
-                        <h3 class={verify_title}>"How to Verify:"</h3>
-                        <ol class={step_list}>
-                            <li class={step_item}>"Inspect the button below in DevTools."</li>
-                            <li class={step_item}>"Find the parent div with the <span class={code_snippet}>az-scope</span> attribute."</li>
-                            <li class={step_item}>"The attribute contains formatted: <span class={code_snippet}>JSON|SIGNATURE</span>."</li>
-                            <li class={step_item}>"Try changing <span class={code_snippet}>\"is_admin\":false</span> to <span class={code_snippet}>true</span>."</li>
-                            <li class={step_item}>"Click 'Secure Increment' and watch the network request fail (400 Bad Request)."</li>
-                        </ol>
-                    </div>
+                <div class={verify_steps}>
+                    <h3 class={verify_title}>"How to Verify:"</h3>
+                    <ol class={step_list}>
+                        <li class={step_item}>"Inspect the button below in DevTools."</li>
+                        <li class={step_item}>"Find the parent div with the "<span class={code_snippet}>"az-scope"</span>" attribute."</li>
+                        <li class={step_item}>"The attribute contains formatted: "<span class={code_snippet}>"JSON|SIGNATURE"</span>"."</li>
+                        <li class={step_item}>"Try changing "<span class={code_snippet}>"\"is_admin\":false"</span>" to "<span class={code_snippet}>"true"</span>"."</li>
+                        <li class={step_item}>"Click 'Secure Increment' and watch the network request fail (400 Bad Request)."</li>
+                    </ol>
                 </div>
             </div>
-            <script src="/static/idiomorph.js"></script>
-            <script src="/static/azumi.js"></script>
-        </body>
-        </html>
             <style>
-                .body { font-family: "system-ui"; background: "#f8fafc"; margin: "0"; color: "#334155"; }
-                .container { max-width: "600px"; margin: "0 auto"; padding: "4rem 2rem"; }
-                .card { background: "white"; padding: "2rem"; border-radius: "12px"; box-shadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)"; border: "1px solid #e2e8f0"; }
-                .header { text-align: "center"; margin-bottom: "2rem"; }
-                .title { font-size: "2rem"; font-weight: "800"; color: "#0f172a"; margin: "0 0 0.5rem 0"; }
-                .subtitle { color: "#64748b"; font-size: "1.1rem"; }
+                .container { max-width: "700px"; margin: "0 auto"; }
+                .header { text-align: "center"; margin-bottom: "3rem"; }
+                .main_title {
+                    font-size: "3rem";
+                    font-weight: "800";
+                    margin-bottom: "1rem";
+                    background: "linear-gradient(to right, #f87171, #ef4444)";
+                    -webkit-background-clip: "text";
+                    -webkit-text-fill-color: "transparent";
+                }
+                .subtitle { color: "#94a3b8"; font-size: "1.2rem"; }
 
-                .demo_section { margin-top: "2rem"; padding-top: "2rem"; border-top: "1px solid #e2e8f0"; }
-                .info_box { background: "#eff6ff"; border-left: "4px solid #3b82f6"; padding: "1rem"; margin-bottom: "1.5rem"; border-radius: "4px"; }
-                .info_text { margin: "0"; color: "#1e40af"; font-size: "0.95rem"; line-height: "1.5"; }
-                .code_snippet { font-family: "monospace"; background: "#1e293b"; color: "#e2e8f0"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-size: "0.9em"; }
+                .info_card {
+                    background: "rgba(239, 68, 68, 0.1)";
+                    border: "1px solid rgba(239, 68, 68, 0.2)";
+                    border-radius: "12px";
+                    padding: "1.5rem";
+                    margin-bottom: "2rem";
+                }
+                .info_content { display: "flex"; gap: "1rem"; align-items: "flex-start"; }
+                .info_icon { font-size: "1.5rem"; }
+                .info_text { color: "#fca5a5"; margin: "0"; line-height: "1.6"; }
 
-                .info_text { margin: "0"; color: "#1e40af"; font-size: "0.95rem"; line-height: "1.5"; }
-                .code_snippet { font-family: "monospace"; background: "#1e293b"; color: "#e2e8f0"; padding: "0.2rem 0.4rem"; border-radius: "4px"; font-size: "0.9em"; }
+                .code_snippet {
+                    font-family: "monospace";
+                    background: "rgba(0,0,0,0.3)";
+                    color: "#fca5a5";
+                    padding: "0.2rem 0.4rem";
+                    border-radius: "4px";
+                    font-size: "0.9em";
+                }
 
-                .verify_steps { background: "#f8fafc"; padding: "1.5rem"; border-radius: "8px"; margin-top: "2rem"; border: "1px solid #e2e8f0"; }
-                .verify_title { margin: "0 0 1rem 0"; font-size: "1rem"; color: "#0f172a"; }
-                .step_list { margin: "0"; padding-left: "1.2rem"; }
-                .step_item { margin-bottom: "0.5rem"; color: "#475569"; }
+                .demo_wrapper { margin-bottom: "2rem"; }
+
+                .verify_steps {
+                    background: "rgba(30, 41, 59, 0.6)";
+                    backdrop-filter: "blur(10px)";
+                    padding: "1.5rem";
+                    border-radius: "12px";
+                    border: "1px solid rgba(255,255,255,0.05)";
+                }
+                .verify_title { margin: "0 0 1rem 0"; font-size: "1.1rem"; color: "#cbd5e1"; }
+                .step_list { margin: "0"; padding-left: "1.2rem"; display: "grid"; gap: "0.5rem"; }
+                .step_item { color: "#94a3b8"; }
             </style>
+        }
     }
 }
 
-// Update secure_view to use new styles
 // Update secure_view with scoped styles
 #[azumi::component]
-fn secure_view<'a>(state: &'a SecureCounter) -> impl Component + 'a {
+pub fn secure_view<'a>(state: &'a SecureCounter) -> impl Component + 'a {
     html! {
-
-
-        <div>
+        <div class={card}>
             <div class={counter_display}>
                 <div class={count_val}>{state.count}</div>
                 // Combine base badge class with conditional specific class
-                <span class={format!("{} {}", status_badge, if state.is_admin { status_admin } else { status_user })}>
+                <span class={if state.is_admin { format!("{} {}", status_badge, status_admin) } else { format!("{} {}", status_badge, status_user) }}>
                     {if state.is_admin { "Admin Access Unlocked" } else { "Standard User Access" }}
                 </span>
             </div>
@@ -157,15 +166,53 @@ fn secure_view<'a>(state: &'a SecureCounter) -> impl Component + 'a {
             </button>
         </div>
         <style>
-            .counter_display { text-align: "center"; margin: "2rem 0"; }
-            .count_val { font-size: "4rem"; font-weight: "bold"; color: "#0f172a"; line-height: "1"; }
+             .card {
+                background: "rgba(30, 41, 59, 0.4)";
+                border-radius: "16px";
+                padding: "2rem";
+                border: "1px solid rgba(255,255,255,0.05)";
+                display: "flex";
+                flex-direction: "column";
+                align-items: "center";
+            }
+            .counter_display { text-align: "center"; margin-bottom: "2rem"; }
+            .count_val {
+                font-size: "5rem";
+                font-weight: "800";
+                color: "#f8fafc";
+                line-height: "1";
+                margin-bottom: "1rem";
+                text-shadow: "0 4px 12px rgba(0,0,0,0.5)";
+            }
 
-            .status_badge { display: "inline-block"; padding: "0.25rem 0.75rem"; border-radius: "9999px"; font-size: "0.875rem"; font-weight: "600"; margin-top: "1rem"; }
-            .status_user { background: "#f1f5f9"; color: "#475569"; }
-            .status_admin { background: "#dcfce7"; color: "#166534"; }
+            .status_badge {
+                display: "inline-block";
+                padding: "0.5rem 1rem";
+                border-radius: "9999px";
+                font-size: "0.875rem";
+                font-weight: "600";
+                letter-spacing: "0.05em";
+                text-transform: "uppercase";
+            }
+            .status_user { background: "rgba(148, 163, 184, 0.2)"; color: "#cbd5e1"; border: "1px solid rgba(148, 163, 184, 0.2)"; }
+            .status_admin { background: "rgba(34, 197, 94, 0.2)"; color: "#86efac"; border: "1px solid rgba(34, 197, 94, 0.3)"; box-shadow: "0 0 10px rgba(34, 197, 94, 0.2)"; }
 
-            .btn { display: "inline-flex"; align-items: "center"; justify-content: "center"; padding: "0.75rem 1.5rem"; background: "#0f172a"; color: "white"; font-weight: "600"; border-radius: "8px"; border: "none"; cursor: "pointer"; transition: "all 0.2s"; width: "100%"; font-size: "1rem"; }
-            .btn:hover { background: "#1e293b"; transform: "translateY(-1px)"; }
+            .btn {
+                display: "inline-flex";
+                align-items: "center";
+                justify-content: "center";
+                padding: "1rem 2rem";
+                background: "linear-gradient(to right, #ef4444, #dc2626)";
+                color: "white";
+                font-weight: "700";
+                border-radius: "8px";
+                border: "none";
+                cursor: "pointer";
+                transition: "all 0.2s";
+                font-size: "1.1rem";
+                box-shadow: "0 4px 6px -1px rgba(220, 38, 38, 0.3)";
+            }
+            .btn:hover { transform: "translateY(-2px)"; box-shadow: "0 10px 15px -3px rgba(220, 38, 38, 0.4)"; }
             .btn:active { transform: "translateY(0)"; }
         </style>
     }
