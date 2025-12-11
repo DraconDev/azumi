@@ -1546,7 +1546,7 @@ cargo run
 
 ### Client Runtime Integration
 
-The client runtime is **automatically injected** by the compiler when it detects a `<head>` or `<body>` tag.
+The client runtime **must be manually included** if you want interactive features.
 
 ```rust
 #[azumi::component]
