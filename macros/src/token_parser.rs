@@ -429,7 +429,7 @@ impl Parse for Element {
                     "JavaScript must be external or JSON data:
   ✅ <script src=\"/static/app.js\" />
   ✅ <script type=\"application/json\">{{ data }}</script>
-  ✅ <script>{azumi::Raw(\"console.log(1)\")}</script>
+  ✅ <script>@{azumi::Raw(\"console.log(1)\")}</script>
   ❌ <script>const x = 42;</script>
 
 For data: use data-* attributes or JSON script blocks"
