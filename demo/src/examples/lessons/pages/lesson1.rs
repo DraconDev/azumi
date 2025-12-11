@@ -8,17 +8,31 @@ use azumi::html;
 pub fn scoped_component() -> impl azumi::Component {
     html! {
         <div class={container}>
-            <h1 class={title}>"Automatically Scoped CSS"</h1>
-            <p>"This CSS is scoped to this component only"</p>
+            <div class={icon}>"🔒"</div>
+            <div>
+                <h1 class={title}>"Automatically Scoped CSS"</h1>
+                <p class={desc}>"This CSS is safely confined to this component."</p>
+            </div>
         </div>
         <style>
             .container {
-                padding: "1.5rem";
-                border: "1px solid rgba(56, 189, 248, 0.3)";
-                background: "rgba(56, 189, 248, 0.1)";
-                border-radius: "8px";
+                padding: "2rem";
+                border: "1px solid rgba(56, 189, 248, 0.2)";
+                background: "linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(56, 189, 248, 0.05))";
+                border-radius: "12px";
+                display: "flex";
+                align-items: "center";
+                gap: "1.5rem";
+                box-shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
             }
-            .title { color: "#38bdf8"; margin-bottom: "0.5rem"; font-size: "1.25rem"; }
+            .icon { font-size: "2rem"; }
+            .title {
+                color: "#38bdf8";
+                margin-bottom: "0.25rem";
+                font-size: "1.25rem";
+                font-weight: "700";
+            }
+            .desc { color: "#bae6fd"; margin: "0"; }
         </style>
     }
 }
@@ -27,26 +41,45 @@ pub fn scoped_component() -> impl azumi::Component {
 #[azumi::component]
 pub fn multiple_scoped_components() -> impl azumi::Component {
     html! {
-        <div>
+        <div class={grid}>
             <div class={card}>
+                <div class={badge_purple}>"Component A"</div>
                 <h3 class={card_title}>"First Component"</h3>
-                <p class={card_text}>"This uses the same class names as the second component"</p>
+                <p class={card_text}>"Uses class 'card'"</p>
             </div>
-            <div class={card}>
+            <div class={card_alt}>
+                <div class={badge_blue}>"Component B"</div>
                 <h3 class={card_title}>"Second Component"</h3>
-                <p class={card_text}>"But the CSS is automatically scoped, so no conflicts!"</p>
+                <p class={card_text}>"Also uses class 'card'"</p>
             </div>
         </div>
         <style>
+            .grid { display: "grid"; grid-template-columns: "1fr 1fr"; gap: "1.5rem"; }
             .card {
                 padding: "1.5rem";
-                margin: "1rem 0";
-                border: "1px solid rgba(255,255,255,0.1)";
-                background: "rgba(30, 41, 59, 0.6)";
+                border: "1px solid rgba(167, 139, 250, 0.2)";
+                background: "rgba(167, 139, 250, 0.05)";
                 border-radius: "12px";
             }
-            .card_title { font-weight: "bold"; color: "#a78bfa"; margin-bottom: "0.5rem"; font-size: "1.1rem"; }
-            .card_text { color: "#cbd5e1"; }
+            .card_alt {
+                padding: "1.5rem";
+                border: "1px solid rgba(56, 189, 248, 0.2)";
+                background: "rgba(56, 189, 248, 0.05)";
+                border-radius: "12px";
+            }
+            .card_title { font-weight: "bold"; color: "#f1f5f9"; margin: "0.5rem 0"; font-size: "1.1rem"; }
+            .card_text { color: "#94a3b8"; font-size: "0.9rem"; }
+
+            .badge_purple {
+                display: "inline-block"; font-size: "0.75rem"; font-weight: "bold";
+                color: "#a78bfa"; background: "rgba(167, 139, 250, 0.1)";
+                padding: "0.2rem 0.6rem"; border-radius: "9999px";
+            }
+            .badge_blue {
+                display: "inline-block"; font-size: "0.75rem"; font-weight: "bold";
+                color: "#38bdf8"; background: "rgba(56, 189, 248, 0.1)";
+                padding: "0.2rem 0.6rem"; border-radius: "9999px";
+            }
         </style>
     }
 }
@@ -56,24 +89,35 @@ pub fn multiple_scoped_components() -> impl azumi::Component {
 pub fn valid_css_example() -> impl azumi::Component {
     html! {
         <div class={valid_container}>
-            <h2 class={valid_title}>"Valid CSS Example"</h2>
-            <p class={valid_text}>"This CSS follows Azumi's validation rules"</p>
+            <div class={header}>
+                <h2 class={valid_title}>"Valid CSS Rules"</h2>
+                <div class={check_icon}>"✓"</div>
+            </div>
+            <p class={valid_text}>"This component passes compile-time validation."</p>
             <ul class={valid_list}>
-                <li>"Proper property values"</li>
-                <li>"Valid color formats"</li>
-                <li>"Correct unit usage"</li>
+                <li class={item}><span class={bullet}>"•"</span>"Proper property values"</li>
+                <li class={item}><span class={bullet}>"•"</span>"Valid color formats"</li>
+                <li class={item}><span class={bullet}>"•"</span>"Correct unit usage"</li>
             </ul>
         </div>
         <style>
             .valid_container {
                 padding: "2rem";
-                background: "rgba(16, 185, 129, 0.1)";
+                background: "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 95, 70, 0.1))";
                 border: "1px solid rgba(16, 185, 129, 0.2)";
                 border-radius: "12px";
             }
-            .valid_title { color: "#34d399"; font-size: "1.5rem"; margin-bottom: "1rem"; }
-            .valid_text { color: "#e2e8f0"; margin-bottom: "1rem"; }
-            .valid_list { color: "#cbd5e1"; padding-left: "1.5rem"; }
+            .header { display: "flex"; justify_content: "space-between"; align-items: "center"; margin-bottom: "1rem"; }
+            .check_icon {
+                background: "rgba(16, 185, 129, 0.2)"; color: "#34d399";
+                width: "32px"; height: "32px"; border-radius: "50%";
+                display: "flex"; align-items: "center"; justify-content: "center"; font-weight: "bold";
+            }
+            .valid_title { color: "#34d399"; font-size: "1.25rem"; margin: "0"; font-weight: "700"; }
+            .valid_text { color: "#d1fae5"; margin-bottom: "1.5rem"; }
+            .valid_list { list-style: "none"; padding: "0"; margin: "0"; display: "grid"; gap: "0.5rem"; }
+            .item { color: "#e2e8f0"; display: "flex"; align-items: "center"; gap: "0.5rem"; }
+            .bullet { color: "#34d399"; }
         </style>
     }
 }

@@ -7,10 +7,17 @@ use azumi::html;
 #[azumi::component]
 pub fn global_css_example() -> impl azumi::Component {
     html! {
-        <div class={component_class}>
-        <h2 class={local_class}>"Scoped Style"</h2>
-        <p class={global_demo}>"Global Style Effect (simulated)"</p>
-            <p class={text_content}>"This component demonstrates CSS scoping concepts"</p>
+        <div class={wrapper}>
+            <div class={component_card}>
+                <div class={badge}>"Scoped"</div>
+                <h2 class={local_class}>"Component Level"</h2>
+                <p class={text_content}>"Styles defined here stay here."</p>
+            </div>
+            <div class={global_card}>
+                <div class={badge_global}>"Global"</div>
+                <h2 class={global_demo}>"Global Level"</h2>
+                <p class={text_content}>"Styles apply everywhere."</p>
+            </div>
         </div>
         // Global styles - not scoped to component
         <style global>
@@ -19,15 +26,31 @@ pub fn global_css_example() -> impl azumi::Component {
 
         // Component-scoped styles - automatically scoped
         <style>
-            .component_class {
-                background: "rgba(30, 41, 59, 0.5)";
+            .wrapper { display: "grid"; grid-template-columns: "1fr 1fr"; gap: "1.5rem"; }
+            .component_card {
+                background: "rgba(56, 189, 248, 0.1)";
                 padding: "1.5rem";
                 border-radius: "12px";
-                border: "1px solid rgba(255,255,255,0.1)";
+                border: "1px solid rgba(56, 189, 248, 0.2)";
             }
-            .local_class { color: "#38bdf8"; font-weight: "600"; margin-bottom: "0.5rem"; }
-            .global_demo { color: "#a78bfa"; font-style: "italic"; margin-bottom: "0.5rem"; }
-            .text_content { color: "#cbd5e1"; }
+            .global_card {
+                background: "rgba(167, 139, 250, 0.1)";
+                padding: "1.5rem";
+                border-radius: "12px";
+                border: "1px solid rgba(167, 139, 250, 0.2)";
+            }
+            .local_class { color: "#38bdf8"; font-weight: "700"; margin: "0.5rem 0"; font-size: "1.25rem"; }
+            .global_demo { color: "#a78bfa"; font-weight: "700"; margin: "0.5rem 0"; font-size: "1.25rem"; }
+            .text_content { color: "#cbd5e1"; font-size: "0.95rem"; }
+
+            .badge {
+                display: "inline-block"; font-size: "0.75rem"; font-weight: "bold"; text-transform: "uppercase";
+                color: "#38bdf8"; background: "rgba(56, 189, 248, 0.2)"; padding: "0.2rem 0.6rem"; border-radius: "4px";
+            }
+            .badge_global {
+                display: "inline-block"; font-size: "0.75rem"; font-weight: "bold"; text-transform: "uppercase";
+                color: "#a78bfa"; background: "rgba(167, 139, 250, 0.2)"; padding: "0.2rem 0.6rem"; border-radius: "4px";
+            }
         </style>
     }
 }
@@ -37,9 +60,25 @@ pub fn global_css_example() -> impl azumi::Component {
 pub fn mixed_scoping_example() -> impl azumi::Component {
     html! {
         <div class={container}>
-            <h3 class={scoped_title}>"Scoping Concepts"</h3>
-            <p class={global_simulation}>"Global styles affect everything"</p>
-            <p class={scoped_text}>"Scoped styles are component-specific"</p>
+            <div class={header}>
+                <h3 class={scoped_title}>"Visualizing Scope"</h3>
+            </div>
+            <div class={visual_list}>
+                <div class={item}>
+                    <div class={dot_global}></div>
+                    <div>
+                        <span class={label_global}>"Global Scope"</span>
+                        <p class={desc}>"Affects 100% of pages"</p>
+                    </div>
+                </div>
+                <div class={item}>
+                    <div class={dot_scoped}></div>
+                    <div>
+                        <span class={label_scoped}>"Component Scope"</span>
+                        <p class={desc}>"Affects only this instance"</p>
+                    </div>
+                </div>
+            </div>
         </div>
         <style global>
             /* This would affect the entire app */
@@ -48,14 +87,23 @@ pub fn mixed_scoping_example() -> impl azumi::Component {
 
         <style>
             .container {
-                padding: "1.5rem";
-                border: "1px solid rgba(255,255,255,0.1)";
-                background: "rgba(15, 23, 42, 0.4)";
-                border-radius: "12px";
+                padding: "2rem";
+                border: "1px solid rgba(255,255,255,0.05)";
+                background: "rgba(30, 41, 59, 0.4)";
+                border-radius: "16px";
             }
-            .scoped_title { color: "#34d399"; font-size: "1.25rem"; margin-bottom: "0.75rem"; }
-            .global_simulation { font-size: "1.0rem"; font-weight: "bold"; color: "#f472b6"; margin-bottom: "0.5rem"; }
-            .scoped_text { color: "#94a3b8"; }
+            .header { border-bottom: "1px solid rgba(255,255,255,0.05)"; padding-bottom: "1rem"; margin-bottom: "1.5rem"; }
+            .scoped_title { color: "#e2e8f0"; font-size: "1.25rem"; font-weight: "700"; margin: "0"; }
+
+            .visual_list { display: "grid"; gap: "1.5rem"; }
+            .item { display: "flex"; gap: "1rem"; align-items: "flex-start"; }
+
+            .dot_global { width: "12px"; height: "12px"; border-radius: "50%"; background: "#f472b6"; margin-top: "0.4rem"; box-shadow: "0 0 10px rgba(244, 114, 182, 0.5)"; }
+            .dot_scoped { width: "12px"; height: "12px"; border-radius: "50%"; background: "#34d399"; margin-top: "0.4rem"; box-shadow: "0 0 10px rgba(52, 211, 153, 0.5)"; }
+
+            .label_global { color: "#f472b6"; font-weight: "bold"; font-size: "1.1rem"; }
+            .label_scoped { color: "#34d399"; font-weight: "bold"; font-size: "1.1rem"; }
+            .desc { color: "#94a3b8"; margin: "0.25rem 0 0 0"; }
         </style>
     }
 }
