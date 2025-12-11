@@ -327,7 +327,7 @@ pub async fn lesson16_handler() -> axum::response::Html<String> {
 
     // Use the page component wrapper
     use Lesson16Page_component::*;
-    
+
     // RENDER THE PAGE WRAPPER, NOT THE VIEW DIRECTLY
     let component_html = azumi::render_to_string(&render(
         Props::builder().state(&state).build().expect("props"),
@@ -335,4 +335,3 @@ pub async fn lesson16_handler() -> axum::response::Html<String> {
 
     axum::response::Html(component_html)
 }
-```
