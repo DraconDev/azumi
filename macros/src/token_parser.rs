@@ -874,7 +874,7 @@ fn is_css_at_rule(input: ParseStream) -> bool {
 
 fn parse_script_content(input: ParseStream, tag_name: &str) -> Result<Vec<Node>> {
     let mut nodes = Vec::new();
-    eprintln!("parse_script_content starting for tag: {}", tag_name);
+    // eprintln!("parse_script_content starting for tag: {}", tag_name);
     while !input.is_empty() {
         if input.peek(Token![<]) && input.peek2(Token![/]) {
             let fork = input.fork();
@@ -882,7 +882,6 @@ fn parse_script_content(input: ParseStream, tag_name: &str) -> Result<Vec<Node>>
             fork.parse::<Token![/]>()?;
             if let Ok((name, _)) = parse_html_name(&fork, false) {
                 if name == tag_name {
-                    eprintln!("Found closing tag: </{}>", name);
                     break;
                 }
             }
