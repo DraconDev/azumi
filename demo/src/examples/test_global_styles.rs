@@ -3,6 +3,12 @@ use azumi::html;
 #[azumi::component]
 pub fn test_global_styles() -> impl azumi::Component {
     html! {
+        <div class={scoped_box}>
+            <h1>"Global + Scoped Styles Test"</h1>
+            <p>"Global styles apply to body and * (unscoped)"</p>
+            <p>"Scoped styles apply only to this component"</p>
+        </div>
+
         <style global>
             body {
                 margin: "0";
@@ -23,11 +29,6 @@ pub fn test_global_styles() -> impl azumi::Component {
             }
         </style>
 
-        <div class={scoped_box}>
-            <h1>"Global + Scoped Styles Test"</h1>
-            <p>"Global styles apply to body and * (unscoped)"</p>
-            <p>"Scoped styles apply only to this component"</p>
-        </div>
     }
 }
 

@@ -6,12 +6,7 @@ use azumi::html;
 #[azumi::component]
 pub fn control_flow_example() -> impl azumi::Component {
     html! {
-        <style>
-            .content { padding: "1rem"; }
-            .item { margin: "0.5rem 0"; padding: "0.5rem"; background: "#f5f5f5"; }
-            .status_active { color: "green"; }
-            .status_inactive { color: "red"; }
-        </style>
+
         <div class={content}>
             <h2>"Control Flow Demo"</h2>
 
@@ -39,6 +34,12 @@ pub fn control_flow_example() -> impl azumi::Component {
                 }
             }
         </div>
+        <style>
+            .content { padding: "1rem"; }
+            .item { margin: "0.5rem 0"; padding: "0.5rem"; background: "#f5f5f5"; }
+            .status_active { color: "green"; }
+            .status_inactive { color: "red"; }
+        </style>
     }
 }
 
@@ -46,11 +47,7 @@ pub fn control_flow_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn complex_conditions() -> impl azumi::Component {
     html! {
-        <style>
-            .conditions_container { padding: "1rem"; background: "#f9f9f9"; }
-            .permission_granted { color: "green"; font-weight: "bold"; }
-            .permission_denied { color: "red"; font-weight: "bold"; }
-        </style>
+
         <div class={conditions_container}>
             <h3>"Complex Conditions"</h3>
 
@@ -67,6 +64,11 @@ pub fn complex_conditions() -> impl azumi::Component {
                 <p class={permission_denied}>"Limited access only"</p>
             }
         </div>
+        <style>
+            .conditions_container { padding: "1rem"; background: "#f9f9f9"; }
+            .permission_granted { color: "green"; font-weight: "bold"; }
+            .permission_denied { color: "red"; font-weight: "bold"; }
+        </style>
     }
 }
 
@@ -74,12 +76,7 @@ pub fn complex_conditions() -> impl azumi::Component {
 #[azumi::component]
 pub fn pattern_matching_example() -> impl azumi::Component {
     html! {
-        <style>
-            .pattern_container { padding: "1rem"; }
-            .state_loading { color: "blue"; }
-            .state_success { color: "green"; }
-            .state_error { color: "red"; }
-        </style>
+
         <div class={pattern_container}>
             <h3>"Pattern Matching"</h3>
 
@@ -98,6 +95,12 @@ pub fn pattern_matching_example() -> impl azumi::Component {
                 }
             }
         </div>
+        <style>
+            .pattern_container { padding: "1rem"; }
+            .state_loading { color: "blue"; }
+            .state_success { color: "green"; }
+            .state_error { color: "red"; }
+        </style>
     }
 }
 
@@ -105,18 +108,7 @@ pub fn pattern_matching_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn lesson6() -> impl azumi::Component {
     html! {
-        <style>
-            .container { padding: "20px"; }
-            .header { text-align: "center"; margin-bottom: "30px"; }
-            .main_title { font-size: "32px"; color: "#333"; }
-            .subtitle { font-size: "18px"; color: "#666"; }
-            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
-            .section_title { font-size: "20px"; margin-bottom: "15px"; }
-            .points_list { list-style: "none"; padding: "0"; }
-            .point { margin-bottom: "10px"; }
-            .examples { display: "grid"; gap: "20px"; }
-            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
-        </style>
+
         <div class={container}>
             <header class={header}>
                 <h1 class={main_title}>"Lesson 6: Control Flow Patterns"</h1>
@@ -146,6 +138,18 @@ pub fn lesson6() -> impl azumi::Component {
                 </div>
             </section>
         </div>
+        <style>
+            .container { padding: "20px"; }
+            .header { text-align: "center"; margin-bottom: "30px"; }
+            .main_title { font-size: "32px"; color: "#333"; }
+            .subtitle { font-size: "18px"; color: "#666"; }
+            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
+            .section_title { font-size: "20px"; margin-bottom: "15px"; }
+            .points_list { list-style: "none"; padding: "0"; }
+            .point { margin-bottom: "10px"; }
+            .examples { display: "grid"; gap: "20px"; }
+            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
+        </style>
     }
 }
 
