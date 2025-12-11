@@ -13,7 +13,44 @@ pub fn homepage() -> impl Component {
 #[azumi::component]
 pub fn Lessons() -> impl Component {
     html! {
-        <style>
+
+
+        <div>
+            <div class={hero_section}>
+                <h1 class={hero_title}>"Master Azumi"</h1>
+                <p class={hero_subtitle}>
+                    "A comprehensive, interactive journey through the Azumi framework.
+                    From basic components to full-scale applications, learn how to build the future of web development."
+                </p>
+            </div>
+
+            <div class={grid_container}>
+                // Basics
+                @LessonCard(num="00", title="Introduction", desc="Understanding the component structure.", link="/lesson-0")
+                @LessonCard(num="01", title="Components", desc="Building your first reusable blocks.", link="/lesson-1")
+                @LessonCard(num="02", title="CSS Scoping", desc="How styles are isolated safely.", link="/lesson-2")
+                @LessonCard(num="03", title="Global Styles", desc="Managing global vs local CSS.", link="/lesson-3")
+
+                // Structure & Forms
+                @LessonCard(num="04", title="HTML Structure", desc="Compile-time HTML validation.", link="/lesson-4")
+                @LessonCard(num="05", title="Accessibility", desc="Building inclusive interfaces.", link="/lesson-5")
+                @LessonCard(num="06", title="Basic Forms", desc="Standard form handling patterns.", link="/lesson-6")
+                @LessonCard(num="07", title="Event Handling", desc="Interactivity with event listeners.", link="/lesson-7")
+
+                // Advanced
+                @LessonCard(num="08", title="State Management", desc="Managing complex component state.", link="/lesson-8")
+                @LessonCard(num="09", title="Advanced Patterns", desc="Composition and slots.", link="/lesson-9")
+                @LessonCard(num="10", title="Performance", desc="Optimizing rendering and updates.", link="/lesson-10")
+                @LessonCard(num="11", title="Async Patterns", desc="Loading states and error handling.", link="/lesson-11")
+
+                // New Features
+                @LessonCard(num="12", title="Image Optimization", desc="Automatic lazy loading & attributes.", link="/lesson-12")
+                @LessonCard(num="13", title="Live Forms", desc="Real-time validation and feedback.", link="/lesson-13")
+                @LessonCard(num="14", title="Composition", desc="Building complex Live UIs.", link="/lesson-14")
+                @LessonCard(num="15", title="Full Application", desc="A complete Todo App demo.", link="/lesson-15")
+            </div>
+        </div>
+         <style>
             .hero_section {
                 text-align: "center";
                 padding: "4rem 1rem";
@@ -65,7 +102,7 @@ pub fn Lessons() -> impl Component {
                 border-color: "#60a5fa";
                 box-shadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)";
             }
-            // Glow effect on hover
+            // Glow effect on hover 
             .lesson_card::before {
                 content: "''";
                 position: "absolute";
@@ -121,42 +158,6 @@ pub fn Lessons() -> impl Component {
                 to { opacity: "1"; transform: "translateY(0)"; }
             }
         </style>
-
-        <div>
-            <div class={hero_section}>
-                <h1 class={hero_title}>"Master Azumi"</h1>
-                <p class={hero_subtitle}>
-                    "A comprehensive, interactive journey through the Azumi framework.
-                    From basic components to full-scale applications, learn how to build the future of web development."
-                </p>
-            </div>
-
-            <div class={grid_container}>
-                // Basics
-                @LessonCard(num="00", title="Introduction", desc="Understanding the component structure.", link="/lesson-0")
-                @LessonCard(num="01", title="Components", desc="Building your first reusable blocks.", link="/lesson-1")
-                @LessonCard(num="02", title="CSS Scoping", desc="How styles are isolated safely.", link="/lesson-2")
-                @LessonCard(num="03", title="Global Styles", desc="Managing global vs local CSS.", link="/lesson-3")
-
-                // Structure & Forms
-                @LessonCard(num="04", title="HTML Structure", desc="Compile-time HTML validation.", link="/lesson-4")
-                @LessonCard(num="05", title="Accessibility", desc="Building inclusive interfaces.", link="/lesson-5")
-                @LessonCard(num="06", title="Basic Forms", desc="Standard form handling patterns.", link="/lesson-6")
-                @LessonCard(num="07", title="Event Handling", desc="Interactivity with event listeners.", link="/lesson-7")
-
-                // Advanced
-                @LessonCard(num="08", title="State Management", desc="Managing complex component state.", link="/lesson-8")
-                @LessonCard(num="09", title="Advanced Patterns", desc="Composition and slots.", link="/lesson-9")
-                @LessonCard(num="10", title="Performance", desc="Optimizing rendering and updates.", link="/lesson-10")
-                @LessonCard(num="11", title="Async Patterns", desc="Loading states and error handling.", link="/lesson-11")
-
-                // New Features
-                @LessonCard(num="12", title="Image Optimization", desc="Automatic lazy loading & attributes.", link="/lesson-12")
-                @LessonCard(num="13", title="Live Forms", desc="Real-time validation and feedback.", link="/lesson-13")
-                @LessonCard(num="14", title="Composition", desc="Building complex Live UIs.", link="/lesson-14")
-                @LessonCard(num="15", title="Full Application", desc="A complete Todo App demo.", link="/lesson-15")
-            </div>
-        </div>
     }
 }
 
