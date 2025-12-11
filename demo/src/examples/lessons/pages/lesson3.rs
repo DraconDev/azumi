@@ -12,19 +12,24 @@ pub fn card<'a>(title: &'a str, content: &'a str) -> impl azumi::Component + 'a 
         </div>
         <style>
             .card {
-                border: "1px solid rgba(255,255,255,0.1)";
+                border: "1px solid rgba(255,255,255,0.08)";
                 padding: "1.5rem";
                 margin: "0.5rem";
-                background: "rgba(30, 41, 59, 0.6)";
+                background: "rgba(30, 41, 59, 0.4)";
+                backdrop-filter: "blur(12px)";
                 border-radius: "12px";
+                box-shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
+                transition: "transform 0.2s ease";
             }
+            .card:hover { transform: "translateY(-2px)"; }
             .card_title {
-                font-weight: "bold";
-                margin-bottom: "0.5rem";
+                font-weight: "700";
+                margin-bottom: "0.75rem";
                 color: "#e2e8f0";
                 font-size: "1.1rem";
+                letter-spacing: "-0.01em";
             }
-            .card_content { color: "#cbd5e1"; }
+            .card_content { color: "#94a3b8"; line-height: "1.6"; }
         </style>
     }
 }
@@ -34,7 +39,10 @@ pub fn card<'a>(title: &'a str, content: &'a str) -> impl azumi::Component + 'a 
 pub fn dashboard() -> impl azumi::Component {
     azumi::html! {
         <div>
-            <h2 class={dashboard_title}>"Component Composition Dashboard"</h2>
+            <div class={dash_header}>
+                <h2 class={dashboard_title}>"Component Composition Dashboard"</h2>
+                <span class={status_badge}>"Live"</span>
+            </div>
             <div class={dashboard_container}>
                 @card(title="Welcome", content="Welcome to Azumi Component Composition")
                 @card(title="Features", content="Type-safe components that compose beautifully")
@@ -42,12 +50,22 @@ pub fn dashboard() -> impl azumi::Component {
             </div>
         </div>
         <style>
-            .dashboard_container { display: "grid"; gap: "1rem"; }
+            .dashboard_container { display: "grid"; gap: "1rem"; grid-template-columns: "repeat(auto-fit, minmax(250px, 1fr))"; }
+            .dash_header { display: "flex"; align-items: "center"; justify-content: "space-between"; margin-bottom: "1.5rem"; }
             .dashboard_title {
                 font-size: "1.5rem";
                 color: "#818cf8";
-                margin-bottom: "1rem";
-                font-weight: "600";
+                font-weight: "700";
+                margin: "0";
+            }
+            .status_badge {
+                background: "rgba(16, 185, 129, 0.2)";
+                color: "#34d399";
+                font-size: "0.75rem";
+                font-weight: "bold";
+                padding: "0.25rem 0.75rem";
+                border-radius: "9999px";
+                text-transform: "uppercase";
             }
         </style>
     }
@@ -69,21 +87,24 @@ pub fn complex_layout() -> impl azumi::Component {
                 </div>
                 <div class={sidebar}>
                     <h3 class={sidebar_title}>"Sidebar"</h3>
-                    @card(title="Quick Links", content="Navigation and tools")
+                    <div class={link_list}>
+                        @card(title="Quick Links", content="Navigation and tools")
+                        @card(title="Resources", content="Docs and API")
+                    </div>
                 </div>
             </div>
         </div>
         <style>
             .layout_container { display: "grid"; gap: "1.5rem"; }
             .header_section {
-                background: "rgba(99, 102, 241, 0.1)";
-                padding: "1.5rem";
+                background: "linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.1))";
+                padding: "2rem";
                 border-radius: "12px";
                 border: "1px solid rgba(99, 102, 241, 0.2)";
                 text-align: "center";
             }
-            .header_title { color: "#818cf8"; margin-bottom: "0.5rem"; font-size: "1.5rem"; }
-            .header_desc { color: "#cbd5e1"; }
+            .header_title { color: "#818cf8"; margin-bottom: "0.5rem"; font-size: "1.75rem"; font-weight: "700"; }
+            .header_desc { color: "#c7d2fe"; font-size: "1.1rem"; }
 
             .main_section {
                 display: "grid";
@@ -96,8 +117,17 @@ pub fn complex_layout() -> impl azumi::Component {
                 padding: "1.5rem";
                 border-radius: "12px";
                 border: "1px solid rgba(255,255,255,0.05)";
+                height: "fit-content";
             }
-            .sidebar_title { color: "#94a3b8"; margin-bottom: "1rem"; font-size: "1.1rem"; border-bottom: "1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem"; }
+            .sidebar_title {
+                color: "#94a3b8";
+                margin-bottom: "1rem";
+                font-size: "0.875rem";
+                text-transform: "uppercase";
+                letter-spacing: "0.05em";
+                font-weight: "600";
+            }
+            .link_list { display: "grid"; gap: "0.5rem"; }
         </style>
     }
 }

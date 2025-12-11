@@ -12,21 +12,23 @@ pub fn let_pattern_example() -> impl azumi::Component {
 
             // Basic variable declaration
             @let name = "Azumi";
-            <p>"Hello, " <span class={calculated}>{name}</span> "!"</p>
+            <p>"Hello, " <span class={highlight}>{name}</span> "!"</p>
 
             // Calculated values
             @let items = vec!["Item 1", "Item 2", "Item 3"];
             @let item_count = items.len();
-            <p>"Total items: " <span class={calculated}>{item_count}</span></p>
+            <p>"items.len() = " <span class={highlight}>{item_count}</span></p>
 
             // Derived values from calculations
             @let base_price = 100.0;
             @let tax_rate = 0.08;
             @let _total_price = base_price * (1.0 + tax_rate);
-            <div class={derived}>
-                <p>"Base Price: ${base_price}"</p>
-                <p>"Tax Rate: {tax_rate * 100}%"</p>
-                <p>"Total: ${total_price:.2}"</p>
+
+            <div class={receipt}>
+                <div class={receipt_header}>"Receipt"</div>
+                <div class={line_item}><span>"Base Price"</span> <span>"$" {base_price} ".00"</span></div>
+                <div class={line_item}><span>"Tax Rate"</span> <span>{tax_rate * 100.0} "%"</span></div>
+                <div class={line_total}><span>"Total"</span> <span>"$" {format!("{:.2}", base_price * (1.0 + tax_rate))}</span></div>
             </div>
 
             // Complex data transformations
@@ -36,24 +38,45 @@ pub fn let_pattern_example() -> impl azumi::Component {
                 ("Charlie", 35)
             ];
             @let user_names = users.iter().map(|(name, _)| *name).collect::<Vec<&str>>();
-            <div class={derived}>
-                <h3>"User Names:"</h3>
-                @for name in user_names {
-                    <p>{name}</p>
-                }
+            <div class={user_list}>
+                <h3 class={list_title}>"Active Users:"</h3>
+                <div class={badges}>
+                    @for name in user_names {
+                        <span class={user_badge}>{name}</span>
+                    }
+                </div>
             </div>
         </div>
         <style>
-            .let_demo { padding: "1.5rem"; }
-            .title { color: "#e2e8f0"; margin-bottom: "1rem"; font-size: "1.25rem"; }
-            .calculated { font-weight: "bold"; color: "#38bdf8"; }
-            .derived {
-                background: "rgba(15, 23, 42, 0.4)";
-                padding: "1rem";
+            .let_demo { padding: "1.5rem"; font-family: "'Inter', sans-serif"; }
+            .title { color: "#e2e8f0"; margin-bottom: "1rem"; font-size: "1.25rem"; font-weight: "700"; }
+            .highlight { font-weight: "bold"; color: "#38bdf8"; background: "rgba(56, 189, 248, 0.1)"; padding: "0.1rem 0.3rem"; border-radius: "4px"; }
+
+            .receipt {
+                background: "#f8fafc";
+                padding: "1.5rem";
                 border-radius: "8px";
-                margin-top: "1rem";
-                border: "1px solid rgba(255,255,255,0.05)";
-                color: "#cbd5e1";
+                margin-top: "1.5rem";
+                color: "#334155";
+                font-family: "monospace";
+                box-shadow: "0 4px 6px -1px rgba(0,0,0,0.1)";
+                max-width: "300px";
+                transform: "rotate(-1deg)";
+            }
+            .receipt_header { text-align: "center"; font-weight: "bold"; text-transform: "uppercase"; border-bottom: "1px dashed #cbd5e1"; padding-bottom: "0.5rem"; margin-bottom: "0.5rem"; }
+            .line_item { display: "flex"; justify-content: "space-between"; margin-bottom: "0.25rem"; font-size: "0.9rem"; }
+            .line_total { display: "flex"; justify-content: "space-between"; margin-top: "0.5rem"; border-top: "1px dashed #cbd5e1"; padding-top: "0.5rem"; font-weight: "bold"; font-size: "1.1rem"; }
+
+            .user_list { margin-top: "2rem"; }
+            .list_title { font-size: "1rem"; color: "#94a3b8"; margin-bottom: "0.5rem"; text-transform: "uppercase"; letter-spacing: "0.05em"; }
+            .badges { display: "flex"; gap: "0.5rem"; flex-wrap: "wrap"; }
+            .user_badge {
+                background: "rgba(167, 139, 250, 0.2)";
+                color: "#c084fc";
+                padding: "0.25rem 0.75rem";
+                border-radius: "9999px";
+                font-size: "0.875rem";
+                font-weight: "600";
             }
         </style>
     }
@@ -77,8 +100,13 @@ pub fn let_with_conditions() -> impl azumi::Component {
                 "F"
             };
 
-            <p>"Score: " <span class={result}>{score}</span></p>
-            <p>"Grade: " <span class={result}>{grade}</span></p>
+            <div class={grade_card}>
+                <div class={score_circle}>
+                    <span class={score_val}>{score}</span>
+                    <span class={score_label}>"SCORE"</span>
+                </div>
+                <div class={grade_val}>{grade}</div>
+            </div>
         </div>
         <style>
             .conditions_demo {
@@ -88,8 +116,18 @@ pub fn let_with_conditions() -> impl azumi::Component {
                 border: "1px solid rgba(20, 184, 166, 0.2)";
                 color: "#e2e8f0";
             }
-            .title { color: "#2dd4bf"; margin-bottom: "1rem"; font-size: "1.25rem"; }
-            .result { font-weight: "bold"; color: "#5eead4"; }
+            .title { color: "#2dd4bf"; margin-bottom: "1.5rem"; font-size: "1.25rem"; font-weight: "700"; }
+
+            .grade_card { display: "flex"; align-items: "center"; gap: "2rem"; }
+            .score_circle {
+                width: "80px"; height: "80px"; border-radius: "50%";
+                border: "4px solid #2dd4bf";
+                display: "flex"; flex-direction: "column"; align-items: "center"; justify-content: "center";
+            }
+            .score_val { font-size: "1.5rem"; font-weight: "800"; color: "#2dd4bf"; line-height: "1"; }
+            .score_label { font-size: "0.6rem"; color: "#5eead4"; font-weight: "bold"; }
+
+            .grade_val { font-size: "4rem"; font-weight: "900"; color: "#f0fdfa"; text-shadow: "0 0 20px rgba(45, 212, 191, 0.5)"; }
         </style>
     }
 }
@@ -105,8 +143,11 @@ pub fn let_composition_example() -> impl azumi::Component {
             @let content = "This component uses @let variables";
 
             <div class={component_container}>
-                <h4 class={comp_title}>{title}</h4>
-                <p>{content}</p>
+                <div class={icon}>"✨"</div>
+                <div>
+                    <h4 class={comp_title}>{title}</h4>
+                    <p class={comp_text}>{content}</p>
+                </div>
             </div>
         </div>
         <style>
@@ -114,13 +155,17 @@ pub fn let_composition_example() -> impl azumi::Component {
             .title { color: "#e2e8f0"; margin-bottom: "1rem"; font-size: "1.25rem"; }
             .component_container {
                 margin: "1rem 0";
-                padding: "1rem";
-                background: "rgba(30, 41, 59, 0.6)";
-                border-radius: "8px";
+                padding: "1.5rem";
+                background: "linear-gradient(to right, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4))";
+                border-radius: "12px";
                 border: "1px solid rgba(255,255,255,0.05)";
-                color: "#cbd5e1";
+                display: "flex";
+                gap: "1rem";
+                align-items: "flex-start";
             }
-            .comp_title { color: "#a5f3fc"; margin-bottom: "0.5rem"; }
+            .icon { font-size: "2rem"; }
+            .comp_title { color: "#a5f3fc"; margin-bottom: "0.25rem"; font-size: "1.1rem"; font-weight: "bold"; }
+            .comp_text { color: "#cbd5e1"; margin: "0"; }
         </style>
     }
 }

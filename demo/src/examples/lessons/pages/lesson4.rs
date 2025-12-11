@@ -9,10 +9,11 @@ pub fn container(children: impl azumi::Component) -> impl azumi::Component {
         </div>
         <style>
             .content_box {
-                padding: "2rem";
-                border: "1px solid rgba(255,255,255,0.1)";
+                padding: "1.5rem";
+                border: "1px solid rgba(255,255,255,0.08)";
                 border-radius: "12px";
-                background: "rgba(15, 23, 42, 0.4)";
+                background: "rgba(30, 41, 59, 0.3)";
+                backdrop-filter: "blur(4px)";
                 color: "#e2e8f0";
             }
         </style>
@@ -24,7 +25,10 @@ pub fn container(children: impl azumi::Component) -> impl azumi::Component {
 pub fn layout_example() -> impl azumi::Component {
     html! {
         <div>
-            <h2 class={layout_title}>"Container with Children"</h2>
+            <div class={header}>
+                <h2 class={layout_title}>"Container with Children"</h2>
+                <div class={icon}>"📦"</div>
+            </div>
 
             @container() {
                 <p>"This content is passed as children"</p>
@@ -32,8 +36,10 @@ pub fn layout_example() -> impl azumi::Component {
             }
         </div>
         <style>
-            .layout_title { font-size: "1.5rem"; color: "#38bdf8"; margin-bottom: "1rem"; font-weight: "600"; }
-            .dim_text { color: "#94a3b8"; margin-top: "0.5rem"; }
+            .header { display: "flex"; justify-content: "space-between"; align-items: "center"; margin-bottom: "1rem"; }
+            .layout_title { font-size: "1.5rem"; color: "#38bdf8"; margin: "0"; font-weight: "700"; }
+            .icon { font-size: "1.5rem"; }
+            .dim_text { color: "#94a3b8"; margin-top: "0.5rem"; font-style: "italic"; }
         </style>
     }
 }
@@ -55,8 +61,8 @@ pub fn nested_children() -> impl azumi::Component {
             }
         </div>
         <style>
-            .title { font-size: "1.25rem"; color: "#e2e8f0"; margin-bottom: "1rem"; }
-            .outer_text { color: "#94a3b8"; margin-bottom: "1rem"; }
+            .title { font-size: "1.25rem"; color: "#e2e8f0"; margin-bottom: "1rem"; font-weight: "600"; }
+            .outer_text { color: "#94a3b8"; margin-bottom: "1rem"; font-weight: "600"; text-transform: "uppercase"; font-size: "0.8rem"; letter-spacing: "0.05em"; }
             .outer_container {
                 background: "rgba(0,0,0,0.2)";
                 padding: "1.5rem";
@@ -64,7 +70,7 @@ pub fn nested_children() -> impl azumi::Component {
                 border: "1px solid rgba(255,255,255,0.05)";
             }
             .inner_text { color: "#cbd5e1"; margin-bottom: "1rem"; }
-            .deep_text { color: "#a5f3fc"; font-weight: "500"; }
+            .deep_text { color: "#a5f3fc"; font-weight: "600"; text-shadow: "0 0 10px rgba(165, 243, 252, 0.3)"; }
         </style>
     }
 }
@@ -77,13 +83,16 @@ pub fn multiple_children_example() -> impl azumi::Component {
             @container() {
                 <div class={children_demo}>
                     <div class={child_item}>
-                        "Child 1"
+                        <div class={item_icon}>"1"</div>
+                        "Child A"
                     </div>
                     <div class={child_item}>
-                        "Child 2"
+                         <div class={item_icon}>"2"</div>
+                        "Child B"
                     </div>
                     <div class={child_item}>
-                        "Child 3"
+                         <div class={item_icon}>"3"</div>
+                        "Child C"
                     </div>
                 </div>
             }
@@ -102,7 +111,10 @@ pub fn multiple_children_example() -> impl azumi::Component {
                 border-radius: "8px";
                 color: "#38bdf8";
                 font-weight: "600";
+                transition: "all 0.2s";
             }
+            .child_item:hover { background: "rgba(56, 189, 248, 0.2)"; transform: "translateY(-2px)"; }
+            .item_icon { font-size: "1.5rem"; margin-bottom: "0.5rem"; opacity: "0.5"; }
             .spacer { height: "1.5rem"; }
         </style>
     }
