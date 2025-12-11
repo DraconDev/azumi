@@ -197,7 +197,7 @@ html! {
 
 ### 3. CSS Minification
 
--   Styles defined in `<style>` blocks are automatically parsed and minified at compile time.
+-   Styles defined in `<div>` blocks are automatically parsed and minified at compile time.
 -   Comments and whitespace are removed to reduce payload size.
 -   No configuration needed.
 
@@ -211,13 +211,13 @@ html! {
 #[azumi::component]
 pub fn MyComponent(title: &str, count: i32) -> impl Component {
     html! {
-        <style>
-            .container { padding: "1rem"; }
-            .title { font-size: "1.5rem"; color: "#333"; }
-        </style>
         <div class={container}>
             <h1 class={title}>{title}</h1>
             <p>"Count: " {count}</p>
+        </div>
+        <style>
+            .container { padding: "1rem"; }
+            .title { font-size: "1.5rem"; color: "#333"; }
         </div>
     }
 }
@@ -229,12 +229,12 @@ pub fn MyComponent(title: &str, count: i32) -> impl Component {
 #[azumi::component]
 pub fn Container(children: impl Component) -> impl Component {
     html! {
-        <style>
-            .container { padding: "1rem"; border: "1px solid #ddd"; }
-        </style>
         <div class={container}>
             {children}
         </div>
+        <style>
+            .container { padding: "1rem"; border: "1px solid #ddd"; }
+        </style>
     }
 }
 
@@ -251,14 +251,14 @@ pub fn Container(children: impl Component) -> impl Component {
 #[azumi::component]
 pub fn Card<'a>(title: &'a str, content: &'a str) -> impl Component + 'a {
     html! {
-        <style>
-            .card { border: "1px solid #eee"; padding: "1rem"; }
-            .title { font-weight: "bold"; margin-bottom: "0.5rem"; }
-        </style>
         <div class={card}>
             <h3 class={title}>{title}</h3>
             <p>{content}</p>
         </div>
+        <style>
+            .card { border: "1px solid #eee"; padding: "1rem"; }
+            .title { font-weight: "bold"; margin-bottom: "0.5rem"; }
+        </style>
     }
 }
 
@@ -283,6 +283,11 @@ pub fn Dashboard() -> impl Component {
 #[azumi::component]
 pub fn StyledComponent() -> impl Component {
     html! {
+        <div class={container}>
+            <h1 class={local_heading}>"Scoped (blue)"</h1>
+            <h2 class={global_heading}>"Global (purple)"</h2>
+        </div>
+
         // Global styles - NOT scoped (use string literals)
         <style global>
             body { font-family: "Inter, sans-serif"; }
@@ -294,11 +299,6 @@ pub fn StyledComponent() -> impl Component {
             .local_heading { color: "blue"; }
             .container { padding: "1rem"; }
         </style>
-
-        <div class={container}>
-            <h1 class={local_heading}>"Scoped (blue)"</h1>
-            <h2 class={global_heading}>"Global (purple)"</h2>
-        </div>
     }
 }
 ```
@@ -309,6 +309,10 @@ pub fn StyledComponent() -> impl Component {
 #[azumi::component]
 pub fn ProgressMeter(completion: f64, accent_color: &str) -> impl Component {
     html! {
+        <div class={meter}>
+            // style={} ONLY allows CSS custom properties (--variables)
+            <div class={fill} style={--progress: completion; --accent: accent_color}></div>
+        </div>
         <style>
             .meter {
                 width: "100%";
@@ -324,11 +328,6 @@ pub fn ProgressMeter(completion: f64, accent_color: &str) -> impl Component {
                 transition: "width 0.3s ease";
             }
         </style>
-
-        <div class={meter}>
-            // style={} ONLY allows CSS custom properties (--variables)
-            <div class={fill} style={--progress: completion; --accent: accent_color}></div>
-        </div>
     }
 }
 ```
@@ -361,9 +360,6 @@ Azumi validates all CSS at compile time:
 #[azumi::component]
 pub fn LetExample() -> impl Component {
     html! {
-        <style>
-            .result { background: "#f0f0f0"; padding: "0.5rem"; }
-        </style>
         <div>
             // Basic variable declaration
             @let name = "Azumi";
@@ -393,6 +389,9 @@ pub fn LetExample() -> impl Component {
             };
             <p>"Grade: " {grade}</p>
         </div>
+        <style>
+            .result { background: "#f0f0f0"; padding: "0.5rem"; }
+        </style>
     }
 }
 ```
@@ -451,11 +450,6 @@ html! {
 #[azumi::component]
 pub fn StatusDisplay(status: &str) -> impl Component {
     html! {
-        <style>
-            .loading { color: "blue"; }
-            .success { color: "green"; }
-            .error { color: "red"; }
-        </style>
         <div>
             @match status {
                 "loading" => {
@@ -472,6 +466,11 @@ pub fn StatusDisplay(status: &str) -> impl Component {
                 }
             }
         </div>
+        <style>
+            .loading { color: "blue"; }
+            .success { color: "green"; }
+            .error { color: "red"; }
+        </style>
     }
 }
 ```
@@ -539,11 +538,6 @@ impl TodoList {
 #[azumi::component]
 pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
     html! {
-        <style>
-            .counter { padding: "2rem"; text-align: "center"; }
-            .value { font-size: "3rem"; margin: "1rem 0"; }
-            .btn { padding: "1rem 2rem"; cursor: "pointer"; }
-        </style>
         <div class={counter}>
             <div class={value}>{state.count}</div>
             <button class={btn} on:click={state.increment}>
@@ -551,6 +545,11 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
             </button>
             <p>"Status: " {if state.active { "Active" } else { "Inactive" }}</p>
         </div>
+        <style>
+            .counter { padding: "2rem"; text-align: "center"; }
+            .value { font-size: "3rem"; margin: "1rem 0"; }
+            .btn { padding: "1rem 2rem"; cursor: "pointer"; }
+        </style>
     }
 }
 ```
@@ -665,13 +664,6 @@ impl ContactForm {
 #[azumi::component]
 pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
     html! {
-        <style>
-            .form { display: "grid"; gap: "1rem"; max-width: "400px"; }
-            .field { display: "grid"; gap: "0.5rem"; }
-            .input { padding: "0.5rem"; border: "1px solid #ddd"; }
-            .btn { padding: "0.75rem"; background: "#2196f3"; color: "white"; }
-        </style>
-
         @if state.submitted {
             <div>"Thank you for your message!"</div>
             <button on:click={state.reset}>"Send Another"</button>
@@ -692,6 +684,12 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
                 </button>
             </form>
         }
+        <style>
+            .form { display: "grid"; gap: "1rem"; max-width: "400px"; }
+            .field { display: "grid"; gap: "0.5rem"; }
+            .input { padding: "0.5rem"; border: "1px solid #ddd"; }
+            .btn { padding: "0.75rem"; background: "#2196f3"; color: "white"; }
+        </style>
     }
 }
 ```
@@ -708,10 +706,6 @@ The `data-bind` attribute enables optimistic UI updates by binding state propert
 #[azumi::component]
 pub fn LiveCounter(state: &Counter) -> impl Component {
     html! {
-        <style>
-            .counter { padding: "2rem"; text-align: "center"; }
-            .value { font-size: "3rem"; color: "#2196f3"; }
-        </style>
         <div class={counter}>
             <div class={value} data-bind="count">{state.count}</div>
             <p>"Status: "
@@ -720,6 +714,10 @@ pub fn LiveCounter(state: &Counter) -> impl Component {
                 </span>
             </p>
         </div>
+        <style>
+            .counter { padding: "2rem"; text-align: "center"; }
+            .value { font-size: "3rem"; color: "#2196f3"; }
+        </style>
     }
 }
 ```
@@ -742,16 +740,16 @@ struct UserRegistration {
 #[azumi::component]
 pub fn RegistrationForm() -> impl Component {
     html! {
-        <style>
-            .form { display: "grid"; gap: "1rem"; max-width: "400px"; }
-            .input { padding: "0.5rem"; border: "1px solid #ddd"; }
-        </style>
         <form class={form} bind={UserRegistration}>
             <input class={input} name="username" type="text" placeholder="Username" />
             <input class={input} name="email" type="email" placeholder="Email" />
             <input class={input} name="password" type="password" placeholder="Password" />
             <button type="submit">"Register"</button>
         </form>
+        <style>
+            .form { display: "grid"; gap: "1rem"; max-width: "400px"; }
+            .input { padding: "0.5rem"; border: "1px solid #ddd"; }
+        </style>
     }
 }
 ```
@@ -810,12 +808,6 @@ impl TabState {
 #[azumi::component]
 pub fn tabs_view<'a>(state: &'a TabState) -> impl Component + 'a {
     html! {
-        <style>
-            .tabs { display: "flex"; gap: "0.5rem"; }
-            .tab { padding: "0.5rem 1rem"; cursor: "pointer"; }
-            .active { background: "#2196f3"; color: "white"; }
-        </style>
-
         <div>
             <div class={tabs}>
                 <button class={if state.active_index == 0 { "tab active" } else { "tab" }}
@@ -834,6 +826,11 @@ pub fn tabs_view<'a>(state: &'a TabState) -> impl Component + 'a {
                 }
             </div>
         </div>
+        <style>
+            .tabs { display: "flex"; gap: "0.5rem"; }
+            .tab { padding: "0.5rem 1rem"; cursor: "pointer"; }
+            .active { background: "#2196f3"; color: "white"; }
+        </style>
     }
 }
 ```
@@ -844,16 +841,16 @@ pub fn tabs_view<'a>(state: &'a TabState) -> impl Component + 'a {
 #[azumi::component]
 pub fn PageLayout(children: impl Component) -> impl Component {
     html! {
-        <style>
-            .page { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
-            .header { border-bottom: "1px solid #eee"; margin-bottom: "2rem"; }
-        </style>
         <div class={page}>
             <header class={header}>
                 <h1>"My App"</h1>
             </header>
             <main>{children}</main>
         </div>
+        <style>
+            .page { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
+            .header { border-bottom: "1px solid #eee"; margin-bottom: "2rem"; }
+        </style>
     }
 }
 ```
