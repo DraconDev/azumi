@@ -69,6 +69,7 @@ pub fn live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     live::expand_live_impl(attr, item)
 }
 
+#[allow(dead_code)]
 struct NodesWrapper(Vec<token_parser::Node>);
 
 impl Parse for NodesWrapper {
@@ -79,6 +80,7 @@ impl Parse for NodesWrapper {
 
 /// Validates that a style attribute only contains CSS custom properties (--variables).
 /// Returns Ok(()) if valid, Err(error_message) if invalid.
+#[allow(dead_code)]
 fn validate_style_only_css_vars(style_value: &str) -> Result<(), String> {
     // Parse style value: "prop: value; prop2: value2"
     for part in style_value.split(';') {
@@ -118,7 +120,7 @@ pub fn html(input: TokenStream) -> TokenStream {
     asset_rewriter::rewrite_nodes(&mut nodes);
 
     // 1. Process styles (hoist <style> tags)
-    let (style_bindings, scoped_css, global_css) = process_styles(&nodes);
+    let (style_bindings, _scoped_css, _global_css) = process_styles(&nodes);
 
     // 2. CSS dependencies are no longer collected for external files
     let css_deps: Vec<proc_macro2::TokenStream> = Vec::new();
@@ -158,6 +160,7 @@ pub fn html(input: TokenStream) -> TokenStream {
     TokenStream::from(expanded)
 }
 
+#[allow(dead_code)]
 fn extract_styles(nodes: Vec<token_parser::Node>) -> (Vec<token_parser::StyleBlock>, Vec<token_parser::Node>) {
     let mut styles = Vec::new();
     let mut other_nodes = Vec::new();
@@ -1255,7 +1258,7 @@ fn generate_body_with_context(
                                 write!(f, " {}=\"{}\"", #attr_name, azumi::Escaped(&(#expr)))?;
                             });
                         }
-                        token_parser::AttributeValue::StyleDsl(props) => {
+                        token_parser::AttributeValue::StyleDsl(_props) => {
                             // Style DSL is only valid for 'style' attribute, which is handled above.
                             // If we reach here, it means it was used on a non-style attribute, which is invalid.
                             // But we should handle it gracefully or error.

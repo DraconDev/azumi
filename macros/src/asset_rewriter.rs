@@ -37,7 +37,7 @@ fn load_manifest() -> Option<HashMap<String, String>> {
     None
 }
 
-use crate::token_parser::{self, AttributeValue, Block, Node};
+use crate::token_parser::{AttributeValue, Block, Node};
 
 pub fn rewrite_nodes(nodes: &mut [Node]) {
     for node in nodes {

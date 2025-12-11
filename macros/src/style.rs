@@ -1,10 +1,8 @@
-use crate::css::{extract_selectors, rename_css_selectors};
+use crate::css::extract_selectors;
 use heck::ToSnakeCase;
 use lightningcss::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
 use proc_macro2::{TokenStream, TokenTree};
 use quote::{format_ident, quote};
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
 use syn::parse::{Parse, ParseStream};
 use syn::{braced, parse2, token, Ident, LitStr, Token};
 
@@ -36,6 +34,7 @@ struct StyleBlock {
 struct StyleProperty {
     name: String,
     value: String,
+    #[allow(dead_code)]
     span: proc_macro2::Span,
 }
 
@@ -65,7 +64,7 @@ impl Parse for AtRule {
         // Parse everything until we hit a semicolon or end
         let mut content = String::new();
         let mut depth = 0;
-        let mut found_opening_brace = false;
+        let mut _found_opening_brace = false;
 
         while !input.is_empty() {
             let fork = input.fork();
@@ -75,7 +74,7 @@ impl Parse for AtRule {
             // Handle braces for nested structures
             if token_str == "{" {
                 depth += 1;
-                found_opening_brace = true;
+                _found_opening_brace = true;
             } else if token_str == "}" {
                 depth -= 1;
             }
@@ -504,7 +503,7 @@ pub fn process_global_style_macro(input: TokenStream) -> StyleOutput {
 pub fn process_style_macro(input: TokenStream) -> StyleOutput {
     // 1. Parse the input (clone first to use later for reconstruction)
     let input_clone = input.clone();
-    let style_input: StyleInput = match parse2(input) {
+    let _style_input: StyleInput = match parse2(input) {
         Ok(input) => input,
         Err(err) => {
             return StyleOutput {
@@ -564,7 +563,7 @@ pub fn reconstruct_css_from_tokens(input: TokenStream) -> String {
     // 1. Parse the input
     let style_input: StyleInput = match parse2(input) {
         Ok(input) => input,
-        Err(e) => {
+        Err(_e) => {
             return String::new();
         }
     };

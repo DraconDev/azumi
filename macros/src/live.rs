@@ -49,8 +49,10 @@ impl Prediction {
 /// Metadata about an analyzed method
 #[derive(Debug)]
 pub struct MethodAnalysis {
+    #[allow(dead_code)]
     pub name: String,
     pub predictions: Vec<Prediction>,
+    #[allow(dead_code)]
     pub has_unpredictable: bool,
 }
 
@@ -196,13 +198,13 @@ fn is_side_effect(expr: &Expr) -> bool {
     }
 }
 
-fn is_self_field_mutation(mc: &ExprMethodCall) -> bool {
+fn is_self_field_mutation(_mc: &ExprMethodCall) -> bool {
     // Check if this is something like self.field.push() which we can't predict
     false
 }
 
 /// Main macro expansion for #[azumi::live]
-pub fn expand_live(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn expand_live(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemStruct);
     let struct_name = &input.ident;
     let struct_vis = &input.vis;
@@ -210,7 +212,7 @@ pub fn expand_live(attr: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = &input.fields;
 
     // Extract field information
-    let field_info: Vec<_> = match struct_fields {
+    let _field_info: Vec<_> = match struct_fields {
         Fields::Named(fields) => fields
             .named
             .iter()
