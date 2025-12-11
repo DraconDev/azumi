@@ -581,6 +581,64 @@ pub fn auto_detected_view<'a>(state: &'a MyState) -> impl Component + 'a {
 <form on:submit={state.submit_form}>"Submit"</form>
 ```
 
+// ... (existing content)
+
+### Optimistic UI with Predictions (`#[predict]`)
+
+Azumi allows you to define **client-side predictions** for your server actions. This enables instant UI updates without waiting for the server roundtrip.
+
+```rust
+#[azumi::live_impl(component = "user_loader_view")]
+impl UserLoader {
+    // 1. Define the prediction: "When this is called, set loading=true IMEMDIATELY"
+    #[predict(loading = true, error = None)]
+    pub async fn load_users(&mut self) {
+        // 2. Server-side logic (runs later)
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        self.users = db::fetch_users().await;
+        self.loading = false;
+    }
+
+    // Predict multiple fields
+    #[predict(loading = false, users = vec![])]
+    pub fn reset(&mut self) {
+        self.users.clear();
+        self.loading = false;
+    }
+}
+```
+
+**Key Benefits:**
+
+-   **Zero Latency**: UI feels native.
+-   **Automatic Synchronization**: If the server response differs from the prediction, Azumi automatically reconciles the state.
+-   **Declarative**: No manual DOM manipulation or separate "optimistic" state logic.
+
+---
+
+## 🛠️ Developer Tools
+
+Azumi includes built-in tools to improve the developer experience.
+
+### Prevention of Browser Caching
+
+During development, browsers may aggressively cache your WASM or static assets. Azumi provides a middleware to prevent this.
+
+**Usage:**
+
+In your `main.rs`:
+
+```rust
+// Use the devtools router which matches development routes
+let app = Router::new()
+    .merge(azumi::devtools::router())
+    // ... your other routes
+    // Apply the no-cache middleware (active only in debug mode)
+    .layer(axum::middleware::from_fn(azumi::devtools::no_cache_middleware));
+```
+
+This ensures that `Cache-Control: no-cache` headers are automatically injected during `cargo run`, preventing stale pages.
+
 ---
 
 ## 📋 Form Handling

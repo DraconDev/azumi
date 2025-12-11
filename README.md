@@ -54,6 +54,23 @@ impl Counter {
 // No JavaScript needed - UI updates instantly!
 ```
 
+**For async actions, use `#[predict]`:**
+
+```rust
+#[predict(loading = true)]
+pub async fn load_data(&mut self) {
+    // UI shows loading spinner IMMEDIATELY
+    self.data = fetch_data().await;
+    self.loading = false;
+}
+```
+
+#### ✅ **Built-in Developer Experience**
+
+-   **Hot Reloading**: Instant updates when files change.
+-   **No-Cache Dev Middleware**: Prevents stale WASM/CSS during development.
+-   **Detailed Error Overlays**: See compile errors right in the browser.
+
 ---
 
 ## 🚨 Critical Rules (Must-Know)
