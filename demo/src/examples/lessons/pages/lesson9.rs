@@ -51,6 +51,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
                 </button>
             </div>
         </div>
+        
         <style>
             .counter_box {
                 padding: "2rem";
