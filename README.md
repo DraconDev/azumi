@@ -68,7 +68,7 @@ pub async fn load_data(&mut self) {
 #### ✅ **Built-in Developer Experience**
 
 -   **Hot Reloading**: Instant updates when files change.
--   **No-Cache Dev Middleware**: Prevents stale WASM/CSS during development.
+-   **No-Cache Dev Middleware**: Prevents stale CSS during development.
 -   **Detailed Error Overlays**: See compile errors right in the browser.
 
 ---
