@@ -6,14 +6,14 @@ use azumi::html;
 #[azumi::component]
 pub fn scoped_component() -> impl azumi::Component {
     html! {
-        <style>
-            .container { padding: "1rem"; border: "1px solid #ddd"; }
-            .title { color: "#2196f3"; }
-        </style>
         <div class={container}>
             <h1 class={title}>"Automatically Scoped CSS"</h1>
             <p>"This CSS is scoped to this component only"</p>
         </div>
+        <style>
+            .container { padding: "1rem"; border: "1px solid #ddd"; }
+            .title { color: "#2196f3"; }
+        </style>
     }
 }
 
@@ -21,10 +21,6 @@ pub fn scoped_component() -> impl azumi::Component {
 #[azumi::component]
 pub fn multiple_scoped_components() -> impl azumi::Component {
     html! {
-        <style>
-            .card { padding: "1rem"; margin: "0.5rem"; border: "1px solid #eee"; }
-            .card_title { font-weight: "bold"; color: "#1976d2"; }
-        </style>
         <div>
             <div class={card}>
                 <h3 class={card_title}>"First Component"</h3>
@@ -35,6 +31,10 @@ pub fn multiple_scoped_components() -> impl azumi::Component {
                 <p>"But the CSS is automatically scoped, so no conflicts!"</p>
             </div>
         </div>
+        <style>
+            .card { padding: "1rem"; margin: "0.5rem"; border: "1px solid #eee"; }
+            .card_title { font-weight: "bold"; color: "#1976d2"; }
+        </style>
     }
 }
 
@@ -42,11 +42,6 @@ pub fn multiple_scoped_components() -> impl azumi::Component {
 #[azumi::component]
 pub fn valid_css_example() -> impl azumi::Component {
     html! {
-        <style>
-            .valid_container { padding: "20px"; background: "#f9f9f9"; }
-            .valid_title { color: "#2196f3"; font-size: "1.2rem"; }
-            .valid_text { color: "#666"; }
-        </style>
         <div class={valid_container}>
             <h2 class={valid_title}>"Valid CSS Example"</h2>
             <p class={valid_text}>"This CSS follows Azumi's validation rules"</p>
@@ -56,6 +51,11 @@ pub fn valid_css_example() -> impl azumi::Component {
                 <li>"Correct unit usage"</li>
             </ul>
         </div>
+        <style>
+            .valid_container { padding: "20px"; background: "#f9f9f9"; }
+            .valid_title { color: "#2196f3"; font-size: "1.2rem"; }
+            .valid_text { color: "#666"; }
+        </style>
     }
 }
 
@@ -63,18 +63,6 @@ pub fn valid_css_example() -> impl azumi::Component {
 #[azumi::component]
 pub fn lesson1() -> impl azumi::Component {
     html! {
-        <style>
-            .container { padding: "20px"; }
-            .header { text-align: "center"; margin-bottom: "30px"; }
-            .main_title { font-size: "32px"; color: "#333"; }
-            .subtitle { font-size: "18px"; color: "#666"; }
-            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
-            .section_title { font-size: "20px"; margin-bottom: "15px"; }
-            .points_list { list-style: "none"; padding: "0"; }
-            .point { margin-bottom: "10px"; }
-            .examples { display: "grid"; gap: "20px"; }
-            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
-        </style>
         <div class={container}>
             <header class={header}>
                 <h1 class={main_title}>"Lesson 2: CSS Scoping & Validation Fundamentals"</h1>
@@ -104,6 +92,18 @@ pub fn lesson1() -> impl azumi::Component {
                 </div>
             </section>
         </div>
+        <style>
+            .container { padding: "20px"; }
+            .header { text-align: "center"; margin-bottom: "30px"; }
+            .main_title { font-size: "32px"; color: "#333"; }
+            .subtitle { font-size: "18px"; color: "#666"; }
+            .key_points { background: "#f9f9f9"; padding: "20px"; border-radius: "8px"; margin-bottom: "30px"; }
+            .section_title { font-size: "20px"; margin-bottom: "15px"; }
+            .points_list { list-style: "none"; padding: "0"; }
+            .point { margin-bottom: "10px"; }
+            .examples { display: "grid"; gap: "20px"; }
+            .example_card { border: "1px solid #ddd"; padding: "20px"; border-radius: "8px"; }
+        </style>
     }
 }
 

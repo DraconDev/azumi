@@ -84,10 +84,7 @@ mod tests {
 #[azumi::component]
 pub fn lesson17() -> impl Component {
     html! {
-        <style>
-            .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
-            .code { background: "#f5f5f5"; padding: "1rem"; border-radius: "8px"; overflow-x: "auto"; }
-        </style>
+
         <div class={container}>
             <h1>"Lesson 17: Testing Azumi Components"</h1>
             <p>"Azumi provides a dedicated test harness to verify components and logic without a browser."</p>
@@ -113,6 +110,10 @@ pub fn lesson17() -> impl Component {
 
             <p>"If you are seeing this page, the unit tests in this file passed!"</p>
         </div>
+        <style>
+            .container { max-width: "800px"; margin: "0 auto"; padding: "2rem"; }
+            .code { background: "#f5f5f5"; padding: "1rem"; border-radius: "8px"; overflow-x: "auto"; }
+        </style>
     }
 }
 
