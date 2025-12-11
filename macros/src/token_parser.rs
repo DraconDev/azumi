@@ -486,6 +486,16 @@ impl Parse for Element {
                      content: expr.to_token_stream(),
                      span: Span::call_site(),
                  }));
+                 // DEBUG
+                 // eprintln!("MAGIC SCRIPT DETECTED: Removed src, pushed child. Children len: {}", children.len());
+             }
+        }
+        
+        // DEBUG
+        // if name == "script" {
+        //   let has_ex = children.iter().any(|node| matches!(node, Node::Expression(_)));
+        //   eprintln!("SCRIPT VALIDATION: Name: {}, Children: {}, HasExpr: {}", name, children.len(), has_ex);
+        // }
              }
         }
 
