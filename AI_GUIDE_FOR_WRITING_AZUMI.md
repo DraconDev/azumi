@@ -151,12 +151,16 @@ html! {
 
 ## 🚀 Setup & Configuration
 
-### Injecting Client Runtime
+### Client Runtime (Automatic)
 
-Azumi is **Static by Default**. It does NOT automatically inject the client runtime. You must explicitly opt-in to interactivity by including the `azumi.js` script.
+The Azumi client runtime (`azumi.js`) is **automatically injected** before `</body>` by the `html!` macro. You don't need to add any script tags manually.
 
--   **Manual Injection (Required for Live Features)**: Add `<script src="azumi.js" />` to your root layout or page component if you want interactivity (Signals, SPA navigation, etc.).
--   **Static Defaults**: If you omit the script, the page renders as pure static HTML (perfect for landing pages, blogs, etc.).
+#### How It Works
+
+1. **The macro injects it automatically** when rendering a `<body>` element
+2. **The route is served automatically** by `azumi::action::register_actions()`
+
+No configuration needed—it just works!
 
 ```rust
 #[azumi::component]
@@ -170,20 +174,15 @@ pub fn RootLayout(children: impl Component) -> impl Component {
             </head>
             <body>
                 {children}
-
-                // ⚠️ REQUIRED: Manually include the runtime for interactivity
-                // This magic script is intercepted by the server to serve the correct runtime/hot-reload logic.
-                <script src="azumi.js" />
+                // ✅ <script src="/azumi.js"> is automatically injected here by the macro
             </body>
         </html>
     }
 }
 ```
 
-> [!IMPORTANT] > **Use `<script src="azumi.js" />`.**
-> Azumi intercepts requests for this specific file. You do not need to create this file manually; it is a virtual file served by the framework. Place this ONCE in your root layout, and it will be inherited by all pages dealing with that layout.
-
-This ensures explicit control over when the 12kb runtime is included.
+> [!NOTE] > **Automatic Injection**: The `<script src="/azumi.js">` is automatically injected before `</body>`.
+> **Automatic Serving**: The `/azumi.js` route is served by `azumi::action::register_actions()`.
 
 ---
 
