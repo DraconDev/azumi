@@ -425,3 +425,42 @@ fn process_selectors(buffer: &str, classes: &mut HashSet<String>, ids: &mut Hash
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_scope_css_nested_media() {
+        let css = "@media (max-width: 768px) { .center_zone { display: none !important; } }";
+        let scope_id = "s123";
+        let scoped = scope_css(css, scope_id);
+
+        // Expected: @media (max-width: 768px) { .center_zone[data-s123] { display: none !important; } }
+        assert!(
+            scoped.contains(".center_zone[data-s123]"),
+            "Actual: {}",
+            scoped
+        );
+        assert!(scoped.contains("@media (max-width: 768px)"));
+    }
+
+    #[test]
+    fn test_scope_css_nested_media_complex() {
+        let css = "@media (min-width: 1024px) { .foo { color: red; } .bar { color: blue; } }";
+        let scope_id = "xyz";
+        let scoped = scope_css(css, scope_id);
+
+        assert!(scoped.contains(".foo[data-xyz]"));
+        assert!(scoped.contains(".bar[data-xyz]"));
+    }
+
+    #[test]
+    fn test_extract_selectors_nested() {
+        let css = "@media screen { .foo { color: red; } } .bar { color: blue; }";
+        let (classes, _ids) = extract_selectors(css);
+
+        assert!(classes.contains("foo"));
+        assert!(classes.contains("bar"));
+    }
+}
