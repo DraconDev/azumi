@@ -25,99 +25,182 @@ impl ContactForm {
 pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
     html! {
 
-        <div class={form_container}>
-            <h2 class={form_title}>"📧 Contact Form"</h2>
+    html! {
+        <div class={form_wrapper}>
+            <div class={card_glow}></div>
+            <div class={form_container}>
+                <h2 class={form_title}>
+                    <span class={icon}>"📬"</span>
+                    "Contact Form"
+                </h2>
 
-            @if state.submitted {
-                <div class={success_box}>
-                    <div class={success_icon}>"✅"</div>
-                    <div class={success_text}>"Thank you for your message!"</div>
-                </div>
-                <button class={btn btn_secondary} on:click={state.reset} >
-                    "Send Another"
-                </button>
-            }
+                @if state.submitted {
+                    <div class={success_box}>
+                        <div class={success_icon}>"✨"</div>
+                        <h3 class={success_title}>"Message Sent!"</h3>
+                        <p class={success_text}>"We've received your inquiry and will get back to you shortly."</p>
+                        <button class={btn btn_secondary} on:click={state.reset}>
+                            "Send Another Message"
+                        </button>
+                    </div>
+                }
 
-            @if !state.submitted {
-                <div class={field}>
-                    <label class={label}>"Name"</label>
-                    <input class={input} type="text" name="name" placeholder="Your name" />
-                </div>
-                <div class={field}>
-                    <label class={label}>"Email"</label>
-                    <input class={input} type="email" name="email" placeholder="your@email.com" />
-                </div>
-                <div class={field}>
-                    <label class={label}>"Message"</label>
-                    <textarea class={textarea} name="message" placeholder="Your message..."></textarea>
-                </div>
-                <button class={btn} type="button" on:click={state.submit}>
-                    "Submit"
-                </button>
-            }
+                @if !state.submitted {
+                    <div class={field_group}>
+                        <div class={field}>
+                            <label class={label}>"Name"</label>
+                            <input class={input} type="text" name="name" placeholder="Ex: Alice Smith" />
+                        </div>
+                        <div class={field}>
+                            <label class={label}>"Email"</label>
+                            <input class={input} type="email" name="email" placeholder="alice@example.com" />
+                        </div>
+                    </div>
+                    <div class={field}>
+                        <label class={label}>"Message"</label>
+                        <textarea class={textarea} name="message" placeholder="How can we help you today?"></textarea>
+                    </div>
+                    <div class={actions}>
+                        <button class={btn btn_primary} type="button" on:click={state.submit}>
+                            "Send Message"
+                        </button>
+                    </div>
+                }
+            </div>
         </div>
         <style>
+            .form_wrapper {
+                position: "relative";
+                padding: "2px"; /* For border gradient if needed */
+                border-radius: "20px";
+                background: "linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))";
+            }
+            .card_glow {
+                position: "absolute"; inset: "0";
+                background: "radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 70%)";
+                pointer-events: "none"; border-radius: "20px";
+            }
+            
             .form_container {
-                max-width: "400px";
-                padding: "2rem";
-                background: "white";
-                border-radius: "12px";
-                border: "1px solid #e0e0e0";
+                max-width: "480px";
+                padding: "2.5rem";
+                background: "var(--azumi-bg-card, rgba(15, 23, 42, 0.8))";
+                backdrop-filter: "blur(12px)";
+                border-radius: "18px";
+                border: "1px solid var(--azumi-border, rgba(255,255,255,0.1))";
+                box-shadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)";
             }
+
             .form_title {
-                margin-bottom: "1.5rem";
-                color: "#333";
+                margin-bottom: "2rem";
+                color: "var(--azumi-text, #f8fafc)";
+                font-size: "1.75rem";
+                font-weight: "700";
+                display: "flex"; align-items: "center"; gap: "0.75rem";
             }
-            .field {
-                display: "grid";
-                gap: "0.5rem";
-                margin-bottom: "1rem";
-            }
+            .icon { font-size: "1.5rem"; }
+
+            .field_group { display: "grid"; grid-template-columns: "1fr 1fr"; gap: "1.5rem"; margin-bottom: "1.5rem"; }
+            
+            .field { display: "flex"; flex-direction: "column"; gap: "0.5rem"; margin-bottom: "1.5rem"; }
+            
             .label {
-                font-weight: "bold";
-                color: "#555";
+                font-size: "0.875rem";
+                font-weight: "600";
+                color: "var(--azumi-text-dim, #94a3b8)";
+                text-transform: "uppercase";
+                letter-spacing: "0.05em";
             }
-            .input {
-                padding: "0.75rem";
-                border: "1px solid #ddd";
-                border-radius: "6px";
+
+            .input, .textarea {
+                padding: "0.875rem 1rem";
+                background: "rgba(0, 0, 0, 0.2)";
+                border: "1px solid var(--azumi-border, rgba(255,255,255,0.1))";
+                border-radius: "10px";
+                color: "var(--azumi-text, white)";
                 font-size: "1rem";
+                transition: "all 0.2s ease";
+                font-family: "inherit";
             }
+            .input:focus, .textarea:focus {
+                outline: "none";
+                border-color: "var(--azumi-primary, #6366f1)";
+                background: "rgba(99, 102, 241, 0.05)";
+                box-shadow: "0 0 0 4px rgba(99, 102, 241, 0.1)";
+            }
+            
             .textarea {
-                padding: "0.75rem";
-                border: "1px solid #ddd";
-                border-radius: "6px";
-                font-size: "1rem";
-                min-height: "100px";
+                min-height: "140px";
                 resize: "vertical";
+                line-height: "1.6";
             }
+
+            .actions { margin-top: "1rem"; }
+
             .btn {
-                padding: "0.75rem 1.5rem";
-                background: "#2196f3";
-                color: "white";
+                padding: "0.875rem 2rem";
                 border: "none";
-                border-radius: "6px";
+                border-radius: "10px";
                 font-size: "1rem";
+                font-weight: "600";
                 cursor: "pointer";
                 width: "100%";
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)";
+                display: "flex"; justify-content: "center"; align-items: "center";
             }
+            .btn:active { transform: "scale(0.98)"; }
+
+            .btn_primary {
+                background: "linear-gradient(135deg, var(--azumi-primary, #6366f1), var(--azumi-accent, #8b5cf6))";
+                color: "white";
+                box-shadow: "0 10px 15px -3px rgba(99, 102, 241, 0.3)";
+                text-shadow: "0 1px 2px rgba(0,0,0,0.2)";
+            }
+            .btn_primary:hover {
+                filter: "brightness(1.1)";
+                box-shadow: "0 20px 25px -5px rgba(99, 102, 241, 0.4)";
+                transform: "translateY(-2px)";
+            }
+
             .btn_secondary {
-                background: "#757575";
+                background: "rgba(255,255,255,0.05)";
+                color: "var(--azumi-text, white)";
+                border: "1px solid rgba(255,255,255,0.1)";
             }
+            .btn_secondary:hover {
+                background: "rgba(255,255,255,0.1)";
+            }
+
+            /* Success State */
             .success_box {
-                padding: "2rem";
+                padding: "3rem 2rem";
                 text-align: "center";
-                background: "#e8f5e9";
-                border-radius: "8px";
+                display: "flex"; flex-direction: "column"; align-items: "center";
+                animation: "scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)";
             }
             .success_icon {
-                font-size: "3rem";
+                font-size: "4rem";
                 margin-bottom: "1rem";
+                animation: "pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards";
+            }
+            .success_title {
+                color: "var(--azumi-text, white)";
+                margin-bottom: "0.5rem";
+                font-size: "1.5rem";
             }
             .success_text {
-                color: "#2e7d32";
-                font-size: "1.2rem";
-                font-weight: "bold";
+                color: "var(--azumi-text-dim, #94a3b8)";
+                margin-bottom: "2rem";
+                line-height: "1.5";
+            }
+            
+            @keyframes scaleIn {
+                from { opacity: "0"; transform: "scale(0.9)"; }
+                to { opacity: "1"; transform: "scale(1)"; }
+            }
+            @keyframes pop {
+                from { opacity: "0"; transform: "scale(0.5)"; }
+                to { opacity: "1"; transform: "scale(1)"; }
             }
         </style>
     }
