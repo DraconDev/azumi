@@ -173,7 +173,6 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
                 background: "rgba(255,255,255,0.1)";
             }
 
-            /* Success State */
             .success_box {
                 padding: "3rem 2rem";
                 text-align: "center";
