@@ -49,23 +49,33 @@ html! {
 }
 ```
 
-### 2. Optimistic UI from Pure Rust
+### 2. Optimistic UI (Hybrid: Auto + Manual)
 
 Write Rust. Get instant UI. No JavaScript required.
 
-```rust
-#[azumi::live]
-pub struct Counter { count: i32 }
+**Automatic:** Simple mutations (assignments, toggles) are predicted automatically by the compiler.
 
+```rust
+#[azumi::live_impl]
 impl Counter {
     pub fn increment(&mut self) {
-        self.count += 1;  // Compiler generates client-side prediction
+        self.count += 1;  // ✅ Compiler generates: data-predict="count = count + 1"
     }
 }
+```
+
+**Manual:** Complex mutations (structs, vectors) use explicit hints.
+
+```rust
+// 🚀 Instant feedback for complex data
+#[azumi::predict("todos.push(new_todo)")]
+pub fn add_todo(&mut self) { ... }
+```
 
 // Click → UI updates INSTANTLY → Server confirms
-// Zero latency. Zero JS. Zero magic strings.
-```
+// Zero latency. Zero JS glue code.
+
+````
 
 ### 3. Async with `#[predict]`
 
@@ -77,7 +87,7 @@ pub async fn load_users(&mut self) {
     self.users = db::fetch_all().await;   // Fetch in background
     self.loading = false;                  // Hide spinner when done
 }
-```
+````
 
 The UI feels instant. The data is consistent. The code is obvious.
 
