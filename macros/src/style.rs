@@ -66,12 +66,13 @@ impl Parse for AtRule {
         input.parse::<Token![@]>()?;
         let name = input.parse::<Ident>()?.to_string();
 
-        // Parse everything until we hit a semicolon or end
-        let mut content = String::new();
+        // Collect tokens to form the content
+        let mut tokens = TokenStream::new();
         let mut depth = 0;
         let mut _found_opening_brace = false;
 
         while !input.is_empty() {
+            // Peek to check structure without consuming yet
             let fork = input.fork();
             let tt: TokenTree = fork.parse()?;
             let token_str = tt.to_string();
@@ -84,20 +85,39 @@ impl Parse for AtRule {
                 depth -= 1;
             }
 
-            // Stop when we've closed all braces and hit a semicolon
-            if depth == 0 && input.peek(Token![;]) {
-                break;
-            }
-
             // Consume the token
             let tt: TokenTree = input.parse()?;
-            content.push_str(&tt.to_string());
+            tokens.extend(std::iter::once(tt));
+
+            // Check termination conditions AFTER consuming
+            if depth == 0 {
+                if _found_opening_brace {
+                    // We just closed the main block of the AtRule (e.g. @media { ... })
+                    // Stop here so we don't swallow subsequent rules!
+                    break;
+                }
+
+                // If it's a statement rule (like @import), it ends with semicolon
+                if input.peek(Token![;]) {
+                    // We don't consume the semicolon here (it's handled by caller loop logic usually?
+                    // Wait, caller loop in StyleInput::parse invokes AtRule::parse.
+                    // If AtRule::parse consumes everything including semicolon, that's fine.
+                    // The original code had: "Consume trailing semicolon if present" at end.
+                    // So we should break here, and let the end logic handle it?
+                    // Original logic: "Stop when we've closed all braces and hit a semicolon"
+                    // If we peek semicolon, we break loop.
+                    break;
+                }
+            }
         }
 
-        // Consume trailing semicolon if present
+        // Consume trailing semicolon if present (for statement rules)
         if input.peek(Token![;]) {
             input.parse::<Token![;]>()?;
         }
+
+        // Convert collected tokens to CSS string using the helper to ensure proper spacing
+        let content = tokens_to_css_string(&tokens);
 
         Ok(AtRule { name, content })
     }
