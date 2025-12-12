@@ -1190,13 +1190,13 @@ cargo run
 -   **Secure by default** — HMAC-signed state prevents client-side tampering
 -   **Long-term maintainability** — Types survive refactors; dead code is caught
 
-### ⚠️ **Current Limitations:**
+### 🎯 **Outside Core Scope:**
 
--   **Heavy client-side interactivity** — Drag-and-drop, canvas, complex animations (use JS interop)
--   **Real-time multiplayer** — WebSocket-first apps need additional architecture
--   **Mobile native** — Web only (wrap in Tauri/Capacitor for desktop/mobile)
+-   **Heavy client-side interactivity** — Drag-and-drop, canvas, complex animations → use JS interop
+-   **Real-time multiplayer** — WebSocket-first apps → pair with dedicated real-time layer
+-   **Mobile native** — Web-first → wrap in Tauri/Capacitor for native distribution
 
-> **Note:** These are architectural constraints, not ecosystem maturity issues. Azumi is opinionated about where logic runs (server) and optimizes for that path.
+Azumi is opinionated: logic runs on the server, UI updates are predicted, the server is truth. These aren't gaps — they're the design.
 
 ## 📁 Project Structure
 
