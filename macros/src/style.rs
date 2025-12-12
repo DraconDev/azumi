@@ -960,3 +960,30 @@ fn minify_css(css: &str) -> String {
     // Fallback: simple whitespace/cleanup if parsing (unexpectedly) fails
     css.trim().to_string()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_media_query_property_stripping() {
+        let input = quote! {
+            @media (max-width: 768px) {
+                .center_zone {
+                    display: "none !important";
+                }
+            }
+        };
+
+        let output = process_global_style_macro(input);
+
+        // We expect: display: none !important;
+        // Current bug produces: display: "none !important";
+        println!("Generated CSS: {}", output.css);
+        assert!(
+            !output.css.contains(r#""none !important""#),
+            "CSS contains quoted value: {}",
+            output.css
+        );
+    }
+}
