@@ -131,6 +131,22 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 <p>Hello world</p>
 ```
 
+### 8. Style Order: HTML First, Style Last
+
+For readability and consistency, always place your `<style>` block **after** your HTML content.
+
+```rust
+html! {
+    // 1. Structure
+    <div class={container}>...</div>
+
+    // 2. Style
+    <style>
+        .container { ... }
+    </style>
+}
+```
+
 ---
 
 ## 🚀 Setup & Configuration
@@ -606,38 +622,55 @@ pub fn auto_detected_view<'a>(state: &'a MyState) -> impl Component + 'a {
 <form on:submit={state.submit_form}>"Submit"</form>
 ```
 
-// ... (existing content)
+### Local State (Client-Only `set`)
 
-### Optimistic UI with Predictions (`#[predict]`)
-
-Azumi allows you to define **client-side predictions** for your server actions. This enables instant UI updates without waiting for the server roundtrip.
+For temporary UI state (like dropdowns, modals, tabs) that doesn't need to involve the server, use the `set` action directly in the template.
 
 ```rust
-#[azumi::live_impl(component = "user_loader_view")]
-impl UserLoader {
-    // 1. Define the prediction: "When this is called, set loading=true IMEMDIATELY"
-    #[predict(loading = true, error = None)]
-    pub async fn load_users(&mut self) {
-        // 2. Server-side logic (runs later)
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-        self.users = db::fetch_users().await;
-        self.loading = false;
-    }
+// Toggle value (Client-side only, 0ms latency, no network)
+<button az-on="click set is_open = !is_open">"Toggle"</button>
 
-    // Predict multiple fields
-    #[predict(loading = false, users = vec![])]
-    pub fn reset(&mut self) {
-        self.users.clear();
-        self.loading = false;
+// Set literal value
+<button az-on="click set active_tab = 1">"Tab 1"</button>
+```
+
+// ... (existing content)
+
+### Hybrid Optimistic UI (`on:event` & `data-predict`)
+
+Azumi uses a hybrid model for client-side predictions:
+
+#### 1. Automatic (Simple Logic)
+
+For simple assignments, toggles, and increments, use `on:event={state.method}`. The compiler analyzes the Rust method and generates the prediction automatically.
+
+```rust
+impl Counter {
+    pub fn toggle(&mut self) {
+        self.active = !self.active; // Auto-predicted: "active = !active"
     }
 }
+```
+
+#### 2. Manual (Complex Logic)
+
+For complex mutations (vectors, structs, arbitrary logic), explicitly define the prediction using `data-predict`.
+
+```rust
+// HTML
+<button
+    on:click={state.add_todo}
+    data-predict="todos.push({ text: input, id: -1 })"
+>
+    "Add Todo"
+</button>
 ```
 
 **Key Benefits:**
 
 -   **Zero Latency**: UI feels native.
 -   **Automatic Synchronization**: If the server response differs from the prediction, Azumi automatically reconciles the state.
--   **Declarative**: No manual DOM manipulation or separate "optimistic" state logic.
+-   **Declarative**: No manual DOM manipulation.
 
 ---
 

@@ -226,6 +226,22 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 <p>Hello world</p>
 ```
 
+### 8. Style Order: HTML First, Style Last
+
+For readability and consistency, always place your `<style>` block **after** your HTML content.
+
+```rust
+html! {
+    // 1. Structure
+    <div class={container}>...</div>
+
+    // 2. Style
+    <style>
+        .container { ... }
+    </style>
+}
+```
+
 ---
 
 ## 🚀 Setup & Configuration
