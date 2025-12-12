@@ -1,45 +1,57 @@
-# 🚀 Azumi: Compile-Time Safe Web Framework for Rust
+# Azumi
 
-> **Type-safe HTML templating, CSS validation, and compiler-driven optimistic UI in one revolutionary framework.**
-
-**Azumi** brings **compile-time safety** to web development by validating HTML structure, CSS styles, and generating optimistic UI from Rust code. Write once, get instant updates with zero JavaScript needed.
-
----
-
-## 🎯 What is Azumi?
-
-Azumi is a **compiler-driven optimistic UI framework** that generates client-side predictions from Rust code. Write logic once, get instant UI updates everywhere.
-
-### Philosophy & Core Concepts
-
--   **Single Source of Truth**: Rust code is the only source of truth
--   **Compile-Time Safety**: Macros catch errors before runtime
--   **Zero JavaScript**: Compiler generates all client logic
--   **Server-Side Truth**: Server always wins, client predictions are optimistic
-
-### What Makes Azumi Revolutionary
-
-#### ✅ **Only Framework with CSS-HTML Co-Validation**
+> **The framework that catches your CSS typos before your users do.**
 
 ```rust
-// This fails at compile time:
 html! {
-    <style>
-        .my_class { color: "blue"; }
-    </style>
-    <div class={typo_in_class_name}>  // ❌ Compile error: "CSS class not defined"
-        "Content"
+    <div class={buttno}>  // ❌ COMPILE ERROR: Did you mean `button`?
+        "Click me"
     </div>
 }
 ```
 
-#### ✅ **Automatic CSS Scoping**
+**Azumi** is a **compile-time validated web framework** for Rust. Your CSS classes, your HTML structure, your UI logic — all verified before a single byte hits production.
 
--   Each component gets cryptographically unique scope IDs
--   No more BEM naming or CSS conflicts
--   True style isolation between components
+No runtime errors. No "works on my machine". No surprises.
 
-#### ✅ **Compiler-Generated Optimistic UI**
+---
+
+## ⚡ The Pitch
+
+Traditional web frameworks let bugs slip through to production. Azumi doesn't.
+
+| Other Frameworks              | Azumi                                  |
+| ----------------------------- | -------------------------------------- |
+| CSS typo → silent fail        | CSS typo → **compile error**           |
+| Missing class → invisible bug | Missing class → **compile error**      |
+| Invalid HTML → maybe works?   | Invalid HTML → **compile error**       |
+| Click handler typo → 💀       | Click handler typo → **compile error** |
+
+**Everything happens at compile time.** Your IDE shows errors before you save. Your CI fails before it deploys. Your users never see a broken page.
+
+---
+
+## 🚀 Features That Actually Matter
+
+### 1. CSS-HTML Co-Validation (Industry First)
+
+The compiler knows your styles. Use a class that doesn't exist? Error. Typo in a class name? Error. Define a class you never use? Warning.
+
+```rust
+html! {
+    <style>
+        .my_button { background: "#3b82f6"; }
+    </style>
+
+    <div class={my_buttn}>  // ❌ "my_buttn" not found. Did you mean "my_button"?
+        "Oops"
+    </div>
+}
+```
+
+### 2. Optimistic UI from Pure Rust
+
+Write Rust. Get instant UI. No JavaScript required.
 
 ```rust
 #[azumi::live]
@@ -47,29 +59,42 @@ pub struct Counter { count: i32 }
 
 impl Counter {
     pub fn increment(&mut self) {
-        self.count += 1; // Compiler generates: "count = count + 1"
+        self.count += 1;  // Compiler generates client-side prediction
     }
 }
 
-// No JavaScript needed - UI updates instantly!
+// Click → UI updates INSTANTLY → Server confirms
+// Zero latency. Zero JS. Zero magic strings.
 ```
 
-**For async actions, use `#[predict]`:**
+### 3. Async with `#[predict]`
+
+For async operations, tell the compiler what to show immediately:
 
 ```rust
-#[predict(loading = true)]
-pub async fn load_data(&mut self) {
-    // UI shows loading spinner IMMEDIATELY
-    self.data = fetch_data().await;
-    self.loading = false;
+#[predict(loading = true, error = None)]  // Show spinner NOW
+pub async fn load_users(&mut self) {
+    self.users = db::fetch_all().await;   // Fetch in background
+    self.loading = false;                  // Hide spinner when done
 }
 ```
 
-#### ✅ **Built-in Developer Experience**
+The UI feels instant. The data is consistent. The code is obvious.
 
--   **Hot Reloading**: Instant updates when files change.
--   **No-Cache Dev Middleware**: Prevents stale CSS during development.
--   **Detailed Error Overlays**: See compile errors right in the browser.
+### 4. Signed State (Anti-Tampering)
+
+Every component's state is HMAC-signed. Users can't forge counts, bypass auth, or inject data. The server rejects tampered requests automatically.
+
+```rust
+// User tries to edit az-scope JSON in DevTools...
+// → 400 Bad Request. Automatically. No code needed.
+```
+
+### 5. Production-Ready Asset Pipeline
+
+-   **Content-hashed filenames** → Immutable caching (1 year)
+-   **Automatic path rewriting** → Write `/static/logo.png`, get `/assets/logo.a8f3c2.png`
+-   **CSS minification** → Zero config
 
 ---
 
