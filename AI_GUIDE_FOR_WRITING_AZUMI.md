@@ -626,31 +626,35 @@ pub fn auto_detected_view<'a>(state: &'a MyState) -> impl Component + 'a {
 
 For temporary UI state (like dropdowns, modals, tabs) that doesn't need to involve the server, use the `set` action directly in the template.
 
-```rust
+````rust
 // Toggle value (Client-side only, 0ms latency, no network)
 <button az-on="click set is_open = !is_open">"Toggle"</button>
 
 // Set literal value
-<button az-on="click set active_tab = 1">"Tab 1"</button>
-```
+### State Management: The Hybrid Optimistic Model
 
-// ... (existing content)
+Azumi uses a **Hybrid Optimistic Model** for state management. This is the "Gold Standard" pattern you should always use.
 
-### Hybrid Optimistic UI (`on:event` & `data-predict`)
+1.  **User Trigger**: User performs an action (e.g., clicks "Like").
+2.  **Optimistic Client Update (0ms)**: The browser immediately runs a compiled prediction (e.g., `liked = !liked`). This feels instant.
+3.  **Server Synchronization**: The action is sent to the server. The server executes the *real* logic, signs the new state, and returns it.
+4.  **Reconciliation**: The client seamlessly morphs to the server's signed state.
 
-Azumi uses a hybrid model for client-side predictions:
+**Why not just use client state?**
+Pure client state (like the now-removed `set` command) is "Zombie State". It looks alive but lacks the cryptographic signature from the server. The moment you interact with the server again, your unsigned local changes are rejected and overwritten.
 
-#### 1. Automatic (Simple Logic)
-
-For simple assignments, toggles, and increments, use `on:event={state.method}`. The compiler analyzes the Rust method and generates the prediction automatically.
+**Best Practice:**
+Always implement interactivity via `#[azumi::live_impl]` methods. The compiler automatically generates the optimistic prediction for you!
 
 ```rust
-impl Counter {
+#[azumi::live_impl(component = "like_button")]
+impl LikeState {
     pub fn toggle(&mut self) {
-        self.active = !self.active; // Auto-predicted: "active = !active"
+        // Compiler sees this and generates: "liked = !liked" for the client!
+        self.liked = !self.liked;
     }
 }
-```
+````
 
 #### 2. Manual (Complex Logic)
 
