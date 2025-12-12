@@ -102,9 +102,20 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
             }
             .icon { font-size: "1.5rem"; }
 
-            .field_group { display: "grid"; grid-template-columns: "1fr 1fr"; gap: "1.5rem"; margin-bottom: "1.5rem"; }
+            .field_group {
+                display: "grid";
+                grid-template-columns: "repeat(auto-fit, minmax(200px, 1fr))";
+                gap: "1.5rem";
+                margin-bottom: "1.5rem";
+            }
 
-            .field { display: "flex"; flex-direction: "column"; gap: "0.5rem"; margin-bottom: "1.5rem"; }
+            .field {
+                display: "flex";
+                flex-direction: "column";
+                gap: "0.5rem";
+                margin-bottom: "1px"; /* Collapsing margins fix */
+                width: "100%";
+            }
 
             .label {
                 font-size: "0.875rem";
@@ -115,6 +126,8 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
             }
 
             .input, .textarea {
+                width: "100%";
+                box-sizing: "border-box";
                 padding: "0.875rem 1rem";
                 background: "rgba(0, 0, 0, 0.2)";
                 border: "1px solid var(--azumi-border, rgba(255,255,255,0.1))";
