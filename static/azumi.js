@@ -10,6 +10,49 @@ class Azumi {
     constructor() {
         this.scopes = new WeakMap(); // Element -> state cache
         this.delegate();
+        this.connectHotReload();
+    }
+
+    // Hot Reload Logic
+    connectHotReload() {
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${protocol}//${window.location.host}/_azumi/live_reload`;
+
+        try {
+            const ws = new WebSocket(wsUrl);
+            let connected = false;
+
+            ws.onopen = () => {
+                connected = true;
+                console.log("🔥 Hot Reload: Connected");
+            };
+
+            ws.onclose = () => {
+                if (connected) {
+                    console.log(
+                        "🔥 Hot Reload: Connection lost, polling for restart..."
+                    );
+                    this.pollForReload();
+                }
+            };
+        } catch (e) {
+            // Hot reload likely not enabled on server
+        }
+    }
+
+    pollForReload() {
+        const interval = setInterval(() => {
+            fetch(window.location.href, { method: "HEAD" })
+                .then((res) => {
+                    if (res.ok) {
+                        clearInterval(interval);
+                        window.location.reload();
+                    }
+                })
+                .catch(() => {
+                    /* keep polling */
+                });
+        }, 200);
     }
 
     // Event delegation
@@ -78,6 +121,19 @@ class Azumi {
         }
 
         // Parse 'set' for local state
+        if (actionType === "set") {
+            // Format: "set field = value"
+            // tokens: ["set", "field", "=", "value"]
+            const field = tokens[1];
+            const value = tokens.slice(3).join(" "); // everything after "="
+
+            return {
+                type: "set",
+                field,
+                value,
+            };
+        }
+
         return null;
     }
 
@@ -218,7 +274,6 @@ class Azumi {
     }
 
     // Server action with optimistic prediction
-    // Server action with optimistic prediction
     async callAction(action, element) {
         // Find scope element
         const scopeElement = element.closest("[az-scope]");
@@ -260,6 +315,15 @@ class Azumi {
             if (!res.ok) throw new Error(`Action failed: ${res.status}`);
 
             const html = await res.text();
+
+            // OPTIMIZATION: Check if server state matches prediction
+            // If prediction was correct, skip morphing to prevent flicker
+            /*
+            // DISABLED: This optimization prevents structural updates (e.g. @if blocks) from rendering
+            if (predictionResult && scopeElement) {
+                // ... (omitted for brevity)
+            }
+            */
 
             // FIXED: Default target to scopeElement (component root), then element
             let target = scopeElement || element;
