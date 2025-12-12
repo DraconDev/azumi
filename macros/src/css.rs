@@ -16,12 +16,12 @@ fn scope_css_recursive(iter: &mut Peekable<Chars>, scope_attr: &str) -> String {
     while let Some(ch) = iter.next() {
         match ch {
             '{' => {
-                let selector_raw = buffer.trim();
+                let selector_raw = buffer.trim().to_string();
                 buffer.clear();
 
                 // Check if this is a grouping rule (recurse) or style rule (scope)
-                if is_grouping_rule(selector_raw) {
-                    result.push_str(selector_raw);
+                if is_grouping_rule(&selector_raw) {
+                    result.push_str(&selector_raw);
                     result.push_str(" {");
                     // Recurse into the block
                     // We need to pass the iterator which is now inside the block
@@ -35,8 +35,8 @@ fn scope_css_recursive(iter: &mut Peekable<Chars>, scope_attr: &str) -> String {
                     let inner_content = scope_css_level(iter, scope_attr, true); // true = stop at '}'
                     result.push_str(&inner_content);
                     result.push('}');
-                } else if is_keyframes(selector_raw) {
-                    result.push_str(selector_raw);
+                } else if is_keyframes(&selector_raw) {
+                    result.push_str(&selector_raw);
                     result.push_str(" {");
                     // Keyframes content (0% { ... }) should NOT be scoped
                     // Just copy balanced block
@@ -61,7 +61,7 @@ fn scope_css_recursive(iter: &mut Peekable<Chars>, scope_attr: &str) -> String {
                         result.push_str(&scoped.join(", "));
                     } else {
                         // e.g. @font-face
-                        result.push_str(selector_raw);
+                        result.push_str(&selector_raw);
                     }
 
                     result.push_str(" {");
