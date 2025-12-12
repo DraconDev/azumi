@@ -1303,21 +1303,48 @@ fn generate_body_with_context(
 
                 // Generate element with potential scope attribute from context
                 if let Some(ref scope_id) = ctx.scope_id {
-                    quote! {
-                        write!(f, "<{}", #name)?;
-                        write!(f, " data-{}", #scope_id)?;
-                        #attr_code
-                        write!(f, ">")?;
-                        #children_code
-                        write!(f, "</{}>", #name)?;
+                    // Special case: Inject azumi.js before </body>
+                    if name == "body" {
+                        quote! {
+                            write!(f, "<{}", #name)?;
+                            write!(f, " data-{}", #scope_id)?;
+                            #attr_code
+                            write!(f, ">")?;
+                            #children_code
+                            // Auto-inject Azumi client runtime before </body>
+                            write!(f, "<script src=\"/azumi.js\"></script>")?;
+                            write!(f, "</{}>", #name)?;
+                        }
+                    } else {
+                        quote! {
+                            write!(f, "<{}", #name)?;
+                            write!(f, " data-{}", #scope_id)?;
+                            #attr_code
+                            write!(f, ">")?;
+                            #children_code
+                            write!(f, "</{}>", #name)?;
+                        }
                     }
                 } else {
-                    quote! {
-                        write!(f, "<{}", #name)?;
-                        #attr_code
-                        write!(f, ">")?;
-                        #children_code
-                        write!(f, "</{}>", #name)?;
+                    // Special case: Inject azumi.js before </body>
+                    if name == "body" {
+                        quote! {
+                            write!(f, "<{}", #name)?;
+                            #attr_code
+                            write!(f, ">")?;
+                            #children_code
+                            // Auto-inject Azumi client runtime before </body>
+                            write!(f, "<script src=\"/azumi.js\"></script>")?;
+                            write!(f, "</{}>", #name)?;
+                        }
+                    } else {
+                        quote! {
+                            write!(f, "<{}", #name)?;
+                            #attr_code
+                            write!(f, ">")?;
+                            #children_code
+                            write!(f, "</{}>", #name)?;
+                        }
                     }
                 }
             }
