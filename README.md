@@ -996,28 +996,35 @@ cargo run
 # Visit http://localhost:3000
 ```
 
-### Client Runtime Integration
+### Client Runtime (Manual Opt-In)
 
-The client runtime is **automatically injected** by the compiler when it detects a `<head>` or `<body>` tag.
+Azumi is **static by default**. Pages render as pure HTML with zero JavaScript.
+
+To enable interactivity (Live components, optimistic UI), add the runtime script to your root layout:
 
 ```rust
 #[azumi::component]
-pub fn InteractivePage() -> impl Component {
+pub fn RootLayout(children: impl Component) -> impl Component {
     html! {
+        <!DOCTYPE html>
         <html>
         <head>
-            // No manual script tags needed!
-            // The compiler injects the runtime here automatically.
+            <meta charset="utf-8" />
+            <title>"My App"</title>
         </head>
         <body>
-            // Your components here
+            {children}
+
+            // ⚠️ REQUIRED for Live features
+            // This is a virtual file served by the framework
+            <script src="azumi.js" />
         </body>
         </html>
     }
 }
 ```
 
-If you ever need to manually place it (e.g. for specific ordering), use `{azumi::azumi_script()}`.
+**Why manual?** You control the bundle. Static pages stay at 0kb JS. Interactive pages get only what they need (~12kb).
 
 ### CSS ID Handling
 
