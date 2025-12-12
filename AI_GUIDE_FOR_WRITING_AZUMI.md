@@ -72,7 +72,7 @@ html! {
     <div id={my_unique_id}>...</div>
     <style>
         #my_unique_id { ... }
-    </div>
+    </style>
 }
 ```
 
@@ -217,7 +217,7 @@ html! {
 
 ### 3. CSS Minification
 
--   Styles defined in `<div>` blocks are automatically parsed and minified at compile time.
+-   Styles defined in `<style>` blocks are automatically parsed and minified at compile time.
 -   Comments and whitespace are removed to reduce payload size.
 -   No configuration needed.
 
