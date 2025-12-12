@@ -4,7 +4,7 @@
 
 ```rust
 html! {
-    <div class={buttno}>  // ❌ COMPILE ERROR: Did you mean `button`?
+    <div class={button}>  // ❌ COMPILE ERROR: Did you mean `button`?
         "Click me"
     </div>
 }
