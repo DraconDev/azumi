@@ -238,7 +238,7 @@ pub fn MyComponent(title: &str, count: i32) -> impl Component {
         <style>
             .container { padding: "1rem"; }
             .title { font-size: "1.5rem"; color: "#333"; }
-        </div>
+        </style>
     }
 }
 ```
