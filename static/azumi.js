@@ -285,9 +285,40 @@ class Azumi {
         }
     }
 
-    // Local state change
+    // Local state change (no server roundtrip)
     setState(action, element) {
-        console.log("Set state not implemented yet");
+        const scopeElement = element.closest("[az-scope]");
+        if (!scopeElement) {
+            console.warn("setState: No az-scope found");
+            return;
+        }
+
+        const scopeAttr = scopeElement.getAttribute("az-scope");
+        if (!scopeAttr) return;
+
+        try {
+            const state = JSON.parse(scopeAttr);
+
+            // Apply the prediction DSL (reuse existing logic)
+            const prediction = `${action.field} = ${action.value}`;
+            this.applyPrediction(state, prediction);
+
+            // Update the scope attribute
+            scopeElement.setAttribute("az-scope", JSON.stringify(state));
+
+            // Update bound elements
+            this.updateBindings(scopeElement, state);
+
+            console.log(
+                "🎯 Client set:",
+                action.field,
+                "=",
+                action.value,
+                state
+            );
+        } catch (err) {
+            console.warn("setState failed:", err);
+        }
     }
 }
 
