@@ -1192,8 +1192,8 @@ cargo run
 
 ### 🎯 **Outside Core Scope:**
 
--   **Heavy client-side interactivity** — Drag-and-drop, canvas, complex animations → use JS interop
--   **Real-time multiplayer** — WebSocket-first apps → pair with dedicated real-time layer
+-   **Offline-first apps** — Azumi assumes server is truth; offline requires separate sync layer
+-   **Continuous real-time sync** — Collaborative editing, multiplayer games → pair with dedicated real-time layer
 -   **Mobile native** — Web-first → wrap in Tauri/Capacitor for native distribution
 
 Azumi is opinionated: logic runs on the server, UI updates are predicted, the server is truth. These aren't gaps — they're the design.
