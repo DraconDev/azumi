@@ -1035,4 +1035,23 @@ mod tests {
             output.css
         );
     }
+    #[test]
+    fn test_media_query_spacing() {
+        let input = quote! {
+            @media (max-width: 768px) {}
+        };
+        let output = process_global_style_macro(input);
+        // Should be "@media (max-width: 768px) {}" NOT "@ media ..."
+        println!("CSS: {}", output.css);
+        assert!(
+            output.css.contains("@media"),
+            "CSS contains broken @ media: {}",
+            output.css
+        );
+        assert!(
+            !output.css.contains("@ media"),
+            "CSS contains broken @ media: {}",
+            output.css
+        );
+    }
 }
