@@ -12,9 +12,14 @@ pub struct StyleOutput {
 }
 
 // AST for our style! macro
+// AST for our style! macro
 struct StyleInput {
-    rules: Vec<StyleRule>,
-    at_rules: Vec<AtRule>,
+    items: Vec<StyleItem>,
+}
+
+enum StyleItem {
+    Rule(StyleRule),
+    AtRule(AtRule),
 }
 
 struct AtRule {
@@ -40,19 +45,19 @@ struct StyleProperty {
 
 impl Parse for StyleInput {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let mut rules = Vec::new();
-        let mut at_rules = Vec::new();
+        let mut items = Vec::new();
 
         while !input.is_empty() {
             // Check for @ rules
             if input.peek(Token![@]) {
                 let at_rule = input.parse::<AtRule>()?;
-                at_rules.push(at_rule);
+                items.push(StyleItem::AtRule(at_rule));
             } else {
-                rules.push(input.parse()?);
+                let rule = input.parse::<StyleRule>()?;
+                items.push(StyleItem::Rule(rule));
             }
         }
-        Ok(StyleInput { rules, at_rules })
+        Ok(StyleInput { items })
     }
 }
 
@@ -444,28 +449,30 @@ pub fn process_global_style_macro(input: TokenStream) -> StyleOutput {
 
     let mut raw_css = String::new();
 
-    // Add @rules first
-    for at_rule in &style_input.at_rules {
-        raw_css.push_str("@");
-        raw_css.push_str(&at_rule.name);
-        raw_css.push_str(" ");
-        raw_css.push_str(&at_rule.content);
-        if !at_rule.content.trim().ends_with('}') {
-            raw_css.push_str(";");
-        }
-        raw_css.push_str(" ");
-    }
+    // Iterate items in order!
+    for item in &style_input.items {
+        match item {
+            StyleItem::AtRule(at_rule) => {
+                raw_css.push_str("@");
+                raw_css.push_str(&at_rule.name);
+                raw_css.push_str(" ");
+                raw_css.push_str(&at_rule.content);
+                if !at_rule.content.trim().ends_with('}') {
+                    raw_css.push_str(";");
+                }
+                raw_css.push_str(" ");
+            }
+            StyleItem::Rule(rule) => {
+                let selector_str = tokens_to_css_string(&rule.selectors);
 
-    // Add regular rules
-    for rule in &style_input.rules {
-        let selector_str = tokens_to_css_string(&rule.selectors);
-
-        raw_css.push_str(&selector_str);
-        raw_css.push_str(" { ");
-        for prop in &rule.block.properties {
-            raw_css.push_str(&format!("{}: {}; ", prop.name, prop.value));
+                raw_css.push_str(&selector_str);
+                raw_css.push_str(" { ");
+                for prop in &rule.block.properties {
+                    raw_css.push_str(&format!("{}: {}; ", prop.name, prop.value));
+                }
+                raw_css.push_str("} ");
+            }
         }
-        raw_css.push_str("} ");
     }
 
     // 3. Extract classes and IDs for bindings (even though not scoped)
@@ -570,28 +577,30 @@ pub fn reconstruct_css_from_tokens(input: TokenStream) -> String {
 
     let mut raw_css = String::new();
 
-    // Add @rules first
-    for at_rule in &style_input.at_rules {
-        raw_css.push_str("@");
-        raw_css.push_str(&at_rule.name);
-        raw_css.push_str(" ");
-        raw_css.push_str(&at_rule.content);
-        if !at_rule.content.trim().ends_with('}') {
-            raw_css.push_str(";");
-        }
-        raw_css.push_str(" ");
-    }
+    // Iterate items in order!
+    for item in &style_input.items {
+        match item {
+            StyleItem::AtRule(at_rule) => {
+                raw_css.push_str("@");
+                raw_css.push_str(&at_rule.name);
+                raw_css.push_str(" ");
+                raw_css.push_str(&at_rule.content);
+                if !at_rule.content.trim().ends_with('}') {
+                    raw_css.push_str(";");
+                }
+                raw_css.push_str(" ");
+            }
+            StyleItem::Rule(rule) => {
+                let selector_str = tokens_to_css_string(&rule.selectors);
 
-    // Add regular rules
-    for rule in &style_input.rules {
-        let selector_str = tokens_to_css_string(&rule.selectors);
-
-        raw_css.push_str(&selector_str);
-        raw_css.push_str(" { ");
-        for prop in &rule.block.properties {
-            raw_css.push_str(&format!("{}: {}; ", prop.name, prop.value));
+                raw_css.push_str(&selector_str);
+                raw_css.push_str(" { ");
+                for prop in &rule.block.properties {
+                    raw_css.push_str(&format!("{}: {}; ", prop.name, prop.value));
+                }
+                raw_css.push_str("} ");
+            }
         }
-        raw_css.push_str("} ");
     }
 
     raw_css
