@@ -85,7 +85,7 @@ pub fn Lessons() -> impl Component {
                     @LessonCard(num="12", title="Image Optimization", desc="Automatic lazy loading & attributes.", link="/lesson-12", accent="#f59e0b")
                     @LessonCard(num="13", title="Live Forms", desc="Real-time validation and feedback.", link="/lesson-13", accent="#f59e0b")
                     @LessonCard(num="14", title="Composition", desc="Building complex Live UIs.", link="/lesson-14", accent="#f59e0b")
-                    @LessonCard(num="15", title="SQL Basics", desc="Direct database queries.", link="/lesson-15-sql-basics", accent="#f59e0b")
+                    @LessonCard(num="15", title="Full Application", desc="Interactive Todo App (In-Memory).", link="/lesson-15-sql-basics", accent="#f59e0b")
                 </div>
             </section>
 
