@@ -11,6 +11,6 @@ pub mod class_syntax_verification;
 pub mod example_component;
 pub mod form;
 pub mod live_component_demo;
-pub mod test_at_rule_termination;
+
 pub mod test_css_validation; // CSS validation test case
 pub mod test_global_styles; // Global style tag test // Class syntax verification test
