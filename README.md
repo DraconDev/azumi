@@ -1182,23 +1182,21 @@ cargo run
 
 ## 🏢 When to Use Azumi
 
-### ✅ **Perfect for:**
+### ✅ **Azumi Excels At:**
 
--   **Safety-critical applications** where bugs are unacceptable
--   **SEO-heavy applications** requiring server-side rendering
--   **Long-term maintainable projects** with changing teams
--   **Teams with Rust expertise** wanting compile-time guarantees
--   **Educational platforms** - built-in lesson system
+-   **Compile-time correctness** — CSS typos, missing classes, invalid HTML all caught before deploy
+-   **Server-rendered apps** — SEO, fast first paint, no hydration mismatches
+-   **Optimistic UI** — Instant feedback with automatic server reconciliation
+-   **Secure by default** — HMAC-signed state prevents client-side tampering
+-   **Long-term maintainability** — Types survive refactors; dead code is caught
 
-### ❌ **Consider alternatives if you need:**
+### ⚠️ **Current Limitations:**
 
--   **Rapid prototyping** (Svelte, Next.js)
--   **Large JavaScript teams** (Next.js)
--   **Complex client-side interactions** (React/Vue)
--   **Mobile app development** (React Native)
--   **Real-time collaboration** (WebSocket-heavy apps)
+-   **Heavy client-side interactivity** — Drag-and-drop, canvas, complex animations (use JS interop)
+-   **Real-time multiplayer** — WebSocket-first apps need additional architecture
+-   **Mobile native** — Web only (wrap in Tauri/Capacitor for desktop/mobile)
 
----
+> **Note:** These are architectural constraints, not ecosystem maturity issues. Azumi is opinionated about where logic runs (server) and optimizes for that path.
 
 ## 📁 Project Structure
 
