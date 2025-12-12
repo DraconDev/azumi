@@ -74,7 +74,11 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
                 background: "linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))";
             }
             .card_glow {
-                position: "absolute"; inset: "0";
+                position: "absolute";
+                top: "0";
+                left: "0";
+                right: "0";
+                bottom: "0";
                 background: "radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 70%)";
                 pointer-events: "none"; border-radius: "20px";
             }
