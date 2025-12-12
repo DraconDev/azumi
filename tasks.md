@@ -1,2 +1,1 @@
- - terms of service page still has max width bug
- - dropdown is still not opening when i click o the profile icon 
+- dropdown is still not opening when i click o the profile icon 
