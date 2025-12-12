@@ -69,7 +69,7 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
         <style>
             .form_wrapper {
                 position: "relative";
-                padding: "2px"; /* For border gradient if needed */
+                padding: "2px";
                 border-radius: "20px";
                 background: "linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))";
             }
