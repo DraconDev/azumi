@@ -24,8 +24,6 @@ impl ContactForm {
 #[azumi::component]
 pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
     html! {
-
-    html! {
         <div class={form_wrapper}>
             <div class={card_glow}></div>
             <div class={form_container}>
@@ -80,7 +78,7 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
                 background: "radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 70%)";
                 pointer-events: "none"; border-radius: "20px";
             }
-            
+
             .form_container {
                 max-width: "480px";
                 padding: "2.5rem";
@@ -101,9 +99,9 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
             .icon { font-size: "1.5rem"; }
 
             .field_group { display: "grid"; grid-template-columns: "1fr 1fr"; gap: "1.5rem"; margin-bottom: "1.5rem"; }
-            
+
             .field { display: "flex"; flex-direction: "column"; gap: "0.5rem"; margin-bottom: "1.5rem"; }
-            
+
             .label {
                 font-size: "0.875rem";
                 font-weight: "600";
@@ -128,7 +126,7 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
                 background: "rgba(99, 102, 241, 0.05)";
                 box-shadow: "0 0 0 4px rgba(99, 102, 241, 0.1)";
             }
-            
+
             .textarea {
                 min-height: "140px";
                 resize: "vertical";
@@ -193,7 +191,7 @@ pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
                 margin-bottom: "2rem";
                 line-height: "1.5";
             }
-            
+
             @keyframes scaleIn {
                 from { opacity: "0"; transform: "scale(0.9)"; }
                 to { opacity: "1"; transform: "scale(1)"; }
