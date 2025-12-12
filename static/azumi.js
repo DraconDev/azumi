@@ -218,20 +218,13 @@ class Azumi {
     }
 
     // Server action with optimistic prediction
+    // Server action with optimistic prediction
     async callAction(action, element) {
         // Find scope element
         const scopeElement = element.closest("[az-scope]");
 
-        // Check for prediction attribute (Azumi Live)
-        const prediction = element.getAttribute("data-predict");
-        let predictionResult = null;
-
-        if (prediction && scopeElement) {
-            // Execute prediction BEFORE server call (0ms latency!)
-            predictionResult = this.executePrediction(scopeElement, prediction);
-        }
-
-        // Collect state for server
+        // IMPORTANT: Capture original state BEFORE prediction
+        // We send original state to server, not predicted state
         let body = null;
         if (element.tagName === "FORM") {
             body = new FormData(element);
@@ -244,6 +237,15 @@ class Azumi {
             } else {
                 body = "{}";
             }
+        }
+
+        // Check for prediction attribute (Azumi Live)
+        const prediction = element.getAttribute("data-predict");
+        let predictionResult = null;
+
+        if (prediction && scopeElement) {
+            // Execute prediction AFTER capturing state (0ms latency!)
+            predictionResult = this.executePrediction(scopeElement, prediction);
         }
 
         try {
@@ -259,14 +261,18 @@ class Azumi {
 
             const html = await res.text();
 
-            let target = element;
+            // FIXED: Default target to scopeElement (component root), then element
+            let target = scopeElement || element;
             if (action.target) {
                 target = document.querySelector(action.target);
             }
 
             if (target && window.Idiomorph) {
                 // Morph will reconcile prediction with server truth
-                window.Idiomorph.morph(target, html);
+                // Use outerHTML to replace component wrapper
+                window.Idiomorph.morph(target, html, {
+                    morphStyle: "outerHTML",
+                });
             } else if (target) {
                 console.warn(
                     "Idiomorph not loaded, falling back to outerHTML replacement"

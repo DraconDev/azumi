@@ -318,6 +318,8 @@ class Azumi {
 
             // OPTIMIZATION: Check if server state matches prediction
             // If prediction was correct, skip morphing to prevent flicker
+            /* 
+            // DISABLED: This optimization prevents structural updates (e.g. @if blocks) from rendering
             if (predictionResult && scopeElement) {
                 // Extract az-scope from the response HTML
                 const scopeMatch = html.match(/az-scope='([^']+)'/);
@@ -354,6 +356,7 @@ class Azumi {
                     }
                 }
             }
+            */
 
             // FIXED: Default target to scopeElement (component root), then element
             let target = scopeElement || element;
@@ -363,9 +366,9 @@ class Azumi {
 
             if (target && window.Idiomorph) {
                 // Morph will reconcile prediction with server truth
-                // Use innerHTML mode to minimize visual artifacts
+                // Use outerHTML to replace component wrapper
                 window.Idiomorph.morph(target, html, {
-                    morphStyle: "innerHTML",
+                    morphStyle: "outerHTML",
                 });
             } else if (target) {
                 console.warn(
