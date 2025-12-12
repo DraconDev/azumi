@@ -629,67 +629,141 @@ pub fn reconstruct_css_from_tokens(input: TokenStream) -> String {
 fn tokens_to_css_string(tokens: &TokenStream) -> String {
     let mut css = String::new();
     let mut last_char_was_hyphen = false;
-    let mut last_char_was_dot_or_hash = false;
+    let mut last_char_was_dot_or_hash_or_colon = false;
+    let mut last_was_open_paren = false;
 
     for tt in tokens.clone() {
         match tt {
             TokenTree::Ident(ident) => {
                 // Add space if previous wasn't a special char that expects attachment
-                if !css.is_empty() && !last_char_was_hyphen && !last_char_was_dot_or_hash {
+                if !css.is_empty()
+                    && !last_char_was_hyphen
+                    && !last_char_was_dot_or_hash_or_colon
+                    && !last_was_open_paren
+                {
                     css.push(' ');
                 }
                 css.push_str(&ident.to_string());
                 last_char_was_hyphen = false;
-                last_char_was_dot_or_hash = false;
+                last_char_was_dot_or_hash_or_colon = false;
+                last_was_open_paren = false;
             }
             TokenTree::Punct(punct) => {
                 let ch = punct.as_char();
                 if ch == '-' {
-                    // No space before hyphen (handled by loop logic: if previous was ident, we didn't add space? Wait.
-                    // If previous was ident, we are here.
-                    // We just append '-'.
+                    // Hyphen: could be minus or part of ident (max-width)
+                    // If preceded by ident, assume part of ident? No, CSS is weird.
+                    // But usually no space before hyphen.
                     css.push(ch);
                     last_char_was_hyphen = true;
-                    last_char_was_dot_or_hash = false;
+                    last_char_was_dot_or_hash_or_colon = false;
+                    last_was_open_paren = false;
                 } else if ch == '.' || ch == '#' || ch == ':' {
-                    // Add space before dot/hash if it's not the start?
-                    // Actually, for `.class`, we want space before dot if it's `div .class`.
-                    // But we decided to collapse spaces to fix `.class`.
-                    // So we just append.
-                    if !css.is_empty() && !last_char_was_hyphen && !last_char_was_dot_or_hash {
-                        // For now, let's NOT add space before dot/hash to ensure .class works.
-                        // This breaks `div .class` but fixes `.class`.
-                        // css.push(' ');
+                    // No space before dot/hash/colon usually (e.g. .class, #id, prop:val)
+                    // Wait, prop: val. Space AFTER colon logic handled by loop check.
+                    // But BEFORE colon? "prop :" vs "prop:"
+                    // Let's assume no space before these.
+                    css.push(ch);
+                    last_char_was_hyphen = false;
+                    last_char_was_dot_or_hash_or_colon = true;
+                    last_was_open_paren = false;
+                } else if ch == '(' {
+                    // No space before paren if function? url(...) media(...)
+                    // But if logic? @media (...)
+                    // Ideally we want @media (...) but url(...)
+                    // For now, let's just append.
+                    if !css.is_empty()
+                        && !last_char_was_hyphen
+                        && !last_char_was_dot_or_hash_or_colon
+                        && !last_was_open_paren
+                    {
+                        // space before ( unless function?
+                        // Hard to tell. Let's just append.
                     }
                     css.push(ch);
                     last_char_was_hyphen = false;
-                    last_char_was_dot_or_hash = true;
+                    last_char_was_dot_or_hash_or_colon = false; // reset
+                    last_was_open_paren = true;
                 } else {
-                    // Other puncts (>, +, etc)
+                    // Other puncts (>, +, ;, etc)
                     css.push(ch);
                     last_char_was_hyphen = false;
-                    last_char_was_dot_or_hash = false;
+                    last_char_was_dot_or_hash_or_colon = false;
+                    last_was_open_paren = false;
                 }
             }
             TokenTree::Literal(lit) => {
-                if !css.is_empty() {
+                if !css.is_empty() && !last_char_was_dot_or_hash_or_colon && !last_was_open_paren {
                     css.push(' ');
                 }
-                css.push_str(&lit.to_string());
+
+                let s = lit.to_string();
+                // Strip outer quotes if it's a string literal
+                // Check if it starts/ends with quote
+                let trimmed = s.trim();
+                let is_quoted = trimmed.len() >= 2
+                    && ((trimmed.starts_with('"') && trimmed.ends_with('"'))
+                        || (trimmed.starts_with('\'') && trimmed.ends_with('\'')));
+
+                if is_quoted {
+                    // Check if it's a content property value which NEEDS quotes?
+                    // BUT here we are inside AtRule which is "lazy".
+                    // If user wrote `content: "foo"`, `trimmed` is `"foo"`.
+                    // If we strip, we get `foo`.
+                    // `content: foo` is invalid.
+                    // But `display: "none"` -> `display: none` is VALID and REQUIRED.
+
+                    // Heuristic: If content of string has spaces or special chars, maybe keep quotes?
+                    // No, standard CSS syntax in Azumi usually implies unquoted unless it's a string.
+                    // BUT macros require quotes for string literals.
+
+                    // If standard usage is `display: "none"`, we MUST strip.
+                    // If standard usage is `content: "\"foo\""`, `lit` is `"foo"`. We strip -> `foo`? No.
+                    // Wait. `LitStr` parsing `("\"foo\"")` -> value `foo`.
+                    // `Literal::string("foo")` -> `to_string()` -> `"foo"`.
+
+                    // If user writes `content: "\"foo\""`. Input token is `Literal("\"foo\"")`.
+                    // `to_string()` is `"\"foo\""`.
+                    // If we strip outer, we get `"foo"`. Correct!
+
+                    // If user writes `display: "none"`. Input token is `Literal("none")`.
+                    // `to_string()` is `"none"`.
+                    // If we strip outer, we get `none`. Correct!
+
+                    // So YES, ALWAYS STRIP OUTER QUOTES.
+                    css.push_str(&trimmed[1..trimmed.len() - 1]);
+                } else {
+                    css.push_str(&s);
+                }
+
                 last_char_was_hyphen = false;
-                last_char_was_dot_or_hash = false;
+                last_char_was_dot_or_hash_or_colon = false;
+                last_was_open_paren = false;
             }
             TokenTree::Group(group) => {
-                if !css.is_empty() {
+                if !css.is_empty() && !last_char_was_dot_or_hash_or_colon && !last_was_open_paren {
                     css.push(' ');
                 }
-                // Recurse? Or just to_string?
-                // Selectors usually don't have groups (parens maybe for :not()?)
-                // For :not(), we want :not(...).
-                // Let's just use to_string for groups for now.
-                css.push_str(&group.to_string());
+                // Recurse for group content?
+                // to_string() on Group includes delimiters.
+                // We might want to execute recursion to handle inner quoting logic?
+                // Yes, otherwise `@media (max-width: 768px)` group content `max-width: 768px` would be flat stringified with quotes?
+                // `Group` contains tokens.
+                // WE MUST RECURSE to handle `display: "none"` inside a group!
+                let delimiter_pair = match group.delimiter() {
+                    proc_macro2::Delimiter::Parenthesis => ("(", ")"),
+                    proc_macro2::Delimiter::Brace => ("{", "}"),
+                    proc_macro2::Delimiter::Bracket => ("[", "]"),
+                    proc_macro2::Delimiter::None => ("", ""),
+                };
+
+                css.push_str(delimiter_pair.0);
+                css.push_str(&tokens_to_css_string(&group.stream()));
+                css.push_str(delimiter_pair.1);
+
                 last_char_was_hyphen = false;
-                last_char_was_dot_or_hash = false;
+                last_char_was_dot_or_hash_or_colon = false;
+                last_was_open_paren = false;
             }
         }
     }
