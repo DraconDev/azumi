@@ -72,26 +72,7 @@ impl Counter {
 pub fn add_todo(&mut self) { ... }
 ```
 
-// Click → UI updates INSTANTLY → Server confirms
-// Zero latency. Zero JS glue code.
-
-````
-
-### 3. Async with `#[predict]`
-
-For async operations, tell the compiler what to show immediately:
-
-```rust
-#[predict(loading = true, error = None)]  // Show spinner NOW
-pub async fn load_users(&mut self) {
-    self.users = db::fetch_all().await;   // Fetch in background
-    self.loading = false;                  // Hide spinner when done
-}
-````
-
-The UI feels instant. The data is consistent. The code is obvious.
-
-### 4. Signed State (Anti-Tampering)
+### 3. Signed State (Anti-Tampering)
 
 Every component's state is HMAC-signed. Users can't forge counts, bypass auth, or inject data. The server rejects tampered requests automatically.
 
