@@ -318,7 +318,7 @@ class Azumi {
 
             // OPTIMIZATION: Check if server state matches prediction
             // If prediction was correct, skip morphing to prevent flicker
-            /*
+            /* 
             // DISABLED: This optimization prevents structural updates (e.g. @if blocks) from rendering
             if (predictionResult && scopeElement) {
                 // ... (omitted for brevity)
