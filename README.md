@@ -1184,11 +1184,29 @@ cargo run
 
 ### ✅ **Azumi Excels At:**
 
--   **Compile-time correctness** — CSS typos, missing classes, invalid HTML all caught before deploy
--   **Server-rendered apps** — SEO, fast first paint, no hydration mismatches
--   **Optimistic UI** — Instant feedback with automatic server reconciliation
--   **Secure by default** — HMAC-signed state prevents client-side tampering
--   **Long-term maintainability** — Types survive refactors; dead code is caught
+**Correctness**
+
+-   **CSS-HTML co-validation** — Typos, missing classes, invalid HTML caught at compile time
+-   **End-to-end type safety** — DB struct → component state → HTML, zero schema drift
+-   **XSS prevention by default** — Rust's type system enforces escaping
+
+**Performance**
+
+-   **Zero hydration** — No JS bundle replay, no `__NEXT_DATA__` blob, HTML is truth
+-   **~3kb runtime** — Compare to Next.js (~80kb), Leptos (~150kb)
+-   **Instant TTI** — No WASM download, no JS parse delay
+
+**Developer Experience**
+
+-   **No API layer** — DB queries live next to your components (no REST/tRPC ceremony)
+-   **Browserless testing** — Unit test components without JSDOM or Cypress
+-   **Asset pipeline built-in** — Content-hashed, immutable caching, zero config
+
+**Production**
+
+-   **~90% cloud cost vs Node** — Rust concurrency + low memory footprint
+-   **Signed state** — HMAC prevents client-side tampering (no `isAdmin: true` hacks)
+-   **Edge-cacheable** — Deterministic HTML, hashed assets, stateless servers
 
 ### 🎯 **Outside Core Scope:**
 
