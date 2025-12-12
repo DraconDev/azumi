@@ -575,31 +575,65 @@ pub fn StatusDisplay(status: &str) -> impl Component {
 
 ## ⚡ Live Interactive Components
 
-### Live State Structure
+### Hybrid Optimistic UI
+
+Azumi uses a **Hybrid Approach** to optimistic UI:
+
+1.  **Automatic Predictions**: Simple updates are handled by the compiler.
+2.  **Manual Predictions**: Complex logic uses `data-predict`.
+
+#### 1. Automatic (Compiler-Driven)
+
+For simple scalar operations, just write Rust. The compiler generates the prediction logic for you.
 
 ```rust
-#[azumi::live]
-pub struct Counter {
-    pub count: i32,
-    pub active: bool,
-}
-
-#[azumi::live_impl(component = "counter_view")]
+#[azumi::live_impl]
 impl Counter {
-    pub fn increment(&mut self) {
-        self.count += 1;
-    }
-
+    // Compiler sees: self.active = !self.active
+    // Generates: data-predict="active = !active"
     pub fn toggle(&mut self) {
         self.active = !self.active;
     }
 
-    // Async action (Optimistic + Server-Side)
-    pub async fn load_data(&mut self) {
-        self.active = true;
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await; // Non-blocking!
-        self.count = 42;
+    // Compiler sees: self.count += 1
+    // Generates: data-predict="count = count + 1"
+    pub fn increment(&mut self) {
+        self.count += 1;
     }
+}
+```
+
+#### 2. Manual (Developer-Driven)
+
+For complex types (Vectors, HashMaps) or logic the compiler can't predict safely, use the `data-predict` attribute manually.
+
+```rust
+html! {
+    <button
+        on:click={state.add_todo}
+        // Manual hint: "When clicked, optimistic append"
+        data-predict="todos.push({ text: input, id: -1 })"
+    >
+        "Add Todo"
+    </button>
+}
+```
+
+### Local State (Client-Only)
+
+For temporary UI state (dropdowns, modals, tabs) that doesn't need to persist to the server, use the `set` action.
+
+```rust
+html! {
+    // 🚀 updates state.open = true locally. No server request.
+    <button az-on="click set open = true">
+        "Open Modal"
+    </button>
+
+    // Toggle logic
+    <button az-on="click set open = !open">
+        "Toggle"
+    </button>
 }
 ```
 
