@@ -97,16 +97,16 @@ fn scope_css_level(iter: &mut Peekable<Chars>, scope_attr: &str, finding_close: 
     while let Some(ch) = iter.next() {
         match ch {
             '{' => {
-                let selector_raw = buffer.trim();
+                let selector_raw = buffer.trim().to_string();
 
-                if is_grouping_rule(selector_raw) {
+                if is_grouping_rule(&selector_raw) {
                     result.push_str(&buffer); // Keep original whitespace/selector
                     result.push('{');
                     buffer.clear();
                     // Recurse
                     result.push_str(&scope_css_level(iter, scope_attr, true));
                     result.push('}');
-                } else if is_keyframes(selector_raw) {
+                } else if is_keyframes(&selector_raw) {
                     result.push_str(&buffer);
                     result.push('{');
                     buffer.clear();
@@ -332,17 +332,17 @@ fn extract_selectors_recursive(
     while let Some(ch) = iter.next() {
         match ch {
             '{' => {
-                let selector_raw = buffer.trim();
-                if is_grouping_rule(selector_raw) {
+                let selector_raw = buffer.trim().to_string();
+                if is_grouping_rule(&selector_raw) {
                     buffer.clear();
                     extract_selectors_recursive(iter, classes, ids, true);
-                } else if is_keyframes(selector_raw) {
+                } else if is_keyframes(&selector_raw) {
                     buffer.clear();
                     // Consume balanced block without extracting
                     let _ = extract_balanced_block(iter);
                 } else {
                     // Extract from selectors
-                    process_selectors(selector_raw, classes, ids);
+                    process_selectors(&selector_raw, classes, ids);
                     buffer.clear();
                     // Consume balanced block (properties)
                     let _ = extract_balanced_block(iter);
