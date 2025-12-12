@@ -1,1 +1,0 @@
-- dropdown is still not opening when i click o the profile icon 
