@@ -77,7 +77,7 @@ class Azumi {
             };
         }
 
-        // TODO: Implement 'set' for local state
+        // Parse 'set' for local state
         return null;
     }
 

@@ -120,7 +120,7 @@ class Azumi {
             };
         }
 
-        // TODO: Implement 'set' for local state
+        // Parse 'set' for local state
         if (actionType === "set") {
             // Format: "set field = value"
             // tokens: ["set", "field", "=", "value"]
