@@ -1,66 +1,218 @@
 use std::collections::HashSet;
+use std::iter::Peekable;
+use std::str::Chars;
 
 /// Transform CSS selectors to include scope attribute
 pub fn scope_css(css: &str, scope_id: &str) -> String {
     let scope_attr = format!("[data-{}]", scope_id);
+    let mut iter = css.chars().peekable();
+    scope_css_recursive(&mut iter, &scope_attr)
+}
+
+fn scope_css_recursive(iter: &mut Peekable<Chars>, scope_attr: &str) -> String {
     let mut result = String::new();
-    let mut in_rule = false;
-    let mut selector_buffer = String::new();
+    let mut buffer = String::new();
 
-    for ch in css.chars() {
+    while let Some(ch) = iter.next() {
         match ch {
-            '{' if !in_rule => {
-                // Found opening brace - scope the selector buffer
-                let selectors: Vec<&str> = selector_buffer.split(',').collect();
-                let scoped: Vec<String> = selectors
-                    .iter()
-                    .filter(|s| !s.trim().is_empty())
-                    .map(|s| scope_selector(s.trim(), &scope_attr))
-                    .collect();
+            '{' => {
+                let selector_raw = buffer.trim();
+                buffer.clear();
 
-                result.push_str(&scoped.join(", "));
-                result.push('{');
-                selector_buffer.clear();
-                in_rule = true;
+                // Check if this is a grouping rule (recurse) or style rule (scope)
+                if is_grouping_rule(selector_raw) {
+                    result.push_str(selector_raw);
+                    result.push_str(" {");
+                    // Recurse into the block
+                    // We need to pass the iterator which is now inside the block
+                    // We need to call scope_css_recursive until we hit '}' matched to this level?
+                    // No, scope_css_recursive consumes until end of stream.
+                    // But we want to consume only ONE block.
+                    // Actually, we can just recurse. The recursive call will return when it finds a closing brace?
+                    // We need to architect this so the recursive function processes a sequence of rules.
+                    // It stops when it hits `}` (if it was called for a block) or EOF.
+
+                    let inner_content = scope_css_level(iter, scope_attr, true); // true = stop at '}'
+                    result.push_str(&inner_content);
+                    result.push('}');
+                } else if is_keyframes(selector_raw) {
+                    result.push_str(selector_raw);
+                    result.push_str(" {");
+                    // Keyframes content (0% { ... }) should NOT be scoped
+                    // Just copy balanced block
+                    let content = extract_balanced_block(iter);
+                    result.push_str(&content);
+                    result.push('}');
+                } else {
+                    // Style Rule - Scope the selector
+                    // But skip @font-face etc which are not grouping rules but also not style rules with selectors?
+                    // @font-face { src: ... }
+                    // scope_selector handles @ check.
+
+                    // Split by comma for multiple selectors
+                    let selectors: Vec<&str> = selector_raw.split(',').collect();
+                    let scoped: Vec<String> = selectors
+                        .iter()
+                        .filter(|s| !s.trim().is_empty())
+                        .map(|s| scope_selector(s.trim(), scope_attr))
+                        .collect();
+
+                    if !scoped.is_empty() {
+                        result.push_str(&scoped.join(", "));
+                    } else {
+                        // e.g. @font-face
+                        result.push_str(selector_raw);
+                    }
+
+                    result.push_str(" {");
+                    // Content is properties, just copy balanced block
+                    let content = extract_balanced_block(iter);
+                    result.push_str(&content);
+                    result.push('}');
+                }
             }
-            '}' if in_rule => {
-                result.push('}');
-                in_rule = false;
+            '}' => {
+                // Determine if this closes the current level
+                // In scope_css_level, we check this.
+                // But here we are iterating.
+                // If we hit '}', it means the block we were processing has ended.
+                // We should put it back? Or return?
+                // We need a helper that consumes.
             }
             _ => {
-                if in_rule {
-                    result.push(ch);
-                } else {
-                    selector_buffer.push(ch);
-                }
+                buffer.push(ch);
             }
         }
     }
-
-    // Handle any remaining selector buffer (malformed CSS)
-    if !selector_buffer.trim().is_empty() {
-        result.push_str(&selector_buffer);
-    }
-
+    // Append remaining buffer (whitespace etc)
+    result.push_str(&buffer);
     result
+}
+
+// Helper that processes rules until it sees a closing brace (if finding_close=true) or EOF
+fn scope_css_level(iter: &mut Peekable<Chars>, scope_attr: &str, finding_close: bool) -> String {
+    let mut result = String::new();
+    let mut buffer = String::new();
+
+    while let Some(ch) = iter.next() {
+        match ch {
+            '{' => {
+                let selector_raw = buffer.trim();
+
+                if is_grouping_rule(selector_raw) {
+                    result.push_str(&buffer); // Keep original whitespace/selector
+                    result.push('{');
+                    buffer.clear();
+                    // Recurse
+                    result.push_str(&scope_css_level(iter, scope_attr, true));
+                    result.push('}');
+                } else if is_keyframes(selector_raw) {
+                    result.push_str(&buffer);
+                    result.push('{');
+                    buffer.clear();
+                    result.push_str(&extract_balanced_block(iter));
+                    result.push('}');
+                } else {
+                    // Scope selectors
+                    // We need to preserve the whitespace in buffer before the selector?
+                    // buffer contains the selector.
+                    let scoped_selector_str = if selector_raw.starts_with('@') {
+                        selector_raw.to_string()
+                    } else {
+                        let selectors: Vec<&str> = selector_raw.split(',').collect();
+                        selectors
+                            .iter()
+                            .filter(|s| !s.trim().is_empty())
+                            .map(|s| scope_selector(s.trim(), scope_attr))
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    };
+
+                    // We replace buffer content with scoped selector
+                    // But try to keep formatting? Naive replacement is fine for minified CSS.
+                    result.push_str(&scoped_selector_str);
+                    result.push('{');
+                    buffer.clear();
+
+                    result.push_str(&extract_balanced_block(iter));
+                    result.push('}');
+                }
+            }
+            '}' => {
+                if finding_close {
+                    // We found the closing brace for this level
+                    // Return everything accumulated so far (excluding the })
+                    // The caller will append '}'
+                    result.push_str(&buffer);
+                    return result;
+                } else {
+                    // Stray } or logic error, just append
+                    buffer.push(ch);
+                }
+            }
+            ';' => {
+                buffer.push(ch);
+                result.push_str(&buffer);
+                buffer.clear();
+            }
+            _ => {
+                buffer.push(ch);
+            }
+        }
+    }
+    result.push_str(&buffer);
+    result
+}
+
+fn is_grouping_rule(s: &str) -> bool {
+    s.starts_with("@media")
+        || s.starts_with("@supports")
+        || s.starts_with("@layer")
+        || s.starts_with("@container")
+}
+
+fn is_keyframes(s: &str) -> bool {
+    s.starts_with("@keyframes") || s.starts_with("@-webkit-keyframes")
+}
+
+fn extract_balanced_block(iter: &mut Peekable<Chars>) -> String {
+    let mut content = String::new();
+    let mut depth = 1; // We already passed the opening '{'
+
+    while let Some(ch) = iter.next() {
+        match ch {
+            '{' => {
+                depth += 1;
+                content.push(ch);
+            }
+            '}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return content;
+                }
+                content.push(ch);
+            }
+            _ => content.push(ch),
+        }
+    }
+    content
 }
 
 /// Transform CSS selectors by renaming classes with a suffix (CSS Modules style)
 /// e.g. .container -> .container-xyz
 #[allow(dead_code)]
 pub fn rename_css_selectors(css: &str, suffix: &str) -> String {
+    // Keep original implementation or upgrade? Use scope_css logic ideally but focused on renaming.
+    // For now, not touched as not primarily used (Azumi uses attribute scoping).
     let mut result = String::new();
     let mut in_rule = false;
     let mut selector_buffer = String::new();
 
-    // Simple tokenizer to handle strings and comments would be better,
-    // but for now we reuse the char loop approach
     let mut chars = css.chars().peekable();
 
     while let Some(ch) = chars.next() {
         match ch {
             '{' if !in_rule => {
-                // Found opening brace - process the selector buffer
                 let selectors: Vec<&str> = selector_buffer.split(',').collect();
                 let scoped: Vec<String> = selectors
                     .iter()
@@ -69,7 +221,7 @@ pub fn rename_css_selectors(css: &str, suffix: &str) -> String {
                     .collect();
 
                 result.push_str(&scoped.join(", "));
-                result.push_str(" {"); // Add space before opening brace
+                result.push_str(" {");
                 selector_buffer.clear();
                 in_rule = true;
             }
@@ -78,11 +230,9 @@ pub fn rename_css_selectors(css: &str, suffix: &str) -> String {
                 in_rule = false;
             }
             '/' if !in_rule => {
-                // Check for comment
                 if let Some(&'*') = chars.peek() {
                     result.push('/');
-                    result.push(chars.next().unwrap()); // *
-                                                        // Skip until */
+                    result.push(chars.next().unwrap());
                     while let Some(c) = chars.next() {
                         result.push(c);
                         if c == '*' {
@@ -106,7 +256,6 @@ pub fn rename_css_selectors(css: &str, suffix: &str) -> String {
         }
     }
 
-    // Handle any remaining selector buffer (malformed CSS)
     if !selector_buffer.trim().is_empty() {
         result.push_str(&selector_buffer);
     }
@@ -115,23 +264,15 @@ pub fn rename_css_selectors(css: &str, suffix: &str) -> String {
 }
 
 fn rename_selector(selector: &str, suffix: &str) -> String {
-    // Skip @-rules
     if selector.starts_with('@') {
         return selector.to_string();
     }
-
-    // We need to find all class names in the selector and append the suffix
-    // e.g. "div.container > .item:hover" -> "div.container-suffix > .item-suffix:hover"
-
     let mut result = String::new();
     let mut chars = selector.chars().peekable();
 
     while let Some(ch) = chars.next() {
         if ch == '.' {
-            // Potential class start
             result.push('.');
-
-            // Read class name
             let mut class_name = String::new();
             while let Some(&c) = chars.peek() {
                 if c.is_alphanumeric() || c == '-' || c == '_' {
@@ -141,7 +282,6 @@ fn rename_selector(selector: &str, suffix: &str) -> String {
                     break;
                 }
             }
-
             if !class_name.is_empty() {
                 result.push_str(&class_name);
                 result.push('-');
@@ -151,31 +291,23 @@ fn rename_selector(selector: &str, suffix: &str) -> String {
             result.push(ch);
         }
     }
-
     result
 }
 
 fn scope_selector(selector: &str, scope_attr: &str) -> String {
-    // Skip @-rules and comments
     if selector.starts_with('@') || selector.starts_with("/*") {
         return selector.to_string();
     }
-
-    // Handle pseudo-elements (::before, ::after, etc.)
     if let Some(pseudo_pos) = selector.find("::") {
         let base = &selector[..pseudo_pos];
         let pseudo = &selector[pseudo_pos..];
         return format!("{}{}{}", base, scope_attr, pseudo);
     }
-
-    // Handle pseudo-classes (:hover, :focus, etc.)
     if let Some(pseudo_pos) = selector.find(':') {
         let base = &selector[..pseudo_pos];
         let pseudo = &selector[pseudo_pos..];
         return format!("{}{}{}", base, scope_attr, pseudo);
     }
-
-    // Default: append scope attribute
     format!("{}{}", selector, scope_attr)
 }
 
@@ -183,90 +315,87 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
 pub fn extract_selectors(css: &str) -> (HashSet<String>, HashSet<String>) {
     let mut classes = HashSet::new();
     let mut ids = HashSet::new();
-    let mut in_rule = false;
-    let mut selector_buffer = String::new();
-
-    // Strip comments and strings first
-    let mut clean_css = String::with_capacity(css.len());
-    let mut chars = css.chars().peekable();
-    while let Some(ch) = chars.next() {
-        if ch == '/' {
-            if let Some(&next_ch) = chars.peek() {
-                if next_ch == '*' {
-                    // Start of comment, skip until end
-                    chars.next(); // consume '*'
-                    while let Some(c) = chars.next() {
-                        if c == '*' {
-                            if let Some(&end_ch) = chars.peek() {
-                                if end_ch == '/' {
-                                    chars.next(); // consume '/'
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    continue;
-                }
-            }
-            clean_css.push(ch);
-        } else if ch == '"' || ch == '\'' {
-            // Start of string, skip until end quote
-            let quote = ch;
-            clean_css.push(quote); // Keep opening quote
-
-            while let Some(c) = chars.next() {
-                if c == quote {
-                    clean_css.push(c); // Keep closing quote
-                    break;
-                }
-                // Replace content with space to avoid parsing selectors inside strings
-                clean_css.push(' ');
-            }
-        } else {
-            clean_css.push(ch);
-        }
-    }
-
-    // Simple parser to extract selectors
-    // This is a basic implementation and might need refinement for complex CSS
-    for ch in clean_css.chars() {
-        match ch {
-            '{' if !in_rule => {
-                // Process selectors in buffer
-                process_selectors(&selector_buffer, &mut classes, &mut ids);
-                selector_buffer.clear();
-                in_rule = true;
-            }
-            '}' if in_rule => {
-                in_rule = false;
-            }
-            _ => {
-                if !in_rule {
-                    selector_buffer.push(ch);
-                }
-            }
-        }
-    }
-
+    // Use recursive extractor
+    let mut iter = css.chars().peekable();
+    extract_selectors_recursive(&mut iter, &mut classes, &mut ids, false);
     (classes, ids)
 }
 
+fn extract_selectors_recursive(
+    iter: &mut Peekable<Chars>,
+    classes: &mut HashSet<String>,
+    ids: &mut HashSet<String>,
+    finding_close: bool,
+) {
+    let mut buffer = String::new();
+
+    while let Some(ch) = iter.next() {
+        match ch {
+            '{' => {
+                let selector_raw = buffer.trim();
+                if is_grouping_rule(selector_raw) {
+                    buffer.clear();
+                    extract_selectors_recursive(iter, classes, ids, true);
+                } else if is_keyframes(selector_raw) {
+                    buffer.clear();
+                    // Consume balanced block without extracting
+                    let _ = extract_balanced_block(iter);
+                } else {
+                    // Extract from selectors
+                    process_selectors(selector_raw, classes, ids);
+                    buffer.clear();
+                    // Consume balanced block (properties)
+                    let _ = extract_balanced_block(iter);
+                }
+            }
+            '}' => {
+                if finding_close {
+                    return;
+                }
+                // Ignore stray
+            }
+            '/' => {
+                // Skip comments
+                if let Some(&'*') = iter.peek() {
+                    iter.next();
+                    while let Some(c) = iter.next() {
+                        if c == '*' {
+                            if let Some(&'/') = iter.peek() {
+                                iter.next();
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    buffer.push(ch);
+                }
+            }
+            '"' | '\'' => {
+                // Skip strings
+                let quote = ch;
+                while let Some(c) = iter.next() {
+                    if c == quote {
+                        break;
+                    }
+                }
+            }
+            _ => {
+                buffer.push(ch);
+            }
+        }
+    }
+}
+
 fn process_selectors(buffer: &str, classes: &mut HashSet<String>, ids: &mut HashSet<String>) {
-    // Split by comma for multiple selectors
     for selector in buffer.split(',') {
         let selector = selector.trim();
         if selector.is_empty() || selector.starts_with('@') || selector.starts_with("/*") {
             continue;
         }
 
-        // Split by whitespace and combinators to get individual parts
-        // e.g. "div.container > .item" -> ["div.container", ">", ".item"]
-        // We just want to find .class and #id in the string
-
         let mut chars = selector.chars().peekable();
         while let Some(ch) = chars.next() {
             if ch == '.' {
-                // Start of class
                 let mut name = String::new();
                 while let Some(&c) = chars.peek() {
                     if c.is_alphanumeric() || c == '-' || c == '_' {
@@ -280,7 +409,6 @@ fn process_selectors(buffer: &str, classes: &mut HashSet<String>, ids: &mut Hash
                     classes.insert(name);
                 }
             } else if ch == '#' {
-                // Start of ID
                 let mut name = String::new();
                 while let Some(&c) = chars.peek() {
                     if c.is_alphanumeric() || c == '-' || c == '_' {
