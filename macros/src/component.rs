@@ -152,7 +152,9 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
                 azumi::from_fn(move |f| {
                     // Auto-generated az-scope wrapper
                     let scope_json = <_ as azumi::LiveState>::to_scope(#state_ident);
-                    write!(f, "<div az-scope='{}' style='display: contents'>", scope_json)?;
+                    // Parse as string and escape double quotes to match HTML spec safely
+                    let scope_escaped = scope_json.replace("\"", "&quot;");
+                    write!(f, "<div az-scope=\"{}\" style=\"display: contents\">", scope_escaped)?;
                     // Render the inner component
                     let inner = #fn_block;
                     inner.render(f)?;
