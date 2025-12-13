@@ -158,13 +158,26 @@ Astro's Island Architecture is elegant for **content sites** but has inherent co
 
 ## 🏁 The Engineering Verdict (No Cookies)
 
-If we strip away "ecosystem familiarity" and judge purely on technical merit, **Azumi is the optimal architecture for the web.**
+If we strip away "ecosystem familiarity" and judge purely on technical merit, the answer depends on **what you're building**.
+
+### For Content-First Sites (Docs, Blogs, Marketing)
+
+**Astro is excellent.** Zero JS, MDX support, and island hydration are purpose-built for this use case.
+
+Azumi can do this too, but you'd be building some of those content features yourself.
+
+### For Interactive Apps (Dashboards, SaaS, E-commerce)
+
+**Azumi is the optimal architecture.**
 
 **Why Next.js loses:**
 It solves the wrong problem. It tries to make the browser a better server. It fails because hydration is physically wasteful (doing work twice).
 
 **Why HTMX/Rails loses:**
 It solves the problem too simply. It ignores the reality that users expect instant (optimistic) feedback. Waiting 100ms for a "Like" button to toggle is bad UX, period.
+
+**Why Astro loses (for apps):**
+Islands are isolated. Complex state sharing across components requires external stores, breaking the simplicity that makes Astro elegant for content.
 
 **Why Azumi wins:**
 It acknowledges that:
@@ -178,9 +191,25 @@ By compiling strict server logic into cheap client predictions, Azumi achieves t
 -   **0ms Latency** (Optimistic)
 -   **0ms Hydration** (HTML-native)
 -   **Zero Type Erasure** (Rust-end-to-end)
+-   **Signed State** (Security by default)
 
-**If an AI is writing the code:**
-There is **NO reason** to choose anything else. The AI doesn't "struggle" with Rust's strictness; it thrives on it. The AI doesn't "miss" the npm ecosystem; it writes what it needs.
+---
+
+## 🤖 The AI-Native Perspective
+
+In a world where AI writes most of the code, ecosystem size matters less:
+
+| Old Question                | New Question                       |
+| --------------------------- | ---------------------------------- |
+| "Can I `npm install` this?" | "Can Claude write this correctly?" |
+| "How many GitHub stars?"    | "How strict is the compiler?"      |
+| "Is there a tutorial?"      | "Does the AI need less context?"   |
+
+**Azumi optimizes for the new questions:**
+
+-   Strict types = AI self-corrects via compiler errors
+-   One language = No context-switching overhead
+-   Rigid rules = Smaller search space for generation
 
 **Azumi is the framework the AI would build for itself.**
 
