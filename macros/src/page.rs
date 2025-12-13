@@ -48,59 +48,32 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let desc_tokens = if description.is_empty() {
         quote! { None }
     } else {
-        quote! { Some(#description) }
+        quote! { Some(#description.to_string()) }
     };
 
     // 3. Generate Wrapper
-    // We name the inner function `_inner_{name}`
     let inner_name = format_ident!("_inner_{}", fn_name);
 
-    // We need to strip the #[azumi::page] attribute from the inner function to avoid recursion
-    // The macro input doesn't have the attribute itself usually, but we should be clean.
-    // Also strip other attributes that might be problematic if duplicated? No, keep them on inner.
-    // Actually, `azumi::component` handles logic. If the user put `#[azumi::page]` INSTEAD OF `#[azumi::component]`,
-    // we need to make sure `#[azumi::component]` is applied to the inner function!
-    // BUT, usually the user might write:
-    // #[azumi::page]
-    // pub fn foo() ...
-    // So we should generate:
-    // #[azumi::component]
-    // fn _inner_foo() ...
-    // #[azumi::component]
-    // pub fn foo() ...
-
     let expanded = quote! {
-        // Inner implementation (The actual UI)
+        // Inner implementation
         #[azumi::component]
         fn #inner_name #fn_sig {
             #fn_block
         }
 
-        // Public Wrapper (The SEO injector)
+        // Public Wrapper
         #[azumi::component]
         #fn_vis fn #fn_name() -> impl azumi::Component {
-            // Check if feature enabled, otherwise this is a no-op wrapper
-            #[cfg(feature = "seo")]
-            {
-                let _seo_head = azumi::seo::generate_head(
-                    #title,
-                    #desc_tokens,
-                    None // Image TODO: Extract from some other attribute?
-                );
+            // Set context for Layouts to find
+            azumi::context::set_page_meta(
+                Some(#title.to_string()),
+                #desc_tokens,
+                None
+            );
 
-                azumi::html! {
-                    // Inject the generated head first
-                    {_seo_head}
-                    // Render the inner component
-                    @#inner_name()
-                }
-            }
-
-            #[cfg(not(feature = "seo"))]
-            {
-                azumi::html! {
-                    @#inner_name()
-                }
+            // Render inner (which calls Layout, which calls seo::render_automatic_seo)
+            azumi::html! {
+                @#inner_name()
             }
         }
     };

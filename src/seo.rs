@@ -85,29 +85,45 @@ pub fn generate_head(
 ) -> crate::Raw<String> {
     let global = SITE_CONFIG.get();
 
-    // 1. Merge Title
-    // If global has a title template like "%s | MySite", we could use it here.
-    // For now, we append site name if available.
+    // 0. Resolve Context (ThreadLocal override from #[azumi::page])
+    let context_meta = crate::context::get_page_meta();
+
+    // Resolve effective title/desc/image
+    // Priority: Explicit Arg > Context > Global Default
+    let effective_title = if !title.is_empty() {
+        title.to_string()
+    } else {
+        context_meta.title.unwrap_or_default()
+    };
+
+    let effective_desc = description
+        .map(|s| s.to_string())
+        .or(context_meta.description)
+        .or(global.and_then(|g| g.description.clone()));
+
+    let effective_image = image
+        .map(|s| s.to_string())
+        .or(context_meta.image)
+        .or(global.and_then(|g| g.open_graph.as_ref().and_then(|og| og.image.clone())));
+
+    // 1. Merge Title with Site Name
     let full_title = if let Some(g) = global {
         if let Some(og) = &g.open_graph {
             if let Some(site_name) = &og.site_name {
-                format!("{} | {}", title, site_name)
+                if !effective_title.is_empty() {
+                    format!("{} | {}", effective_title, site_name)
+                } else {
+                    site_name.clone()
+                }
             } else {
-                title.to_string()
+                effective_title.clone()
             }
         } else {
-            title.to_string()
+            effective_title.clone()
         }
     } else {
-        title.to_string()
+        effective_title.clone()
     };
-
-    // 2. Resolve Description
-    let desc = description.or(global.and_then(|g| g.description.as_deref()));
-
-    // 3. Resolve Image
-    let img =
-        image.or(global.and_then(|g| g.open_graph.as_ref().and_then(|og| og.image.as_deref())));
 
     // 4. Infer Canonical / Current URL from Context
     let current_path = crate::context::get_current_path();
@@ -132,7 +148,7 @@ pub fn generate_head(
 
     // Basic Tags
     let _ = write!(html, "<title>{}</title>", full_title);
-    if let Some(d) = desc {
+    if let Some(d) = &effective_desc {
         let _ = write!(html, r#"<meta name="description" content="{}">"#, d);
     }
     if let Some(url) = &full_url {
@@ -151,7 +167,7 @@ pub fn generate_head(
             );
 
             // Description
-            if let Some(d) = desc {
+            if let Some(d) = &effective_desc {
                 let _ = write!(html, r#"<meta property="og:description" content="{}">"#, d);
             }
 
@@ -161,7 +177,7 @@ pub fn generate_head(
             }
 
             // Image
-            if let Some(i) = img {
+            if let Some(i) = &effective_image {
                 let _ = write!(html, r#"<meta property="og:image" content="{}">"#, i);
             }
 
@@ -192,16 +208,24 @@ pub fn generate_head(
                 r#"<meta name="twitter:title" content="{}">"#,
                 full_title
             ); // Simplified: Always use page title
-            if let Some(d) = desc {
+            if let Some(d) = &effective_desc {
                 let _ = write!(html, r#"<meta name="twitter:description" content="{}">"#, d);
             }
-            if let Some(i) = img {
+            if let Some(i) = &effective_image {
                 let _ = write!(html, r#"<meta name="twitter:image" content="{}">"#, i);
             }
         }
     }
 
     crate::Raw(html)
+}
+
+/// Helper function to automatically render SEO tags based on current context.
+/// Call this inside your Layout's <head>.
+#[cfg(feature = "seo")]
+pub fn render_automatic_seo() -> crate::Raw<String> {
+    // Pass empty strings to force reading from Context/Global
+    generate_head("", None, None)
 }
 
 /// Simple Sitemap Builder
