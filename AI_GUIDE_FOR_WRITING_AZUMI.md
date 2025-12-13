@@ -333,9 +333,33 @@ pub fn about_us() -> impl Component {
 
 The `#[azumi::page]` macro sets thread-local context that the `Layout` component can read. This means you **don't** need to pass title/description props down through your component tree.
 
+**Custom Layout Implementation:**
+
+If you are building a custom root layout, you must call `render_automatic_seo()` inside your `<head>` tag to inject the metadata.
+
 ```rust
-// In your layout (already handled by default layouts):
-azumi::seo::render_automatic_seo()
+#[azumi::component]
+pub fn MyCustomLayout(children: impl Component) -> impl Component {
+    html! {
+       <!DOCTYPE html>
+       <html lang="en">
+       <head>
+           <meta charset="utf-8" />
+           <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+           // 1. Inject Automatic SEO tags here
+           // This pulls title/desc from the inner #[azumi::page]
+           {azumi::seo::render_automatic_seo()}
+
+           // 2. Inject Client Runtime (Required for interactivity)
+           <script src="azumi.js" />
+       </head>
+       <body>
+           {children}
+       </body>
+       </html>
+    }
+}
 ```
 
 ### 📋 Schema.org JSON-LD Structured Data
