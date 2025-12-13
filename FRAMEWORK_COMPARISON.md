@@ -89,6 +89,38 @@ WASM frameworks promise native speeds, but they front-load the cost:
 
 **Azumi's Advantage:** Azumi respects the platform. It uses standard HTML for rendering and tiny, surgical JS for interactions. It starts instantly, even on 3G.
 
+### 4. The "Island Limit" (Astro)
+
+Astro's Island Architecture is elegant for **content sites** but has inherent constraints:
+
+1.  **Framework Lock-in per Island:** Each island imports its own framework runtime. A React island + a Svelte island = you ship both runtimes.
+2.  **No Cross-Island State:** Islands are isolated. Sharing state between a header component and a sidebar requires external orchestration (stores, URLs, or custom events).
+3.  **Runtime Type Gaps:** Astro templates are `.astro` files with TypeScript support, but the interactive islands fall back to their respective framework's type story (React's `any` escape hatches, etc.).
+
+**Why Astro Wins:**
+
+-   **Zero JS by default** — Nothing beats shipping no JavaScript at all.
+-   **Content Collections** — First-class MDX, Markdown, and content management.
+-   **Ecosystem Interop** — Use React, Svelte, Vue, Solid, or Preact components inside the same project.
+
+**Why Azumi Might Win Instead:**
+
+-   **Unified Type Safety** — One language (Rust), one type system, from DB to DOM.
+-   **Optimistic UI** — Astro islands that need interactivity still show network latency. Azumi predicts success.
+-   **Signed State** — Astro trusts the client; Azumi cryptographically verifies.
+-   **AI Suitability** — Astro's multi-language nature (Astro + React/Svelte + TS) creates more "seams" for AI hallucinations. Azumi's strict Rust DSL reduces the search space.
+
+**The Honest Verdict:**
+
+| Use Case                    | Better Choice                                    |
+| --------------------------- | ------------------------------------------------ |
+| Documentation site          | **Astro**                                        |
+| Marketing landing pages     | Tie (both excellent)                             |
+| Blog with comments          | Astro (MDX) or Azumi (if comments need security) |
+| Dashboard / Admin panel     | **Azumi**                                        |
+| E-commerce checkout         | **Azumi** (signed state critical)                |
+| Real-time collaborative app | Neither (use WebSocket-native solution)          |
+
 ---
 
 ## 💰 The Business Case (For CTOs)
