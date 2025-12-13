@@ -6,8 +6,9 @@ pub mod prelude {
     };
 }
 
-pub use azumi_macros::{action, component, head, html, live, live_impl, predict};
+pub use azumi_macros::{action, component, head, html, live, live_impl, page, predict};
 pub mod action;
+pub mod context;
 pub mod hot_reload;
 pub mod script;
 pub mod security;
