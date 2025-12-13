@@ -282,6 +282,20 @@ class Azumi {
         // Find scope element
         const scopeElement = element.closest("[az-scope]");
 
+        // PREVENT CONCURRENT UPDATES:
+        // In a signed-state system, we CANNOT send a second request until we get the
+        // signature for the first result. Pipelining is mathematically impossible
+        // without client-side signing keys.
+        if (scopeElement) {
+            if (scopeElement._azumi_pending) {
+                console.warn(
+                    "🚫 Action ignored: Request already pending for this component."
+                );
+                return;
+            }
+            scopeElement._azumi_pending = true;
+        }
+
         // IMPORTANT: Capture state BEFORE prediction
         // We must send the original, signed state to the server.
         // If we predict first, we might dirty the state or invalidly sign it.
