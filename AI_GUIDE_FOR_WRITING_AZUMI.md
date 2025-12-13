@@ -238,106 +238,87 @@ let app = Router::new()
 
 ---
 
-## ⚡ Server Actions & `az-scope` (Interactivity)
+## ⚡ Azumi Live (Optimistic UI)
 
-Azumi uses **Server Actions** for interactivity. The client sends state to the server, the action updates it, and the server returns re-rendered HTML.
+Azumi Live is the **recommended** way to add interactivity. It uses compiler analysis to predict UI updates before the server responds.
 
-### 1. Defining an Action
+### 1. Define State with `#[azumi::live]`
 
-Use `#[azumi::action]` to create a server action. The macro auto-generates the Axum route.
+Mark your state struct. This enables serialization and prediction.
 
 ```rust
-#[derive(Serialize, Deserialize, Default, Clone)]
-pub struct CounterState {
+#[azumi::live]
+pub struct Counter {
     pub count: i32,
-}
-
-// The action receives state from the client and returns new HTML
-#[azumi::action]
-pub async fn increment_counter(state: CounterState) -> impl Component {
-    let new_state = CounterState { count: state.count + 1 };
-    counter_display(new_state) // Re-render the component
+    pub active: bool,
 }
 ```
 
-### 2. Using `az-scope` (State Container)
+### 2. Define Methods with `#[azumi::live_impl]`
 
-The `az-scope` attribute tells Azumi which element holds the state. **Critical: The value MUST be a dynamic expression (`{...}`).**
+The `component` attribute links to the view function that renders this state.
 
 ```rust
-pub fn counter_display(state: CounterState) -> impl Component {
+#[azumi::live_impl(component = "counter_view")]
+impl Counter {
+    pub fn increment(&mut self) {
+        self.count += 1;
+    }
+
+    pub fn toggle(&mut self) {
+        self.active = !self.active;
+    }
+}
+```
+
+### 3. Create the Component
+
+The component receives a reference to the state. Use `on:click={state.method}` for event binding.
+
+```rust
+#[azumi::component]
+pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
     html! {
-        // ✅ CORRECT: Dynamic expression - evaluates to JSON
-        <div id={counter_box} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
-            <div>{state.count}</div>
-            <button az-on={click call increment_counter -> #counter_box}>
-                "Increment"
-            </button>
+        <div class={counter_box}>
+            <div data-bind="count">{state.count}</div>
+            <button on:click={state.increment}>"+ Increment"</button>
+            <button on:click={state.toggle}>"Toggle"</button>
         </div>
     }
 }
 ```
 
-> [!WARNING] > **Common Mistake**: Using static strings for `az-scope` won't work.
->
-> ```rust
-> // ❌ WRONG: This renders the literal string, not the JSON
-> <div az-scope="some_static_value">
-> ```
+### 4. How It Works
 
-### 3. The `az-on` Attribute (Event Binding)
+1.  **Compiler Analysis**: `#[azumi::live_impl]` analyzes method bodies to generate **predictions**.
+2.  **Optimistic Update**: When you click, the client updates the UI _immediately_ based on the prediction.
+3.  **Server Reconciliation**: The server runs the actual method and sends back the real HTML.
+4.  **Morphing**: The client morphs the DOM to match the server response (usually identical).
 
-Format: `az-on={EVENT call ACTION_NAME -> TARGET}`
+### 5. `data-bind` for Optimistic Updates
 
-| Part               | Description                                             |
-| ------------------ | ------------------------------------------------------- |
-| `EVENT`            | Browser event: `click`, `submit`, `change`, `input`     |
-| `call ACTION_NAME` | The Rust function name (with `#[azumi::action]`)        |
-| `-> TARGET`        | CSS selector for the element to morph with the response |
+Use `data-bind="field_name"` on elements that should update instantly:
 
 ```rust
-// Call `toggle_like` on click, morph response into #like_box
-<button az-on={click call toggle_like -> #like_box}>
+// This element updates BEFORE the server responds
+<div data-bind="count">{state.count}</div>
 ```
 
-### 4. Registering Actions (in `main.rs`)
-
-Actions are auto-registered via `inventory`. Just merge the router:
+### 6. Using in a Page
 
 ```rust
-let app = Router::new()
-    .route("/", get(home_handler))
-    .merge(azumi::action::register_actions(axum::Router::new())); // <- Required!
-```
-
-### 5. Complete Example
-
-```rust
-// State
-#[derive(Serialize, Deserialize, Default, Clone)]
-pub struct LikeState { pub liked: bool, pub count: i32 }
-
-// Component
-pub fn like_button(state: LikeState) -> impl Component {
+#[azumi::page]
+pub fn my_page() -> impl Component {
+    let state = Counter { count: 0, active: true };
     html! {
-        <div id={like_box} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
-            <button az-on={click call toggle_like -> #like_box}>
-                {if state.liked { "❤️" } else { "🤍" }} " " {state.count}
-            </button>
-        </div>
+        @DarkModernLayout() {
+            @counter_view(state = &state)
+        }
     }
 }
-
-// Action
-#[azumi::action]
-pub async fn toggle_like(state: LikeState) -> impl Component {
-    let new_state = LikeState {
-        liked: !state.liked,
-        count: if state.liked { state.count - 1 } else { state.count + 1 },
-    };
-    like_button(new_state)
-}
 ```
+
+> [!NOTE] > **When to Use**: Azumi Live is best for simple, predictable mutations (toggles, counters). For complex state or DB-driven updates, use server actions directly.
 
 ---
 
