@@ -1977,6 +1977,30 @@ Use standard HTML `srcset` for responsive sizing. The compiler leaves these alon
 
 ---
 
+## 🚀 Deployment & Production
+
+### 1. Zero-Dependency Binary
+
+Azumi compiles to a single binary.
+
+```bash
+cargo build --release
+```
+
+### 2. Assets in Production
+
+Azumi uses a `build.rs` script to hash assets. In production, you must serve the `target/assets` directory.
+
+**Important**: The `demo` example hardcodes the asset path to `env!("OUT_DIR")`. For real production apps, you should configure this via an environment variable.
+
+```rust
+// Recommended Production Pattern
+let assets_path = std::env::var("ASSETS_DIR").unwrap_or("assets".to_string());
+app.nest_service("/assets", ServeDir::new(assets_path));
+```
+
+---
+
 ## 🎯 Key Takeaways
 
 1. **Write Rust, get JavaScript**: The compiler does the heavy lifting
