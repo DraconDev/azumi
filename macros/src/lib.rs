@@ -896,6 +896,26 @@ fn generate_body_with_context(
 
                     // Handle az-* attributes (DSL treated as string)
                     if attr_name.starts_with("az-") {
+                        // SPECIAL CASE: az-scope should evaluate its value as a Rust expression
+                        if attr_name == "az-scope" {
+                            match &attr.value {
+                                token_parser::AttributeValue::Dynamic(tokens) => {
+                                    instructions.push(quote! {
+                                        write!(f, " {}=\"{}\"", #attr_name, azumi::html_escape::encode_double_quoted_attribute(&#tokens))?;
+                                    });
+                                }
+                                token_parser::AttributeValue::Static(val) => {
+                                    let clean = strip_outer_quotes(val);
+                                    instructions.push(quote! {
+                                        write!(f, " {}=\"{}\"", #attr_name, #clean)?;
+                                    });
+                                }
+                                _ => {}
+                            }
+                            continue;
+                        }
+
+                        // Other az-* attributes (like az-on) are DSL and treated as string literals
                         match &attr.value {
                             token_parser::AttributeValue::Dynamic(tokens) => {
                                 let s = tokens.to_string(); // Stringify tokens
