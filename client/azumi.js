@@ -320,12 +320,19 @@ class Azumi {
         let predictionResult = null;
 
         if (prediction && scopeElement) {
+            console.log("[Azumi] Executing Optimistic Prediction:", prediction);
             // Execute prediction. This updates the DOM optimistically.
             // But we already captured 'body' (original state) above, so we are safe!
             predictionResult = this.executePrediction(scopeElement, prediction);
         }
 
         try {
+            console.log(
+                "[Azumi] Fetching Action:",
+                action.url,
+                "Payload:",
+                body
+            );
             const res = await fetch(action.url, {
                 method: "POST",
                 headers: {
@@ -334,9 +341,12 @@ class Azumi {
                 body, // Sends the ORIGINAL, validly signed state
             });
 
+            console.log("[Azumi] Server Response Status:", res.status);
+
             if (!res.ok) throw new Error(`Action failed: ${res.status}`);
 
             const html = await res.text();
+            console.log("[Azumi] Received HTML length:", html.length);
 
             // OPTIMIZATION: Check if server state matches prediction
             // If prediction was correct, skip morphing to prevent flicker
