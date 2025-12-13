@@ -11,7 +11,9 @@ pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Componen
         <head>
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>"Azumi Lesson"</title>
+
+            // Automatic SEO
+            { azumi::seo::render_automatic_seo() }
 
             // Preconnect for performance
             <link rel="preconnect" href="https://fonts.googleapis.com" />

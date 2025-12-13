@@ -127,7 +127,8 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 }
 
 /// Main lesson demonstration component
-#[azumi::component]
+/// This uses #[azumi::page] so SEO is automatic!
+#[azumi::page]
 pub fn lesson9() -> impl azumi::Component {
     let state = Counter {
         count: 0,
