@@ -1,4 +1,4 @@
-// Force rebuild 10
+// Force rebuild 11
 mod component;
 
 mod accessibility_validator;
@@ -165,6 +165,10 @@ pub fn html(input: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         {
+            // Import FallbackRender to ensure render_azumi works even if trait not imported by user
+            #[allow(unused_imports)]
+            use azumi::FallbackRender;
+
             // Inject style bindings (hoisted)
             #style_bindings
 
@@ -926,8 +930,12 @@ fn generate_body_with_context(
                                     Ok(exprs) if !exprs.is_empty() => {
                                         // Collect format string "{} {}"
                                         let fmt = vec!["{}"; exprs.len()].join(" ");
+                                        let mut format_args = Vec::new();
+                                        for e in exprs {
+                                            format_args.push(quote! { #e });
+                                        }
                                         instructions.push(quote! {
-                                            write!(f, " class=\"{}\"", azumi::Escaped(&format!(#fmt, #(#exprs),*)))?;
+                                            write!(f, " class=\"{}\"", azumi::Escaped(&format!(#fmt, #(#format_args),*)))?;
                                         });
                                     }
                                     _ => {
@@ -1025,7 +1033,7 @@ fn generate_body_with_context(
             token_parser::Node::Expression(expr) => {
                 let tokens = &expr.content;
                 instructions.push(quote! {
-                    azumi::RenderWrapper(#tokens).render_azumi(f)?;
+                    azumi::RenderWrapper(&(#tokens)).render_azumi(f)?;
                 });
             }
             token_parser::Node::Fragment(frag) => {
@@ -1122,6 +1130,13 @@ fn generate_body_with_context(
                                 #func_mod_path::render(#builder_expr, #children_arg).render(f)?;
                             });
                         }
+                    }
+                    token_parser::Block::Let(let_block) => {
+                        let pat = &let_block.pattern;
+                        let val = &let_block.value;
+                        instructions.push(quote! {
+                            let #pat = #val;
+                        });
                     }
                     token_parser::Block::Style(_) => {
                         // Handled in hoisting pass
