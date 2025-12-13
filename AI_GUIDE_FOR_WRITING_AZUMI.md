@@ -294,6 +294,335 @@ pub fn Dashboard() -> impl Component {
 
 ---
 
+## 🔍 Search Engine Optimization (SEO)
+
+### Automatic SEO (Recommended)
+
+Azumi provides **Automatic SEO** via the `#[azumi::page]` macro. This infers metadata directly from your Rust code components, generating `<title>`, `<meta name="description">`, OpenGraph, and Twitter Card tags automatically.
+
+#### How to use:
+
+1.  Use `#[azumi::page]` instead of `#[azumi::component]` for your page root.
+2.  Use the function name for the Title (e.g., `fn about_us` -> "About Us").
+3.  Use doc comments (`///`) for the Description.
+
+```rust
+/// About Us
+/// We are a team of passionate developers building the future of web frameworks.
+#[azumi::page]
+pub fn about_us() -> impl Component {
+    html! {
+        <h1>"About Us"</h1>
+    }
+}
+```
+
+**Generated HTML:**
+
+```html
+<title>About Us | My App</title>
+<meta name="description" content="We are a team of passionate developers..." />
+<meta property="og:title" content="About Us | My App" />
+<meta
+    property="og:description"
+    content="We are a team of passionate developers..."
+/>
+```
+
+#### Context Awareness & Page Metadata
+
+The `#[azumi::page]` macro sets thread-local context that the `Layout` component can read. This means you **don't** need to pass title/description props down through your component tree.
+
+```rust
+// In your layout (already handled by default layouts):
+azumi::seo::render_automatic_seo()
+```
+
+### 📋 Schema.org JSON-LD Structured Data
+
+Azumi supports generating Schema.org structured data for SEO through the `#[schema]` derive macro.
+
+#### Basic Schema Support
+
+```rust
+use azumi::Schema;
+
+#[derive(Schema)]
+#[schema(type = "BlogPosting")]
+pub struct Article {
+    pub headline: String,
+    pub author: String,
+    pub date_published: String,
+    #[schema(skip)]
+    pub internal_id: String, // Skip this field in JSON-LD
+}
+
+#[azumi::component]
+pub fn ArticlePage(article: &Article) -> impl Component {
+    html! {
+        <html>
+        <head>
+            {head! {
+                title: &article.headline,
+                description: "Read this article about web development"
+            }}
+            {article.to_schema_script()} // ← Generates JSON-LD script
+        </head>
+        <body>
+            <article>
+                <h1>{article.headline}</h1>
+                <p>"By " {article.author} " on " {article.date_published}</p>
+                <div>"Article content goes here..."</div>
+            </article>
+        </body>
+        </html>
+    }
+}
+```
+
+#### Custom Field Names
+
+```rust
+#[derive(Schema)]
+pub struct Product {
+    pub name: String,
+    #[schema(name = "description")]
+    pub product_description: String,
+    pub price: f64,
+    #[schema(name = "image")]
+    pub product_image_url: String,
+}
+
+// Generates: {
+//   "@type": "Product",
+//   "name": "...",
+//   "description": "...", // Note: camelCase -> original name
+//   "price": ...,
+//   "image": "..."
+// }
+```
+
+#### Schema Types
+
+Common Schema.org types:
+
+| Type           | Use Case                  | Example Usage               |
+| -------------- | ------------------------- | --------------------------- |
+| `Article`      | Blog posts, news articles | News sites, blogs           |
+| `BlogPosting`  | Blog articles             | Personal/professional blogs |
+| `Product`      | E-commerce products       | Online stores               |
+| `Organization` | Companies, teams          | About pages                 |
+| `Person`       | Individual profiles       | Team pages, author bios     |
+| `Event`        | Events, webinars          | Event listings              |
+| `Recipe`       | Cooking instructions      | Food blogs                  |
+| `VideoObject`  | Video content             | YouTube embeds              |
+| `WebSite`      | Website information       | Site-wide metadata          |
+
+#### Complex Schema Example
+
+```rust
+#[derive(Schema)]
+#[schema(type = "WebSite")]
+pub struct Website {
+    pub name: String,
+    pub url: String,
+    pub description: String,
+    pub potential_action: SearchAction,
+}
+
+#[derive(Schema)]
+pub struct SearchAction {
+    pub target: String,
+    pub query_input: String,
+}
+
+#[azumi::component]
+pub fn WebsiteLayout() -> impl Component {
+    let website = Website {
+        name: "My Azumi App".to_string(),
+        url: "https://myapp.com".to_string(),
+        description: "A modern web application".to_string(),
+        potential_action: SearchAction {
+            target: "https://myapp.com/search?q={search_term_string}".to_string(),
+            query_input: "search_term_string".to_string(),
+        },
+    };
+
+    html! {
+        <html>
+        <head>
+            {website.to_schema_script()}
+        </head>
+        <body>
+            <div>"Website content"</div>
+        </body>
+        </html>
+    }
+}
+```
+
+### 📄 Manual SEO (Head Meta Tags)
+
+For fine-grained control or when not using `#[azumi::page]`, use the `head!` macro. It generates complete HTML head meta tags including title, description, and Open Graph/Twitter card tags.
+
+#### Basic Head Meta
+
+```rust
+use azumi::head;
+
+#[azumi::component]
+pub fn Page() -> impl Component {
+    html! {
+        <html>
+        <head>
+            {head! {
+                title: "My Azumi App",
+                description: "A type-safe Rust web framework"
+            }}
+        </head>
+        <body>
+            <h1>"Welcome to Azumi"</h1>
+        </body>
+        </html>
+    }
+}
+```
+
+#### Full Meta with Social Sharing
+
+```rust
+#[azumi::component]
+pub fn BlogPost() -> impl Component {
+    let title = "Building with Azumi Live";
+    let description = "Learn how to create reactive UI components";
+
+    html! {
+        <html>
+        <head>
+            {head! {
+                title: title,
+                description: description,
+                image: "/static/azumi-preview.jpg",
+                url: "https://myapp.com/blog/azumi-live",
+                type: "article"
+            }}
+        </head>
+        <body>
+            <article>
+                <h1>{title}</h1>
+                <p>{description}</p>
+            </article>
+        </body>
+        </html>
+    }
+}
+```
+
+#### Dynamic Meta Values
+
+```rust
+#[azumi::component]
+pub fn ProductPage(product: &'a Product) -> impl Component + 'a {
+    html! {
+        <html>
+        <head>
+            {head! {
+                title: format!("{} - {} | My Store", product.name, product.category),
+                description: format!("Buy {} for ${}. {} {}", product.name, product.price, product.brand, product.description),
+                image: product.image_url,
+                url: format!("https://mystore.com/products/{}", product.id),
+                type: "product"
+            }}
+        </head>
+        <body>
+            <div>
+                <h1>{product.name}</h1>
+                <p>"$" {product.price}</p>
+            </div>
+        </body>
+        </html>
+    }
+}
+```
+
+#### Head Meta Field Reference
+
+| Field         | Required | Description          | Generated Tags                                                       |
+| ------------- | -------- | -------------------- | -------------------------------------------------------------------- |
+| `title`       | ✅ Yes   | Page title           | `<title>`, `og:title`, `twitter:title`                               |
+| `description` | ✅ Yes   | Page description     | `<meta name="description">`, `og:description`, `twitter:description` |
+| `image`       | ❌ No    | Social sharing image | `og:image`, `twitter:image`, `twitter:card="summary_large_image"`    |
+| `url`         | ❌ No    | Canonical URL        | `og:url`                                                             |
+| `type`        | ❌ No    | Content type         | `og:type` (defaults to "website")                                    |
+
+#### Meta Tag Output Examples
+
+**Minimal (title + description only):**
+
+```html
+<title>My Page</title>
+<meta name="description" content="Page description" />
+<meta property="og:title" content="My Page" />
+<meta property="og:description" content="Page description" />
+<meta property="og:type" content="website" />
+<meta name="twitter:title" content="My Page" />
+<meta name="twitter:description" content="Page description" />
+<meta name="twitter:card" content="summary" />
+```
+
+**Full (with image, URL, type):**
+
+```html
+<title>My Article</title>
+<meta name="description" content="Article description" />
+<meta property="og:title" content="My Article" />
+<meta property="og:description" content="Article description" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://example.com/article" />
+<meta property="og:image" content="/image.jpg" />
+<meta name="twitter:image" content="/image.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="My Article" />
+<meta name="twitter:description" content="Article description" />
+```
+
+#### SEO Best Practices
+
+```rust
+#[azumi::component]
+pub fn SEOOptimizedPage() -> impl Component {
+    let page_title = "Azumi Live Guide - Type-Safe Reactive UI";
+    let description = "Complete guide to building reactive web applications with Azumi Live. Zero JavaScript, full type safety.";
+    let keywords = "rust, web framework, reactive ui, type-safe, azumi";
+
+    html! {
+        <html lang="en">
+        <head>
+            {head! {
+                title: page_title,
+                description: description,
+                image: "/static/azumi-social-preview.jpg",
+                url: "https://azumi.dev/guide",
+                type: "article"
+            }}
+            // Additional SEO meta tags
+            <meta name="keywords" content={keywords} />
+            <meta name="author" content="Azumi Team" />
+            <meta name="robots" content="index, follow" />
+        </head>
+        <body>
+            <main>
+                <h1>"Azumi Live Guide"</h1>
+                <p>{description}</p>
+            </main>
+        </body>
+        </html>
+    }
+}
+```
+
+---
+
 ## 🎨 Styling System
 
 ### CSS Scoping: Component vs Global
@@ -1031,293 +1360,6 @@ pub async fn complex_action(&mut self) {
     // External API calls
     // Complex calculations
     // These cannot be predicted
-}
-```
-
----
-
-## 📋 Schema.org JSON-LD Structured Data
-
-Azumi supports generating Schema.org structured data for SEO through the `#[schema]` derive macro.
-
-### Basic Schema Support
-
-```rust
-use azumi::Schema;
-
-#[derive(Schema)]
-#[schema(type = "BlogPosting")]
-pub struct Article {
-    pub headline: String,
-    pub author: String,
-    pub date_published: String,
-    #[schema(skip)]
-    pub internal_id: String, // Skip this field in JSON-LD
-}
-
-#[azumi::component]
-pub fn ArticlePage(article: &Article) -> impl Component {
-    html! {
-        <html>
-        <head>
-            {head! {
-                title: &article.headline,
-                description: "Read this article about web development"
-            }}
-            {article.to_schema_script()} // ← Generates JSON-LD script
-        </head>
-        <body>
-            <article>
-                <h1>{article.headline}</h1>
-                <p>"By " {article.author} " on " {article.date_published}</p>
-                <div>"Article content goes here..."</div>
-            </article>
-        </body>
-        </html>
-    }
-}
-```
-
-### Custom Field Names
-
-```rust
-#[derive(Schema)]
-pub struct Product {
-    pub name: String,
-    #[schema(name = "description")]
-    pub product_description: String,
-    pub price: f64,
-    #[schema(name = "image")]
-    pub product_image_url: String,
-}
-
-// Generates: {
-//   "@type": "Product",
-//   "name": "...",
-//   "description": "...", // Note: camelCase -> original name
-//   "price": ...,
-//   "image": "..."
-// }
-```
-
-### Schema Types
-
-Common Schema.org types:
-
-| Type           | Use Case                  | Example Usage               |
-| -------------- | ------------------------- | --------------------------- |
-| `Article`      | Blog posts, news articles | News sites, blogs           |
-| `BlogPosting`  | Blog articles             | Personal/professional blogs |
-| `Product`      | E-commerce products       | Online stores               |
-| `Organization` | Companies, teams          | About pages                 |
-| `Person`       | Individual profiles       | Team pages, author bios     |
-| `Event`        | Events, webinars          | Event listings              |
-| `Recipe`       | Cooking instructions      | Food blogs                  |
-| `VideoObject`  | Video content             | YouTube embeds              |
-| `WebSite`      | Website information       | Site-wide metadata          |
-
-### Complex Schema Example
-
-```rust
-#[derive(Schema)]
-#[schema(type = "WebSite")]
-pub struct Website {
-    pub name: String,
-    pub url: String,
-    pub description: String,
-    pub potential_action: SearchAction,
-}
-
-#[derive(Schema)]
-pub struct SearchAction {
-    pub target: String,
-    pub query_input: String,
-}
-
-#[azumi::component]
-pub fn WebsiteLayout() -> impl Component {
-    let website = Website {
-        name: "My Azumi App".to_string(),
-        url: "https://myapp.com".to_string(),
-        description: "A modern web application".to_string(),
-        potential_action: SearchAction {
-            target: "https://myapp.com/search?q={search_term_string}".to_string(),
-            query_input: "search_term_string".to_string(),
-        },
-    };
-
-    html! {
-        <html>
-        <head>
-            {website.to_schema_script()}
-        </head>
-        <body>
-            <div>"Website content"</div>
-        </body>
-        </html>
-    }
-}
-```
-
----
-
-## 📄 Head Meta Tags (SEO & Social Sharing)
-
-The `head!` macro generates complete HTML head meta tags including title, description, and Open Graph/Twitter card tags.
-
-### Basic Head Meta
-
-```rust
-use azumi::head;
-
-#[azumi::component]
-pub fn Page() -> impl Component {
-    html! {
-        <html>
-        <head>
-            {head! {
-                title: "My Azumi App",
-                description: "A type-safe Rust web framework"
-            }}
-        </head>
-        <body>
-            <h1>"Welcome to Azumi"</h1>
-        </body>
-        </html>
-    }
-}
-```
-
-### Full Meta with Social Sharing
-
-```rust
-#[azumi::component]
-pub fn BlogPost() -> impl Component {
-    let title = "Building with Azumi Live";
-    let description = "Learn how to create reactive UI components";
-
-    html! {
-        <html>
-        <head>
-            {head! {
-                title: title,
-                description: description,
-                image: "/static/azumi-preview.jpg",
-                url: "https://myapp.com/blog/azumi-live",
-                type: "article"
-            }}
-        </head>
-        <body>
-            <article>
-                <h1>{title}</h1>
-                <p>{description}</p>
-            </article>
-        </body>
-        </html>
-    }
-}
-```
-
-### Dynamic Meta Values
-
-```rust
-#[azumi::component]
-pub fn ProductPage(product: &'a Product) -> impl Component + 'a {
-    html! {
-        <html>
-        <head>
-            {head! {
-                title: format!("{} - {} | My Store", product.name, product.category),
-                description: format!("Buy {} for ${}. {} {}", product.name, product.price, product.brand, product.description),
-                image: product.image_url,
-                url: format!("https://mystore.com/products/{}", product.id),
-                type: "product"
-            }}
-        </head>
-        <body>
-            <div>
-                <h1>{product.name}</h1>
-                <p>"$" {product.price}</p>
-            </div>
-        </body>
-        </html>
-    }
-}
-```
-
-### Head Meta Field Reference
-
-| Field         | Required | Description          | Generated Tags                                                       |
-| ------------- | -------- | -------------------- | -------------------------------------------------------------------- |
-| `title`       | ✅ Yes   | Page title           | `<title>`, `og:title`, `twitter:title`                               |
-| `description` | ✅ Yes   | Page description     | `<meta name="description">`, `og:description`, `twitter:description` |
-| `image`       | ❌ No    | Social sharing image | `og:image`, `twitter:image`, `twitter:card="summary_large_image"`    |
-| `url`         | ❌ No    | Canonical URL        | `og:url`                                                             |
-| `type`        | ❌ No    | Content type         | `og:type` (defaults to "website")                                    |
-
-### Meta Tag Output Examples
-
-**Minimal (title + description only):**
-
-```html
-<title>My Page</title>
-<meta name="description" content="Page description" />
-<meta property="og:title" content="My Page" />
-<meta property="og:description" content="Page description" />
-<meta property="og:type" content="website" />
-<meta name="twitter:title" content="My Page" />
-<meta name="twitter:description" content="Page description" />
-<meta name="twitter:card" content="summary" />
-```
-
-**Full (with image, URL, type):**
-
-```html
-<title>My Article</title>
-<meta name="description" content="Article description" />
-<meta property="og:title" content="My Article" />
-<meta property="og:description" content="Article description" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://example.com/article" />
-<meta property="og:image" content="/image.jpg" />
-<meta name="twitter:image" content="/image.jpg" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="My Article" />
-<meta name="twitter:description" content="Article description" />
-```
-
-### SEO Best Practices
-
-```rust
-#[azumi::component]
-pub fn SEOOptimizedPage() -> impl Component {
-    let page_title = "Azumi Live Guide - Type-Safe Reactive UI";
-    let description = "Complete guide to building reactive web applications with Azumi Live. Zero JavaScript, full type safety.";
-    let keywords = "rust, web framework, reactive ui, type-safe, azumi";
-
-    html! {
-        <html lang="en">
-        <head>
-            {head! {
-                title: page_title,
-                description: description,
-                image: "/static/azumi-social-preview.jpg",
-                url: "https://azumi.dev/guide",
-                type: "article"
-            }}
-            // Additional SEO meta tags
-            <meta name="keywords" content={keywords} />
-            <meta name="author" content="Azumi Team" />
-            <meta name="robots" content="index, follow" />
-        </head>
-        <body>
-            <main>
-                <h1>"Azumi Live Guide"</h1>
-                <p>{description}</p>
-            </main>
-        </body>
-        </html>
-    }
 }
 ```
 
