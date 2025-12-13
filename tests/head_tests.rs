@@ -39,9 +39,10 @@ fn test_full_head() {
 #[test]
 fn test_dynamic_values() {
     let page_title = "Dynamic Title";
+    let page_desc = format!("Description for {}", page_title);
     let meta = head! {
         title: page_title,
-        description: format!("Description for {}", page_title)
+        description: page_desc.as_str()
     };
 
     assert!(meta.0.contains("<title>Dynamic Title</title>"));
