@@ -53,11 +53,13 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
     // 3. Generate Wrapper
     let inner_name = format_ident!("_inner_{}", fn_name);
+    let mut inner_sig = fn_sig.clone();
+    inner_sig.ident = inner_name.clone();
 
     let expanded = quote! {
         // Inner implementation
         #[azumi::component]
-        fn #inner_name #fn_sig {
+        #inner_sig {
             #fn_block
         }
 
