@@ -16,7 +16,6 @@ resolver = "2"
 [features]
 schema = ["azumi-macros/schema"]
 test-utils = ["dep:scraper"]
-seo = []
 
 [dependencies]
 azumi-macros = { path = "macros" }
