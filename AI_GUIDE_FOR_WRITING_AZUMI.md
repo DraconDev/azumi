@@ -363,7 +363,74 @@ pub fn my_page() -> impl Component {
 
 ---
 
-## 📦 Asset Pipeline & Optimization
+## � Common Patterns & Recipes
+
+### 🟢 Azumi Live Pattern: Instant Toggle (e.g., Like Button)
+
+Use this for interactions that should feel "instant" to the user.
+
+```rust
+#[azumi::live]
+pub struct LikeState { pub liked: bool, pub count: i32 }
+
+#[azumi::live_impl(component = "like_button")]
+impl LikeState {
+    pub fn toggle(&mut self) {
+        // 1. Predictable update (runs instantly on client)
+        if self.liked {
+            self.count -= 1;
+        } else {
+            self.count += 1;
+        }
+        self.liked = !self.liked;
+    }
+}
+
+#[azumi::component]
+pub fn like_button<'a>(state: &'a LikeState) -> impl Component + 'a {
+    html! {
+        // data-bind ensures the count flips instantly
+        <button on:click={state.toggle} class={if state.liked { "liked" } else { "" }}>
+            {if state.liked { "❤️" } else { "🤍" }}
+            <span data-bind="count">{state.count}</span>
+        </button>
+    }
+}
+```
+
+### 🔵 Server Action Pattern: Login Form (RPC)
+
+Use this for data submission where you _want_ to wait for the server (e.g., validation, redirect).
+
+```rust
+#[derive(Deserialize)]
+pub struct LoginPayload { email: String, pass: String }
+
+#[azumi::action]
+pub async fn login_user(data: LoginPayload) -> impl Component {
+    // 1. Validate DB (unpredictable)
+    if let Ok(user) = db::auth(&data.email, &data.pass).await {
+        // 2. Return redirect or success UI
+        return html! { <div id="login-box">"Welcome back, " {user.name} "!"</div> };
+    }
+    // 3. Return error UI
+    html! { <div id="login-error" class="error">"Invalid credentials"</div> }
+}
+
+// In your view (Standard HTML Form):
+// Note: 'submit' event triggers the action
+html! {
+    <form az-on="submit call login_user -> #login-box">
+        <input name="email" type="email" />
+        <input name="pass" type="password" />
+        <button>"Login"</button>
+    </form>
+}
+```
+
+---
+
+## �📦 Asset Pipeline & Optimization
 
 Azumi includes a production-ready asset pipeline that handles hashing, rewriting, and optimization automatically.
 
