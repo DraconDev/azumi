@@ -901,11 +901,10 @@ fn generate_body_with_context(
                             match &attr.value {
                                 token_parser::AttributeValue::Dynamic(tokens) => {
                                     // Evaluate the expression and escape quotes for HTML attribute
-                                    instructions.push(quote! {
-                                        let __scope_val: String = #tokens;
-                                        let __escaped = __scope_val.replace("\"", "&quot;");
-                                        write!(f, " {}=\"{}\"", #attr_name, __escaped)?;
-                                    });
+                                    let __scope_val: String = #tokens;
+                                    let __escaped = __scope_val.replace("\"", "&quot;");
+                                    write!(f, " {}=\"{}\"", #attr_name, format!("{}|DEBUG", __escaped))?;
+                                });
                                 }
                                 token_parser::AttributeValue::Static(val) => {
                                     let clean = strip_outer_quotes(val);
