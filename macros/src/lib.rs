@@ -900,8 +900,11 @@ fn generate_body_with_context(
                         if attr_name == "az-scope" {
                             match &attr.value {
                                 token_parser::AttributeValue::Dynamic(tokens) => {
+                                    // Evaluate the expression and escape quotes for HTML attribute
                                     instructions.push(quote! {
-                                        write!(f, " {}=\"{}\"", #attr_name, azumi::html_escape::encode_double_quoted_attribute(&#tokens))?;
+                                        let __scope_val: String = #tokens;
+                                        let __escaped = __scope_val.replace("\"", "&quot;");
+                                        write!(f, " {}=\"{}\"", #attr_name, __escaped)?;
                                     });
                                 }
                                 token_parser::AttributeValue::Static(val) => {
