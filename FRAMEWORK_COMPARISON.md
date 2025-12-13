@@ -1,18 +1,19 @@
 # ⚔️ The Modern Web Architecture Matrix: Azumi vs. The World
 
-> **The Definitive Comparison Guide** > _Comparing: Azumi, Next.js, Leptos, Svelte 5, HTMX, Maud, and Rails_
+> **The Definitive Comparison Guide** > _Comparing: Azumi, Astro, Next.js, Leptos, Svelte 5, HTMX, Maud, and Rails_
 
 ---
 
 ## 🧐 The "TL;DR" Thesis
 
-The web is currently divided into three camps:
+The web is currently divided into four camps:
 
 1.  **The Hydrators (Next.js, Svelte, Remix):** "We'll fix it in post." They send HTML, then send JS to replay the logic. Great UX, bad TTI.
 2.  **The App-Builders (Leptos, Dioxus):** "Download the whole world." They treat the browser like an OS. Great for tools, bad for sites.
 3.  **The Purists (HTMX, Maud, Rails):** "Wait for the network." The server does everything. Simple model, sluggish feel.
+4.  **The Islanders (Astro):** "Zero JS by default, hydrate only islands." Static-first with surgical interactivity. Great for content, limited for apps.
 
-**Azumi leads the fourth camp: The Optimists.**
+**Azumi leads the fifth camp: The Optimists.**
 They rely on **Compiler-Driven Optimistic UI (CDO)**. Their philosophy? **"Assume success."**
 The server matches the Purists (SSOT), but compiles optimistic predictions into the HTML. The client updates instantly, bridging the gap between static speed and dynamic feel.
 
