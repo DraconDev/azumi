@@ -914,6 +914,53 @@ fn generate_body_with_context(
                         continue;
                     }
 
+                    // Handle on:* attributes (Events) - stringify method access
+                    if attr_name.starts_with("on:") {
+                        match &attr.value {
+                            token_parser::AttributeValue::Dynamic(tokens) => {
+                                // Parse as expression to extracting name, but fallback to stringify
+                                // Try to parse `obj.method` or `method`
+                                let s = if let Ok(expr) = syn::parse2::<syn::Expr>(tokens.clone()) {
+                                    match expr {
+                                        syn::Expr::Field(f) => {
+                                            if let syn::Member::Named(ident) = f.member {
+                                                ident.to_string()
+                                            } else {
+                                                tokens.to_string().replace(" ", "")
+                                            }
+                                        }
+                                        syn::Expr::Path(p) => {
+                                            if let Some(ident) = p.path.get_ident() {
+                                                ident.to_string()
+                                            } else {
+                                                tokens.to_string().replace(" ", "")
+                                            }
+                                        }
+                                        syn::Expr::MethodCall(m) => {
+                                            // method() -> "method"
+                                            m.method.to_string()
+                                        }
+                                        _ => tokens.to_string().replace(" ", ""),
+                                    }
+                                } else {
+                                    tokens.to_string().replace(" ", "")
+                                };
+
+                                instructions.push(quote! {
+                                    write!(f, " {}=\"{}\"", #attr_name, #s)?;
+                                });
+                            }
+                            token_parser::AttributeValue::Static(val) => {
+                                let clean = strip_outer_quotes(val);
+                                instructions.push(quote! {
+                                    write!(f, " {}=\"{}\"", #attr_name, #clean)?;
+                                });
+                            }
+                            _ => {}
+                        }
+                        continue;
+                    }
+
                     if attr_name == "class" {
                         match &attr.value {
                             token_parser::AttributeValue::Static(val) => {
@@ -1119,8 +1166,9 @@ fn generate_body_with_context(
                             let children_body =
                                 generate_body_with_context(&call_block.children, ctx);
                             // Wrap children in a component-compatible closure
+                            // IMPORTANT: Do NOT use `move` here. Inner closure should borrow from outer closure.
                             let children_arg = quote! {
-                                azumi::from_fn(move |f| {
+                                azumi::from_fn(|f| {
                                     #children_body
                                     Ok(())
                                 })
