@@ -282,15 +282,18 @@ class Azumi {
         // Find scope element
         const scopeElement = element.closest("[az-scope]");
 
-        // IMPORTANT: Capture original state BEFORE prediction
-        // We send original state to server, not predicted state
+        // IMPORTANT: Capture state BEFORE prediction
+        // We must send the original, signed state to the server.
+        // If we predict first, we might dirty the state or invalidly sign it.
         let body = null;
         if (element.tagName === "FORM") {
+            // For forms, we send the form data, not the state
             body = new FormData(element);
             const data = Object.fromEntries(body.entries());
             body = JSON.stringify(data);
         } else {
             if (scopeElement) {
+                // Get the raw attribute value (including signature if present)
                 let scopeData = scopeElement.getAttribute("az-scope");
                 body = scopeData || "{}";
             } else {
@@ -303,7 +306,8 @@ class Azumi {
         let predictionResult = null;
 
         if (prediction && scopeElement) {
-            // Execute prediction AFTER capturing state (0ms latency!)
+            // Execute prediction. This updates the DOM optimistically.
+            // But we already captured 'body' (original state) above, so we are safe!
             predictionResult = this.executePrediction(scopeElement, prediction);
         }
 
@@ -313,7 +317,7 @@ class Azumi {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body,
+                body, // Sends the ORIGINAL, validly signed state
             });
 
             if (!res.ok) throw new Error(`Action failed: ${res.status}`);
