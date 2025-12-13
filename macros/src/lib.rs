@@ -1,4 +1,4 @@
-// Force rebuild 9
+// Force rebuild 10
 mod component;
 
 mod accessibility_validator;
@@ -104,6 +104,15 @@ fn transform_path_for_component(path: &syn::Path) -> syn::Path {
         }
     }
     new_path
+}
+
+// Helper for parsing space-separated expressions (e.g. class={expr1 expr2})
+fn parse_multi_exprs(input: ParseStream) -> syn::Result<Vec<syn::Expr>> {
+    let mut exprs = Vec::new();
+    while !input.is_empty() {
+        exprs.push(input.parse()?);
+    }
+    Ok(exprs)
 }
 
 /// Validates that a style attribute only contains CSS custom properties (--variables).
@@ -881,7 +890,27 @@ fn generate_body_with_context(
                 for attr in &elem.attrs {
                     let attr_name = &attr.name;
 
-                    if attr_name == "class" && ctx.scope_id.is_some() {
+                    // Handle az-* attributes (DSL treated as string)
+                    if attr_name.starts_with("az-") {
+                        match &attr.value {
+                            token_parser::AttributeValue::Dynamic(tokens) => {
+                                let s = tokens.to_string(); // Stringify tokens
+                                instructions.push(quote! {
+                                    write!(f, " {}=\"{}\"", #attr_name, #s)?;
+                                });
+                            }
+                            token_parser::AttributeValue::Static(val) => {
+                                let clean = strip_outer_quotes(val);
+                                instructions.push(quote! {
+                                    write!(f, " {}=\"{}\"", #attr_name, #clean)?;
+                                });
+                            }
+                            _ => {}
+                        }
+                        continue;
+                    }
+
+                    if attr_name == "class" {
                         match &attr.value {
                             token_parser::AttributeValue::Static(val) => {
                                 let clean = strip_outer_quotes(val);
@@ -889,14 +918,32 @@ fn generate_body_with_context(
                                     write!(f, " class=\"{}\"", #clean)?;
                                 });
                             }
-                            token_parser::AttributeValue::Dynamic(expr) => {
-                                instructions.push(quote! {
-                                    write!(f, " class=\"{}\"", azumi::Escaped(&#expr))?;
-                                });
+                            token_parser::AttributeValue::Dynamic(tokens) => {
+                                // Try parsing as multi-expr
+                                let exprs_res =
+                                    syn::parse::Parser::parse2(parse_multi_exprs, tokens.clone());
+                                match exprs_res {
+                                    Ok(exprs) if !exprs.is_empty() => {
+                                        // Collect format string "{} {}"
+                                        let fmt = vec!["{}"; exprs.len()].join(" ");
+                                        instructions.push(quote! {
+                                            write!(f, " class=\"{}\"", azumi::Escaped(&format!(#fmt, #(#exprs),*)))?;
+                                        });
+                                    }
+                                    _ => {
+                                        // Fallback or empty
+                                        instructions.push(quote! {
+                                            write!(f, " class=\"{}\"", azumi::Escaped(&#tokens))?;
+                                        });
+                                    }
+                                }
                             }
                             _ => {}
                         }
-                    } else if attr_name == "style" {
+                        continue;
+                    }
+
+                    if attr_name == "style" {
                         match &attr.value {
                             token_parser::AttributeValue::StyleDsl(props) => {
                                 instructions.push(quote! { write!(f, " style=\"")?; });
