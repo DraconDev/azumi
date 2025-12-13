@@ -18,7 +18,7 @@ mod token_parser;
 
 use proc_macro::TokenStream;
 use quote::{quote, quote_spanned};
-use syn::parse::{Parse, ParseStream};
+use syn::parse::{Parse, ParseStream, Parser};
 use syn::parse_macro_input;
 use syn::spanned::Spanned;
 use syn::Token; // Needed for Token! macro
