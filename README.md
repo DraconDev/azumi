@@ -81,6 +81,19 @@ Every component's state is HMAC-signed. Users can't forge counts, bypass auth, o
 // → 400 Bad Request. Automatically. No code needed.
 ```
 
+### 4. Automatic SEO
+
+Azumi infers metadata directly from your Rust code. Zero configuration required.
+
+```rust
+/// About Us
+/// We are a team of passionate developers...
+#[azumi::page]
+pub fn about_us() -> impl Component { ... }
+```
+
+**Generates:** `<title>About Us</title>`, `<meta name="description" ...>`, OpenGraph tags, and Twitter cards automatically.
+
 ### 5. Production-Ready Asset Pipeline
 
 -   **Content-hashed filenames** → Immutable caching (1 year)
