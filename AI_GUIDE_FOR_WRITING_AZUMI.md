@@ -238,6 +238,109 @@ let app = Router::new()
 
 ---
 
+## ⚡ Server Actions & `az-scope` (Interactivity)
+
+Azumi uses **Server Actions** for interactivity. The client sends state to the server, the action updates it, and the server returns re-rendered HTML.
+
+### 1. Defining an Action
+
+Use `#[azumi::action]` to create a server action. The macro auto-generates the Axum route.
+
+```rust
+#[derive(Serialize, Deserialize, Default, Clone)]
+pub struct CounterState {
+    pub count: i32,
+}
+
+// The action receives state from the client and returns new HTML
+#[azumi::action]
+pub async fn increment_counter(state: CounterState) -> impl Component {
+    let new_state = CounterState { count: state.count + 1 };
+    counter_display(new_state) // Re-render the component
+}
+```
+
+### 2. Using `az-scope` (State Container)
+
+The `az-scope` attribute tells Azumi which element holds the state. **Critical: The value MUST be a dynamic expression (`{...}`).**
+
+```rust
+pub fn counter_display(state: CounterState) -> impl Component {
+    html! {
+        // ✅ CORRECT: Dynamic expression - evaluates to JSON
+        <div id={counter_box} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
+            <div>{state.count}</div>
+            <button az-on={click call increment_counter -> #counter_box}>
+                "Increment"
+            </button>
+        </div>
+    }
+}
+```
+
+> [!WARNING] > **Common Mistake**: Using static strings for `az-scope` won't work.
+>
+> ```rust
+> // ❌ WRONG: This renders the literal string, not the JSON
+> <div az-scope="some_static_value">
+> ```
+
+### 3. The `az-on` Attribute (Event Binding)
+
+Format: `az-on={EVENT call ACTION_NAME -> TARGET}`
+
+| Part               | Description                                             |
+| ------------------ | ------------------------------------------------------- |
+| `EVENT`            | Browser event: `click`, `submit`, `change`, `input`     |
+| `call ACTION_NAME` | The Rust function name (with `#[azumi::action]`)        |
+| `-> TARGET`        | CSS selector for the element to morph with the response |
+
+```rust
+// Call `toggle_like` on click, morph response into #like_box
+<button az-on={click call toggle_like -> #like_box}>
+```
+
+### 4. Registering Actions (in `main.rs`)
+
+Actions are auto-registered via `inventory`. Just merge the router:
+
+```rust
+let app = Router::new()
+    .route("/", get(home_handler))
+    .merge(azumi::action::register_actions(axum::Router::new())); // <- Required!
+```
+
+### 5. Complete Example
+
+```rust
+// State
+#[derive(Serialize, Deserialize, Default, Clone)]
+pub struct LikeState { pub liked: bool, pub count: i32 }
+
+// Component
+pub fn like_button(state: LikeState) -> impl Component {
+    html! {
+        <div id={like_box} az-scope={serde_json::to_string(&state).unwrap_or_default()}>
+            <button az-on={click call toggle_like -> #like_box}>
+                {if state.liked { "❤️" } else { "🤍" }} " " {state.count}
+            </button>
+        </div>
+    }
+}
+
+// Action
+#[azumi::action]
+pub async fn toggle_like(state: LikeState) -> impl Component {
+    let new_state = LikeState {
+        liked: !state.liked,
+        count: if state.liked { state.count - 1 } else { state.count + 1 },
+    };
+    like_button(new_state)
+}
+```
+
+---
+
 ## 📦 Asset Pipeline & Optimization
 
 Azumi includes a production-ready asset pipeline that handles hashing, rewriting, and optimization automatically.
