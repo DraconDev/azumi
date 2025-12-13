@@ -184,6 +184,60 @@ pub fn RootLayout(children: impl Component) -> impl Component {
 
 ---
 
+## 🔌 Server-Side Integration (Axum)
+
+Azumi is designed to run on top of **Axum**. You possess full control over the server, routing, and middleware.
+
+### 1. Routing & Handlers
+
+Routing is **manual and explicit**. You map routes to async handler functions in `main.rs`.
+
+**Handler Pattern:**
+
+1.  Define an async function.
+2.  Perform data fetching (DB, API) inside the handler.
+3.  Pass data to the component.
+4.  Render the component to a string response.
+
+```rust
+// 1. Logic & Data Fetching (The Handler)
+pub async fn profile_handler(Path(user_id): Path<String>) -> impl IntoResponse {
+    // A. Fetch Data (Async)
+    let user = db::get_user(&user_id).await.expect("User not found");
+
+    // B. Render Component
+    // Pass strictly typed data to the component
+    let view = ProfilePage(user);
+
+    // C. Return HTML
+    Html(azumi::render_to_string(&view))
+}
+
+// 2. The Component (Pure Presentation)
+#[azumi::page]
+fn ProfilePage(user: User) -> impl Component {
+    html! {
+        <h1>"Hello, " {user.name}</h1>
+    }
+}
+
+// 3. Mount in main.rs
+let app = Router::new()
+    .route("/profile/:id", get(profile_handler));
+```
+
+### 2. Middleware
+
+Use standard Axum middleware layers to handle cross-cutting concerns like Auth, Logging, or Compression.
+
+```rust
+let app = Router::new()
+    .route("/", get(home_handler))
+    .layer(axum::middleware::from_fn(auth_middleware)); // Apply to all routes
+```
+
+---
+
 ## 📦 Asset Pipeline & Optimization
 
 Azumi includes a production-ready asset pipeline that handles hashing, rewriting, and optimization automatically.
