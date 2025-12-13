@@ -79,21 +79,11 @@ pub fn expand_head(input: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         {
-            // If SEO feature is enabled, use the robust runtime engine
-            #[cfg(feature = "seo")]
-            {
-                azumi::seo::generate_head(
-                    #title,
-                    #description,
-                    #image,
-                )
-            }
-
-            // Fallback for non-SEO builds (minimal title only)
-            #[cfg(not(feature = "seo"))]
-            {
-                format!("<title>{}</title>", #title)
-            }
+            azumi::seo::generate_head(
+                #title,
+                #description,
+                #image,
+            )
         }
     };
 
