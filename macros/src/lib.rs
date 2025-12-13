@@ -969,14 +969,18 @@ fn generate_body_with_context(
                                     tokens.to_string().replace(" ", "")
                                 };
 
+                                let event_name = attr_name.strip_prefix("on:").unwrap_or(attr_name);
+                                let dsl = format!("{} call {}", event_name, s);
                                 instructions.push(quote! {
-                                    write!(f, " {}=\"{}\"", #attr_name, #s)?;
+                                    write!(f, " az-on=\"{}\"", #dsl)?;
                                 });
                             }
                             token_parser::AttributeValue::Static(val) => {
                                 let clean = strip_outer_quotes(val);
+                                let event_name = attr_name.strip_prefix("on:").unwrap_or(attr_name);
+                                let dsl = format!("{} call {}", event_name, clean);
                                 instructions.push(quote! {
-                                    write!(f, " {}=\"{}\"", #attr_name, #clean)?;
+                                    write!(f, " az-on=\"{}\"", #dsl)?;
                                 });
                             }
                             _ => {}
