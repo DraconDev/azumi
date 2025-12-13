@@ -263,13 +263,10 @@ impl SitemapBuilder {
                 path
             } else {
                 format!(
-                    "{}{}",
+                    "{}{}{}",
                     base,
-                    if path.starts_with('/') {
-                        &path[..]
-                    } else {
-                        &format!("/{}", path)
-                    }
+                    if path.starts_with('/') { "" } else { "/" },
+                    path
                 )
             };
 
