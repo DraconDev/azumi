@@ -1,4 +1,4 @@
-// Force rebuild 8
+// Force rebuild 9
 mod component;
 
 mod accessibility_validator;
@@ -21,6 +21,7 @@ use quote::{quote, quote_spanned};
 use syn::parse::{Parse, ParseStream};
 use syn::parse_macro_input;
 use syn::spanned::Spanned;
+use syn::Token; // Needed for Token! macro
 
 #[proc_macro]
 pub fn head(input: TokenStream) -> TokenStream {
@@ -48,36 +49,16 @@ pub fn action(_attr: TokenStream, item: TokenStream) -> TokenStream {
     action::expand_action(item)
 }
 
-/// Azumi Live - Compiler-driven optimistic UI
-///
-/// Marks a struct as a live component state. The macro:
-/// - Adds Serialize/Deserialize derives
-/// - Generates `to_scope()` helper method
-///
-/// Use with `#[azumi::live_impl]` on the impl block to enable
-/// automatic prediction generation.
 #[proc_macro_attribute]
 pub fn live(attr: TokenStream, item: TokenStream) -> TokenStream {
     live::expand_live(attr, item)
 }
 
-/// Azumi Live Impl - Method analysis for optimistic UI
-///
-/// Analyzes methods in an impl block for predictable mutations:
-/// - `self.field = literal` → SetLiteral prediction
-/// - `self.field = !self.field` → Toggle prediction  
-/// - `self.field += value` → Add prediction
-/// - `self.field -= value` → Sub prediction
-///
-/// Generates Axum action handlers automatically.
 #[proc_macro_attribute]
 pub fn live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     live::expand_live_impl(attr, item)
 }
 
-/// Helper attribute for optimistic UI predictions
-/// Used inside #[azumi::live_impl] blocks.
-/// This is a marker attribute that is read by `live_impl` but needs to exist for the compiler.
 #[proc_macro_attribute]
 pub fn predict(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
@@ -90,6 +71,39 @@ impl Parse for NodesWrapper {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         token_parser::parse_nodes(input).map(NodesWrapper)
     }
+}
+
+// Helpers for parsing Component arguments
+struct KeyValueArg {
+    key: syn::Ident,
+    value: syn::Expr,
+}
+
+impl Parse for KeyValueArg {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let key = input.parse()?;
+        input.parse::<Token![=]>()?;
+        let value = input.parse()?;
+        Ok(KeyValueArg { key, value })
+    }
+}
+
+fn parse_args(tokens: proc_macro2::TokenStream) -> syn::Result<Vec<KeyValueArg>> {
+    let parser = syn::punctuated::Punctuated::<KeyValueArg, Token![,]>::parse_terminated;
+    parser.parse2(tokens).map(|p| p.into_iter().collect())
+}
+
+// Helper to transform snake_case component paths to their module name (append _component)
+fn transform_path_for_component(path: &syn::Path) -> syn::Path {
+    let mut new_path = path.clone();
+    if let Some(last) = new_path.segments.last_mut() {
+        let s = last.ident.to_string();
+        // If starts with lowercase, it's snake_case -> append _component
+        if s.chars().next().map(|c| c.is_lowercase()).unwrap_or(false) {
+            last.ident = syn::Ident::new(&format!("{}_component", s), last.ident.span());
+        }
+    }
+    new_path
 }
 
 /// Validates that a style attribute only contains CSS custom properties (--variables).
@@ -110,14 +124,8 @@ fn validate_style_only_css_vars(style_value: &str) -> Result<(), String> {
             // Property must start with --
             if !prop_name.starts_with("--") {
                 return Err(format!(
-                    "Invalid style property '{}'. Only CSS variables are allowed in inline styles.\n\
-                    \n\
-                    Allowed:\n\
-                    - CSS Variables: style={{ --custom-color: \"red\" }}\n\
-                    - CSS Variables (string): style=\"--custom-color: red\"\n\
-                    \n\
-                    For standard properties like '{}', please use CSS classes in the <style> block.",
-                    prop_name, prop_name
+                    "Invalid style property '{}'. Only CSS variables are allowed in inline styles.",
+                    prop_name
                 ));
             }
         }
@@ -161,8 +169,6 @@ pub fn html(input: TokenStream) -> TokenStream {
 
             // Runtime HTML generation
             azumi::from_fn(move |f| {
-                // Inject global CSS first (unscoped)
-                // CSS Injection is now handled by generated code (smart injection into <head>)
                 if false {
                    // Legacy code removed
                 }
@@ -202,12 +208,10 @@ fn process_styles(nodes: &[token_parser::Node]) -> (proc_macro2::TokenStream, St
         match node {
             token_parser::Node::Block(token_parser::Block::Style(style_block)) => {
                 if style_block.is_global {
-                    // Global styles: validate but don't scope, but DO generate bindings
                     let output = style::process_global_style_macro(style_block.content.clone());
                     bindings.extend(output.bindings);
                     global_css.push_str(&output.css);
                 } else {
-                    // Scoped styles: normal processing
                     let output = style::process_style_macro(style_block.content.clone());
                     bindings.extend(output.bindings);
                     scoped_css.push_str(&output.css);
@@ -271,7 +275,6 @@ fn collect_bind_checks(nodes: &[token_parser::Node], checks: &mut Vec<proc_macro
     for node in nodes {
         match node {
             token_parser::Node::Element(elem) => {
-                // If this element has bind={Struct}, generate a check function
                 if let Some(struct_path) = &elem.bind_struct {
                     let mut field_accesses = Vec::new();
                     collect_input_names(&elem.children, struct_path, &mut field_accesses);
@@ -289,35 +292,31 @@ fn collect_bind_checks(nodes: &[token_parser::Node], checks: &mut Vec<proc_macro
                         checks.push(check_block);
                     }
                 }
-                // Recurse
                 collect_bind_checks(&elem.children, checks);
             }
             token_parser::Node::Fragment(frag) => {
                 collect_bind_checks(&frag.children, checks);
             }
-            token_parser::Node::Block(block) => {
-                // Handle blocks (if, for, match, etc.) by recursing into their bodies
-                match block {
-                    token_parser::Block::If(if_block) => {
-                        collect_bind_checks(&if_block.then_branch, checks);
-                        if let Some(else_branch) = &if_block.else_branch {
-                            collect_bind_checks(else_branch, checks);
-                        }
+            token_parser::Node::Block(block) => match block {
+                token_parser::Block::If(if_block) => {
+                    collect_bind_checks(&if_block.then_branch, checks);
+                    if let Some(else_branch) = &if_block.else_branch {
+                        collect_bind_checks(else_branch, checks);
                     }
-                    token_parser::Block::For(for_block) => {
-                        collect_bind_checks(&for_block.body, checks);
-                    }
-                    token_parser::Block::Match(match_block) => {
-                        for arm in &match_block.arms {
-                            collect_bind_checks(&arm.body, checks);
-                        }
-                    }
-                    token_parser::Block::Call(call_block) => {
-                        collect_bind_checks(&call_block.children, checks);
-                    }
-                    _ => {}
                 }
-            }
+                token_parser::Block::For(for_block) => {
+                    collect_bind_checks(&for_block.body, checks);
+                }
+                token_parser::Block::Match(match_block) => {
+                    for arm in &match_block.arms {
+                        collect_bind_checks(&arm.body, checks);
+                    }
+                }
+                token_parser::Block::Call(call_block) => {
+                    collect_bind_checks(&call_block.children, checks);
+                }
+                _ => {}
+            },
             _ => {}
         }
     }
@@ -332,26 +331,19 @@ fn collect_input_names(
         match node {
             token_parser::Node::Element(elem) => {
                 if elem.name == "input" || elem.name == "textarea" || elem.name == "select" {
-                    // Find "name" attribute
                     for attr in &elem.attrs {
                         if attr.name == "name" {
                             if let token_parser::AttributeValue::Static(name_str) = &attr.value {
-                                // Use the span of the attribute value for better error reporting
                                 let span = attr.value_span.unwrap_or(attr.span);
                                 let parts: Vec<&str> = name_str.split('.').collect();
-
-                                // Validate each part is a valid Rust identifier
                                 let mut all_valid = true;
                                 for part in &parts {
                                     if !is_valid_identifier(part) {
                                         all_valid = false;
-                                        let error_msg = format!(
-                                            "Invalid field name '{}' in form binding. Field names must be valid Rust identifiers (no spaces or special characters).",
-                                            part
+                                        let error_msg = format!("Invalid field name: {}", part);
+                                        errors.push(
+                                            quote_spanned! {span=> compile_error!(#error_msg); },
                                         );
-                                        errors.push(quote_spanned! {span=>
-                                            compile_error!(#error_msg);
-                                        });
                                         break;
                                     }
                                 }
@@ -360,13 +352,11 @@ fn collect_input_names(
                                     continue;
                                 }
 
-                                // Generate identifiers for the field path
                                 let field_idents: Vec<proc_macro2::Ident> = parts
                                     .iter()
                                     .map(|s| proc_macro2::Ident::new(s, span))
                                     .collect();
 
-                                // Generate validation that field exists on struct
                                 errors.push(quote! {
                                     let _ = &data.#(#field_idents).*;
                                 });
@@ -374,7 +364,6 @@ fn collect_input_names(
                         }
                     }
                 }
-                // Recurse (e.g. input inside label or div)
                 collect_input_names(&elem.children, bind_struct, errors);
             }
             token_parser::Node::Fragment(frag) => {
@@ -385,27 +374,20 @@ fn collect_input_names(
     }
 }
 
-// Helper function to check if a string is a valid Rust identifier
 fn is_valid_identifier(s: &str) -> bool {
     if s.is_empty() {
         return false;
     }
-
     let mut chars = s.chars();
     let first = chars.next().unwrap();
-
-    // First character must be alphabetic or underscore
     if !first.is_alphabetic() && first != '_' {
         return false;
     }
-
-    // Remaining characters must be alphanumeric or underscore
     for c in chars {
         if !c.is_alphanumeric() && c != '_' {
             return false;
         }
     }
-
     true
 }
 
@@ -417,8 +399,6 @@ fn generate_nodes(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
     }
 }
 
-/// Strip outer quotes from string literals for cleaner text rendering
-/// If the user wants literal quotes, they should use raw strings like r#""Hello""#
 fn strip_outer_quotes(s: &str) -> String {
     let trimmed = s.trim();
     if trimmed.len() >= 2
@@ -440,9 +420,7 @@ enum Context {
 struct GenerationContext {
     mode: Context,
     scope_id: Option<String>,
-    /// All valid class names (before scoping) for auto-scoping static strings
     valid_classes: std::collections::HashSet<String>,
-    /// All valid ID names for auto-scoping static strings  
     valid_ids: std::collections::HashSet<String>,
 }
 
@@ -479,8 +457,6 @@ impl GenerationContext {
     }
 }
 
-/// Collect ALL CSS content from all <style> tags in the component
-/// Returns (global_css, scoped_css)
 fn collect_all_styles(nodes: &[token_parser::Node]) -> (String, String) {
     let mut global_css = String::new();
     let mut scoped_css = String::new();
@@ -497,12 +473,8 @@ fn collect_styles_recursive(
         match node {
             token_parser::Node::Element(elem) => {
                 if elem.name == "style" {
-                    // Extract CSS from this style tag
                     if let Some(_src_attr) = elem.attrs.iter().find(|a| a.name == "src") {
-                        // External CSS is banned, do nothing here.
-                        // Validation will catch it.
                     } else {
-                        // Inline content - treat as scoped
                         for child in &elem.children {
                             if let token_parser::Node::Text(text) = child {
                                 scoped_css.push_str(&text.content);
@@ -511,7 +483,6 @@ fn collect_styles_recursive(
                         }
                     }
                 } else {
-                    // Recurse into children
                     collect_styles_recursive(&elem.children, global_css, scoped_css);
                 }
             }
@@ -520,7 +491,6 @@ fn collect_styles_recursive(
             }
             token_parser::Node::Block(block) => match block {
                 token_parser::Block::Style(style_block) => {
-                    // Handle <style> blocks - reconstruct CSS from TokenStream
                     let css_content =
                         crate::style::reconstruct_css_from_tokens(style_block.content.clone());
                     if style_block.is_global {
@@ -556,15 +526,11 @@ fn collect_styles_recursive(
 }
 
 fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
-    // Pass 0: CSS Validation - Revolutionary compile-time CSS type checking!
     let css_validation_errors = css_validator::validate_component_css(nodes);
-
-    // If there are compile errors from CSS validation, emit them
     if !css_validation_errors.is_empty() {
         return css_validation_errors;
     }
 
-    // Pass 0.1: Validate Node Order (Script -> HTML -> Style) - Enforced at top level
     let order_errors = html_structure_validator::validate_node_order(nodes);
     if !order_errors.is_empty() {
         let mut tokens = proc_macro2::TokenStream::new();
@@ -574,21 +540,15 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         return tokens;
     }
 
-    // Collect all CSS content first (needed for validation and scoping)
     let (global_css, scoped_css) = collect_all_styles(nodes);
-
-    // Pass 0.5: Strict CSS Validation (New Feature)
-    // Extract valid selectors from the SCOPED CSS only (global CSS is opt-out)
     let (valid_classes, valid_ids) = crate::css::extract_selectors(&scoped_css);
 
-    // Validate nodes against strict rules - COMPILE ERRORS
     let style_validation_errors =
         validate_nodes(nodes, &valid_classes, &valid_ids, !scoped_css.is_empty());
     if !style_validation_errors.is_empty() {
         return style_validation_errors;
     }
 
-    // Pass 1: Check if component has any style tags
     let has_global = !global_css.is_empty();
     let has_scoped = !scoped_css.is_empty();
 
@@ -596,7 +556,6 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
 
-        // Generate scoped CSS and ID
         let (scoped_output, scope_id) = if has_scoped {
             let mut hasher = DefaultHasher::new();
             scoped_css.hash(&mut hasher);
@@ -610,7 +569,6 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
             (String::new(), None)
         };
 
-        // Construct CSS string to inject
         let css_to_inject = if has_global {
             if has_scoped {
                 format!(
@@ -627,13 +585,9 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
             )
         };
 
-        // Attempt to inject into AST (find <head>)
-        // We need a mutable nodes vector
         let mut working_nodes = nodes.to_vec();
         let injected = inject_css_into_head(&mut working_nodes, &css_to_inject);
 
-        // Generate body with context (scope ID etc)
-        // If injected, working_nodes has the styles. If not, we prepend.
         let ctx = if let Some(sid) = scope_id {
             GenerationContext::with_scope(sid, valid_classes.clone(), valid_ids.clone())
         } else {
@@ -643,10 +597,8 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         let body_content = generate_body_with_context(&working_nodes, &ctx);
 
         if injected {
-            // CSS successfully injected into <head>
             body_content
         } else {
-            // Fallback: Prepend (only for fragments/components without head)
             quote! {
                 write!(f, "{}", #css_to_inject)?;
                 #body_content
@@ -657,15 +609,12 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
     }
 }
 
-// Helper to inject CSS into <head>
 fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool {
     for node in nodes.iter_mut() {
         match node {
             token_parser::Node::Element(elem) => {
                 if elem.name == "head" {
-                    // Found <head>! Inject CSS as first child
-                    // Create Node::Text with quoted string for generate_body_with_context
-                    let content = format!("{:?}", css); // quote the string
+                    let content = format!("{:?}", css);
                     let text_node = token_parser::Node::Text(token_parser::Text {
                         content,
                         span: elem.span,
@@ -673,7 +622,6 @@ fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool 
                     elem.children.insert(0, text_node);
                     return true;
                 }
-                // Recurse
                 if inject_css_into_head(&mut elem.children, css) {
                     return true;
                 }
@@ -724,7 +672,6 @@ fn validate_nodes(
                     for attr in &elem.attrs {
                         let name = &attr.name;
 
-                        // Rule 1: Check inline styles
                         if name == "style" {
                             match &attr.value {
                                 token_parser::AttributeValue::Static(_) => {
@@ -733,17 +680,10 @@ fn validate_nodes(
                                     compile_error!("Static style attributes are banned (e.g. style=\"...\"). Use style={ --prop: value } instead.");
                                 });
                                 }
-                                token_parser::AttributeValue::StyleDsl(_) => {
-                                    // Style DSL is allowed!
-                                }
-                                token_parser::AttributeValue::Dynamic(_) => {
-                                    // Dynamic styles are allowed (we trust the user or warn later)
-                                }
                                 _ => {}
                             }
                         }
 
-                        // Rule 2: Check class existence - COMPILE ERROR
                         if name == "class" {
                             match &attr.value {
                                 token_parser::AttributeValue::Static(_) => {
@@ -753,7 +693,6 @@ fn validate_nodes(
                                     });
                                 }
                                 token_parser::AttributeValue::Dynamic(tokens) => {
-                                    // Check if variable name matches an ID but is used in class
                                     if let Ok(ident) = syn::parse2::<syn::Ident>(tokens.clone()) {
                                         let var_name = ident.to_string();
                                         if valid_ids.contains(&var_name)
@@ -770,7 +709,6 @@ fn validate_nodes(
                                     }
                                 }
                                 token_parser::AttributeValue::StyleDsl(_) => {
-                                    // Style DSL is not valid for class attribute
                                     errors.push(quote_spanned! { attr.span =>
                                         compile_error!("Style DSL syntax { --var: val } is only allowed in 'style' attribute.");
                                     });
@@ -779,7 +717,6 @@ fn validate_nodes(
                             }
                         }
 
-                        // Rule 3: Check ID existence - COMPILE ERROR
                         if name == "id" {
                             match &attr.value {
                                 token_parser::AttributeValue::Static(_) => {
@@ -789,7 +726,6 @@ fn validate_nodes(
                                     });
                                 }
                                 token_parser::AttributeValue::Dynamic(tokens) => {
-                                    // Check if variable name matches a Class but is used in ID
                                     if let Ok(ident) = syn::parse2::<syn::Ident>(tokens.clone()) {
                                         let var_name = ident.to_string();
                                         if valid_classes.contains(&var_name)
@@ -806,7 +742,6 @@ fn validate_nodes(
                                     }
                                 }
                                 token_parser::AttributeValue::StyleDsl(_) => {
-                                    // Style DSL is not valid for id attribute
                                     errors.push(quote_spanned! { attr.span =>
                                         compile_error!("Style DSL syntax { --var: val } is only allowed in 'style' attribute.");
                                     });
@@ -815,13 +750,11 @@ fn validate_nodes(
                             }
                         }
 
-                        // Rule 4: Validate attribute name (Strict HTML)
                         if let Some(err) = html_structure_validator::validate_attribute_name(attr) {
                             errors.push(err);
                         }
                     }
 
-                    // Recurse attributes/children
                     collect_errors_recursive(
                         &elem.children,
                         valid_classes,
@@ -914,7 +847,6 @@ fn validate_nodes(
         false,
     );
 
-    // Convert errors to TokenStream
     let mut tokens = proc_macro2::TokenStream::new();
     for err in errors {
         tokens.extend(err);
@@ -922,7 +854,6 @@ fn validate_nodes(
     tokens
 }
 
-// Generate code for a specific context
 fn generate_body_with_context(
     nodes: &[token_parser::Node],
     ctx: &GenerationContext,
@@ -933,18 +864,6 @@ fn generate_body_with_context(
         match node {
             token_parser::Node::Text(text) => {
                 let content = &text.content;
-                // If the user wrote "..." we should probably escape it?
-                // Actually the user writes pure text in html! { }.
-                // But the parser might have captured quotes.
-                // For now, assume content is what they want.
-                // We should escape HTML entities if it's not raw.
-                // But wait, the previous implementation seemed to assume Raw by default?
-                // Actually, Azumi html! usually treats text as raw? No, safe by default.
-                // But here we are writing string literals to buf.
-                // If I write <div>Hello</div>, I want Hello.
-                // If I write {variable}, it goes through expression path.
-
-                // Strip outer quotes if present (the parser keeps them for string literals)
                 let clean_content = strip_outer_quotes(content);
                 if !clean_content.is_empty() {
                     instructions.push(quote! {
@@ -955,34 +874,22 @@ fn generate_body_with_context(
             token_parser::Node::Element(elem) => {
                 let name = &elem.name;
 
-                if name == "script" {
-                    // Script tag - switch context?
-                    // Actually we just render it.
-                }
-
                 instructions.push(quote! {
                    write!(f, "<{}", #name)?;
                 });
 
-                // Render attributes
                 for attr in &elem.attrs {
                     let attr_name = &attr.name;
 
                     if attr_name == "class" && ctx.scope_id.is_some() {
-                        // Handle scoped classes
                         match &attr.value {
                             token_parser::AttributeValue::Static(val) => {
-                                // Static string: "foo bar" -> "foo bar" (no scope added to attr value itself?)
-                                // Wait, CSS scoping adds [data-s123] to selectors.
-                                // The elements need `data-s123` attribute.
-                                // Class names don't change.
                                 let clean = strip_outer_quotes(val);
                                 instructions.push(quote! {
                                     write!(f, " class=\"{}\"", #clean)?;
                                 });
                             }
                             token_parser::AttributeValue::Dynamic(expr) => {
-                                // Dynamic class: class={foo}
                                 instructions.push(quote! {
                                     write!(f, " class=\"{}\"", azumi::Escaped(&#expr))?;
                                 });
@@ -990,43 +897,35 @@ fn generate_body_with_context(
                             _ => {}
                         }
                     } else if attr_name == "style" {
-                        // Handle style DSL
                         match &attr.value {
                             token_parser::AttributeValue::StyleDsl(props) => {
-                                // props is Vec<(String, TokenStream)> which are (key, value_expr)
                                 instructions.push(quote! { write!(f, " style=\"")?; });
                                 for (i, (key, val)) in props.iter().enumerate() {
                                     if i > 0 {
                                         instructions.push(quote! { write!(f, "; ")?; });
                                     }
-                                    // Check if value is a string literal (static) or expression
-                                    // The parser returns TokenStream, so treat as expression
                                     instructions.push(quote! {
                                         write!(f, "{}: {}", #key, azumi::Escaped(&#val))?;
                                     });
                                 }
                                 instructions.push(quote! { write!(f, "\"")?; });
                             }
-                            _ => {
-                                // Normal handling
-                                match &attr.value {
-                                    token_parser::AttributeValue::Static(val) => {
-                                        let clean = strip_outer_quotes(val);
-                                        instructions.push(quote! {
-                                            write!(f, " {}=\"{}\"", #attr_name, #clean)?;
-                                        });
-                                    }
-                                    token_parser::AttributeValue::Dynamic(expr) => {
-                                        instructions.push(quote! {
+                            _ => match &attr.value {
+                                token_parser::AttributeValue::Static(val) => {
+                                    let clean = strip_outer_quotes(val);
+                                    instructions.push(quote! {
+                                        write!(f, " {}=\"{}\"", #attr_name, #clean)?;
+                                    });
+                                }
+                                token_parser::AttributeValue::Dynamic(expr) => {
+                                    instructions.push(quote! {
                                               write!(f, " {}=\"{}\"", #attr_name, azumi::Escaped(&#expr))?;
                                           });
-                                    }
-                                    _ => {}
                                 }
-                            }
+                                _ => {}
+                            },
                         }
                     } else {
-                        // Normal attributes
                         match &attr.value {
                             token_parser::AttributeValue::Static(val) => {
                                 let clean = strip_outer_quotes(val);
@@ -1035,16 +934,11 @@ fn generate_body_with_context(
                                 });
                             }
                             token_parser::AttributeValue::Dynamic(expr) => {
-                                // If bool, only render name if true
-                                // But we don't know type here.
-                                // For now assume string-like.
-                                // TODO: Boolean attribute support
                                 instructions.push(quote! {
                                     write!(f, " {}=\"{}\"", #attr_name, azumi::Escaped(&#expr))?;
                                 });
                             }
                             token_parser::AttributeValue::None => {
-                                // Boolean attr like "disabled"
                                 instructions.push(quote! {
                                     write!(f, " {}", #attr_name)?;
                                 });
@@ -1054,10 +948,7 @@ fn generate_body_with_context(
                     }
                 }
 
-                // Add scope attribute if needed
                 if let Some(sid) = &ctx.scope_id {
-                    // Only add scope to HTML elements, not <template> or <script> maybe?
-                    // Generally safe to add to all.
                     instructions.push(quote! {
                         write!(f, " data-{}", #sid)?;
                     });
@@ -1067,7 +958,6 @@ fn generate_body_with_context(
                    write!(f, ">")?;
                 });
 
-                // Children
                 let child_ctx = ctx.with_mode(if name == "script" {
                     Context::Script
                 } else {
@@ -1075,7 +965,6 @@ fn generate_body_with_context(
                 });
                 instructions.push(generate_body_with_context(&elem.children, &child_ctx));
 
-                // Close tag (unless void)
                 let void_elements = [
                     "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
                     "param", "source", "track", "wbr",
@@ -1087,10 +976,6 @@ fn generate_body_with_context(
                 }
             }
             token_parser::Node::Expression(expr) => {
-                // {expr}
-                // Check if we are in script mode -> raw?
-                // Or user helper.
-                // Standard: render_azumi() trait method handles Component vs Display
                 let tokens = &expr.content;
                 instructions.push(quote! {
                     azumi::RenderWrapper(#tokens).render_azumi(f)?;
@@ -1129,7 +1014,7 @@ fn generate_body_with_context(
                         });
                     }
                     token_parser::Block::Match(match_block) => {
-                        let expr = &match_block.expr; // FIXED from expression
+                        let expr = &match_block.expr;
                         let mut arms = Vec::new();
                         for arm in &match_block.arms {
                             let pat = &arm.pattern;
@@ -1145,34 +1030,61 @@ fn generate_body_with_context(
                         });
                     }
                     token_parser::Block::Call(call_block) => {
-                        // @Component(props)
-                        let func = &call_block.name; // FIXED from function
-                        let args = &call_block.args; // TokenStream of args
+                        let func_path = &call_block.name;
+                        // Resolve snake_case to _component module
+                        let func_mod_path = transform_path_for_component(func_path);
+
+                        // Parse key=value arguments
+                        let args_list = match parse_args(call_block.args.clone()) {
+                            Ok(a) => a,
+                            Err(e) => {
+                                instructions.push(e.to_compile_error());
+                                Vec::new() // Should not proceed but this is best effort
+                            }
+                        };
+
+                        let setters = args_list.iter().map(|arg| {
+                            let key = &arg.key;
+                            let val = &arg.value;
+                            quote! { .#key(#val) }
+                        });
+
+                        let builder_expr = quote! {
+                            #func_mod_path::Props::builder()
+                            #(#setters)*
+                            .build()
+                            .expect("Failed to build props")
+                        };
 
                         if call_block.children.is_empty() {
                             instructions.push(quote! {
-                                #func #args .render(f)?;
+                                #func_mod_path::render(#builder_expr).render(f)?;
                             });
                         } else {
                             let children_body =
                                 generate_body_with_context(&call_block.children, ctx);
-                            let children_closure = quote! {
+                            // Wrap children in a component-compatible closure
+                            let children_arg = quote! {
                                 azumi::from_fn(move |f| {
                                     #children_body
                                     Ok(())
                                 })
                             };
+
                             instructions.push(quote! {
-                             compile_error!("Children blocks in @Component calls are not fully supported yet.");
-                         });
+                                #func_mod_path::render(#builder_expr, #children_arg).render(f)?;
+                            });
                         }
                     }
                     token_parser::Block::Style(_) => {
-                        // Handled in hoisting pass, ignore here
+                        // Handled in hoisting pass
                     }
+                    // IMPORTANT: Fix for previous error - explicitly handle all variants or wildcard
+                    // Since we have specific handlers for known types, wildcard is safe
                     _ => {}
                 }
-            } // End of Node::Block wrapper
+            } // Close Node::Block wrapper
+            // IMPORTANT fix: Added wildcard arm for match node to handle Comment/Doctype
             _ => {}
         }
     }
