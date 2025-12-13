@@ -105,34 +105,10 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
             if let Pat::Ident(pat_ident) = &**pat {
                 // Only consider parameter if it's named "state"
                 if pat_ident.ident == "state" {
-                    // Check if type is a reference to a non-primitive type
-                    if let syn::Type::Reference(type_ref) = &**ty {
-                        // Exclude primitive types like &str
-                        if let syn::Type::Path(type_path) = &*type_ref.elem {
-                            // Check if it's NOT a primitive like str, String, etc.
-                            if let Some(last_segment) = type_path.path.segments.last() {
-                                let type_name = last_segment.ident.to_string();
-                                // Exclude common primitive/library types
-                                if !matches!(
-                                    type_name.as_str(),
-                                    "str"
-                                        | "String"
-                                        | "i32"
-                                        | "i64"
-                                        | "u32"
-                                        | "u64"
-                                        | "f32"
-                                        | "f64"
-                                        | "bool"
-                                        | "char"
-                                        | "usize"
-                                        | "isize"
-                                ) {
-                                    live_state_ident = Some(&pat_ident.ident);
-                                }
-                            }
-                        }
-                    }
+                    // We trust the trait bound to catch invalid types later
+                    // If 'state' doesn't implement LiveState, the generated code will fail to compile
+                    // which is better than silently verifying it.
+                    live_state_ident = Some(&pat_ident.ident);
                 }
             }
         }
@@ -148,7 +124,9 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
                 azumi::from_fn(move |f| {
                     // Auto-generated az-scope wrapper
                     let scope_json = <_ as azumi::LiveState>::to_scope(#state_ident);
-                    write!(f, "<div az-scope='{}' style='display: contents'>", scope_json)?;
+                    // Parse as string and escape double quotes to match HTML spec safely
+                    let scope_escaped = scope_json.replace("\"", "&quot;");
+                    write!(f, "<div az-scope=\"{}\" style=\"display: contents\">", scope_escaped)?;
                     // Render the inner component
                     let inner = #fn_block;
                     inner.render(f)?;
