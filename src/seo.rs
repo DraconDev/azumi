@@ -1,12 +1,8 @@
-#[cfg(feature = "seo")]
 use std::fmt::Write;
-#[cfg(feature = "seo")]
 use std::sync::OnceLock;
 
-#[cfg(feature = "seo")]
 static SITE_CONFIG: OnceLock<SeoConfig> = OnceLock::new();
 
-#[cfg(feature = "seo")]
 #[derive(Clone, Default, Debug)]
 pub struct OpenGraph {
     pub title: Option<String>,
@@ -18,7 +14,6 @@ pub struct OpenGraph {
     pub type_: Option<String>,
 }
 
-#[cfg(feature = "seo")]
 #[derive(Clone, Default, Debug)]
 pub struct TwitterCard {
     pub card: String,            // "summary", "summary_large_image"
@@ -29,7 +24,6 @@ pub struct TwitterCard {
     pub image: Option<String>,
 }
 
-#[cfg(feature = "seo")]
 #[derive(Clone, Default, Debug)]
 pub struct SeoConfig {
     pub title: String,
@@ -40,7 +34,6 @@ pub struct SeoConfig {
     pub twitter: Option<TwitterCard>,
 }
 
-#[cfg(feature = "seo")]
 impl SeoConfig {
     pub fn new(title: impl Into<String>) -> Self {
         Self {
@@ -70,14 +63,12 @@ impl SeoConfig {
 
 /// Initialize the global SEO configuration.
 /// This should be called once at application startup.
-#[cfg(feature = "seo")]
 pub fn init_seo(config: SeoConfig) {
     let _ = SITE_CONFIG.set(config);
 }
 
 /// Generates the full HTML string for <head> meta tags.
 /// automatically inferring missing fields from Global Defaults and Request Context.
-#[cfg(feature = "seo")]
 pub fn generate_head(
     title: &str,
     description: Option<&str>,
@@ -222,20 +213,17 @@ pub fn generate_head(
 
 /// Helper function to automatically render SEO tags based on current context.
 /// Call this inside your Layout's <head>.
-#[cfg(feature = "seo")]
 pub fn render_automatic_seo() -> crate::Raw<String> {
     // Pass empty strings to force reading from Context/Global
     generate_head("", None, None)
 }
 
 /// Simple Sitemap Builder
-#[cfg(feature = "seo")]
 pub struct SitemapBuilder {
     base_url: String,
     urls: Vec<String>,
 }
 
-#[cfg(feature = "seo")]
 impl SitemapBuilder {
     pub fn new(base_url: impl Into<String>) -> Self {
         Self {
