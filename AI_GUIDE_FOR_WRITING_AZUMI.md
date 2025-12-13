@@ -428,6 +428,23 @@ html! {
 }
 ```
 
+### 🔌 Integration Pattern: Hooking up `azumi.js`
+
+If your buttons aren't working, you likely missed one of these 3 steps:
+
+1.  **Add Script to Layout**:
+    ```rust
+    // In your root HTML layout (e.g. layout.rs)
+    <script src="azumi.js" />
+    ```
+2.  **Register Routes in `main.rs`**:
+    ```rust
+    // This serves the JS file at /azumi.js
+    .merge(azumi::action::register_actions(Router::new()))
+    ```
+3.  **Use `az-on` or `on:click`**:
+    The script only listens for events on elements with these attributes.
+
 ---
 
 ## �📦 Asset Pipeline & Optimization
