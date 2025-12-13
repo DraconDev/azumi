@@ -30,6 +30,7 @@ fn test_minimal_head() {
 
 #[test]
 fn test_full_head() {
+    ensure_seo_init();
     let meta = head! {
         title: "Full Page",
         description: "Everything included",
@@ -49,6 +50,7 @@ fn test_full_head() {
 
 #[test]
 fn test_dynamic_values() {
+    ensure_seo_init();
     let page_title = "Dynamic Title";
     let page_desc = format!("Description for {}", page_title);
     let meta = head! {
