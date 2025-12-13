@@ -1,8 +1,9 @@
-// Force rebuild 7
+// Force rebuild 8
 mod component;
 
 mod accessibility_validator;
 mod action;
+mod asset_rewriter;
 mod css;
 mod css_validator;
 mod head;
@@ -14,7 +15,6 @@ mod schema;
 mod style;
 mod test_spacing;
 mod token_parser;
-mod asset_rewriter;
 
 use proc_macro::TokenStream;
 use quote::{quote, quote_spanned};
@@ -102,11 +102,11 @@ fn validate_style_only_css_vars(style_value: &str) -> Result<(), String> {
         if part.is_empty() {
             continue;
         }
-        
+
         // Split by first ':'
         if let Some(colon_pos) = part.find(':') {
             let prop_name = part[..colon_pos].trim();
-            
+
             // Property must start with --
             if !prop_name.starts_with("--") {
                 return Err(format!(
@@ -175,7 +175,9 @@ pub fn html(input: TokenStream) -> TokenStream {
 }
 
 #[allow(dead_code)]
-fn extract_styles(nodes: Vec<token_parser::Node>) -> (Vec<token_parser::StyleBlock>, Vec<token_parser::Node>) {
+fn extract_styles(
+    nodes: Vec<token_parser::Node>,
+) -> (Vec<token_parser::StyleBlock>, Vec<token_parser::Node>) {
     let mut styles = Vec::new();
     let mut other_nodes = Vec::new();
 
@@ -196,12 +198,9 @@ fn process_styles(nodes: &[token_parser::Node]) -> (proc_macro2::TokenStream, St
     let mut scoped_css = String::new();
     let mut global_css = String::new();
 
-
-
     for node in nodes {
         match node {
             token_parser::Node::Block(token_parser::Block::Style(style_block)) => {
-
                 if style_block.is_global {
                     // Global styles: validate but don't scope, but DO generate bindings
                     let output = style::process_global_style_macro(style_block.content.clone());
@@ -457,7 +456,11 @@ impl GenerationContext {
         }
     }
 
-    fn with_scope(scope_id: String, valid_classes: std::collections::HashSet<String>, valid_ids: std::collections::HashSet<String>) -> Self {
+    fn with_scope(
+        scope_id: String,
+        valid_classes: std::collections::HashSet<String>,
+        valid_ids: std::collections::HashSet<String>,
+    ) -> Self {
         Self {
             mode: Context::Normal,
             scope_id: Some(scope_id),
@@ -599,7 +602,10 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
             scoped_css.hash(&mut hasher);
             let hash = hasher.finish();
             let scope_id = format!("s{:x}", hash);
-            (crate::css::scope_css(&scoped_css, &scope_id), Some(scope_id))
+            (
+                crate::css::scope_css(&scoped_css, &scope_id),
+                Some(scope_id),
+            )
         } else {
             (String::new(), None)
         };
@@ -607,12 +613,18 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         // Construct CSS string to inject
         let css_to_inject = if has_global {
             if has_scoped {
-                format!("<style>{}</style><style data-azumi-internal=\"true\">{}</style>", global_css, scoped_output)
+                format!(
+                    "<style>{}</style><style data-azumi-internal=\"true\">{}</style>",
+                    global_css, scoped_output
+                )
             } else {
                 format!("<style>{}</style>", global_css)
             }
         } else {
-             format!("<style data-azumi-internal=\"true\">{}</style>", scoped_output)
+            format!(
+                "<style data-azumi-internal=\"true\">{}</style>",
+                scoped_output
+            )
         };
 
         // Attempt to inject into AST (find <head>)
@@ -627,7 +639,7 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         } else {
             GenerationContext::normal()
         };
-        
+
         let body_content = generate_body_with_context(&working_nodes, &ctx);
 
         if injected {
@@ -667,15 +679,19 @@ fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool 
                 }
             }
             token_parser::Node::Fragment(frag) => {
-                 if inject_css_into_head(&mut frag.children, css) {
+                if inject_css_into_head(&mut frag.children, css) {
                     return true;
                 }
             }
             token_parser::Node::Block(token_parser::Block::If(if_block)) => {
-                 if inject_css_into_head(&mut if_block.then_branch, css) { return true; }
-                 if let Some(else_branch) = &mut if_block.else_branch {
-                     if inject_css_into_head(else_branch, css) { return true; }
-                 }
+                if inject_css_into_head(&mut if_block.then_branch, css) {
+                    return true;
+                }
+                if let Some(else_branch) = &mut if_block.else_branch {
+                    if inject_css_into_head(else_branch, css) {
+                        return true;
+                    }
+                }
             }
             _ => {}
         }
@@ -709,23 +725,23 @@ fn validate_nodes(
                         let name = &attr.name;
 
                         // Rule 1: Check inline styles
-                    if name == "style" {
-                        match &attr.value {
-                            token_parser::AttributeValue::Static(_) => {
-                                let error_span = attr.value_span.unwrap_or(attr.span);
-                                errors.push(quote_spanned! { error_span =>
+                        if name == "style" {
+                            match &attr.value {
+                                token_parser::AttributeValue::Static(_) => {
+                                    let error_span = attr.value_span.unwrap_or(attr.span);
+                                    errors.push(quote_spanned! { error_span =>
                                     compile_error!("Static style attributes are banned (e.g. style=\"...\"). Use style={ --prop: value } instead.");
                                 });
+                                }
+                                token_parser::AttributeValue::StyleDsl(_) => {
+                                    // Style DSL is allowed!
+                                }
+                                token_parser::AttributeValue::Dynamic(_) => {
+                                    // Dynamic styles are allowed (we trust the user or warn later)
+                                }
+                                _ => {}
                             }
-                            token_parser::AttributeValue::StyleDsl(_) => {
-                                // Style DSL is allowed!
-                            }
-                            token_parser::AttributeValue::Dynamic(_) => {
-                                // Dynamic styles are allowed (we trust the user or warn later)
-                            }
-                            _ => {}
                         }
-                    }
 
                         // Rule 2: Check class existence - COMPILE ERROR
                         if name == "class" {
@@ -806,35 +822,98 @@ fn validate_nodes(
                     }
 
                     // Recurse attributes/children
-                    collect_errors_recursive(&elem.children, valid_classes, valid_ids, has_scoped_css, errors, is_inside_form, is_inside_button, is_inside_anchor);
+                    collect_errors_recursive(
+                        &elem.children,
+                        valid_classes,
+                        valid_ids,
+                        has_scoped_css,
+                        errors,
+                        is_inside_form,
+                        is_inside_button,
+                        is_inside_anchor,
+                    );
                 }
                 token_parser::Node::Fragment(frag) => {
-                    collect_errors_recursive(&frag.children, valid_classes, valid_ids, has_scoped_css, errors, is_inside_form, is_inside_button, is_inside_anchor);
+                    collect_errors_recursive(
+                        &frag.children,
+                        valid_classes,
+                        valid_ids,
+                        has_scoped_css,
+                        errors,
+                        is_inside_form,
+                        is_inside_button,
+                        is_inside_anchor,
+                    );
                 }
                 token_parser::Node::Block(block) => match block {
-                     token_parser::Block::If(if_block) => {
-                         collect_errors_recursive(&if_block.then_branch, valid_classes, valid_ids, has_scoped_css, errors, is_inside_form, is_inside_button, is_inside_anchor);
-                         if let Some(else_branch) = &if_block.else_branch {
-                             collect_errors_recursive(else_branch, valid_classes, valid_ids, has_scoped_css, errors, is_inside_form, is_inside_button, is_inside_anchor);
-                         }
-                     }
-                     token_parser::Block::For(for_block) => {
-                         collect_errors_recursive(&for_block.body, valid_classes, valid_ids, has_scoped_css, errors, is_inside_form, is_inside_button, is_inside_anchor);
-                     }
-                     token_parser::Block::Match(match_block) => {
-                         for arm in &match_block.arms {
-                             collect_errors_recursive(&arm.body, valid_classes, valid_ids, has_scoped_css, errors, is_inside_form, is_inside_button, is_inside_anchor);
-                         }
-                     }
-                     _ => {}
-                }
+                    token_parser::Block::If(if_block) => {
+                        collect_errors_recursive(
+                            &if_block.then_branch,
+                            valid_classes,
+                            valid_ids,
+                            has_scoped_css,
+                            errors,
+                            is_inside_form,
+                            is_inside_button,
+                            is_inside_anchor,
+                        );
+                        if let Some(else_branch) = &if_block.else_branch {
+                            collect_errors_recursive(
+                                else_branch,
+                                valid_classes,
+                                valid_ids,
+                                has_scoped_css,
+                                errors,
+                                is_inside_form,
+                                is_inside_button,
+                                is_inside_anchor,
+                            );
+                        }
+                    }
+                    token_parser::Block::For(for_block) => {
+                        collect_errors_recursive(
+                            &for_block.body,
+                            valid_classes,
+                            valid_ids,
+                            has_scoped_css,
+                            errors,
+                            is_inside_form,
+                            is_inside_button,
+                            is_inside_anchor,
+                        );
+                    }
+                    token_parser::Block::Match(match_block) => {
+                        for arm in &match_block.arms {
+                            collect_errors_recursive(
+                                &arm.body,
+                                valid_classes,
+                                valid_ids,
+                                has_scoped_css,
+                                errors,
+                                is_inside_form,
+                                is_inside_button,
+                                is_inside_anchor,
+                            );
+                        }
+                    }
+                    _ => {}
+                },
                 _ => {}
             }
         }
     }
 
-    collect_errors_recursive(nodes, valid_classes, valid_ids, has_scoped_css, &mut errors, false, false, false);
-    
+    collect_errors_recursive(
+        nodes,
+        valid_classes,
+        valid_ids,
+        has_scoped_css,
+        &mut errors,
+        false,
+        false,
+        false,
+    );
+
     // Convert errors to TokenStream
     let mut tokens = proc_macro2::TokenStream::new();
     for err in errors {
@@ -864,7 +943,7 @@ fn generate_body_with_context(
                 // But here we are writing string literals to buf.
                 // If I write <div>Hello</div>, I want Hello.
                 // If I write {variable}, it goes through expression path.
-                
+
                 // Strip outer quotes if present (the parser keeps them for string literals)
                 let clean_content = strip_outer_quotes(content);
                 if !clean_content.is_empty() {
@@ -875,7 +954,7 @@ fn generate_body_with_context(
             }
             token_parser::Node::Element(elem) => {
                 let name = &elem.name;
-                
+
                 if name == "script" {
                     // Script tag - switch context?
                     // Actually we just render it.
@@ -884,94 +963,94 @@ fn generate_body_with_context(
                 instructions.push(quote! {
                    write!(f, "<{}", #name)?;
                 });
-                
+
                 // Render attributes
                 for attr in &elem.attrs {
                     let attr_name = &attr.name;
-                    
+
                     if attr_name == "class" && ctx.scope_id.is_some() {
-                       // Handle scoped classes
-                       match &attr.value {
-                           token_parser::AttributeValue::Static(val) => {
-                               // Static string: "foo bar" -> "foo bar" (no scope added to attr value itself?)
-                               // Wait, CSS scoping adds [data-s123] to selectors.
-                               // The elements need `data-s123` attribute.
-                               // Class names don't change.
-                               let clean = strip_outer_quotes(val);
-                               instructions.push(quote! {
-                                   write!(f, " class=\"{}\"", #clean)?;
-                               });
-                           }
-                           token_parser::AttributeValue::Dynamic(expr) => {
-                               // Dynamic class: class={foo}
-                               instructions.push(quote! {
-                                   write!(f, " class=\"{}\"", azumi::Escaped(&#expr))?;
-                               });
-                           }
+                        // Handle scoped classes
+                        match &attr.value {
+                            token_parser::AttributeValue::Static(val) => {
+                                // Static string: "foo bar" -> "foo bar" (no scope added to attr value itself?)
+                                // Wait, CSS scoping adds [data-s123] to selectors.
+                                // The elements need `data-s123` attribute.
+                                // Class names don't change.
+                                let clean = strip_outer_quotes(val);
+                                instructions.push(quote! {
+                                    write!(f, " class=\"{}\"", #clean)?;
+                                });
+                            }
+                            token_parser::AttributeValue::Dynamic(expr) => {
+                                // Dynamic class: class={foo}
+                                instructions.push(quote! {
+                                    write!(f, " class=\"{}\"", azumi::Escaped(&#expr))?;
+                                });
+                            }
                             _ => {}
-                       }
+                        }
                     } else if attr_name == "style" {
-                         // Handle style DSL
-                         match &attr.value {
-                             token_parser::AttributeValue::StyleDsl(props) => {
-                                 // props is Vec<(String, TokenStream)> which are (key, value_expr)
-                                 instructions.push(quote! { write!(f, " style=\"")?; });
-                                 for (i, (key, val)) in props.iter().enumerate() {
-                                     if i > 0 {
-                                         instructions.push(quote! { write!(f, "; ")?; });
-                                     }
-                                     // Check if value is a string literal (static) or expression
-                                     // The parser returns TokenStream, so treat as expression
-                                     instructions.push(quote! {
-                                         write!(f, "{}: {}", #key, azumi::Escaped(&#val))?;
-                                     });
-                                 }
-                                 instructions.push(quote! { write!(f, "\"")?; });
-                             }
-                             _ => {
-                                 // Normal handling
-                                 match &attr.value {
-                                     token_parser::AttributeValue::Static(val) => {
-                                         let clean = strip_outer_quotes(val);
-                                         instructions.push(quote! {
-                                             write!(f, " {}=\"{}\"", #attr_name, #clean)?;
-                                         });
-                                     }
-                                     token_parser::AttributeValue::Dynamic(expr) => {
-                                          instructions.push(quote! {
+                        // Handle style DSL
+                        match &attr.value {
+                            token_parser::AttributeValue::StyleDsl(props) => {
+                                // props is Vec<(String, TokenStream)> which are (key, value_expr)
+                                instructions.push(quote! { write!(f, " style=\"")?; });
+                                for (i, (key, val)) in props.iter().enumerate() {
+                                    if i > 0 {
+                                        instructions.push(quote! { write!(f, "; ")?; });
+                                    }
+                                    // Check if value is a string literal (static) or expression
+                                    // The parser returns TokenStream, so treat as expression
+                                    instructions.push(quote! {
+                                        write!(f, "{}: {}", #key, azumi::Escaped(&#val))?;
+                                    });
+                                }
+                                instructions.push(quote! { write!(f, "\"")?; });
+                            }
+                            _ => {
+                                // Normal handling
+                                match &attr.value {
+                                    token_parser::AttributeValue::Static(val) => {
+                                        let clean = strip_outer_quotes(val);
+                                        instructions.push(quote! {
+                                            write!(f, " {}=\"{}\"", #attr_name, #clean)?;
+                                        });
+                                    }
+                                    token_parser::AttributeValue::Dynamic(expr) => {
+                                        instructions.push(quote! {
                                               write!(f, " {}=\"{}\"", #attr_name, azumi::Escaped(&#expr))?;
                                           });
-                                     }
-                                     _ => {}
-                                 }
-                             }
-                         }
+                                    }
+                                    _ => {}
+                                }
+                            }
+                        }
                     } else {
                         // Normal attributes
-                         match &attr.value {
-                             token_parser::AttributeValue::Static(val) => {
-                                 let clean = strip_outer_quotes(val);
-                                 instructions.push(quote! {
-                                     write!(f, " {}=\"{}\"", #attr_name, #clean)?;
-                                 });
-                             }
-                             token_parser::AttributeValue::Dynamic(expr) => {
-                                 // If bool, only render name if true
-                                 // But we don't know type here.
-                                 // For now assume string-like.
-                                 // TODO: Boolean attribute support
-                                  instructions.push(quote! {
-                                      write!(f, " {}=\"{}\"", #attr_name, azumi::Escaped(&#expr))?;
-                                  });
-                             }
-                             token_parser::AttributeValue::None => {
-                                 // Boolean attr like "disabled"
-                                 instructions.push(quote! {
-                                     write!(f, " {}", #attr_name)?;
-                                 });
-                             }
-                             _ => {}
-                         }
+                        match &attr.value {
+                            token_parser::AttributeValue::Static(val) => {
+                                let clean = strip_outer_quotes(val);
+                                instructions.push(quote! {
+                                    write!(f, " {}=\"{}\"", #attr_name, #clean)?;
+                                });
+                            }
+                            token_parser::AttributeValue::Dynamic(expr) => {
+                                // If bool, only render name if true
+                                // But we don't know type here.
+                                // For now assume string-like.
+                                // TODO: Boolean attribute support
+                                instructions.push(quote! {
+                                    write!(f, " {}=\"{}\"", #attr_name, azumi::Escaped(&#expr))?;
+                                });
+                            }
+                            token_parser::AttributeValue::None => {
+                                // Boolean attr like "disabled"
+                                instructions.push(quote! {
+                                    write!(f, " {}", #attr_name)?;
+                                });
+                            }
+                            _ => {}
+                        }
                     }
                 }
 
@@ -989,11 +1068,18 @@ fn generate_body_with_context(
                 });
 
                 // Children
-                let child_ctx = ctx.with_mode(if name == "script" { Context::Script } else { ctx.mode.clone() });
+                let child_ctx = ctx.with_mode(if name == "script" {
+                    Context::Script
+                } else {
+                    ctx.mode.clone()
+                });
                 instructions.push(generate_body_with_context(&elem.children, &child_ctx));
 
                 // Close tag (unless void)
-                let void_elements = ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"];
+                let void_elements = [
+                    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
+                    "param", "source", "track", "wbr",
+                ];
                 if !void_elements.contains(&name.as_str()) {
                     instructions.push(quote! {
                         write!(f, "</{}>", #name)?;
@@ -1015,79 +1101,80 @@ fn generate_body_with_context(
             }
             token_parser::Node::Block(block) => {
                 match block {
-                token_parser::Block::If(if_block) => {
-                    let cond = &if_block.condition;
-                    let then_body = generate_body_with_context(&if_block.then_branch, ctx);
-                    let else_part = if let Some(else_branch) = &if_block.else_branch {
-                        let else_body = generate_body_with_context(else_branch, ctx);
-                        quote! { else { #else_body } }
-                    } else {
-                        quote! {}
-                    };
-                    
-                    instructions.push(quote! {
-                        if #cond {
-                            #then_body
-                        } #else_part
-                    });
-                }
-                 token_parser::Block::For(for_block) => {
-                    let pat = &for_block.pattern;
-                    let iter = &for_block.iterator;
-                    let body = generate_body_with_context(&for_block.body, ctx);
-                    
-                    instructions.push(quote! {
-                        for #pat in #iter {
-                            #body
+                    token_parser::Block::If(if_block) => {
+                        let cond = &if_block.condition;
+                        let then_body = generate_body_with_context(&if_block.then_branch, ctx);
+                        let else_part = if let Some(else_branch) = &if_block.else_branch {
+                            let else_body = generate_body_with_context(else_branch, ctx);
+                            quote! { else { #else_body } }
+                        } else {
+                            quote! {}
+                        };
+
+                        instructions.push(quote! {
+                            if #cond {
+                                #then_body
+                            } #else_part
+                        });
+                    }
+                    token_parser::Block::For(for_block) => {
+                        let pat = &for_block.pattern;
+                        let iter = &for_block.iterator;
+                        let body = generate_body_with_context(&for_block.body, ctx);
+
+                        instructions.push(quote! {
+                            for #pat in #iter {
+                                #body
+                            }
+                        });
+                    }
+                    token_parser::Block::Match(match_block) => {
+                        let expr = &match_block.expr; // FIXED from expression
+                        let mut arms = Vec::new();
+                        for arm in &match_block.arms {
+                            let pat = &arm.pattern;
+                            let body = generate_body_with_context(&arm.body, ctx);
+                            arms.push(quote! {
+                                #pat => { #body }
+                            });
                         }
-                    });
-                 }
-                 token_parser::Block::Match(match_block) => {
-                     let expr = &match_block.expr; // FIXED from expression
-                     let mut arms = Vec::new();
-                     for arm in &match_block.arms {
-                         let pat = &arm.pattern;
-                         let body = generate_body_with_context(&arm.body, ctx);
-                         arms.push(quote! {
-                             #pat => { #body }
-                         });
-                     }
-                     instructions.push(quote! {
-                         match #expr {
-                             #(#arms),*
-                         }
-                     });
-                 }
-                 token_parser::Block::Call(call_block) => {
-                     // @Component(props)
-                     let func = &call_block.name; // FIXED from function
-                     let args = &call_block.args; // TokenStream of args
-                     
-                     if call_block.children.is_empty() {
-                         instructions.push(quote! {
-                             #func #args .render(f)?;
-                         });
-                     } else {
-                         let children_body = generate_body_with_context(&call_block.children, ctx);
-                         let children_closure = quote! {
-                             azumi::from_fn(move |f| {
-                                 #children_body
-                                 Ok(())
-                             })
-                         };
-                         instructions.push(quote! {
+                        instructions.push(quote! {
+                            match #expr {
+                                #(#arms),*
+                            }
+                        });
+                    }
+                    token_parser::Block::Call(call_block) => {
+                        // @Component(props)
+                        let func = &call_block.name; // FIXED from function
+                        let args = &call_block.args; // TokenStream of args
+
+                        if call_block.children.is_empty() {
+                            instructions.push(quote! {
+                                #func #args .render(f)?;
+                            });
+                        } else {
+                            let children_body =
+                                generate_body_with_context(&call_block.children, ctx);
+                            let children_closure = quote! {
+                                azumi::from_fn(move |f| {
+                                    #children_body
+                                    Ok(())
+                                })
+                            };
+                            instructions.push(quote! {
                              compile_error!("Children blocks in @Component calls are not fully supported yet.");
                          });
-                     }
-                 }
-                 token_parser::Block::Style(_) => {
-                     // Handled in hoisting pass, ignore here
-                 }
-                 _ => {}
-            }
+                        }
+                    }
+                    token_parser::Block::Style(_) => {
+                        // Handled in hoisting pass, ignore here
+                    }
+                    _ => {}
+                }
             } // End of Node::Block wrapper
+            _ => {}
         }
-        _ => {}
     }
 
     quote! {
