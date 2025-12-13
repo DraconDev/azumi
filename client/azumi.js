@@ -366,13 +366,16 @@ class Azumi {
                 target.outerHTML = html;
             }
         } catch (err) {
-            console.error("Azumi action error:", err);
-            // Rollback prediction on error
-            if (predictionResult) {
+            console.error("Action Call Error:", err);
+            // Rollback optimistic update
+            if (predictionResult && scopeElement) {
                 this.rollbackPrediction(
                     scopeElement,
                     predictionResult.originalState
                 );
+            }
+            if (scopeElement) {
+                scopeElement._azumi_pending = false;
             }
         }
     }
