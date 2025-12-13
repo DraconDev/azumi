@@ -151,16 +151,14 @@ html! {
 
 ## 🚀 Setup & Configuration
 
-### Client Runtime (Automatic)
+### Client Runtime (Manual)
 
-The Azumi client runtime (`azumi.js`) is **automatically injected** before `</body>` by the `html!` macro. You don't need to add any script tags manually.
+The Azumi client runtime (`azumi.js`) must be **manually injected** in your root layout to enable interactive features.
 
 #### How It Works
 
-1. **The macro injects it automatically** when rendering a `<body>` element
-2. **The route is served automatically** by `azumi::action::register_actions()`
-
-No configuration needed—it just works!
+1.  **You Add the Script**: Place `<script src="azumi.js" />` in your root layout.
+2.  **The Route is Served Automatically**: `azumi::action::register_actions()` serves the file.
 
 ```rust
 #[azumi::component]
@@ -174,15 +172,15 @@ pub fn RootLayout(children: impl Component) -> impl Component {
             </head>
             <body>
                 {children}
-                // ✅ <script src="/azumi.js"> is automatically injected here by the macro
+                // ✅ REQUIRED: Manually include the runtime for interactivity
+                <script src="azumi.js" />
             </body>
         </html>
     }
 }
 ```
 
-> [!NOTE] > **Automatic Injection**: The `<script src="/azumi.js">` is automatically injected before `</body>`.
-> **Automatic Serving**: The `/azumi.js` route is served by `azumi::action::register_actions()`.
+> [!NOTE] > **Why Manual?** Azumi defaults to zero-JS static HTML. You opt-in to interactivity by adding the script.
 
 ---
 
