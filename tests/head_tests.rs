@@ -1,7 +1,18 @@
 use azumi::head;
+use azumi::seo::{OpenGraph, SeoConfig, TwitterCard};
+
+fn ensure_seo_init() {
+    let config = SeoConfig {
+        open_graph: Some(OpenGraph::default()),
+        twitter: Some(TwitterCard::default()),
+        ..Default::default()
+    };
+    azumi::seo::init_seo(config);
+}
 
 #[test]
 fn test_minimal_head() {
+    ensure_seo_init();
     let meta = head! {
         title: "Minimal Page",
         description: "Just a title and description"
