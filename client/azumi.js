@@ -159,8 +159,18 @@ class Azumi {
         if (!scopeAttr) return null;
 
         try {
-            const state = JSON.parse(scopeAttr);
-            const originalState = JSON.parse(scopeAttr); // Keep copy for rollback
+            // Handle signed state: "{json}|{signature}"
+            let jsonStr = scopeAttr;
+            if (scopeAttr.includes("|")) {
+                const parts = scopeAttr.split("|");
+                // JSON is the part before the last pipe (to handle pipes in JSON strings, though rare)
+                // Actually, Azumi security uses "last pipe" logic.
+                const lastPipe = scopeAttr.lastIndexOf("|");
+                jsonStr = scopeAttr.substring(0, lastPipe);
+            }
+
+            const state = JSON.parse(jsonStr);
+            const originalState = JSON.parse(jsonStr); // Keep copy for rollback
 
             // Parse multiple predictions separated by ;
             const predictions = prediction
