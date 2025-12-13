@@ -54,9 +54,7 @@ impl Parse for HeadArgs {
         if args.title.is_none() {
             return Err(input.error("Missing required field: title"));
         }
-        if args.description.is_none() {
-            return Err(input.error("Missing required field: description"));
-        }
+        // Description is no longer strictly required by parser, as runtime can fallback
 
         Ok(args)
     }
@@ -66,60 +64,36 @@ pub fn expand_head(input: TokenStream) -> TokenStream {
     let args = parse_macro_input!(input as HeadArgs);
 
     let title = args.title.unwrap();
-    let description = args.description.unwrap();
 
-    let image_meta = if let Some(img) = args.image {
-        quote! {
-            format!(
-                "<meta property=\"og:image\" content=\"{}\">\n<meta name=\"twitter:image\" content=\"{}\">\n<meta name=\"twitter:card\" content=\"summary_large_image\">",
-                #img, #img
-            )
-        }
+    let description = if let Some(d) = args.description {
+        quote! { Some(#d) }
     } else {
-        quote! {
-            "<meta name=\"twitter:card\" content=\"summary\">".to_string()
-        }
+        quote! { None }
     };
 
-    let url_meta = if let Some(url) = args.url {
-        quote! {
-            format!("<meta property=\"og:url\" content=\"{}\">", #url)
-        }
+    let image = if let Some(i) = args.image {
+        quote! { Some(#i) }
     } else {
-        quote! { String::new() }
-    };
-
-    let type_meta = if let Some(t) = args.type_ {
-        quote! {
-            format!("<meta property=\"og:type\" content=\"{}\">", #t)
-        }
-    } else {
-        quote! {
-            "<meta property=\"og:type\" content=\"website\">".to_string()
-        }
+        quote! { None }
     };
 
     let expanded = quote! {
         {
-            let title = #title;
-            let description = #description;
-            format!(
-                "<title>{}</title>\n\
-                <meta name=\"description\" content=\"{}\">\n\
-                <meta property=\"og:title\" content=\"{}\">\n\
-                <meta property=\"og:description\" content=\"{}\">\n\
-                {}\n\
-                {}\n\
-                {}\n\
-                <meta name=\"twitter:title\" content=\"{}\">\n\
-                <meta name=\"twitter:description\" content=\"{}\">",
-                title, description,
-                title, description,
-                #type_meta,
-                #url_meta,
-                #image_meta,
-                title, description
-            )
+            // If SEO feature is enabled, use the robust runtime engine
+            #[cfg(feature = "seo")]
+            {
+                azumi::seo::generate_head(
+                    #title,
+                    #description,
+                    #image,
+                )
+            }
+
+            // Fallback for non-SEO builds (minimal title only)
+            #[cfg(not(feature = "seo"))]
+            {
+                format!("<title>{}</title>", #title)
+            }
         }
     };
 
