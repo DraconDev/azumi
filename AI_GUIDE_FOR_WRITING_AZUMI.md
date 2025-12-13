@@ -238,7 +238,48 @@ let app = Router::new()
 
 ---
 
-## ⚡ Azumi Live (Optimistic UI)
+## ⚡ Interactivity: Live vs Actions
+
+Azumi offers two ways to handle interactivity.
+
+### 1. Azumi Live (Recommended for UI State)
+
+Use **Live** when you have state that stays on the page and updates interactively.
+
+-   **Best for**: Toggles, Counters, Tabs, Wizards, Filters.
+-   **Features**: Optimistic UI (instant updates), Type-safe bindings.
+
+```rust
+#[azumi::live]
+pub struct Counter { count: i32 }
+// ... methods ...
+```
+
+### 2. Server Actions (Recommended for Forms / RPC)
+
+Use **Actions** when you want to handle an event or submit data without maintaining UI state.
+
+-   **Best for**: Forms (Login, Contact), One-off buttons (Logout, Delete), Redirects.
+-   **Features**: Zero-overhead (no state serialization), works with standard `<form>`.
+
+```rust
+// A basic payload (or use axum::Form for standard forms)
+#[derive(Deserialize)]
+pub struct ContactForm { email: String, msg: String }
+
+#[azumi::action]
+pub async fn submit_contact(data: ContactForm) -> impl Component {
+    // Process data...
+    html! { <div>"Thanks for your message!"</div> }
+}
+
+// In your view:
+// <form az-on="submit call submit_contact -> #result"> ...
+```
+
+---
+
+## ⚡ Azumi Live Implementation Details
 
 Azumi Live is the **recommended** way to add interactivity. It uses compiler analysis to predict UI updates before the server responds.
 
@@ -273,7 +314,7 @@ impl Counter {
 
 ### 3. Create the Component
 
-The component receives a reference to the state. Use `on:click={state.method}` for event binding.
+The component receives a reference to the state. Use `on:click={state.increment}` for event binding.
 
 ```rust
 #[azumi::component]
