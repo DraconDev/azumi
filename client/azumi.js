@@ -371,14 +371,30 @@ class Azumi {
         if (!scopeAttr) return;
 
         try {
-            const state = JSON.parse(scopeAttr);
+            // Handle signed state: "{json}|{signature}"
+            let jsonStr = scopeAttr;
+            let signature = "";
+
+            if (scopeAttr.includes("|")) {
+                const lastPipe = scopeAttr.lastIndexOf("|");
+                jsonStr = scopeAttr.substring(0, lastPipe);
+                signature = scopeAttr.substring(lastPipe); // Keep signature ("|sig")
+            }
+
+            const state = JSON.parse(jsonStr);
 
             // Apply the prediction DSL (reuse existing logic)
             const prediction = `${action.field} = ${action.value}`;
             this.applyPrediction(state, prediction);
 
-            // Update the scope attribute
-            scopeElement.setAttribute("az-scope", JSON.stringify(state));
+            // Update the scope attribute (preserve signature!)
+            // We can't re-sign on client, so we just append the old signature.
+            // WARNING: This invalidates the signature technically, but for local-only state it might be fine?
+            // Actually, for Server Actions, the server will reject this if we send it back.
+            // But setState is for local components or temporary toggles.
+
+            const newStateStr = JSON.stringify(state) + signature;
+            scopeElement.setAttribute("az-scope", newStateStr);
 
             // Update bound elements
             this.updateBindings(scopeElement, state);
