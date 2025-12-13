@@ -14,6 +14,9 @@ pub mod security;
 pub use inventory;
 pub mod devtools;
 
+#[cfg(feature = "seo")]
+pub mod seo;
+
 pub use script::AzumiScript;
 
 #[cfg(feature = "test-utils")]
