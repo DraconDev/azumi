@@ -1,4 +1,4 @@
-// Force rebuild 6
+// Force rebuild 7
 mod component;
 
 mod accessibility_validator;
@@ -1013,7 +1013,8 @@ fn generate_body_with_context(
             token_parser::Node::Fragment(frag) => {
                 instructions.push(generate_body_with_context(&frag.children, ctx));
             }
-            token_parser::Node::Block(block) => match block {
+            token_parser::Node::Block(block) => {
+                match block {
                 token_parser::Block::If(if_block) => {
                     let cond = &if_block.condition;
                     let then_body = generate_body_with_context(&if_block.then_branch, ctx);
@@ -1084,6 +1085,7 @@ fn generate_body_with_context(
                  }
                  _ => {}
             }
+            } // End of Node::Block wrapper
         }
         _ => {}
     }
