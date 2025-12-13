@@ -1,0 +1,3 @@
+Error Messages: Heavy use of macros (html!, #[azumi::page]) means compiler errors can sometimes be intimidating or point to the wrong line. This is a common Rust macro pain point.
+Ecosystem: Right now, you have to wire up Axum manually (Routing, Middleware). A CLI tool (cargo azumi new) that generates that boilerplate code would significantly lower the barrier to entry.
+Data Loading: While we documented the "Async Handler" pattern, a specialized #[loader] macro (like Remix/SolidStart) could eventually make data fetching even more seamless.
