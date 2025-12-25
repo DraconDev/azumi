@@ -1,0 +1,2158 @@
+   Compiling azumi-macros v0.1.0 (/home/dracon/_Dev/_Active/azumi-feature/macros)
+warning: unused imports: `Item` and `Stmt`
+ --> macros/src/component.rs:2:37
+  |
+2 | use syn::{parse_macro_input, FnArg, Item, ItemFn, Pat, PatType, Stmt};
+  |                                     ^^^^                        ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `PatType`
+ --> macros/src/action.rs:3:45
+  |
+3 | use syn::{parse_macro_input, FnArg, ItemFn, PatType};
+  |                                             ^^^^^^^
+
+warning: unused variable: `payload_pat`
+  --> macros/src/action.rs:51:24
+   |
+51 |     let (payload_type, payload_pat) = if let Some(arg) = payload_arg {
+   |                        ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_payload_pat`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable `found_opening_brace` is assigned to, but never used
+  --> macros/src/style.rs:68:17
+   |
+68 |         let mut found_opening_brace = false;
+   |                 ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: consider using `_found_opening_brace` instead
+
+warning: value assigned to `found_opening_brace` is never read
+  --> macros/src/style.rs:78:17
+   |
+78 |                 found_opening_brace = true;
+   |                 ^^^^^^^^^^^^^^^^^^^
+   |
+   = help: maybe it is overwritten before being read?
+   = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `style_input`
+   --> macros/src/style.rs:503:9
+    |
+503 |     let style_input: StyleInput = match parse2(input) {
+    |         ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_style_input`
+
+warning: struct `NodesWrapper` is never constructed
+  --> macros/src/lib.rs:43:8
+   |
+43 | struct NodesWrapper(Vec<token_parser::Node>);
+   |        ^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `parse_css_classes` is never used
+  --> macros/src/css_validator.rs:16:8
+   |
+16 | pub fn parse_css_classes(css_content: &str, _file_path: &str) -> HashSet<String> {
+   |        ^^^^^^^^^^^^^^^^^
+
+warning: function `create_class_span` is never used
+  --> macros/src/css_validator.rs:36:4
+   |
+36 | fn create_class_span(class_attr: &crate::token_parser::Attribute, _class_name: &str) -> proc_macro2::Span {
+   |    ^^^^^^^^^^^^^^^^^
+
+warning: function `extract_html_classes` is never used
+  --> macros/src/css_validator.rs:47:8
+   |
+47 | pub fn extract_html_classes(nodes: &[Node]) -> HashMap<String, Vec<proc_macro2::Span>> {
+   |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `extract_html_classes_recursive` is never used
+  --> macros/src/css_validator.rs:53:4
+   |
+53 | fn extract_html_classes_recursive(nodes: &[Node], used_classes: &mut HashMap<String, Vec<proc_macro2::Span>>) {
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `validate_css_classes` is never used
+   --> macros/src/css_validator.rs:113:8
+    |
+113 | pub fn validate_css_classes(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `ValidationError` is never used
+   --> macros/src/css_validator.rs:138:10
+    |
+138 | pub enum ValidationError {
+    |          ^^^^^^^^^^^^^^^
+
+warning: field `span` is never read
+  --> macros/src/style.rs:39:5
+   |
+36 | struct StyleProperty {
+   |        ------------- field in this struct
+...
+39 |     span: proc_macro2::Span,
+   |     ^^^^
+
+warning: field `span` is never read
+  --> macros/src/token_parser.rs:35:9
+   |
+33 | pub struct Text {
+   |            ---- field in this struct
+34 |     pub content: String,
+35 |     pub span: Span,
+   |         ^^^^
+   |
+   = note: `Text` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: field `span` is never read
+  --> macros/src/token_parser.rs:41:9
+   |
+39 | pub struct Expression {
+   |            ---------- field in this struct
+40 |     pub content: TokenStream,
+41 |     pub span: Span,
+   |         ^^^^
+   |
+   = note: `Expression` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: `azumi-macros` (lib) generated 16 warnings (run `cargo fix --lib -p azumi-macros` to apply 2 suggestions)
+    Checking azumi v0.7.774 (/home/dracon/_Dev/_Active/azumi-feature)
+warning: unused import: `serde::de::DeserializeOwned`
+ --> src/action.rs:3:5
+  |
+3 | use serde::de::DeserializeOwned;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `azumi` (lib) generated 1 warning (run `cargo fix --lib -p azumi` to apply 1 suggestion)
+    Checking azumi-demo v0.1.0 (/home/dracon/_Dev/_Active/azumi-feature/demo)
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: button
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.btn { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; background: #eee; } .btn.liked { background: #ff4081; color: white; } #like_box { } '
+DEBUG: extracted classes: {"liked", "btn"}
+DEBUG: extracted ids: {"like_box"}
+DEBUG: scoped_css: '.btn-se0c1b9e88325cdec { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; background: #eee; }.btn-se0c1b9e88325cdec.liked-se0c1b9e88325cdec { background: #ff4081; color: white; }#like_box { }'
+DEBUG: bindings tokens: let liked = "liked-se0c1b9e88325cdec"; let btn = "btn-se0c1b9e88325cdec"; let
+like_box = "like_box";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.card { border: 1px solid #eee; padding: 1rem; margin: 0.5rem; } .card_title { font-weight: bold; margin-bottom: 0.5rem; } '
+DEBUG: extracted classes: {"card", "card_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.card-s3121904d32405666 { border: 1px solid #eee; padding: 1rem; margin: 0.5rem; }.card_title-s3121904d32405666 { font-weight: bold; margin-bottom: 0.5rem; }'
+DEBUG: bindings tokens: let card = "card-s3121904d32405666"; let card_title =
+"card_title-s3121904d32405666";
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.dashboard_container { display: grid; gap: 1rem; } .dashboard_title { font-size: 1.5rem; color: #2196f3; margin-bottom: 1rem; } '
+DEBUG: extracted classes: {"dashboard_container", "dashboard_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.dashboard_container-s5cb4e33ce82b6254 { display: grid; gap: 1rem; }.dashboard_title-s5cb4e33ce82b6254 { font-size: 1.5rem; color: #2196f3; margin-bottom: 1rem; }'
+DEBUG: bindings tokens: let dashboard_container = "dashboard_container-s5cb4e33ce82b6254"; let
+dashboard_title = "dashboard_title-s5cb4e33ce82b6254";
+Parsing element: div
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.layout_container { display: grid; gap: 1rem; } .header_section { background: #f0f0f0; padding: 1rem; } .main_section { display: grid; grid-template-columns: 2fr1fr; gap: 1rem; } .sidebar { background: #f9f9f9; padding: 1rem; } '
+DEBUG: extracted classes: {"sidebar", "header_section", "main_section", "layout_container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.layout_container-sf7f2037aa992b0f7 { display: grid; gap: 1rem; }.header_section-sf7f2037aa992b0f7 { background: #f0f0f0; padding: 1rem; }.main_section-sf7f2037aa992b0f7 { display: grid; grid-template-columns: 2fr1fr; gap: 1rem; }.sidebar-sf7f2037aa992b0f7 { background: #f9f9f9; padding: 1rem; }'
+DEBUG: bindings tokens: let sidebar = "sidebar-sf7f2037aa992b0f7"; let header_section =
+"header_section-sf7f2037aa992b0f7"; let main_section =
+"main_section-sf7f2037aa992b0f7"; let layout_container =
+"layout_container-sf7f2037aa992b0f7";
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"examples", "subtitle", "header", "key_points", "section_title", "main_title", "container", "example_card", "point", "points_list"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let examples = "examples-s5e01d6a09ae0fa76"; let subtitle =
+"subtitle-s5e01d6a09ae0fa76"; let header = "header-s5e01d6a09ae0fa76"; let
+key_points = "key_points-s5e01d6a09ae0fa76"; let section_title =
+"section_title-s5e01d6a09ae0fa76"; let main_title =
+"main_title-s5e01d6a09ae0fa76"; let container = "container-s5e01d6a09ae0fa76";
+let example_card = "example_card-s5e01d6a09ae0fa76"; let point =
+"point-s5e01d6a09ae0fa76"; let points_list = "points_list-s5e01d6a09ae0fa76";
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.counter { padding: 2rem; text-align: center; border: 1px solid #eee; } .count_display { font-size: 3rem; margin: 1rem 0; } .counter_button { padding: 1rem 2rem; background: #4caf50; color: white; border: none; cursor: pointer; } .timestamp { font-size: 0.8rem; color: #666; } #counter_box { display: block; } '
+DEBUG: extracted classes: {"counter_button", "counter", "timestamp", "count_display"}
+DEBUG: extracted ids: {"counter_box"}
+DEBUG: scoped_css: '.counter-s28071be682cd1d60 { padding: 2rem; text-align: center; border: 1px solid #eee; }.count_display-s28071be682cd1d60 { font-size: 3rem; margin: 1rem 0; }.counter_button-s28071be682cd1d60 { padding: 1rem 2rem; background: #4caf50; color: white; border: none; cursor: pointer; }.timestamp-s28071be682cd1d60 { font-size: 0.8rem; color: #666; }#counter_box { display: block; }'
+DEBUG: bindings tokens: let counter_button = "counter_button-s28071be682cd1d60"; let counter =
+"counter-s28071be682cd1d60"; let timestamp = "timestamp-s28071be682cd1d60";
+let count_display = "count_display-s28071be682cd1d60"; let counter_box =
+"counter_box";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.state_container { padding: 1.5rem; background: #f9f9f9; } .state_info { margin: 0.5rem 0; padding: 0.5rem; background: white; } .action_button { padding: 0.75rem 1.5rem; background: #2196f3; color: white; border: none; cursor: pointer; } #state_box { display: block; } '
+DEBUG: extracted classes: {"state_container", "state_info", "action_button"}
+DEBUG: extracted ids: {"state_box"}
+DEBUG: scoped_css: '.state_container-s5462d2a325a7b2b3 { padding: 1.5rem; background: #f9f9f9; }.state_info-s5462d2a325a7b2b3 { margin: 0.5rem 0; padding: 0.5rem; background: white; }.action_button-s5462d2a325a7b2b3 { padding: 0.75rem 1.5rem; background: #2196f3; color: white; border: none; cursor: pointer; }#state_box { display: block; }'
+DEBUG: bindings tokens: let state_container = "state_container-s5462d2a325a7b2b3"; let state_info =
+"state_info-s5462d2a325a7b2b3"; let action_button =
+"action_button-s5462d2a325a7b2b3"; let state_box = "state_box";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.composition_container { padding: 1.5rem; } .action_card { margin: 0.5rem 0; padding: 1rem; background: #f5f5f5; border: 1px solid #eee; } .compose_button { padding: 0.75rem 1.5rem; background: #ff4081; color: white; border: none; cursor: pointer; } #composition_box { display: block; } '
+DEBUG: extracted classes: {"action_card", "compose_button", "composition_container"}
+DEBUG: extracted ids: {"composition_box"}
+DEBUG: scoped_css: '.composition_container-s371347bc06ea7afe { padding: 1.5rem; }.action_card-s371347bc06ea7afe { margin: 0.5rem 0; padding: 1rem; background: #f5f5f5; border: 1px solid #eee; }.compose_button-s371347bc06ea7afe { padding: 0.75rem 1.5rem; background: #ff4081; color: white; border: none; cursor: pointer; }#composition_box { display: block; }'
+DEBUG: bindings tokens: let action_card = "action_card-s371347bc06ea7afe"; let compose_button =
+"compose_button-s371347bc06ea7afe"; let composition_container =
+"composition_container-s371347bc06ea7afe"; let composition_box =
+"composition_box";
+Parsing element: script
+parse_script_content starting for tag: script
+Found closing tag: </script>
+Element::parse: Found closing tag sequence
+Found closing tag: </script>  (expected </script>)
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: hr
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.demo_container { padding: 2rem; border: 1px solid #ccc; border-radius: 8px; max-width: 600px; margin: 0 auto; } .btn { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; background: #eee; } .btn.liked { background: #ff4081; color: white; } #likebox { margin-top: 2rem; } '
+DEBUG: extracted classes: {"demo_container", "liked", "btn"}
+DEBUG: extracted ids: {"likebox"}
+DEBUG: scoped_css: '.demo_container-sade0549c9a597a72 { padding: 2rem; border: 1px solid #ccc; border-radius: 8px; max-width: 600px; margin: 0 auto; }.btn-sade0549c9a597a72 { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; background: #eee; }.btn-sade0549c9a597a72.liked-sade0549c9a597a72 { background: #ff4081; color: white; }#likebox { margin-top: 2rem; }'
+DEBUG: bindings tokens: let demo_container = "demo_container-sade0549c9a597a72"; let liked =
+"liked-sade0549c9a597a72"; let btn = "btn-sade0549c9a597a72"; let likebox =
+"likebox";
+Parsing element: form
+Parsing element: input
+Parsing element: input
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </form>  (expected </form>)
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG GLOBAL: input tokens: body { margin: "0"; padding: "0"; font-family: "Arial, sans-serif"; } *
+{ box-sizing: "border-box"; }
+DEBUG GLOBAL: Parse SUCCESS
+DEBUG GLOBAL: number of parsed rules: 2, at_rules: 0
+DEBUG GLOBAL: raw_css: 'body { margin: 0; padding: 0; font-family: Arial, sans-serif; } * { box-sizing: border-box; } '
+DEBUG GLOBAL: extracted classes: {}
+DEBUG GLOBAL: extracted ids: {}
+DEBUG GLOBAL: bindings tokens: 
+DEBUG: raw_css: '.scoped_box { padding: 20px; background: #f0f0f0; border: 1px solid #ccc; } '
+DEBUG: extracted classes: {"scoped_box"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.scoped_box-s1bd91bcafcbfe35d { padding: 20px; background: #f0f0f0; border: 1px solid #ccc; }'
+DEBUG: bindings tokens: let scoped_box = "scoped_box-s1bd91bcafcbfe35d";
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.basic_container { background-color: #f5f5f5; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } .basic_h1 { color: #333; font-size: 1.5em; font-weight: bold; } .basic_h2 { color: #666; font-size: 1.2em; } .basic_p { color: #999; font-size: 1em; } '
+DEBUG: extracted classes: {"basic_p", "basic_container", "basic_h1", "basic_h2"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.basic_container-s43b13c3ec185bfb4 { background-color: #f5f5f5; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }.basic_h1-s43b13c3ec185bfb4 { color: #333; font-size: 1.5em; font-weight: bold; }.basic_h2-s43b13c3ec185bfb4 { color: #666; font-size: 1.2em; }.basic_p-s43b13c3ec185bfb4 { color: #999; font-size: 1em; }'
+DEBUG: bindings tokens: let basic_p = "basic_p-s43b13c3ec185bfb4"; let basic_container =
+"basic_container-s43b13c3ec185bfb4"; let basic_h1 =
+"basic_h1-s43b13c3ec185bfb4"; let basic_h2 = "basic_h2-s43b13c3ec185bfb4";
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.hello_container { background-color: #f5f5f5; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } .hello_title { color: #333; font-size: 1.5em; font-weight: bold; } '
+DEBUG: extracted classes: {"hello_container", "hello_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.hello_container-s25c9e2da54598fdc { background-color: #f5f5f5; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }.hello_title-s25c9e2da54598fdc { color: #333; font-size: 1.5em; font-weight: bold; }'
+DEBUG: bindings tokens: let hello_container = "hello_container-s25c9e2da54598fdc"; let hello_title =
+"hello_title-s25c9e2da54598fdc";
+Parsing element: div
+Parsing element: img
+Parsing element: img
+Parsing element: input
+Parsing element: input
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"main_title", "section_title", "examples", "container", "point", "key_points", "subtitle", "example_card", "header", "points_list"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let main_title = "main_title-s5e01d6a09ae0fa76"; let section_title =
+"section_title-s5e01d6a09ae0fa76"; let examples =
+"examples-s5e01d6a09ae0fa76"; let container = "container-s5e01d6a09ae0fa76";
+let point = "point-s5e01d6a09ae0fa76"; let key_points =
+"key_points-s5e01d6a09ae0fa76"; let subtitle = "subtitle-s5e01d6a09ae0fa76";
+let example_card = "example_card-s5e01d6a09ae0fa76"; let header =
+"header-s5e01d6a09ae0fa76"; let points_list = "points_list-s5e01d6a09ae0fa76";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.integration_container { padding: 1.5rem; background: #f9f9f9; } .feature_grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; } .feature_card { padding: 1rem; background: white; border: 1px solid #eee; } .feature_name { font-weight: bold; color: #2196f3; } .feature_desc { font-size: 0.9rem; color: #666; } '
+DEBUG: extracted classes: {"feature_grid", "feature_desc", "integration_container", "feature_name", "feature_card"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.integration_container-s6a77ca52d459b0bc { padding: 1.5rem; background: #f9f9f9; }.feature_grid-s6a77ca52d459b0bc { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }.feature_card-s6a77ca52d459b0bc { padding: 1rem; background: white; border: 1px solid #eee; }.feature_name-s6a77ca52d459b0bc { font-weight: bold; color: #2196f3; }.feature_desc-s6a77ca52d459b0bc { font-size: 0.9rem; color: #666; }'
+DEBUG: bindings tokens: let feature_grid = "feature_grid-s6a77ca52d459b0bc"; let feature_desc =
+"feature_desc-s6a77ca52d459b0bc"; let integration_container =
+"integration_container-s6a77ca52d459b0bc"; let feature_name =
+"feature_name-s6a77ca52d459b0bc"; let feature_card =
+"feature_card-s6a77ca52d459b0bc";
+Parsing element: div
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.showcase { display: grid; gap: 2rem; } .section { padding: 1rem; border: 1px solid #eee; } .feature_list { display: grid; gap: 0.5rem; } .feature_item { padding: 0.5rem; background: #f0f0f0; } .active_badge { background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; } '
+DEBUG: extracted classes: {"active_badge", "section", "showcase", "feature_item", "feature_list"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.showcase-sc3e1bb64b6706002 { display: grid; gap: 2rem; }.section-sc3e1bb64b6706002 { padding: 1rem; border: 1px solid #eee; }.feature_list-sc3e1bb64b6706002 { display: grid; gap: 0.5rem; }.feature_item-sc3e1bb64b6706002 { padding: 0.5rem; background: #f0f0f0; }.active_badge-sc3e1bb64b6706002 { background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; }'
+DEBUG: bindings tokens: let active_badge = "active_badge-sc3e1bb64b6706002"; let section =
+"section-sc3e1bb64b6706002"; let showcase = "showcase-sc3e1bb64b6706002"; let
+feature_item = "feature_item-sc3e1bb64b6706002"; let feature_list =
+"feature_list-sc3e1bb64b6706002";
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"section_title", "point", "key_points", "examples", "main_title", "header", "container", "subtitle", "example_card", "points_list"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let section_title = "section_title-s5e01d6a09ae0fa76"; let point =
+"point-s5e01d6a09ae0fa76"; let key_points = "key_points-s5e01d6a09ae0fa76";
+let examples = "examples-s5e01d6a09ae0fa76"; let main_title =
+"main_title-s5e01d6a09ae0fa76"; let header = "header-s5e01d6a09ae0fa76"; let
+container = "container-s5e01d6a09ae0fa76"; let subtitle =
+"subtitle-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76";
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"subtitle", "key_points", "example_card", "header", "section_title", "main_title", "points_list", "point", "examples", "container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let subtitle = "subtitle-s5e01d6a09ae0fa76"; let key_points =
+"key_points-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let header = "header-s5e01d6a09ae0fa76"; let
+section_title = "section_title-s5e01d6a09ae0fa76"; let main_title =
+"main_title-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let point = "point-s5e01d6a09ae0fa76"; let
+examples = "examples-s5e01d6a09ae0fa76"; let container =
+"container-s5e01d6a09ae0fa76";
+Parsing element: form
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: select
+Parsing element: option
+Element::parse: Found closing tag sequence
+Found closing tag: </option>  (expected </option>)
+Parsing element: option
+Element::parse: Found closing tag sequence
+Found closing tag: </option>  (expected </option>)
+Parsing element: option
+Element::parse: Found closing tag sequence
+Found closing tag: </option>  (expected </option>)
+Element::parse: Found closing tag sequence
+Found closing tag: </select>  (expected </select>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: label
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: label
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </form>  (expected </form>)
+DEBUG: raw_css: '.complex_form { display: grid; gap: 1rem; max-width: 500px; } .form_section { border: 1px solid #eee; padding: 1rem; margin-bottom: 1rem; } .section_title { font-weight: bold; margin-bottom: 0.5rem; } .form_grid { display: grid; gap: 0.5rem; } .save_button { padding: 0.75rem; background: #4caf50; color: white; border: none; } '
+DEBUG: extracted classes: {"save_button", "complex_form", "form_grid", "form_section", "section_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.complex_form-s7ab1963b77587ccb { display: grid; gap: 1rem; max-width: 500px; }.form_section-s7ab1963b77587ccb { border: 1px solid #eee; padding: 1rem; margin-bottom: 1rem; }.section_title-s7ab1963b77587ccb { font-weight: bold; margin-bottom: 0.5rem; }.form_grid-s7ab1963b77587ccb { display: grid; gap: 0.5rem; }.save_button-s7ab1963b77587ccb { padding: 0.75rem; background: #4caf50; color: white; border: none; }'
+DEBUG: bindings tokens: let save_button = "save_button-s7ab1963b77587ccb"; let complex_form =
+"complex_form-s7ab1963b77587ccb"; let form_grid =
+"form_grid-s7ab1963b77587ccb"; let form_section =
+"form_section-s7ab1963b77587ccb"; let section_title =
+"section_title-s7ab1963b77587ccb";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.validation_container { padding: 1rem; } .error_message { color: red; font-size: 0.9rem; margin-top: 0.5rem; } .success_message { color: green; font-size: 0.9rem; margin-top: 0.5rem; } '
+DEBUG: extracted classes: {"validation_container", "error_message", "success_message"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.validation_container-s7bbc7b32c888fb4d { padding: 1rem; }.error_message-s7bbc7b32c888fb4d { color: red; font-size: 0.9rem; margin-top: 0.5rem; }.success_message-s7bbc7b32c888fb4d { color: green; font-size: 0.9rem; margin-top: 0.5rem; }'
+DEBUG: bindings tokens: let validation_container = "validation_container-s7bbc7b32c888fb4d"; let
+error_message = "error_message-s7bbc7b32c888fb4d"; let success_message =
+"success_message-s7bbc7b32c888fb4d";
+Parsing element: form
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </form>  (expected </form>)
+DEBUG: raw_css: '.form { display: grid; gap: 1rem; max-width: 400px; } .form_field { display: grid; gap: 0.5rem; } .form_label { font-weight: bold; } .form_input { padding: 0.5rem; border: 1px solid #ddd; } .form_button { padding: 0.75rem; background: #2196f3; color: white; border: none; cursor: pointer; } '
+DEBUG: extracted classes: {"form_label", "form_input", "form_field", "form", "form_button"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.form-s434c7fdf04640c08 { display: grid; gap: 1rem; max-width: 400px; }.form_field-s434c7fdf04640c08 { display: grid; gap: 0.5rem; }.form_label-s434c7fdf04640c08 { font-weight: bold; }.form_input-s434c7fdf04640c08 { padding: 0.5rem; border: 1px solid #ddd; }.form_button-s434c7fdf04640c08 { padding: 0.75rem; background: #2196f3; color: white; border: none; cursor: pointer; }'
+DEBUG: bindings tokens: let form_label = "form_label-s434c7fdf04640c08"; let form_input =
+"form_input-s434c7fdf04640c08"; let form_field =
+"form_field-s434c7fdf04640c08"; let form = "form-s434c7fdf04640c08"; let
+form_button = "form_button-s434c7fdf04640c08";
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"header", "main_title", "subtitle", "container", "points_list", "point", "section_title", "examples", "example_card", "key_points"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let header = "header-s5e01d6a09ae0fa76"; let main_title =
+"main_title-s5e01d6a09ae0fa76"; let subtitle = "subtitle-s5e01d6a09ae0fa76";
+let container = "container-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let point = "point-s5e01d6a09ae0fa76"; let
+section_title = "section_title-s5e01d6a09ae0fa76"; let examples =
+"examples-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let key_points =
+"key_points-s5e01d6a09ae0fa76";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.pattern_container { padding: 1rem; } .state_loading { color: blue; } .state_success { color: green; } .state_error { color: red; } '
+DEBUG: extracted classes: {"state_error", "state_loading", "state_success", "pattern_container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.pattern_container-s6fd2bee4e7b5be93 { padding: 1rem; }.state_loading-s6fd2bee4e7b5be93 { color: blue; }.state_success-s6fd2bee4e7b5be93 { color: green; }.state_error-s6fd2bee4e7b5be93 { color: red; }'
+DEBUG: bindings tokens: let state_error = "state_error-s6fd2bee4e7b5be93"; let state_loading =
+"state_loading-s6fd2bee4e7b5be93"; let state_success =
+"state_success-s6fd2bee4e7b5be93"; let pattern_container =
+"pattern_container-s6fd2bee4e7b5be93";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.conditions_container { padding: 1rem; background: #f9f9f9; } .permission_granted { color: green; font-weight: bold; } .permission_denied { color: red; font-weight: bold; } '
+DEBUG: extracted classes: {"conditions_container", "permission_denied", "permission_granted"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.conditions_container-s6726f038c85be006 { padding: 1rem; background: #f9f9f9; }.permission_granted-s6726f038c85be006 { color: green; font-weight: bold; }.permission_denied-s6726f038c85be006 { color: red; font-weight: bold; }'
+DEBUG: bindings tokens: let conditions_container = "conditions_container-s6726f038c85be006"; let
+permission_denied = "permission_denied-s6726f038c85be006"; let
+permission_granted = "permission_granted-s6726f038c85be006";
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.content { padding: 1rem; } .item { margin: 0.5rem 0; padding: 0.5rem; background: #f5f5f5; } .status_active { color: green; } .status_inactive { color: red; } '
+DEBUG: extracted classes: {"item", "status_active", "content", "status_inactive"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.content-sb19012bf95db5613 { padding: 1rem; }.item-sb19012bf95db5613 { margin: 0.5rem 0; padding: 0.5rem; background: #f5f5f5; }.status_active-sb19012bf95db5613 { color: green; }.status_inactive-sb19012bf95db5613 { color: red; }'
+DEBUG: bindings tokens: let item = "item-sb19012bf95db5613"; let status_active =
+"status_active-sb19012bf95db5613"; let content = "content-sb19012bf95db5613";
+let status_inactive = "status_inactive-sb19012bf95db5613";
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"main_title", "key_points", "container", "point", "section_title", "examples", "points_list", "example_card", "header", "subtitle"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let main_title = "main_title-s5e01d6a09ae0fa76"; let key_points =
+"key_points-s5e01d6a09ae0fa76"; let container = "container-s5e01d6a09ae0fa76";
+let point = "point-s5e01d6a09ae0fa76"; let section_title =
+"section_title-s5e01d6a09ae0fa76"; let examples =
+"examples-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let header = "header-s5e01d6a09ae0fa76"; let
+subtitle = "subtitle-s5e01d6a09ae0fa76";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: h4
+Element::parse: Found closing tag sequence
+Found closing tag: </h4>  (expected </h4>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.composition_demo { padding: 1rem; } .component_container { margin: 0.5rem 0; padding: 0.5rem; background: #f5f5f5; } '
+DEBUG: extracted classes: {"composition_demo", "component_container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.composition_demo-s74f0585d3a265be3 { padding: 1rem; }.component_container-s74f0585d3a265be3 { margin: 0.5rem 0; padding: 0.5rem; background: #f5f5f5; }'
+DEBUG: bindings tokens: let composition_demo = "composition_demo-s74f0585d3a265be3"; let
+component_container = "component_container-s74f0585d3a265be3";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.conditions_demo { padding: 1rem; background: #f9f9f9; } .result { font-weight: bold; } '
+DEBUG: extracted classes: {"conditions_demo", "result"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.conditions_demo-sa20f8bab8162709c { padding: 1rem; background: #f9f9f9; }.result-sa20f8bab8162709c { font-weight: bold; }'
+DEBUG: bindings tokens: let conditions_demo = "conditions_demo-sa20f8bab8162709c"; let result =
+"result-sa20f8bab8162709c";
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.let_demo { padding: 1rem; } .calculated { font-weight: bold; color: #2196f3; } .derived { background: #f0f0f0; padding: 0.5rem; } '
+DEBUG: extracted classes: {"let_demo", "derived", "calculated"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.let_demo-sdb8d346b57ac2316 { padding: 1rem; }.calculated-sdb8d346b57ac2316 { font-weight: bold; color: #2196f3; }.derived-sdb8d346b57ac2316 { background: #f0f0f0; padding: 0.5rem; }'
+DEBUG: bindings tokens: let let_demo = "let_demo-sdb8d346b57ac2316"; let derived =
+"derived-sdb8d346b57ac2316"; let calculated = "calculated-sdb8d346b57ac2316";
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"subtitle", "example_card", "header", "main_title", "examples", "point", "section_title", "key_points", "points_list"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.header-sf72d3607cb9a5e67 { text-align: center; margin-bottom: 30px; }.main_title-sf72d3607cb9a5e67 { font-size: 32px; color: #333; }.subtitle-sf72d3607cb9a5e67 { font-size: 18px; color: #666; }.key_points-sf72d3607cb9a5e67 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-sf72d3607cb9a5e67 { font-size: 20px; margin-bottom: 15px; }.points_list-sf72d3607cb9a5e67 { list-style: none; padding: 0; }.point-sf72d3607cb9a5e67 { margin-bottom: 10px; }.examples-sf72d3607cb9a5e67 { display: grid; gap: 20px; }.example_card-sf72d3607cb9a5e67 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let subtitle = "subtitle-sf72d3607cb9a5e67"; let example_card =
+"example_card-sf72d3607cb9a5e67"; let header = "header-sf72d3607cb9a5e67"; let
+main_title = "main_title-sf72d3607cb9a5e67"; let examples =
+"examples-sf72d3607cb9a5e67"; let point = "point-sf72d3607cb9a5e67"; let
+section_title = "section_title-sf72d3607cb9a5e67"; let key_points =
+"key_points-sf72d3607cb9a5e67"; let points_list =
+"points_list-sf72d3607cb9a5e67";
+Parsing element: div
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.children_demo { display: grid; gap: 1rem; } .child_item { padding: 0.5rem; background: #f9f9f9; border: 1px solid #eee; } '
+DEBUG: extracted classes: {"children_demo", "child_item"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.children_demo-sd8085ca0faae7a19 { display: grid; gap: 1rem; }.child_item-sd8085ca0faae7a19 { padding: 0.5rem; background: #f9f9f9; border: 1px solid #eee; }'
+DEBUG: bindings tokens: let children_demo = "children_demo-sd8085ca0faae7a19"; let child_item =
+"child_item-sd8085ca0faae7a19";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.outer_container { background: #f0f0f0; padding: 1.5rem; } .inner_container { background: white; padding: 1rem; margin-top: 1rem; } '
+DEBUG: extracted classes: {"inner_container", "outer_container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.outer_container-se700eadc9a0d879e { background: #f0f0f0; padding: 1.5rem; }.inner_container-se700eadc9a0d879e { background: white; padding: 1rem; margin-top: 1rem; }'
+DEBUG: bindings tokens: let inner_container = "inner_container-se700eadc9a0d879e"; let outer_container
+= "outer_container-se700eadc9a0d879e";
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.layout_title { font-size: 1.5rem; color: #2196f3; margin-bottom: 1rem; } '
+DEBUG: extracted classes: {"layout_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.layout_title-s4257bc281c2bd327 { font-size: 1.5rem; color: #2196f3; margin-bottom: 1rem; }'
+DEBUG: bindings tokens: let layout_title = "layout_title-s4257bc281c2bd327";
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.content_box { padding: 2rem; border: 1px solid #ddd; border-radius: 8px; } '
+DEBUG: extracted classes: {"content_box"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.content_box-s329935288cb409ed { padding: 2rem; border: 1px solid #ddd; border-radius: 8px; }'
+DEBUG: bindings tokens: let content_box = "content_box-s329935288cb409ed";
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"point", "main_title", "example_card", "container", "subtitle", "examples", "section_title", "points_list", "key_points", "header"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let point = "point-s5e01d6a09ae0fa76"; let main_title =
+"main_title-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let container =
+"container-s5e01d6a09ae0fa76"; let subtitle = "subtitle-s5e01d6a09ae0fa76";
+let examples = "examples-s5e01d6a09ae0fa76"; let section_title =
+"section_title-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let key_points =
+"key_points-s5e01d6a09ae0fa76"; let header = "header-s5e01d6a09ae0fa76";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.best_practices { padding: 1.5rem; background: #f9f9f9; } .practice_item { margin: 0.5rem 0; padding: 0.5rem; background: white; } .do_class { color: green; font-weight: bold; } .dont_class { color: red; font-weight: bold; } '
+DEBUG: extracted classes: {"practice_item", "best_practices", "do_class", "dont_class"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.best_practices-sd700cdd6d2e9f788 { padding: 1.5rem; background: #f9f9f9; }.practice_item-sd700cdd6d2e9f788 { margin: 0.5rem 0; padding: 0.5rem; background: white; }.do_class-sd700cdd6d2e9f788 { color: green; font-weight: bold; }.dont_class-sd700cdd6d2e9f788 { color: red; font-weight: bold; }'
+DEBUG: bindings tokens: let practice_item = "practice_item-sd700cdd6d2e9f788"; let best_practices =
+"best_practices-sd700cdd6d2e9f788"; let do_class =
+"do_class-sd700cdd6d2e9f788"; let dont_class = "dont_class-sd700cdd6d2e9f788";
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG GLOBAL: input tokens: 
+DEBUG GLOBAL: Parse SUCCESS
+DEBUG GLOBAL: number of parsed rules: 0, at_rules: 0
+DEBUG GLOBAL: raw_css: ''
+DEBUG GLOBAL: extracted classes: {}
+DEBUG GLOBAL: extracted ids: {}
+DEBUG GLOBAL: bindings tokens: 
+DEBUG: raw_css: '.container { padding: 1rem; border: 1px solid #ddd; } .scoped_title { color: #2196f3; } .global_simulation { font-size: 1.1rem; font-weight: bold; } '
+DEBUG: extracted classes: {"scoped_title", "container", "global_simulation"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s805c03654d899420 { padding: 1rem; border: 1px solid #ddd; }.scoped_title-s805c03654d899420 { color: #2196f3; }.global_simulation-s805c03654d899420 { font-size: 1.1rem; font-weight: bold; }'
+DEBUG: bindings tokens: let scoped_title = "scoped_title-s805c03654d899420"; let container =
+"container-s805c03654d899420"; let global_simulation =
+"global_simulation-s805c03654d899420";
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG GLOBAL: input tokens: body { font-family: "Arial, sans-serif"; }
+DEBUG GLOBAL: Parse SUCCESS
+DEBUG GLOBAL: number of parsed rules: 1, at_rules: 0
+DEBUG GLOBAL: raw_css: 'body { font-family: Arial, sans-serif; } '
+DEBUG GLOBAL: extracted classes: {}
+DEBUG GLOBAL: extracted ids: {}
+DEBUG GLOBAL: bindings tokens: 
+DEBUG: raw_css: '.component_class { background: #f5f5f5; padding: 1rem; } .local_class { color: blue; } .global_demo { color: purple; font-style: italic; } '
+DEBUG: extracted classes: {"component_class", "global_demo", "local_class"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.component_class-s8fd13c96d0d436c4 { background: #f5f5f5; padding: 1rem; }.local_class-s8fd13c96d0d436c4 { color: blue; }.global_demo-s8fd13c96d0d436c4 { color: purple; font-style: italic; }'
+DEBUG: bindings tokens: let component_class = "component_class-s8fd13c96d0d436c4"; let global_demo =
+"global_demo-s8fd13c96d0d436c4"; let local_class =
+"local_class-s8fd13c96d0d436c4";
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"examples", "subtitle", "points_list", "point", "example_card", "key_points", "section_title", "header", "main_title", "container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let examples = "examples-s5e01d6a09ae0fa76"; let subtitle =
+"subtitle-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let point = "point-s5e01d6a09ae0fa76"; let
+example_card = "example_card-s5e01d6a09ae0fa76"; let key_points =
+"key_points-s5e01d6a09ae0fa76"; let section_title =
+"section_title-s5e01d6a09ae0fa76"; let header = "header-s5e01d6a09ae0fa76";
+let main_title = "main_title-s5e01d6a09ae0fa76"; let container =
+"container-s5e01d6a09ae0fa76";
+Parsing element: nav
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: ul
+Parsing element: li
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </nav>  (expected </nav>)
+DEBUG: raw_css: '.nav_container { padding: 1rem; } .nav_list { list-style: none; padding: 0; display: grid; gap: 0.5rem; } .nav_item { padding: 0.5rem; } .nav_link { color: #2196f3; text-decoration: none; } .nav_link:hover { text-decoration: underline; } '
+DEBUG: extracted classes: {"nav_list", "nav_item", "nav_link", "nav_container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.nav_container-s4e0e44ec3fa0f21a { padding: 1rem; }.nav_list-s4e0e44ec3fa0f21a { list-style: none; padding: 0; display: grid; gap: 0.5rem; }.nav_item-s4e0e44ec3fa0f21a { padding: 0.5rem; }.nav_link-s4e0e44ec3fa0f21a { color: #2196f3; text-decoration: none; }.nav_link-s4e0e44ec3fa0f21a:hover { text-decoration: underline; }'
+DEBUG: bindings tokens: let nav_list = "nav_list-s4e0e44ec3fa0f21a"; let nav_item =
+"nav_item-s4e0e44ec3fa0f21a"; let nav_link = "nav_link-s4e0e44ec3fa0f21a"; let
+nav_container = "nav_container-s4e0e44ec3fa0f21a";
+Parsing element: form
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </form>  (expected </form>)
+DEBUG: raw_css: '.accessible_form { display: grid; gap: 1rem; max-width: 400px; } .form_group { display: grid; gap: 0.5rem; } .form_label { font-weight: bold; } .form_input { padding: 0.5rem; border: 1px solid #ddd; } .form_button { padding: 0.75rem; background: #2196f3; color: white; border: none; cursor: pointer; } '
+DEBUG: extracted classes: {"form_button", "form_input", "form_group", "accessible_form", "form_label"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.accessible_form-s5bbd713b5ed35512 { display: grid; gap: 1rem; max-width: 400px; }.form_group-s5bbd713b5ed35512 { display: grid; gap: 0.5rem; }.form_label-s5bbd713b5ed35512 { font-weight: bold; }.form_input-s5bbd713b5ed35512 { padding: 0.5rem; border: 1px solid #ddd; }.form_button-s5bbd713b5ed35512 { padding: 0.75rem; background: #2196f3; color: white; border: none; cursor: pointer; }'
+DEBUG: bindings tokens: let form_button = "form_button-s5bbd713b5ed35512"; let form_input =
+"form_input-s5bbd713b5ed35512"; let form_group =
+"form_group-s5bbd713b5ed35512"; let accessible_form =
+"accessible_form-s5bbd713b5ed35512"; let form_label =
+"form_label-s5bbd713b5ed35512";
+Parsing element: article
+Parsing element: img
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </article>  (expected </article>)
+DEBUG: raw_css: '.card { max-width: 300px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; } .card_image { width: 100%; height: 200px; object-fit: cover; } .card_content { padding: 1rem; } .card_title { font-size: 1.2rem; margin-bottom: 0.5rem; } .card_description { color: #666; } '
+DEBUG: extracted classes: {"card_title", "card_description", "card_image", "card_content", "card"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.card-sb58fb893f3f2db4c { max-width: 300px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }.card_image-sb58fb893f3f2db4c { width: 100%; height: 200px; object-fit: cover; }.card_content-sb58fb893f3f2db4c { padding: 1rem; }.card_title-sb58fb893f3f2db4c { font-size: 1.2rem; margin-bottom: 0.5rem; }.card_description-sb58fb893f3f2db4c { color: #666; }'
+DEBUG: bindings tokens: let card_title = "card_title-sb58fb893f3f2db4c"; let card_description =
+"card_description-sb58fb893f3f2db4c"; let card_image =
+"card_image-sb58fb893f3f2db4c"; let card_content =
+"card_content-sb58fb893f3f2db4c"; let card = "card-sb58fb893f3f2db4c";
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"example_card", "container", "point", "section_title", "key_points", "points_list", "examples", "subtitle", "main_title", "header"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let example_card = "example_card-s5e01d6a09ae0fa76"; let container =
+"container-s5e01d6a09ae0fa76"; let point = "point-s5e01d6a09ae0fa76"; let
+section_title = "section_title-s5e01d6a09ae0fa76"; let key_points =
+"key_points-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let examples = "examples-s5e01d6a09ae0fa76";
+let subtitle = "subtitle-s5e01d6a09ae0fa76"; let main_title =
+"main_title-s5e01d6a09ae0fa76"; let header = "header-s5e01d6a09ae0fa76";
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.valid_container { padding: 20px; background: #f9f9f9; } .valid_title { color: #2196f3; font-size: 1.2rem; } .valid_text { color: #666; } '
+DEBUG: extracted classes: {"valid_container", "valid_title", "valid_text"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.valid_container-se8ef5e64fd2294e2 { padding: 20px; background: #f9f9f9; }.valid_title-se8ef5e64fd2294e2 { color: #2196f3; font-size: 1.2rem; }.valid_text-se8ef5e64fd2294e2 { color: #666; }'
+DEBUG: bindings tokens: let valid_container = "valid_container-se8ef5e64fd2294e2"; let valid_title =
+"valid_title-se8ef5e64fd2294e2"; let valid_text =
+"valid_text-se8ef5e64fd2294e2";
+Parsing element: div
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.card { padding: 1rem; margin: 0.5rem; border: 1px solid #eee; } .card_title { font-weight: bold; color: #1976d2; } '
+DEBUG: extracted classes: {"card", "card_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.card-s811816e62aaa4e47 { padding: 1rem; margin: 0.5rem; border: 1px solid #eee; }.card_title-s811816e62aaa4e47 { font-weight: bold; color: #1976d2; }'
+DEBUG: bindings tokens: let card = "card-s811816e62aaa4e47"; let card_title =
+"card_title-s811816e62aaa4e47";
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 1rem; border: 1px solid #ddd; } .title { color: #2196f3; } '
+DEBUG: extracted classes: {"title", "container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s579ebc369d2881ac { padding: 1rem; border: 1px solid #ddd; }.title-s579ebc369d2881ac { color: #2196f3; }'
+DEBUG: bindings tokens: let title = "title-s579ebc369d2881ac"; let container =
+"container-s579ebc369d2881ac";
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"main_title", "header", "key_points", "section_title", "points_list", "examples", "subtitle", "point", "container", "example_card"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let main_title = "main_title-s5e01d6a09ae0fa76"; let header =
+"header-s5e01d6a09ae0fa76"; let key_points = "key_points-s5e01d6a09ae0fa76";
+let section_title = "section_title-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let examples = "examples-s5e01d6a09ae0fa76";
+let subtitle = "subtitle-s5e01d6a09ae0fa76"; let point =
+"point-s5e01d6a09ae0fa76"; let container = "container-s5e01d6a09ae0fa76"; let
+example_card = "example_card-s5e01d6a09ae0fa76";
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.card { padding: 1.5rem; margin: 1rem 0; border: 1px solid #eee; border-radius: 8px; } .card_title { font-size: 1.2rem; color: #1976d2; margin-bottom: 0.5rem; } .card_content { color: #666; } '
+DEBUG: extracted classes: {"card_title", "card", "card_content"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.card-s7bee44ace956c029 { padding: 1.5rem; margin: 1rem 0; border: 1px solid #eee; border-radius: 8px; }.card_title-s7bee44ace956c029 { font-size: 1.2rem; color: #1976d2; margin-bottom: 0.5rem; }.card_content-s7bee44ace956c029 { color: #666; }'
+DEBUG: bindings tokens: let card_title = "card_title-s7bee44ace956c029"; let card =
+"card-s7bee44ace956c029"; let card_content = "card_content-s7bee44ace956c029";
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.container { padding: 1rem; border: 1px solid #ddd; } .title { color: #2196f3; } '
+DEBUG: extracted classes: {"title", "container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s579ebc369d2881ac { padding: 1rem; border: 1px solid #ddd; }.title-s579ebc369d2881ac { color: #2196f3; }'
+DEBUG: bindings tokens: let title = "title-s579ebc369d2881ac"; let container =
+"container-s579ebc369d2881ac";
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.greeting { color: #1976d2; font-size: 1.5rem; } '
+DEBUG: extracted classes: {"greeting"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.greeting-se5471f7a8a1e85ce { color: #1976d2; font-size: 1.5rem; }'
+DEBUG: bindings tokens: let greeting = "greeting-se5471f7a8a1e85ce";
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.homepage_title { color: purple; font-size: 3em; } .lesson_grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; } .lesson_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s; } .lesson_card:hover { transform: translateY(-5px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); } .lesson_title { color: #1976d2; font-size: 1.2rem; margin-bottom: 10px; } .lesson_link { color: #6c5ce7; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 10px; } .lesson_link:hover { text-decoration: underline; } .subtitle { text-align: center; color: #666; margin-bottom: 30px; } '
+DEBUG: extracted classes: {"homepage_title", "lesson_card", "lesson_title", "subtitle", "lesson_link", "lesson_grid"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.homepage_title-sc2970f539791bc05 { color: purple; font-size: 3em; }.lesson_grid-sc2970f539791bc05 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; }.lesson_card-sc2970f539791bc05 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s; }.lesson_card-sc2970f539791bc05:hover { transform: translateY(-5px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }.lesson_title-sc2970f539791bc05 { color: #1976d2; font-size: 1.2rem; margin-bottom: 10px; }.lesson_link-sc2970f539791bc05 { color: #6c5ce7; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 10px; }.lesson_link-sc2970f539791bc05:hover { text-decoration: underline; }.subtitle-sc2970f539791bc05 { text-align: center; color: #666; margin-bottom: 30px; }'
+DEBUG: bindings tokens: let homepage_title = "homepage_title-sc2970f539791bc05"; let lesson_card =
+"lesson_card-sc2970f539791bc05"; let lesson_title =
+"lesson_title-sc2970f539791bc05"; let subtitle = "subtitle-sc2970f539791bc05";
+let lesson_link = "lesson_link-sc2970f539791bc05"; let lesson_grid =
+"lesson_grid-sc2970f539791bc05";
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG GLOBAL: input tokens: .dark_layout
+{
+    min-height: "100vh"; background: var(--azumi-bg); color:
+    var(--azumi-text); font-family: var(--font-sans);
+}.content_container
+{
+    max-width: "1200px"; margin: "0 auto"; padding: var(--spacing-lg);
+}.header_section
+{
+    background:
+    "linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%)";
+    backdrop-filter: "blur(10px)"; border-bottom:
+    "1px solid rgba(148, 163, 184, 0.1)"; padding: var(--spacing-md) 0;
+    margin-bottom: var(--spacing-lg);
+}.main_content
+{
+    background:
+    "linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.6) 100%)";
+    backdrop-filter: "blur(8px)"; border:
+    "1px solid rgba(148, 163, 184, 0.1)"; border-radius: var(--radius-md);
+    padding: var(--spacing-lg); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}.footer_section
+{
+    background:
+    linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8)
+    100%); backdrop-filter: blur(10px); border-top: 1px solid
+    rgba(148, 163, 184, 0.1); padding: var(--spacing-md) 0; margin-top:
+    var(--spacing-lg); text-align: center; color: var(--azumi-text-dim);
+    font-size: 0.875rem;
+}.modern_card
+{
+    background:
+    "linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(30, 41, 59, 0.4) 100%)";
+    backdrop-filter: "blur(8px)"; border:
+    "1px solid rgba(148, 163, 184, 0.1)"; border-radius: var(--radius-md);
+    padding: var(--spacing-md); transition: "all 0.3s ease"; box-shadow:
+    "0 2px 4px rgba(0, 0, 0, 0.1)";
+}.modern_card : hover
+{
+    transform: translateY(-2px); box-shadow: 0 4px 12px
+    rgba(79, 70, 229, 0.2); border-color: rgba(79, 70, 229, 0.3);
+}.modern_btn
+{
+    background:
+    linear-gradient(135deg, var(--azumi-primary) 0%, #5b51e5 100%); color:
+    white; padding: var(--spacing-xs) var(--spacing-sm); border: none;
+    border-radius: var(--radius-md); font-weight: 600; cursor: pointer;
+    transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+}.modern_btn : hover
+{
+    transform: translateY(-1px); box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+    background: linear-gradient(135deg, #5b51e5 0%, #4f46e5 100%);
+}.modern_btn : active { transform: translateY(0); }.modern_link
+{
+    color: var(--azumi-primary); text-decoration: none; font-weight: 500;
+    transition: all 0.2s ease; position: relative; padding-bottom: 2px;
+}.modern_link : hover { color: #6366f1; }.modern_link :: after
+{
+    content: ""; position: absolute; bottom: 0; left: 0; width: 0; height:
+    2px; background: var(--azumi-primary); transition: width 0.3s ease;
+}.modern_link : hover :: after { width: 100%; }.responsive_grid
+{
+    display: grid; grid-template-columns:
+    repeat(auto-fill, minmax(300px, 1fr)); gap: var(--spacing-md);
+}.glass_effect
+{
+    background: "rgba(15, 23, 42, 0.5)"; backdrop-filter: "blur(12px)";
+    -webkit-backdrop-filter: "blur(12px)"; border:
+    "1px solid rgba(148, 163, 184, 0.1)";
+}.modern_h1
+{
+    font-size: 2.5rem; font-weight: 700; background:
+    linear-gradient(135deg, var(--azumi-primary), #6366f1);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: var(--spacing-md);
+}.modern_h2
+{
+    font-size: 2rem; font-weight: 600; color: var(--azumi-primary);
+    margin-bottom: var(--spacing-sm); border-bottom: 2px solid
+    rgba(79, 70, 229, 0.3); padding-bottom: var(--spacing-xs);
+} @ keyframes fadeInUp
+{
+    from { opacity: "0"; transform: "translateY(20px)"; } to
+    { opacity: "1"; transform: "translateY(0)"; }
+}.fade_in_up { animation: fadeInUp 0.6s ease-out; }
+DEBUG GLOBAL: Parse SUCCESS
+DEBUG GLOBAL: number of parsed rules: 18, at_rules: 1
+DEBUG GLOBAL: raw_css: '@keyframes fadeInUp{
+    from { opacity: "0"; transform: "translateY(20px)"; } to
+    { opacity: "1"; transform: "translateY(0)"; }
+}.fade_in_up{ animation: fadeInUp 0.6s ease-out; }; .dark_layout { min-height: 100vh; background: var(--azumi-bg); color: var(--azumi-text); font-family: var(--font-sans); } .content_container { max-width: 1200px; margin: 0 auto; padding: var(--spacing-lg); } .header_section { background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(148, 163, 184, 0.1); padding: var(--spacing-md)0; margin-bottom: var(--spacing-lg); } .main_content { background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.6) 100%); backdrop-filter: blur(8px); border: 1px solid rgba(148, 163, 184, 0.1); border-radius: var(--radius-md); padding: var(--spacing-lg); box-shadow: 4px6pxrgba(0,0,0,0.1); } .footer_section { background: linear-gradient(135deg,rgba(30,41,59,0.8)0%,rgba(51,65,85,0.8)100%); backdrop-filter: blur(10px); border-top: solidrgba(148,163,184,0.1); padding: var(--spacing-md)0; margin-top: var(--spacing-lg); text-align: center; color: var(--azumi-text-dim); font-size: ; } .modern_card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(30, 41, 59, 0.4) 100%); backdrop-filter: blur(8px); border: 1px solid rgba(148, 163, 184, 0.1); border-radius: var(--radius-md); padding: var(--spacing-md); transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } .modern_card:hover { transform: translateY(-2px); box-shadow: 4px12pxrgba(79,70,229,0.2); border-color: rgba(79,70,229,0.3); } .modern_btn { background: linear-gradient(135deg,var(--azumi-primary)0%,#5b51e5100%); color: white; padding: var(--spacing-xs)var(--spacing-sm); border: none; border-radius: var(--radius-md); font-weight: ; cursor: pointer; transition: all0.3sease; box-shadow: 2px4pxrgba(79,70,229,0.2); } .modern_btn:hover { transform: translateY(-1px); box-shadow: 4px8pxrgba(79,70,229,0.3); background: linear-gradient(135deg,#5b51e50%,#4f46e5100%); } .modern_btn:active { transform: translateY(0); } .modern_link { color: var(--azumi-primary); text-decoration: none; font-weight: ; transition: all0.2sease; position: relative; padding-bottom: ; } .modern_link:hover { color: #6366f1; } .modern_link::after { content: ; position: absolute; bottom: ; left: ; width: ; height: ; background: var(--azumi-primary); transition: width0.3sease; } .modern_link:hover::after { width: %; } .responsive_grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: var(--spacing-md); } .glass_effect { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); } .modern_h1 { font-size: ; font-weight: ; background: linear-gradient(135deg,var(--azumi-primary),#6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: var(--spacing-md); } .modern_h2 { font-size: ; font-weight: ; color: var(--azumi-primary); margin-bottom: var(--spacing-sm); border-bottom: solidrgba(79,70,229,0.3); padding-bottom: var(--spacing-xs); } '
+DEBUG GLOBAL: extracted classes: {"content_container", "responsive_grid", "glass_effect", "main_content", "modern_link", "modern_h2", "modern_h1", "fade_in_up", "modern_btn", "dark_layout", "header_section", "footer_section", "modern_card"}
+DEBUG GLOBAL: extracted ids: {}
+DEBUG GLOBAL: bindings tokens: let content_container = "content_container"; let responsive_grid =
+"responsive_grid"; let glass_effect = "glass_effect"; let main_content =
+"main_content"; let modern_link = "modern_link"; let modern_h2 = "modern_h2";
+let modern_h1 = "modern_h1"; let fade_in_up = "fade_in_up"; let modern_btn =
+"modern_btn"; let dark_layout = "dark_layout"; let header_section =
+"header_section"; let footer_section = "footer_section"; let modern_card =
+"modern_card";
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: raw_css: '.progress_bar { background-color: #e0e0e0; border-radius: 4px; height: 20px; width: 100%; } .progress_value { background-color: #76c7c0; border-radius: 4px; height: 100%; width: var(--width); transition: width 0.5s ease-in-out; } '
+DEBUG: extracted classes: {"progress_bar", "progress_value"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.progress_bar-sd2e334a8f061087c { background-color: #e0e0e0; border-radius: 4px; height: 20px; width: 100%; }.progress_value-sd2e334a8f061087c { background-color: #76c7c0; border-radius: 4px; height: 100%; width: var(--width); transition: width 0.5s ease-in-out; }'
+DEBUG: bindings tokens: let progress_bar = "progress_bar-sd2e334a8f061087c"; let progress_value =
+"progress_value-sd2e334a8f061087c";
+warning: unused import: `toggle_like`
+ --> demo/src/actions/mod.rs:4:29
+  |
+4 | pub use like::{like_button, toggle_like, LikeState};
+  |                             ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `color`
+ --> demo/src/examples/css_variables.rs:6:9
+  |
+6 |     let color = "yellow";
+  |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_color`
+  |
+  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `total_price`
+  --> demo/src/examples/lessons/pages/lesson5.rs:29:18
+   |
+29 |             @let total_price = base_price * (1.0 + tax_rate);
+   |                  ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_total_price`
+
+warning: function `css_variables_handler` is never used
+  --> demo/src/examples/css_variables.rs:34:14
+   |
+34 | pub async fn css_variables_handler() -> axum::response::Html<String> {
+   |              ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `UserForm` is never constructed
+ --> demo/src/examples/lessons/pages/lesson7.rs:7:8
+  |
+7 | struct UserForm {
+  |        ^^^^^^^^
+
+warning: function `test_handler` is never used
+  --> demo/src/examples/test_accessibility_pass.rs:20:14
+   |
+20 | pub async fn test_handler() -> axum::response::Html<String> {
+   |              ^^^^^^^^^^^^
+
+warning: function `lesson1_handler` is never used
+  --> demo/src/examples/example_component.rs:75:14
+   |
+75 | pub async fn lesson1_handler() -> impl axum::response::IntoResponse {
+   |              ^^^^^^^^^^^^^^^
+
+warning: function `form` is never used
+ --> demo/src/examples/form.rs:3:8
+  |
+3 | pub fn form() -> impl azumi::Component {
+  |        ^^^^
+
+warning: `azumi-demo` (bin "azumi-demo") generated 8 warnings (run `cargo fix --bin "azumi-demo"` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.66s

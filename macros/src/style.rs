@@ -1,0 +1,1055 @@
+use crate::css::extract_selectors;
+use heck::ToSnakeCase;
+use lightningcss::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
+use proc_macro2::{TokenStream, TokenTree};
+use quote::{format_ident, quote};
+use syn::parse::{Parse, ParseStream};
+use syn::{braced, parse2, token, Ident, LitStr, Token};
+
+pub struct StyleOutput {
+    pub bindings: TokenStream,
+    pub css: String,
+}
+
+// AST for our style! macro
+// AST for our style! macro
+struct StyleInput {
+    items: Vec<StyleItem>,
+}
+
+enum StyleItem {
+    Rule(StyleRule),
+    AtRule(AtRule),
+}
+
+struct AtRule {
+    name: String,
+    content: String,
+}
+
+struct StyleRule {
+    selectors: TokenStream,
+    block: StyleBlock,
+}
+
+struct StyleBlock {
+    properties: Vec<StyleProperty>,
+}
+
+struct StyleProperty {
+    name: String,
+    value: String,
+    #[allow(dead_code)]
+    span: proc_macro2::Span,
+}
+
+impl Parse for StyleInput {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut items = Vec::new();
+
+        while !input.is_empty() {
+            // Check for @ rules
+            if input.peek(Token![@]) {
+                let at_rule = input.parse::<AtRule>()?;
+                items.push(StyleItem::AtRule(at_rule));
+            } else {
+                let rule = input.parse::<StyleRule>()?;
+                items.push(StyleItem::Rule(rule));
+            }
+        }
+        Ok(StyleInput { items })
+    }
+}
+
+impl Parse for AtRule {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        input.parse::<Token![@]>()?;
+        let name = input.parse::<Ident>()?.to_string();
+
+        // Collect tokens to form the content
+        let mut tokens = TokenStream::new();
+        let mut depth = 0;
+        let mut _found_opening_brace = false;
+
+        while !input.is_empty() {
+            // Peek to check structure without consuming yet
+            let fork = input.fork();
+            let tt: TokenTree = fork.parse()?;
+            let token_str = tt.to_string();
+
+            // Handle braces for nested structures
+            if token_str == "{" {
+                depth += 1;
+                _found_opening_brace = true;
+            } else if token_str == "}" {
+                depth -= 1;
+            }
+
+            // Consume the token
+            let tt: TokenTree = input.parse()?;
+            tokens.extend(std::iter::once(tt));
+
+            // Check termination conditions AFTER consuming
+            if depth == 0 {
+                if _found_opening_brace {
+                    // We just closed the main block of the AtRule (e.g. @media { ... })
+                    // Stop here so we don't swallow subsequent rules!
+                    break;
+                }
+
+                // If it's a statement rule (like @import), it ends with semicolon
+                if input.peek(Token![;]) {
+                    // We don't consume the semicolon here (it's handled by caller loop logic usually?
+                    // Wait, caller loop in StyleInput::parse invokes AtRule::parse.
+                    // If AtRule::parse consumes everything including semicolon, that's fine.
+                    // The original code had: "Consume trailing semicolon if present" at end.
+                    // So we should break here, and let the end logic handle it?
+                    // Original logic: "Stop when we've closed all braces and hit a semicolon"
+                    // If we peek semicolon, we break loop.
+                    break;
+                }
+            }
+        }
+
+        // Consume trailing semicolon if present (for statement rules)
+        if input.peek(Token![;]) {
+            input.parse::<Token![;]>()?;
+        }
+
+        // Convert collected tokens to CSS string using the helper to ensure proper spacing
+        let content = tokens_to_css_string(&tokens);
+
+        Ok(AtRule { name, content })
+    }
+}
+
+impl Parse for StyleRule {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        // Parse selectors until we see a brace
+        let mut selector_tokens = TokenStream::new();
+        while !input.peek(token::Brace) && !input.is_empty() {
+            selector_tokens.extend(std::iter::once(input.parse::<TokenTree>()?));
+        }
+
+        // Validate selectors for kebab-case classes
+        validate_selectors(&selector_tokens)?;
+
+        if input.is_empty() {
+            return Err(input.error("Expected block after selectors"));
+        }
+
+        let content;
+        braced!(content in input);
+        let block = content.parse()?;
+
+        Ok(StyleRule {
+            selectors: selector_tokens,
+            block,
+        })
+    }
+}
+
+fn validate_selectors(tokens: &TokenStream) -> syn::Result<()> {
+    use std::collections::HashSet;
+
+    let mut seen_ids = HashSet::new();
+
+    // Re-implementing with peekable
+    let mut iter = tokens.clone().into_iter().peekable();
+    while let Some(tt) = iter.next() {
+        if let TokenTree::Punct(p) = &tt {
+            // Check for class selectors
+            if p.as_char() == '.' {
+                // Class start - consume the identifier
+                if let Some(TokenTree::Ident(_)) = iter.peek() {
+                    let _ = iter.next(); // consume ident
+                                         // Check for dashes - explicitly forbidden
+                    if let Some(TokenTree::Punct(next_p)) = iter.peek() {
+                        if next_p.as_char() == '-' {
+                            return Err(syn::Error::new(
+                                next_p.span(),
+                                "Dashes are not allowed in CSS classes in Azumi. Use snake_case (e.g. .my_class).",
+                            ));
+                        }
+                    }
+                }
+            }
+            // Check for ID selectors
+            else if p.as_char() == '#' {
+                // ID start
+                if let Some(TokenTree::Ident(ident)) = iter.peek() {
+                    let ident_span = ident.span();
+                    let id_name = ident.to_string();
+                    let _ = iter.next(); // consume ident
+
+                    // Check for dashes - explicitly forbidden
+                    if let Some(TokenTree::Punct(next_p)) = iter.peek() {
+                        if next_p.as_char() == '-' {
+                            return Err(syn::Error::new(
+                                next_p.span(),
+                                "Dashes are not allowed in CSS IDs in Azumi. Use snake_case (e.g. #my_id).",
+                            ));
+                        }
+                    }
+
+                    // Check for duplicate IDs
+                    if seen_ids.contains(&id_name) {
+                        return Err(syn::Error::new(
+                            ident_span,
+                            format!(
+                                "Duplicate ID '{}' in CSS. IDs must be unique within a component.",
+                                id_name
+                            ),
+                        ));
+                    }
+                    seen_ids.insert(id_name);
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+impl Parse for StyleBlock {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut properties = Vec::new();
+        while !input.is_empty() {
+            properties.push(input.parse()?);
+        }
+        Ok(StyleBlock { properties })
+    }
+}
+
+impl Parse for StyleProperty {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        // Parse property name (kebab-case identifier)
+        // syn::Ident doesn't support dashes, so we might get multiple tokens
+        // e.g. background - color
+        let mut name = String::new();
+        let start_span = input.span();
+
+        loop {
+            if input.peek(Token![:]) {
+                break;
+            }
+            if input.is_empty() {
+                return Err(input.error("Expected ':' after property name"));
+            }
+            let tt: TokenTree = input.parse()?;
+            name.push_str(&tt.to_string());
+        }
+
+        // Validate property name
+        if !is_valid_css_property(&name) {
+            return Err(syn::Error::new(
+                start_span,
+                format!("Unknown CSS property: '{}'", name),
+            ));
+        }
+
+        input.parse::<Token![:]>()?;
+
+        // Parse value - MUST be a double-quoted string literal
+        let value_start_span = input.span();
+
+        // Require double-quoted string literals for CSS values
+        // This prevents lexer issues with values like "2em", "#e0e0e0", "rgba(...)"
+        let lit_str: LitStr = input.parse().map_err(|_| {
+            syn::Error::new(
+                value_start_span,
+                "CSS values must be double-quoted strings.\n\
+                 Example: padding: \"1rem\";\n\
+                 \n\
+                 Unquoted values like `padding: 1rem;` can cause lexer issues\n\
+                 with certain CSS values (e.g., #colors, 2em units).",
+            )
+        })?;
+        let value = lit_str.value();
+
+        input.parse::<Token![;]>()?;
+
+        // Validate the CSS value using lightningcss (skip for CSS variables)
+        if !value.starts_with("var(") {
+            if let Err(err_msg) = validate_css_value(&name, &value) {
+                return Err(syn::Error::new(
+                    value_start_span,
+                    format!("Invalid CSS value for property '{}': {}", name, err_msg),
+                ));
+            }
+        }
+
+        Ok(StyleProperty {
+            name,
+            value,
+            span: start_span,
+        })
+    }
+}
+
+/// Validate CSS property value using custom rules + lightningcss parser
+fn validate_css_value(property: &str, value: &str) -> Result<(), String> {
+    // Step 1: Strict custom validation for common errors
+
+    // Check for spaces in single-word values (common typo)
+    let trimmed = value.trim();
+
+    if !is_multi_word_property(property) {
+        // Properties that should be single tokens (no spaces)
+        if trimmed.contains(' ') && !is_valid_space_in_value(property, trimmed) {
+            return Err(format!(
+                "Unexpected space in value '{}'. Did you mean '{}'?",
+                value,
+                trimmed.replace(' ', "")
+            ));
+        }
+    }
+
+    // Check for invalid units
+    if let Some(err) = validate_units(trimmed) {
+        return Err(err);
+    }
+
+    // Check for malformed hex colors
+    if trimmed.starts_with('#') {
+        if let Some(err) = validate_hex_color(trimmed) {
+            return Err(err);
+        }
+    }
+
+    // Step 2: Use lightningcss for full syntax validation
+    let css = Box::leak(format!(".test {{ {}: {}; }}", property, value).into_boxed_str());
+    let parse_options = ParserOptions::default();
+
+    match StyleSheet::parse(css, parse_options) {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            let error_msg = format!("{:?}", e);
+            if error_msg.contains("Unexpected token") || error_msg.contains("UnexpectedToken") {
+                Err(format!("Unexpected token in value '{}'", value))
+            } else if error_msg.contains("InvalidValue") {
+                Err(format!("'{}' is not a valid value", value))
+            } else {
+                Err(format!("Parse error: {}", error_msg))
+            }
+        }
+    }
+}
+
+/// Properties that accept multiple space-separated values
+fn is_multi_word_property(property: &str) -> bool {
+    // Check for prefixes
+    if property.starts_with("border-")
+        || property.starts_with("background-")
+        || property.starts_with("margin-")
+        || property.starts_with("padding-")
+        || property.starts_with("font-")
+        || property.starts_with("text-")
+        || property.starts_with("grid-")
+        || property.starts_with("flex-")
+        || property.starts_with("animation-")
+        || property.starts_with("transition-")
+        || property.starts_with("transform-")
+        || property.starts_with("list-style-")
+        || property.starts_with("outline-")
+    {
+        return true;
+    }
+
+    matches!(
+        property,
+        "margin"
+            | "padding"
+            | "border"
+            | "border-radius"
+            | "background"
+            | "box-shadow"
+            | "transform"
+            | "transition"
+            | "animation"
+            | "font"
+            | "font-family"
+            | "text-shadow"
+            | "flex"
+            | "grid-template-columns"
+            | "grid-template-rows"
+            | "grid-gap"
+            | "gap"
+            | "content"
+            | "cursor" // cursor can be "pointer", but also "url(...) x y, auto"
+            | "filter"
+            | "backdrop-filter"
+            | "clip-path"
+    )
+}
+
+/// Check if spaces are valid in this specific value context
+fn is_valid_space_in_value(property: &str, value: &str) -> bool {
+    // Allow spaces in certain contexts:
+    // - Multiple values: "10px 20px"
+    // - Functions: "rgb(255, 0, 0)", "calc(100% - 20px)"
+    // - Keywords with spaces: "ease-in-out"
+
+    value.contains('(') || // Function call
+    value.split_whitespace().count() > 1 && is_multi_word_property(property)
+}
+
+/// Validate unit suffixes
+fn validate_units(value: &str) -> Option<String> {
+    // Extract potential unit from value like "10px", "2em", etc.
+    let value_lower = value.to_lowercase();
+
+    // Common typos in units
+    let typo_map = [
+        ("pz", "px"),
+        ("pxs", "px"),
+        ("p x", "px"),
+        ("e m", "em"),
+        ("r em", "rem"),
+        ("p t", "pt"),
+        ("p c", "pc"),
+    ];
+
+    for (typo, correct) in &typo_map {
+        if value_lower.contains(typo) {
+            return Some(format!(
+                "Invalid unit '{}'. Did you mean '{}'?",
+                typo, correct
+            ));
+        }
+    }
+
+    None
+}
+
+/// Validate hex color format
+fn validate_hex_color(value: &str) -> Option<String> {
+    if !value.starts_with('#') {
+        return None;
+    }
+
+    let hex_part = &value[1..];
+
+    // Valid lengths: 3, 4, 6, 8
+    if !matches!(hex_part.len(), 3 | 4 | 6 | 8) {
+        return Some(format!(
+            "Invalid hex color length: '{}'. Expected 3, 4, 6, or 8 characters after #",
+            value
+        ));
+    }
+
+    // Check for non-hex characters
+    for ch in hex_part.chars() {
+        if !ch.is_ascii_hexdigit() {
+            return Some(format!(
+                "Invalid hex color: '{}' contains non-hex character '{}'",
+                value, ch
+            ));
+        }
+    }
+
+    None
+}
+
+/// Process global style macro - validates but doesn't scope or generate bindings
+pub fn process_global_style_macro(input: TokenStream) -> StyleOutput {
+    // 1. Parse the input
+    let style_input: StyleInput = match parse2(input.clone()) {
+        Ok(input) => input,
+        Err(err) => {
+            return StyleOutput {
+                bindings: err.to_compile_error(),
+                css: String::new(),
+            };
+        }
+    };
+
+    // 2. Generate raw CSS (validation happens during parsing above)
+
+    let mut raw_css = String::new();
+
+    // Iterate items in order!
+    for item in &style_input.items {
+        match item {
+            StyleItem::AtRule(at_rule) => {
+                raw_css.push('@');
+                raw_css.push_str(&at_rule.name);
+                raw_css.push(' ');
+                raw_css.push_str(&at_rule.content);
+                if !at_rule.content.trim().ends_with('}') {
+                    raw_css.push(';');
+                }
+                raw_css.push(' ');
+            }
+            StyleItem::Rule(rule) => {
+                let selector_str = tokens_to_css_string(&rule.selectors);
+
+                raw_css.push_str(&selector_str);
+                raw_css.push_str(" { ");
+                for prop in &rule.block.properties {
+                    raw_css.push_str(&format!("{}: {}; ", prop.name, prop.value));
+                }
+                raw_css.push_str("} ");
+            }
+        }
+    }
+
+    // 3. Extract classes and IDs for bindings (even though not scoped)
+    let (classes, ids) = extract_selectors(&raw_css);
+
+    // 4. Generate Bindings for both classes and IDs (without scoping)
+    let mut bindings = TokenStream::new();
+
+    // Generate class bindings (no scoping, just the original class name)
+    for class in classes {
+        let snake_name = class.to_snake_case();
+        let ident = format_ident!("{}", snake_name);
+
+        bindings.extend(quote! {
+            let #ident = #class;
+        });
+    }
+
+    // Generate ID bindings (no scoping, just the original ID)
+    for id in ids {
+        let ident = format_ident!("{}", id);
+
+        bindings.extend(quote! {
+            let #ident = #id;
+        });
+    }
+
+    // 5. Return unscoped CSS with bindings
+    StyleOutput {
+        bindings,                  // Now includes bindings for global styles!
+        css: minify_css(&raw_css), // Unscoped CSS (minified)
+    }
+}
+
+pub fn process_style_macro(input: TokenStream) -> StyleOutput {
+    // 1. Parse the input (clone first to use later for reconstruction)
+    let input_clone = input.clone();
+    let _style_input: StyleInput = match parse2(input) {
+        Ok(input) => input,
+        Err(err) => {
+            return StyleOutput {
+                bindings: err.to_compile_error(),
+                css: String::new(),
+            };
+        }
+    };
+
+    // 2. Reconstruct CSS string (with quotes removed from values)
+    let raw_css = reconstruct_css_from_tokens(input_clone);
+
+    // 3. Extract classes and IDs for bindings
+    let (classes, ids) = extract_selectors(&raw_css);
+
+    // 4. Generate Bindings for both classes and IDs
+    // Note: We do NOT rename classes here (e.g. .class-s123).
+    // Instead, we use Attribute Scoping in generate_body (macros/src/lib.rs).
+    // So we just bind `let class = "class";` and the runtime adds `[data-sID]` to the CSS and element.
+    let mut bindings = TokenStream::new();
+
+    // Generate class bindings (only for valid Rust identifiers - no dashes)
+    for class in classes {
+        // Skip dashed class names - they can only be used via class="..." syntax
+        if class.contains('-') {
+            continue;
+        }
+        let snake_name = class.to_snake_case();
+        let ident = format_ident!("{}", snake_name);
+
+        bindings.extend(quote! {
+            let #ident = #class;
+        });
+    }
+
+    // Generate ID bindings (IDs are NOT scoped, they remain as-is)
+    // Skip dashed IDs - they can only be used via id="..." syntax
+    for id in ids {
+        if id.contains('-') {
+            continue;
+        }
+        let ident = format_ident!("{}", id);
+
+        bindings.extend(quote! {
+            let #ident = #id;
+        });
+    }
+
+    StyleOutput {
+        bindings,
+        css: minify_css(&raw_css),
+    }
+}
+
+/// Reconstruct CSS string from TokenStream (parsing and formatting)
+pub fn reconstruct_css_from_tokens(input: TokenStream) -> String {
+    // 1. Parse the input
+    let style_input: StyleInput = match parse2(input) {
+        Ok(input) => input,
+        Err(_e) => {
+            return String::new();
+        }
+    };
+
+    let mut raw_css = String::new();
+
+    // Iterate items in order!
+    for item in &style_input.items {
+        match item {
+            StyleItem::AtRule(at_rule) => {
+                raw_css.push('@');
+                raw_css.push_str(&at_rule.name);
+                raw_css.push(' ');
+                raw_css.push_str(&at_rule.content);
+                if !at_rule.content.trim().ends_with('}') {
+                    raw_css.push(';');
+                }
+                raw_css.push(' ');
+            }
+            StyleItem::Rule(rule) => {
+                let selector_str = tokens_to_css_string(&rule.selectors);
+
+                raw_css.push_str(&selector_str);
+                raw_css.push_str(" { ");
+                for prop in &rule.block.properties {
+                    raw_css.push_str(&format!("{}: {}; ", prop.name, prop.value));
+                }
+                raw_css.push_str("} ");
+            }
+        }
+    }
+
+    raw_css
+}
+
+fn tokens_to_css_string(tokens: &TokenStream) -> String {
+    let mut css = String::new();
+    let mut last_char_was_hyphen = false;
+    let mut last_char_was_dot_or_hash_or_colon = false;
+    let mut last_was_open_paren = false;
+    let mut last_was_at_sign = false;
+
+    for tt in tokens.clone() {
+        match tt {
+            TokenTree::Ident(ident) => {
+                // Add space if previous wasn't a special char that expects attachment
+                if !css.is_empty()
+                    && !last_char_was_hyphen
+                    && !last_char_was_dot_or_hash_or_colon
+                    && !last_was_open_paren
+                    && !last_was_at_sign
+                {
+                    css.push(' ');
+                }
+                css.push_str(&ident.to_string());
+                last_char_was_hyphen = false;
+                last_char_was_dot_or_hash_or_colon = false;
+                last_was_open_paren = false;
+                last_was_at_sign = false;
+            }
+            TokenTree::Punct(punct) => {
+                let ch = punct.as_char();
+                // Reset at_sign unless this is it (unlikely to have @@)
+                last_was_at_sign = false;
+
+                if ch == '-' {
+                    css.push(ch);
+                    last_char_was_hyphen = true;
+                    last_char_was_dot_or_hash_or_colon = false;
+                    last_was_open_paren = false;
+                } else if ch == '.' || ch == '#' || ch == ':' {
+                    css.push(ch);
+                    last_char_was_hyphen = false;
+                    last_char_was_dot_or_hash_or_colon = true;
+                    last_was_open_paren = false;
+                } else if ch == '(' {
+                    css.push(ch);
+                    last_char_was_hyphen = false;
+                    last_char_was_dot_or_hash_or_colon = false;
+                    last_was_open_paren = true;
+                } else if ch == '@' {
+                    if !css.is_empty() {
+                        css.push(' ');
+                    }
+                    css.push(ch);
+                    last_char_was_hyphen = false;
+                    last_char_was_dot_or_hash_or_colon = false;
+                    last_was_open_paren = false;
+                    last_was_at_sign = true;
+                } else {
+                    // Other puncts (>, +, ;, etc)
+                    css.push(ch);
+                    last_char_was_hyphen = false;
+                    last_char_was_dot_or_hash_or_colon = false;
+                    last_was_open_paren = false;
+                }
+            }
+            TokenTree::Literal(lit) => {
+                if !css.is_empty()
+                    && !last_char_was_dot_or_hash_or_colon
+                    && !last_was_open_paren
+                    && !last_was_at_sign
+                {
+                    css.push(' ');
+                }
+
+                let s = lit.to_string();
+                // Strip outer quotes logic
+                let trimmed = s.trim();
+                let is_quoted = trimmed.len() >= 2
+                    && ((trimmed.starts_with('"') && trimmed.ends_with('"'))
+                        || (trimmed.starts_with('\'') && trimmed.ends_with('\'')));
+
+                if is_quoted {
+                    css.push_str(&trimmed[1..trimmed.len() - 1]);
+                } else {
+                    css.push_str(&s);
+                }
+
+                last_char_was_hyphen = false;
+                last_char_was_dot_or_hash_or_colon = false;
+                last_was_open_paren = false;
+                last_was_at_sign = false;
+            }
+            TokenTree::Group(group) => {
+                if !css.is_empty()
+                    && !last_char_was_dot_or_hash_or_colon
+                    && !last_was_open_paren
+                    && !last_was_at_sign
+                {
+                    css.push(' ');
+                }
+                // Group logic
+                let delimiter_pair = match group.delimiter() {
+                    proc_macro2::Delimiter::Parenthesis => ("(", ")"),
+                    proc_macro2::Delimiter::Brace => ("{", "}"),
+                    proc_macro2::Delimiter::Bracket => ("[", "]"),
+                    proc_macro2::Delimiter::None => ("", ""),
+                };
+
+                css.push_str(delimiter_pair.0);
+                css.push_str(&tokens_to_css_string(&group.stream()));
+                css.push_str(delimiter_pair.1);
+
+                last_char_was_hyphen = false;
+                last_char_was_dot_or_hash_or_colon = false;
+                last_was_open_paren = false;
+                last_was_at_sign = false;
+            }
+        }
+    }
+    css
+}
+
+fn is_valid_css_property(name: &str) -> bool {
+    if name.starts_with("--") {
+        return true;
+    }
+    let valid_properties = [
+        "align-content",
+        "align-items",
+        "align-self",
+        "all",
+        "animation",
+        "animation-delay",
+        "animation-direction",
+        "animation-duration",
+        "animation-fill-mode",
+        "animation-iteration-count",
+        "animation-name",
+        "animation-play-state",
+        "animation-timing-function",
+        "backdrop-filter",
+        "backface-visibility",
+        "background",
+        "background-attachment",
+        "background-blend-mode",
+        "background-clip",
+        "background-color",
+        "background-image",
+        "background-origin",
+        "background-position",
+        "background-repeat",
+        "background-size",
+        "border",
+        "border-bottom",
+        "border-bottom-color",
+        "border-bottom-left-radius",
+        "border-bottom-right-radius",
+        "border-bottom-style",
+        "border-bottom-width",
+        "border-collapse",
+        "border-color",
+        "border-image",
+        "border-image-outset",
+        "border-image-repeat",
+        "border-image-slice",
+        "border-image-source",
+        "border-image-width",
+        "border-left",
+        "border-left-color",
+        "border-left-style",
+        "border-left-width",
+        "border-radius",
+        "border-right",
+        "border-right-color",
+        "border-right-style",
+        "border-right-width",
+        "border-spacing",
+        "border-style",
+        "border-top",
+        "border-top-color",
+        "border-top-left-radius",
+        "border-top-right-radius",
+        "border-top-style",
+        "border-top-width",
+        "border-width",
+        "bottom",
+        "box-decoration-break",
+        "box-shadow",
+        "box-sizing",
+        "break-after",
+        "break-before",
+        "break-inside",
+        "caption-side",
+        "caret-color",
+        "clear",
+        "clip",
+        "clip-path",
+        "color",
+        "column-count",
+        "column-fill",
+        "column-gap",
+        "column-rule",
+        "column-rule-color",
+        "column-rule-style",
+        "column-rule-width",
+        "column-span",
+        "column-width",
+        "columns",
+        "content",
+        "counter-increment",
+        "counter-reset",
+        "cursor",
+        "direction",
+        "display",
+        "empty-cells",
+        "filter",
+        "flex",
+        "flex-basis",
+        "flex-direction",
+        "flex-flow",
+        "flex-grow",
+        "flex-shrink",
+        "flex-wrap",
+        "float",
+        "font",
+        "font-family",
+        "font-feature-settings",
+        "font-kerning",
+        "font-language-override",
+        "font-size",
+        "font-size-adjust",
+        "font-stretch",
+        "font-style",
+        "font-synthesis",
+        "font-variant",
+        "font-variant-alternates",
+        "font-variant-caps",
+        "font-variant-east-asian",
+        "font-variant-ligatures",
+        "font-variant-numeric",
+        "font-variant-position",
+        "font-weight",
+        "gap",
+        "grid",
+        "grid-area",
+        "grid-auto-columns",
+        "grid-auto-flow",
+        "grid-auto-rows",
+        "grid-column",
+        "grid-column-end",
+        "grid-column-gap",
+        "grid-column-start",
+        "grid-gap",
+        "grid-row",
+        "grid-row-end",
+        "grid-row-gap",
+        "grid-row-start",
+        "grid-template",
+        "grid-template-areas",
+        "grid-template-columns",
+        "grid-template-rows",
+        "hanging-punctuation",
+        "height",
+        "hyphens",
+        "image-rendering",
+        "isolation",
+        "justify-content",
+        "justify-items",
+        "justify-self",
+        "left",
+        "letter-spacing",
+        "line-break",
+        "line-height",
+        "list-style",
+        "list-style-image",
+        "list-style-position",
+        "list-style-type",
+        "margin",
+        "margin-bottom",
+        "margin-left",
+        "margin-right",
+        "margin-top",
+        "max-height",
+        "max-width",
+        "min-height",
+        "min-width",
+        "mix-blend-mode",
+        "object-fit",
+        "object-position",
+        "opacity",
+        "order",
+        "orphans",
+        "outline",
+        "outline-color",
+        "outline-offset",
+        "outline-style",
+        "outline-width",
+        "overflow",
+        "overflow-wrap",
+        "overflow-x",
+        "overflow-y",
+        "padding",
+        "padding-bottom",
+        "padding-left",
+        "padding-right",
+        "padding-top",
+        "page-break-after",
+        "page-break-before",
+        "page-break-inside",
+        "perspective",
+        "perspective-origin",
+        "pointer-events",
+        "position",
+        "quotes",
+        "resize",
+        "right",
+        "row-gap",
+        "scroll-behavior",
+        "tab-size",
+        "table-layout",
+        "text-align",
+        "text-align-last",
+        "text-combine-upright",
+        "text-decoration",
+        "text-decoration-color",
+        "text-decoration-line",
+        "text-decoration-style",
+        "text-indent",
+        "text-justify",
+        "text-orientation",
+        "text-overflow",
+        "text-shadow",
+        "text-transform",
+        "text-underline-position",
+        "top",
+        "transform",
+        "transform-origin",
+        "transform-style",
+        "transition",
+        "transition-delay",
+        "transition-duration",
+        "transition-property",
+        "transition-timing-function",
+        "unicode-bidi",
+        "user-select",
+        "vertical-align",
+        "visibility",
+        "white-space",
+        "widows",
+        "width",
+        "word-break",
+        "word-spacing",
+        "word-wrap",
+        "writing-mode",
+        "z-index",
+        // Vendor prefixes
+        "-webkit-backdrop-filter",
+        "-webkit-background-clip",
+        "-webkit-font-smoothing",
+        "-webkit-overflow-scrolling",
+        "-webkit-text-fill-color",
+        "-moz-osx-font-smoothing",
+    ];
+
+    valid_properties.contains(&name)
+}
+
+/// Minify CSS using lightningcss
+fn minify_css(css: &str) -> String {
+    let parse_options = ParserOptions::default();
+    // We treat all CSS as a full stylesheet for parsing simplification
+    // For scoped CSS, this is fine as rename_css_selectors produces valid CSS.
+    if let Ok(stylesheet) = StyleSheet::parse(css, parse_options) {
+        let print_options = PrinterOptions {
+            minify: true,
+            // Keep original targets if possible, or use standard defaults
+            ..PrinterOptions::default()
+        };
+        if let Ok(minified) = stylesheet.to_css(print_options) {
+            return minified.code;
+        }
+    }
+
+    // Fallback: simple whitespace/cleanup if parsing (unexpectedly) fails
+    css.trim().to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_media_query_property_stripping() {
+        let input = quote! {
+            @media (max-width: 768px) {
+                .center_zone {
+                    display: "none !important";
+                }
+            }
+        };
+
+        let output = process_global_style_macro(input);
+
+        // We expect: display: none !important;
+        // Current bug produces: display: "none !important";
+        println!("Generated CSS: {}", output.css);
+        assert!(
+            !output.css.contains(r#""none !important""#),
+            "CSS contains quoted value: {}",
+            output.css
+        );
+    }
+    #[test]
+    fn test_media_query_spacing() {
+        let input = quote! {
+            @media (max-width: 768px) {}
+        };
+        let output = process_global_style_macro(input);
+        // Should be "@media (max-width: 768px) {}" NOT "@ media ..."
+        println!("CSS: {}", output.css);
+        assert!(
+            output.css.contains("@media"),
+            "CSS contains broken @ media: {}",
+            output.css
+        );
+        assert!(
+            !output.css.contains("@ media"),
+            "CSS contains broken @ media: {}",
+            output.css
+        );
+    }
+}

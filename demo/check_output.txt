@@ -1,0 +1,3374 @@
+warning: unused imports: `Item` and `Stmt`
+ --> macros/src/component.rs:2:37
+  |
+2 | ...input, FnArg, Item, ItemFn, Pat, PatType, Stmt};
+  |                  ^^^^                        ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `PatType`
+ --> macros/src/action.rs:3:45
+  |
+3 | use syn::{parse_macro_input, FnArg, ItemFn, PatType};
+  |                                             ^^^^^^^
+
+warning: unused variable: `payload_pat`
+  --> macros/src/action.rs:51:24
+   |
+51 | ...let (payload_type, payload_pat) = if let Some(arg) = payload...
+   |                       ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_payload_pat`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `mc`
+   --> macros/src/live.rs:199:27
+    |
+199 | fn is_self_field_mutation(mc: &ExprMethodCall) -> bool {
+    |                           ^^ help: if this is intentional, prefix it with an underscore: `_mc`
+
+warning: unused variable: `field_info`
+   --> macros/src/live.rs:213:9
+    |
+213 |     let field_info: Vec<_> = match struct_fields {
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_field_info`
+
+warning: unused variable: `attr`
+   --> macros/src/live.rs:205:20
+    |
+205 | pub fn expand_live(attr: TokenStream, item: TokenStream) -> To...
+    |                    ^^^^ help: if this is intentional, prefix it with an underscore: `_attr`
+
+warning: variable `found_opening_brace` is assigned to, but never used
+  --> macros/src/style.rs:68:17
+   |
+68 |         let mut found_opening_brace = false;
+   |                 ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: consider using `_found_opening_brace` instead
+
+warning: value assigned to `found_opening_brace` is never read
+  --> macros/src/style.rs:78:17
+   |
+78 |                 found_opening_brace = true;
+   |                 ^^^^^^^^^^^^^^^^^^^
+   |
+   = help: maybe it is overwritten before being read?
+   = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `style_input`
+   --> macros/src/style.rs:541:9
+    |
+541 |     let style_input: StyleInput = match parse2(input) {
+    |         ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_style_input`
+
+warning: unused variable: `props`
+    --> macros/src/lib.rs:1135:64
+     |
+1135 | ...ibuteValue::StyleDsl(props) => {
+     |                         ^^^^^ help: if this is intentional, prefix it with an underscore: `_props`
+
+warning: struct `NodesWrapper` is never constructed
+  --> macros/src/lib.rs:71:8
+   |
+71 | struct NodesWrapper(Vec<token_parser::Node>);
+   |        ^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `extract_styles` is never used
+   --> macros/src/lib.rs:160:4
+    |
+160 | fn extract_styles(nodes: Vec<token_parser::Node>) -> (Vec<toke...
+    |    ^^^^^^^^^^^^^^
+
+warning: function `parse_css_classes` is never used
+  --> macros/src/css_validator.rs:16:8
+   |
+16 | pub fn parse_css_classes(css_content: &str, _file_path: &str) -...
+   |        ^^^^^^^^^^^^^^^^^
+
+warning: function `create_class_span` is never used
+  --> macros/src/css_validator.rs:36:4
+   |
+36 | fn create_class_span(class_attr: &crate::token_parser::Attribut...
+   |    ^^^^^^^^^^^^^^^^^
+
+warning: function `extract_html_classes` is never used
+  --> macros/src/css_validator.rs:47:8
+   |
+47 | pub fn extract_html_classes(nodes: &[Node]) -> HashMap<String, ...
+   |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `extract_html_classes_recursive` is never used
+  --> macros/src/css_validator.rs:53:4
+   |
+53 | fn extract_html_classes_recursive(nodes: &[Node], used_classes:...
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `validate_css_classes` is never used
+   --> macros/src/css_validator.rs:117:8
+    |
+117 | pub fn validate_css_classes(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `ValidationError` is never used
+   --> macros/src/css_validator.rs:142:10
+    |
+142 | pub enum ValidationError {
+    |          ^^^^^^^^^^^^^^^
+
+warning: fields `name` and `has_unpredictable` are never read
+  --> macros/src/live.rs:52:9
+   |
+51 | pub struct MethodAnalysis {
+   |            -------------- fields in this struct
+52 |     pub name: String,
+   |         ^^^^
+53 |     pub predictions: Vec<Prediction>,
+54 |     pub has_unpredictable: bool,
+   |         ^^^^^^^^^^^^^^^^^
+   |
+   = note: `MethodAnalysis` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `span` is never read
+  --> macros/src/style.rs:39:5
+   |
+36 | struct StyleProperty {
+   |        ------------- field in this struct
+...
+39 |     span: proc_macro2::Span,
+   |     ^^^^
+
+warning: field `span` is never read
+  --> macros/src/token_parser.rs:35:9
+   |
+33 | pub struct Text {
+   |            ---- field in this struct
+34 |     pub content: String,
+35 |     pub span: Span,
+   |         ^^^^
+   |
+   = note: `Text` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: field `span` is never read
+  --> macros/src/token_parser.rs:41:9
+   |
+39 | pub struct Expression {
+   |            ---------- field in this struct
+40 |     pub content: TokenStream,
+41 |     pub span: Span,
+   |         ^^^^
+   |
+   = note: `Expression` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: `azumi-macros` (lib) generated 22 warnings (run `cargo fix --lib -p azumi-macros` to apply 2 suggestions)
+warning: unused import: `serde::de::DeserializeOwned`
+ --> src/action.rs:3:5
+  |
+3 | use serde::de::DeserializeOwned;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `azumi` (lib) generated 1 warning (run `cargo fix --lib -p azumi` to apply 1 suggestion)
+    Checking azumi-demo v0.1.0 (/home/dracon/_Dev/azumi/demo)
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: button
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.btn { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; background: #eee; } .btn.liked { background: #ff4081; color: white; } #like_box { } '
+DEBUG: extracted classes: {"liked", "btn"}
+DEBUG: extracted ids: {"like_box"}
+DEBUG: scoped_css: '.btn-se0c1b9e88325cdec { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; background: #eee; }.btn-se0c1b9e88325cdec.liked-se0c1b9e88325cdec { background: #ff4081; color: white; }#like_box { }'
+DEBUG: bindings tokens: let liked = "liked-se0c1b9e88325cdec"; let btn = "btn-se0c1b9e88325cdec"; let
+like_box = "like_box";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.card { border: 1px solid #eee; padding: 1rem; margin: 0.5rem; } .card_title { font-weight: bold; margin-bottom: 0.5rem; } '
+DEBUG: extracted classes: {"card_title", "card"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.card-s3121904d32405666 { border: 1px solid #eee; padding: 1rem; margin: 0.5rem; }.card_title-s3121904d32405666 { font-weight: bold; margin-bottom: 0.5rem; }'
+DEBUG: bindings tokens: let card_title = "card_title-s3121904d32405666"; let card =
+"card-s3121904d32405666";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.dashboard_container { display: grid; gap: 1rem; } .dashboard_title { font-size: 1.5rem; color: #2196f3; margin-bottom: 1rem; } '
+DEBUG: extracted classes: {"dashboard_container", "dashboard_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.dashboard_container-s5cb4e33ce82b6254 { display: grid; gap: 1rem; }.dashboard_title-s5cb4e33ce82b6254 { font-size: 1.5rem; color: #2196f3; margin-bottom: 1rem; }'
+DEBUG: bindings tokens: let dashboard_container = "dashboard_container-s5cb4e33ce82b6254"; let
+dashboard_title = "dashboard_title-s5cb4e33ce82b6254";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+Parsing element: div
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.layout_container { display: grid; gap: 1rem; } .header_section { background: #f0f0f0; padding: 1rem; } .main_section { display: grid; grid-template-columns: 2fr1fr; gap: 1rem; } .sidebar { background: #f9f9f9; padding: 1rem; } '
+DEBUG: extracted classes: {"header_section", "layout_container", "sidebar", "main_section"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.layout_container-sf7f2037aa992b0f7 { display: grid; gap: 1rem; }.header_section-sf7f2037aa992b0f7 { background: #f0f0f0; padding: 1rem; }.main_section-sf7f2037aa992b0f7 { display: grid; grid-template-columns: 2fr1fr; gap: 1rem; }.sidebar-sf7f2037aa992b0f7 { background: #f9f9f9; padding: 1rem; }'
+DEBUG: bindings tokens: let header_section = "header_section-sf7f2037aa992b0f7"; let layout_container
+= "layout_container-sf7f2037aa992b0f7"; let sidebar =
+"sidebar-sf7f2037aa992b0f7"; let main_section =
+"main_section-sf7f2037aa992b0f7";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"points_list", "header", "examples", "example_card", "section_title", "subtitle", "key_points", "container", "point", "main_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let points_list = "points_list-s5e01d6a09ae0fa76"; let header =
+"header-s5e01d6a09ae0fa76"; let examples = "examples-s5e01d6a09ae0fa76"; let
+example_card = "example_card-s5e01d6a09ae0fa76"; let section_title =
+"section_title-s5e01d6a09ae0fa76"; let subtitle =
+"subtitle-s5e01d6a09ae0fa76"; let key_points = "key_points-s5e01d6a09ae0fa76";
+let container = "container-s5e01d6a09ae0fa76"; let point =
+"point-s5e01d6a09ae0fa76"; let main_title = "main_title-s5e01d6a09ae0fa76";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.counter { padding: 2rem; text-align: center; border: 1px solid #eee; } .count_display { font-size: 3rem; margin: 1rem 0; } .counter_button { padding: 1rem 2rem; background: #4caf50; color: white; border: none; cursor: pointer; } .timestamp { font-size: 0.8rem; color: #666; } #counter_box { display: block; } '
+DEBUG: extracted classes: {"counter", "timestamp", "counter_button", "count_display"}
+DEBUG: extracted ids: {"counter_box"}
+DEBUG: scoped_css: '.counter-s28071be682cd1d60 { padding: 2rem; text-align: center; border: 1px solid #eee; }.count_display-s28071be682cd1d60 { font-size: 3rem; margin: 1rem 0; }.counter_button-s28071be682cd1d60 { padding: 1rem 2rem; background: #4caf50; color: white; border: none; cursor: pointer; }.timestamp-s28071be682cd1d60 { font-size: 0.8rem; color: #666; }#counter_box { display: block; }'
+DEBUG: bindings tokens: let counter = "counter-s28071be682cd1d60"; let timestamp =
+"timestamp-s28071be682cd1d60"; let counter_button =
+"counter_button-s28071be682cd1d60"; let count_display =
+"count_display-s28071be682cd1d60"; let counter_box = "counter_box";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.state_container { padding: 1.5rem; background: #f9f9f9; } .state_info { margin: 0.5rem 0; padding: 0.5rem; background: white; } .action_button { padding: 0.75rem 1.5rem; background: #2196f3; color: white; border: none; cursor: pointer; } #state_box { display: block; } '
+DEBUG: extracted classes: {"state_info", "state_container", "action_button"}
+DEBUG: extracted ids: {"state_box"}
+DEBUG: scoped_css: '.state_container-s5462d2a325a7b2b3 { padding: 1.5rem; background: #f9f9f9; }.state_info-s5462d2a325a7b2b3 { margin: 0.5rem 0; padding: 0.5rem; background: white; }.action_button-s5462d2a325a7b2b3 { padding: 0.75rem 1.5rem; background: #2196f3; color: white; border: none; cursor: pointer; }#state_box { display: block; }'
+DEBUG: bindings tokens: let state_info = "state_info-s5462d2a325a7b2b3"; let state_container =
+"state_container-s5462d2a325a7b2b3"; let action_button =
+"action_button-s5462d2a325a7b2b3"; let state_box = "state_box";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.composition_container { padding: 1.5rem; } .action_card { margin: 0.5rem 0; padding: 1rem; background: #f5f5f5; border: 1px solid #eee; } .compose_button { padding: 0.75rem 1.5rem; background: #ff4081; color: white; border: none; cursor: pointer; } #composition_box { display: block; } '
+DEBUG: extracted classes: {"compose_button", "composition_container", "action_card"}
+DEBUG: extracted ids: {"composition_box"}
+DEBUG: scoped_css: '.composition_container-s371347bc06ea7afe { padding: 1.5rem; }.action_card-s371347bc06ea7afe { margin: 0.5rem 0; padding: 1rem; background: #f5f5f5; border: 1px solid #eee; }.compose_button-s371347bc06ea7afe { padding: 0.75rem 1.5rem; background: #ff4081; color: white; border: none; cursor: pointer; }#composition_box { display: block; }'
+DEBUG: bindings tokens: let compose_button = "compose_button-s371347bc06ea7afe"; let
+composition_container = "composition_container-s371347bc06ea7afe"; let
+action_card = "action_card-s371347bc06ea7afe"; let composition_box =
+"composition_box";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.live_container { padding: 2rem; text-align: center; border: 2px solid #4caf50; border-radius: 8px; } .live_title { font-size: 1.5rem; color: #333; margin-bottom: 1rem; } .live_count { font-size: 3rem; font-weight: bold; color: #4caf50; } .live_status { font-size: 1rem; color: #666; margin: 1rem 0; } .live_button { padding: 0.75rem 1.5rem; margin: 0.5rem; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; } .toggle_btn { background: #2196f3; color: white; } .deactivate_btn { background: #ff5722; color: white; } #live_demo { display: block; } '
+DEBUG: extracted classes: {"live_status", "deactivate_btn", "live_button", "live_title", "live_count", "toggle_btn", "live_container"}
+DEBUG: extracted ids: {"live_demo"}
+DEBUG: scoped_css: '.live_container-s4e9c701829147fa1 { padding: 2rem; text-align: center; border: 2px solid #4caf50; border-radius: 8px; }.live_title-s4e9c701829147fa1 { font-size: 1.5rem; color: #333; margin-bottom: 1rem; }.live_count-s4e9c701829147fa1 { font-size: 3rem; font-weight: bold; color: #4caf50; }.live_status-s4e9c701829147fa1 { font-size: 1rem; color: #666; margin: 1rem 0; }.live_button-s4e9c701829147fa1 { padding: 0.75rem 1.5rem; margin: 0.5rem; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }.toggle_btn-s4e9c701829147fa1 { background: #2196f3; color: white; }.deactivate_btn-s4e9c701829147fa1 { background: #ff5722; color: white; }#live_demo { display: block; }'
+DEBUG: bindings tokens: let live_status = "live_status-s4e9c701829147fa1"; let deactivate_btn =
+"deactivate_btn-s4e9c701829147fa1"; let live_button =
+"live_button-s4e9c701829147fa1"; let live_title =
+"live_title-s4e9c701829147fa1"; let live_count =
+"live_count-s4e9c701829147fa1"; let toggle_btn =
+"toggle_btn-s4e9c701829147fa1"; let live_container =
+"live_container-s4e9c701829147fa1"; let live_demo = "live_demo";
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: script
+parse_script_content starting for tag: script
+Found closing tag: </script>
+Element::parse: Found closing tag sequence
+Found closing tag: </script>  (expected </script>)
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: hr
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.demo_container { padding: 2rem; border: 1px solid #ccc; border-radius: 8px; max-width: 600px; margin: 0 auto; } .btn { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; background: #eee; } .btn.liked { background: #ff4081; color: white; } #likebox { margin-top: 2rem; } '
+DEBUG: extracted classes: {"demo_container", "liked", "btn"}
+DEBUG: extracted ids: {"likebox"}
+DEBUG: scoped_css: '.demo_container-sade0549c9a597a72 { padding: 2rem; border: 1px solid #ccc; border-radius: 8px; max-width: 600px; margin: 0 auto; }.btn-sade0549c9a597a72 { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; background: #eee; }.btn-sade0549c9a597a72.liked-sade0549c9a597a72 { background: #ff4081; color: white; }#likebox { margin-top: 2rem; }'
+DEBUG: bindings tokens: let demo_container = "demo_container-sade0549c9a597a72"; let liked =
+"liked-sade0549c9a597a72"; let btn = "btn-sade0549c9a597a72"; let likebox =
+"likebox";
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: form
+Parsing element: input
+Parsing element: input
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </form>  (expected </form>)
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles found style block
+DEBUG GLOBAL: input tokens: body { margin: "0"; padding: "0"; font-family: "Arial, sans-serif"; } *
+{ box-sizing: "border-box"; }
+DEBUG GLOBAL: Parse SUCCESS
+DEBUG GLOBAL: number of parsed rules: 2, at_rules: 0
+DEBUG GLOBAL: raw_css: 'body { margin: 0; padding: 0; font-family: Arial, sans-serif; } * { box-sizing: border-box; } '
+DEBUG GLOBAL: extracted classes: {}
+DEBUG GLOBAL: extracted ids: {}
+DEBUG GLOBAL: bindings tokens: 
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.scoped_box { padding: 20px; background: #f0f0f0; border: 1px solid #ccc; } '
+DEBUG: extracted classes: {"scoped_box"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.scoped_box-s1bd91bcafcbfe35d { padding: 20px; background: #f0f0f0; border: 1px solid #ccc; }'
+DEBUG: bindings tokens: let scoped_box = "scoped_box-s1bd91bcafcbfe35d";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 6 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.counter_box { border: 1px solid #ccc; padding: 1em; border-radius: 8px; } '
+DEBUG: extracted classes: {"counter_box"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.counter_box-s6b387adbad493246 { border: 1px solid #ccc; padding: 1em; border-radius: 8px; }'
+DEBUG: bindings tokens: let counter_box = "counter_box-s6b387adbad493246";
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.basic_container { background-color: #f5f5f5; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } .basic_h1 { color: #333; font-size: 1.5em; font-weight: bold; } .basic_h2 { color: #666; font-size: 1.2em; } .basic_p { color: #999; font-size: 1em; } '
+DEBUG: extracted classes: {"basic_container", "basic_p", "basic_h1", "basic_h2"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.basic_container-s43b13c3ec185bfb4 { background-color: #f5f5f5; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }.basic_h1-s43b13c3ec185bfb4 { color: #333; font-size: 1.5em; font-weight: bold; }.basic_h2-s43b13c3ec185bfb4 { color: #666; font-size: 1.2em; }.basic_p-s43b13c3ec185bfb4 { color: #999; font-size: 1em; }'
+DEBUG: bindings tokens: let basic_container = "basic_container-s43b13c3ec185bfb4"; let basic_p =
+"basic_p-s43b13c3ec185bfb4"; let basic_h1 = "basic_h1-s43b13c3ec185bfb4"; let
+basic_h2 = "basic_h2-s43b13c3ec185bfb4";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.hello_container { background-color: #f5f5f5; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } .hello_title { color: #333; font-size: 1.5em; font-weight: bold; } '
+DEBUG: extracted classes: {"hello_container", "hello_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.hello_container-s25c9e2da54598fdc { background-color: #f5f5f5; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }.hello_title-s25c9e2da54598fdc { color: #333; font-size: 1.5em; font-weight: bold; }'
+DEBUG: bindings tokens: let hello_container = "hello_container-s25c9e2da54598fdc"; let hello_title =
+"hello_title-s25c9e2da54598fdc";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: img
+Parsing element: img
+Parsing element: input
+Parsing element: input
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 8 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: script
+parse_script_content starting for tag: script
+Found closing tag: </script>
+Element::parse: Found closing tag sequence
+Found closing tag: </script>  (expected </script>)
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Parsing element: pre
+Element::parse: Found closing tag sequence
+Found closing tag: </pre>  (expected </pre>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.page_container { max-width: 800px; margin: 0 auto; padding: 2rem; } .page_title { font-size: 2rem; color: #333; text-align: center; } .page_intro { color: #666; text-align: center; margin-bottom: 2rem; } .code_block { background: #f5f5f5; padding: 1rem; border-radius: 4px; font-family: monospace; overflow-x: auto; } '
+DEBUG: extracted classes: {"code_block", "page_title", "page_container", "page_intro"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.page_container-sce4229e22e1b7976 { max-width: 800px; margin: 0 auto; padding: 2rem; }.page_title-sce4229e22e1b7976 { font-size: 2rem; color: #333; text-align: center; }.page_intro-sce4229e22e1b7976 { color: #666; text-align: center; margin-bottom: 2rem; }.code_block-sce4229e22e1b7976 { background: #f5f5f5; padding: 1rem; border-radius: 4px; font-family: monospace; overflow-x: auto; }'
+DEBUG: bindings tokens: let code_block = "code_block-sce4229e22e1b7976"; let page_title =
+"page_title-sce4229e22e1b7976"; let page_container =
+"page_container-sce4229e22e1b7976"; let page_intro =
+"page_intro-sce4229e22e1b7976";
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 11 nodes
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.counter_box { padding: 2rem; border: 2px solid #e0e0e0; border-radius: 12px; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white; text-align: center; max-width: 400px; } .value { font-size: 4rem; font-weight: bold; margin: 1rem 0; } .status { font-size: 1.2rem; opacity: 0.9; margin-bottom: 1.5rem; } .btn_row { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; } .btn { padding: 0.75rem 1.5rem; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; } .btn_primary { background: #4caf50; color: white; } .btn_secondary { background: #ff9800; color: white; } .btn_danger { background: #f44336; color: white; } '
+DEBUG: extracted classes: {"btn_secondary", "btn_danger", "status", "counter_box", "btn_primary", "value", "btn_row", "btn"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.counter_box-s9e3f15ce82b7afbb { padding: 2rem; border: 2px solid #e0e0e0; border-radius: 12px; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white; text-align: center; max-width: 400px; }.value-s9e3f15ce82b7afbb { font-size: 4rem; font-weight: bold; margin: 1rem 0; }.status-s9e3f15ce82b7afbb { font-size: 1.2rem; opacity: 0.9; margin-bottom: 1.5rem; }.btn_row-s9e3f15ce82b7afbb { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }.btn-s9e3f15ce82b7afbb { padding: 0.75rem 1.5rem; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }.btn_primary-s9e3f15ce82b7afbb { background: #4caf50; color: white; }.btn_secondary-s9e3f15ce82b7afbb { background: #ff9800; color: white; }.btn_danger-s9e3f15ce82b7afbb { background: #f44336; color: white; }'
+DEBUG: bindings tokens: let btn_secondary = "btn_secondary-s9e3f15ce82b7afbb"; let btn_danger =
+"btn_danger-s9e3f15ce82b7afbb"; let status = "status-s9e3f15ce82b7afbb"; let
+counter_box = "counter_box-s9e3f15ce82b7afbb"; let btn_primary =
+"btn_primary-s9e3f15ce82b7afbb"; let value = "value-s9e3f15ce82b7afbb"; let
+btn_row = "btn_row-s9e3f15ce82b7afbb"; let btn = "btn-s9e3f15ce82b7afbb";
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: script
+parse_script_content starting for tag: script
+Found closing tag: </script>
+Element::parse: Found closing tag sequence
+Found closing tag: </script>  (expected </script>)
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"header", "example_card", "key_points", "container", "section_title", "point", "main_title", "subtitle", "examples", "points_list"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let header = "header-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let key_points =
+"key_points-s5e01d6a09ae0fa76"; let container = "container-s5e01d6a09ae0fa76";
+let section_title = "section_title-s5e01d6a09ae0fa76"; let point =
+"point-s5e01d6a09ae0fa76"; let main_title = "main_title-s5e01d6a09ae0fa76";
+let subtitle = "subtitle-s5e01d6a09ae0fa76"; let examples =
+"examples-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"section_title", "header", "point", "examples", "example_card", "subtitle", "key_points", "container", "points_list", "main_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let section_title = "section_title-s5e01d6a09ae0fa76"; let header =
+"header-s5e01d6a09ae0fa76"; let point = "point-s5e01d6a09ae0fa76"; let
+examples = "examples-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let subtitle = "subtitle-s5e01d6a09ae0fa76";
+let key_points = "key_points-s5e01d6a09ae0fa76"; let container =
+"container-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let main_title =
+"main_title-s5e01d6a09ae0fa76";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: form
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: select
+Parsing element: option
+Element::parse: Found closing tag sequence
+Found closing tag: </option>  (expected </option>)
+Parsing element: option
+Element::parse: Found closing tag sequence
+Found closing tag: </option>  (expected </option>)
+Parsing element: option
+Element::parse: Found closing tag sequence
+Found closing tag: </option>  (expected </option>)
+Element::parse: Found closing tag sequence
+Found closing tag: </select>  (expected </select>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: label
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: label
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </form>  (expected </form>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.complex_form { display: grid; gap: 1rem; max-width: 500px; } .form_section { border: 1px solid #eee; padding: 1rem; margin-bottom: 1rem; } .section_title { font-weight: bold; margin-bottom: 0.5rem; } .form_grid { display: grid; gap: 0.5rem; } .save_button { padding: 0.75rem; background: #4caf50; color: white; border: none; } '
+DEBUG: extracted classes: {"complex_form", "section_title", "save_button", "form_section", "form_grid"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.complex_form-s7ab1963b77587ccb { display: grid; gap: 1rem; max-width: 500px; }.form_section-s7ab1963b77587ccb { border: 1px solid #eee; padding: 1rem; margin-bottom: 1rem; }.section_title-s7ab1963b77587ccb { font-weight: bold; margin-bottom: 0.5rem; }.form_grid-s7ab1963b77587ccb { display: grid; gap: 0.5rem; }.save_button-s7ab1963b77587ccb { padding: 0.75rem; background: #4caf50; color: white; border: none; }'
+DEBUG: bindings tokens: let complex_form = "complex_form-s7ab1963b77587ccb"; let section_title =
+"section_title-s7ab1963b77587ccb"; let save_button =
+"save_button-s7ab1963b77587ccb"; let form_section =
+"form_section-s7ab1963b77587ccb"; let form_grid =
+"form_grid-s7ab1963b77587ccb";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 6 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.validation_container { padding: 1rem; } .error_message { color: red; font-size: 0.9rem; margin-top: 0.5rem; } .success_message { color: green; font-size: 0.9rem; margin-top: 0.5rem; } '
+DEBUG: extracted classes: {"success_message", "error_message", "validation_container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.validation_container-s7bbc7b32c888fb4d { padding: 1rem; }.error_message-s7bbc7b32c888fb4d { color: red; font-size: 0.9rem; margin-top: 0.5rem; }.success_message-s7bbc7b32c888fb4d { color: green; font-size: 0.9rem; margin-top: 0.5rem; }'
+DEBUG: bindings tokens: let success_message = "success_message-s7bbc7b32c888fb4d"; let error_message =
+"error_message-s7bbc7b32c888fb4d"; let validation_container =
+"validation_container-s7bbc7b32c888fb4d";
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: form
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </form>  (expected </form>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.form { display: grid; gap: 1rem; max-width: 400px; } .form_field { display: grid; gap: 0.5rem; } .form_label { font-weight: bold; } .form_input { padding: 0.5rem; border: 1px solid #ddd; } .form_button { padding: 0.75rem; background: #2196f3; color: white; border: none; cursor: pointer; } '
+DEBUG: extracted classes: {"form_button", "form_label", "form_input", "form", "form_field"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.form-s434c7fdf04640c08 { display: grid; gap: 1rem; max-width: 400px; }.form_field-s434c7fdf04640c08 { display: grid; gap: 0.5rem; }.form_label-s434c7fdf04640c08 { font-weight: bold; }.form_input-s434c7fdf04640c08 { padding: 0.5rem; border: 1px solid #ddd; }.form_button-s434c7fdf04640c08 { padding: 0.75rem; background: #2196f3; color: white; border: none; cursor: pointer; }'
+DEBUG: bindings tokens: let form_button = "form_button-s434c7fdf04640c08"; let form_label =
+"form_label-s434c7fdf04640c08"; let form_input =
+"form_input-s434c7fdf04640c08"; let form = "form-s434c7fdf04640c08"; let
+form_field = "form_field-s434c7fdf04640c08";
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"key_points", "points_list", "section_title", "point", "container", "header", "main_title", "subtitle", "examples", "example_card"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let key_points = "key_points-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let section_title =
+"section_title-s5e01d6a09ae0fa76"; let point = "point-s5e01d6a09ae0fa76"; let
+container = "container-s5e01d6a09ae0fa76"; let header =
+"header-s5e01d6a09ae0fa76"; let main_title = "main_title-s5e01d6a09ae0fa76";
+let subtitle = "subtitle-s5e01d6a09ae0fa76"; let examples =
+"examples-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.pattern_container { padding: 1rem; } .state_loading { color: blue; } .state_success { color: green; } .state_error { color: red; } '
+DEBUG: extracted classes: {"pattern_container", "state_error", "state_loading", "state_success"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.pattern_container-s6fd2bee4e7b5be93 { padding: 1rem; }.state_loading-s6fd2bee4e7b5be93 { color: blue; }.state_success-s6fd2bee4e7b5be93 { color: green; }.state_error-s6fd2bee4e7b5be93 { color: red; }'
+DEBUG: bindings tokens: let pattern_container = "pattern_container-s6fd2bee4e7b5be93"; let state_error
+= "state_error-s6fd2bee4e7b5be93"; let state_loading =
+"state_loading-s6fd2bee4e7b5be93"; let state_success =
+"state_success-s6fd2bee4e7b5be93";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.conditions_container { padding: 1rem; background: #f9f9f9; } .permission_granted { color: green; font-weight: bold; } .permission_denied { color: red; font-weight: bold; } '
+DEBUG: extracted classes: {"permission_granted", "permission_denied", "conditions_container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.conditions_container-s6726f038c85be006 { padding: 1rem; background: #f9f9f9; }.permission_granted-s6726f038c85be006 { color: green; font-weight: bold; }.permission_denied-s6726f038c85be006 { color: red; font-weight: bold; }'
+DEBUG: bindings tokens: let permission_granted = "permission_granted-s6726f038c85be006"; let
+permission_denied = "permission_denied-s6726f038c85be006"; let
+conditions_container = "conditions_container-s6726f038c85be006";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.content { padding: 1rem; } .item { margin: 0.5rem 0; padding: 0.5rem; background: #f5f5f5; } .status_active { color: green; } .status_inactive { color: red; } '
+DEBUG: extracted classes: {"item", "status_inactive", "content", "status_active"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.content-sb19012bf95db5613 { padding: 1rem; }.item-sb19012bf95db5613 { margin: 0.5rem 0; padding: 0.5rem; background: #f5f5f5; }.status_active-sb19012bf95db5613 { color: green; }.status_inactive-sb19012bf95db5613 { color: red; }'
+DEBUG: bindings tokens: let item = "item-sb19012bf95db5613"; let status_inactive =
+"status_inactive-sb19012bf95db5613"; let content =
+"content-sb19012bf95db5613"; let status_active =
+"status_active-sb19012bf95db5613";
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"container", "subtitle", "key_points", "header", "example_card", "examples", "section_title", "point", "points_list", "main_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let container = "container-s5e01d6a09ae0fa76"; let subtitle =
+"subtitle-s5e01d6a09ae0fa76"; let key_points = "key_points-s5e01d6a09ae0fa76";
+let header = "header-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let examples = "examples-s5e01d6a09ae0fa76";
+let section_title = "section_title-s5e01d6a09ae0fa76"; let point =
+"point-s5e01d6a09ae0fa76"; let points_list = "points_list-s5e01d6a09ae0fa76";
+let main_title = "main_title-s5e01d6a09ae0fa76";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: h4
+Element::parse: Found closing tag sequence
+Found closing tag: </h4>  (expected </h4>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.composition_demo { padding: 1rem; } .component_container { margin: 0.5rem 0; padding: 0.5rem; background: #f5f5f5; } '
+DEBUG: extracted classes: {"composition_demo", "component_container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.composition_demo-s74f0585d3a265be3 { padding: 1rem; }.component_container-s74f0585d3a265be3 { margin: 0.5rem 0; padding: 0.5rem; background: #f5f5f5; }'
+DEBUG: bindings tokens: let composition_demo = "composition_demo-s74f0585d3a265be3"; let
+component_container = "component_container-s74f0585d3a265be3";
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.conditions_demo { padding: 1rem; background: #f9f9f9; } .result { font-weight: bold; } '
+DEBUG: extracted classes: {"result", "conditions_demo"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.conditions_demo-sa20f8bab8162709c { padding: 1rem; background: #f9f9f9; }.result-sa20f8bab8162709c { font-weight: bold; }'
+DEBUG: bindings tokens: let result = "result-sa20f8bab8162709c"; let conditions_demo =
+"conditions_demo-sa20f8bab8162709c";
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.let_demo { padding: 1rem; } .calculated { font-weight: bold; color: #2196f3; } .derived { background: #f0f0f0; padding: 0.5rem; } '
+DEBUG: extracted classes: {"calculated", "let_demo", "derived"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.let_demo-sdb8d346b57ac2316 { padding: 1rem; }.calculated-sdb8d346b57ac2316 { font-weight: bold; color: #2196f3; }.derived-sdb8d346b57ac2316 { background: #f0f0f0; padding: 0.5rem; }'
+DEBUG: bindings tokens: let calculated = "calculated-sdb8d346b57ac2316"; let let_demo =
+"let_demo-sdb8d346b57ac2316"; let derived = "derived-sdb8d346b57ac2316";
+DEBUG: process_styles called with 13 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"example_card", "key_points", "subtitle", "section_title", "main_title", "header", "points_list", "point", "examples"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.header-sf72d3607cb9a5e67 { text-align: center; margin-bottom: 30px; }.main_title-sf72d3607cb9a5e67 { font-size: 32px; color: #333; }.subtitle-sf72d3607cb9a5e67 { font-size: 18px; color: #666; }.key_points-sf72d3607cb9a5e67 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-sf72d3607cb9a5e67 { font-size: 20px; margin-bottom: 15px; }.points_list-sf72d3607cb9a5e67 { list-style: none; padding: 0; }.point-sf72d3607cb9a5e67 { margin-bottom: 10px; }.examples-sf72d3607cb9a5e67 { display: grid; gap: 20px; }.example_card-sf72d3607cb9a5e67 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let example_card = "example_card-sf72d3607cb9a5e67"; let key_points =
+"key_points-sf72d3607cb9a5e67"; let subtitle = "subtitle-sf72d3607cb9a5e67";
+let section_title = "section_title-sf72d3607cb9a5e67"; let main_title =
+"main_title-sf72d3607cb9a5e67"; let header = "header-sf72d3607cb9a5e67"; let
+points_list = "points_list-sf72d3607cb9a5e67"; let point =
+"point-sf72d3607cb9a5e67"; let examples = "examples-sf72d3607cb9a5e67";
+Parsing element: div
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.children_demo { display: grid; gap: 1rem; } .child_item { padding: 0.5rem; background: #f9f9f9; border: 1px solid #eee; } '
+DEBUG: extracted classes: {"child_item", "children_demo"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.children_demo-sd8085ca0faae7a19 { display: grid; gap: 1rem; }.child_item-sd8085ca0faae7a19 { padding: 0.5rem; background: #f9f9f9; border: 1px solid #eee; }'
+DEBUG: bindings tokens: let child_item = "child_item-sd8085ca0faae7a19"; let children_demo =
+"children_demo-sd8085ca0faae7a19";
+DEBUG: process_styles called with 2 nodes
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.outer_container { background: #f0f0f0; padding: 1.5rem; } .inner_container { background: white; padding: 1rem; margin-top: 1rem; } '
+DEBUG: extracted classes: {"inner_container", "outer_container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.outer_container-se700eadc9a0d879e { background: #f0f0f0; padding: 1.5rem; }.inner_container-se700eadc9a0d879e { background: white; padding: 1rem; margin-top: 1rem; }'
+DEBUG: bindings tokens: let inner_container = "inner_container-se700eadc9a0d879e"; let outer_container
+= "outer_container-se700eadc9a0d879e";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.layout_title { font-size: 1.5rem; color: #2196f3; margin-bottom: 1rem; } '
+DEBUG: extracted classes: {"layout_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.layout_title-s4257bc281c2bd327 { font-size: 1.5rem; color: #2196f3; margin-bottom: 1rem; }'
+DEBUG: bindings tokens: let layout_title = "layout_title-s4257bc281c2bd327";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.content_box { padding: 2rem; border: 1px solid #ddd; border-radius: 8px; } '
+DEBUG: extracted classes: {"content_box"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.content_box-s329935288cb409ed { padding: 2rem; border: 1px solid #ddd; border-radius: 8px; }'
+DEBUG: bindings tokens: let content_box = "content_box-s329935288cb409ed";
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"points_list", "subtitle", "section_title", "point", "main_title", "container", "header", "key_points", "example_card", "examples"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let points_list = "points_list-s5e01d6a09ae0fa76"; let subtitle =
+"subtitle-s5e01d6a09ae0fa76"; let section_title =
+"section_title-s5e01d6a09ae0fa76"; let point = "point-s5e01d6a09ae0fa76"; let
+main_title = "main_title-s5e01d6a09ae0fa76"; let container =
+"container-s5e01d6a09ae0fa76"; let header = "header-s5e01d6a09ae0fa76"; let
+key_points = "key_points-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let examples = "examples-s5e01d6a09ae0fa76";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.best_practices { padding: 1.5rem; background: #f9f9f9; } .practice_item { margin: 0.5rem 0; padding: 0.5rem; background: white; } .do_class { color: green; font-weight: bold; } .dont_class { color: red; font-weight: bold; } '
+DEBUG: extracted classes: {"do_class", "dont_class", "practice_item", "best_practices"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.best_practices-sd700cdd6d2e9f788 { padding: 1.5rem; background: #f9f9f9; }.practice_item-sd700cdd6d2e9f788 { margin: 0.5rem 0; padding: 0.5rem; background: white; }.do_class-sd700cdd6d2e9f788 { color: green; font-weight: bold; }.dont_class-sd700cdd6d2e9f788 { color: red; font-weight: bold; }'
+DEBUG: bindings tokens: let do_class = "do_class-sd700cdd6d2e9f788"; let dont_class =
+"dont_class-sd700cdd6d2e9f788"; let practice_item =
+"practice_item-sd700cdd6d2e9f788"; let best_practices =
+"best_practices-sd700cdd6d2e9f788";
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles found style block
+DEBUG GLOBAL: input tokens: 
+DEBUG GLOBAL: Parse SUCCESS
+DEBUG GLOBAL: number of parsed rules: 0, at_rules: 0
+DEBUG GLOBAL: raw_css: ''
+DEBUG GLOBAL: extracted classes: {}
+DEBUG GLOBAL: extracted ids: {}
+DEBUG GLOBAL: bindings tokens: 
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 1rem; border: 1px solid #ddd; } .scoped_title { color: #2196f3; } .global_simulation { font-size: 1.1rem; font-weight: bold; } '
+DEBUG: extracted classes: {"scoped_title", "global_simulation", "container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s805c03654d899420 { padding: 1rem; border: 1px solid #ddd; }.scoped_title-s805c03654d899420 { color: #2196f3; }.global_simulation-s805c03654d899420 { font-size: 1.1rem; font-weight: bold; }'
+DEBUG: bindings tokens: let scoped_title = "scoped_title-s805c03654d899420"; let global_simulation =
+"global_simulation-s805c03654d899420"; let container =
+"container-s805c03654d899420";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles found style block
+DEBUG GLOBAL: input tokens: body { font-family: "Arial, sans-serif"; }
+DEBUG GLOBAL: Parse SUCCESS
+DEBUG GLOBAL: number of parsed rules: 1, at_rules: 0
+DEBUG GLOBAL: raw_css: 'body { font-family: Arial, sans-serif; } '
+DEBUG GLOBAL: extracted classes: {}
+DEBUG GLOBAL: extracted ids: {}
+DEBUG GLOBAL: bindings tokens: 
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.component_class { background: #f5f5f5; padding: 1rem; } .local_class { color: blue; } .global_demo { color: purple; font-style: italic; } '
+DEBUG: extracted classes: {"local_class", "global_demo", "component_class"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.component_class-s8fd13c96d0d436c4 { background: #f5f5f5; padding: 1rem; }.local_class-s8fd13c96d0d436c4 { color: blue; }.global_demo-s8fd13c96d0d436c4 { color: purple; font-style: italic; }'
+DEBUG: bindings tokens: let local_class = "local_class-s8fd13c96d0d436c4"; let global_demo =
+"global_demo-s8fd13c96d0d436c4"; let component_class =
+"component_class-s8fd13c96d0d436c4";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: div
+Parsing element: input
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.todo_app { max-width: 500px; background: white; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; } .app_header { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white; padding: 2rem; text-align: center; } .app_title { margin: 0; font-size: 2rem; } .app_subtitle { opacity: 0.8; margin-top: 0.5rem; } .input_section { padding: 1rem; display: flex; gap: 0.5rem; border-bottom: 1px solid #eee; } .todo_input { flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; } .add_btn { padding: 0.75rem 1.5rem; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; } .filter_section { padding: 1rem; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; } .filter_btn { padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer; } .filter_active { background: #2196f3; color: white; border-color: #2196f3; } .item_count { font-size: 1.5rem; font-weight: bold; color: #667eea; } .clear_btn { padding: 0.5rem 1rem; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; } .todo_list { padding: 1rem; } .empty_state { text-align: center; padding: 2rem; color: #999; } '
+DEBUG: extracted classes: {"todo_list", "todo_app", "app_subtitle", "app_header", "filter_active", "item_count", "app_title", "input_section", "add_btn", "todo_input", "filter_btn", "clear_btn", "filter_section", "empty_state"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.todo_app-s38d19f803d45add8 { max-width: 500px; background: white; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; }.app_header-s38d19f803d45add8 { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white; padding: 2rem; text-align: center; }.app_title-s38d19f803d45add8 { margin: 0; font-size: 2rem; }.app_subtitle-s38d19f803d45add8 { opacity: 0.8; margin-top: 0.5rem; }.input_section-s38d19f803d45add8 { padding: 1rem; display: flex; gap: 0.5rem; border-bottom: 1px solid #eee; }.todo_input-s38d19f803d45add8 { flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }.add_btn-s38d19f803d45add8 { padding: 0.75rem 1.5rem; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }.filter_section-s38d19f803d45add8 { padding: 1rem; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; }.filter_btn-s38d19f803d45add8 { padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer; }.filter_active-s38d19f803d45add8 { background: #2196f3; color: white; border-color: #2196f3; }.item_count-s38d19f803d45add8 { font-size: 1.5rem; font-weight: bold; color: #667eea; }.clear_btn-s38d19f803d45add8 { padding: 0.5rem 1rem; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; }.todo_list-s38d19f803d45add8 { padding: 1rem; }.empty_state-s38d19f803d45add8 { text-align: center; padding: 2rem; color: #999; }'
+DEBUG: bindings tokens: let todo_list = "todo_list-s38d19f803d45add8"; let todo_app =
+"todo_app-s38d19f803d45add8"; let app_subtitle =
+"app_subtitle-s38d19f803d45add8"; let app_header =
+"app_header-s38d19f803d45add8"; let filter_active =
+"filter_active-s38d19f803d45add8"; let item_count =
+"item_count-s38d19f803d45add8"; let app_title = "app_title-s38d19f803d45add8";
+let input_section = "input_section-s38d19f803d45add8"; let add_btn =
+"add_btn-s38d19f803d45add8"; let todo_input = "todo_input-s38d19f803d45add8";
+let filter_btn = "filter_btn-s38d19f803d45add8"; let clear_btn =
+"clear_btn-s38d19f803d45add8"; let filter_section =
+"filter_section-s38d19f803d45add8"; let empty_state =
+"empty_state-s38d19f803d45add8";
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: div
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.tabs_container { background: white; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; } .tab_buttons { display: flex; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; } .tab_btn { flex: 1; padding: 1rem; border: none; background: transparent; cursor: pointer; font-size: 1rem; transition: background 0.2s; } .tab_btn_active { background: white; color: #2196f3; font-weight: bold; border-bottom: 2px solid #2196f3; } .tab_content { padding: 1.5rem; min-height: 150px; } .tab_panel { animation: fadeIn 0.3s ease; } '
+DEBUG: extracted classes: {"tab_content", "tabs_container", "tab_btn", "tab_buttons", "tab_btn_active", "tab_panel"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.tabs_container-s29efaeaf73f75463 { background: white; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; }.tab_buttons-s29efaeaf73f75463 { display: flex; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; }.tab_btn-s29efaeaf73f75463 { flex: 1; padding: 1rem; border: none; background: transparent; cursor: pointer; font-size: 1rem; transition: background 0.2s; }.tab_btn_active-s29efaeaf73f75463 { background: white; color: #2196f3; font-weight: bold; border-bottom: 2px solid #2196f3; }.tab_content-s29efaeaf73f75463 { padding: 1.5rem; min-height: 150px; }.tab_panel-s29efaeaf73f75463 { animation: fadeIn 0.3s ease; }'
+DEBUG: bindings tokens: let tab_content = "tab_content-s29efaeaf73f75463"; let tabs_container =
+"tabs_container-s29efaeaf73f75463"; let tab_btn = "tab_btn-s29efaeaf73f75463";
+let tab_buttons = "tab_buttons-s29efaeaf73f75463"; let tab_btn_active =
+"tab_btn_active-s29efaeaf73f75463"; let tab_panel =
+"tab_panel-s29efaeaf73f75463";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: input
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: label
+Element::parse: Found closing tag sequence
+Found closing tag: </label>  (expected </label>)
+Parsing element: textarea
+Element::parse: Found closing tag sequence
+Found closing tag: </textarea>  (expected </textarea>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.form_container { max-width: 400px; padding: 2rem; background: white; border-radius: 12px; border: 1px solid #e0e0e0; } .form_title { margin-bottom: 1.5rem; color: #333; } .field { display: grid; gap: 0.5rem; margin-bottom: 1rem; } .label { font-weight: bold; color: #555; } .input { padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; } .textarea { padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; min-height: 100px; resize: vertical; } .btn { padding: 0.75rem 1.5rem; background: #2196f3; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; width: 100%; } .btn_secondary { background: #757575; } .success_box { padding: 2rem; text-align: center; background: #e8f5e9; border-radius: 8px; } .success_icon { font-size: 3rem; margin-bottom: 1rem; } .success_text { color: #2e7d32; font-size: 1.2rem; font-weight: bold; } '
+DEBUG: extracted classes: {"btn_secondary", "success_box", "success_text", "btn", "textarea", "form_title", "label", "success_icon", "field", "form_container", "input"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.form_container-sfa38fa093eb370f0 { max-width: 400px; padding: 2rem; background: white; border-radius: 12px; border: 1px solid #e0e0e0; }.form_title-sfa38fa093eb370f0 { margin-bottom: 1.5rem; color: #333; }.field-sfa38fa093eb370f0 { display: grid; gap: 0.5rem; margin-bottom: 1rem; }.label-sfa38fa093eb370f0 { font-weight: bold; color: #555; }.input-sfa38fa093eb370f0 { padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }.textarea-sfa38fa093eb370f0 { padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; min-height: 100px; resize: vertical; }.btn-sfa38fa093eb370f0 { padding: 0.75rem 1.5rem; background: #2196f3; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; width: 100%; }.btn_secondary-sfa38fa093eb370f0 { background: #757575; }.success_box-sfa38fa093eb370f0 { padding: 2rem; text-align: center; background: #e8f5e9; border-radius: 8px; }.success_icon-sfa38fa093eb370f0 { font-size: 3rem; margin-bottom: 1rem; }.success_text-sfa38fa093eb370f0 { color: #2e7d32; font-size: 1.2rem; font-weight: bold; }'
+DEBUG: bindings tokens: let btn_secondary = "btn_secondary-sfa38fa093eb370f0"; let success_box =
+"success_box-sfa38fa093eb370f0"; let success_text =
+"success_text-sfa38fa093eb370f0"; let btn = "btn-sfa38fa093eb370f0"; let
+textarea = "textarea-sfa38fa093eb370f0"; let form_title =
+"form_title-sfa38fa093eb370f0"; let label = "label-sfa38fa093eb370f0"; let
+success_icon = "success_icon-sfa38fa093eb370f0"; let field =
+"field-sfa38fa093eb370f0"; let form_container =
+"form_container-sfa38fa093eb370f0"; let input = "input-sfa38fa093eb370f0";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: img
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: img
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: img
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.container { max-width: 800px; margin: 0 auto; padding: 2rem; } .section { margin-bottom: 3rem; } .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; } .card { border: 1px solid #eee; padding: 1rem; border-radius: 8px; background: white; } .code { background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 6px; overflow-x: auto; font-family: monospace; margin: 1rem 0; } .label { display: inline-block; background: #e0e7ff; color: #4338ca; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-bottom: 0.5rem; font-weight: bold; } .code_comment { color: #666; font-family: monospace; font-size: 0.9rem; margin-bottom: 1rem; } .responsive_img { width: 100%; height: auto; } '
+DEBUG: extracted classes: {"label", "card", "responsive_img", "grid", "section", "container", "code", "code_comment"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s1ec3a1f4c02b8ee6 { max-width: 800px; margin: 0 auto; padding: 2rem; }.section-s1ec3a1f4c02b8ee6 { margin-bottom: 3rem; }.grid-s1ec3a1f4c02b8ee6 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }.card-s1ec3a1f4c02b8ee6 { border: 1px solid #eee; padding: 1rem; border-radius: 8px; background: white; }.code-s1ec3a1f4c02b8ee6 { background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 6px; overflow-x: auto; font-family: monospace; margin: 1rem 0; }.label-s1ec3a1f4c02b8ee6 { display: inline-block; background: #e0e7ff; color: #4338ca; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-bottom: 0.5rem; font-weight: bold; }.code_comment-s1ec3a1f4c02b8ee6 { color: #666; font-family: monospace; font-size: 0.9rem; margin-bottom: 1rem; }.responsive_img-s1ec3a1f4c02b8ee6 { width: 100%; height: auto; }'
+DEBUG: bindings tokens: let label = "label-s1ec3a1f4c02b8ee6"; let card = "card-s1ec3a1f4c02b8ee6";
+let responsive_img = "responsive_img-s1ec3a1f4c02b8ee6"; let grid =
+"grid-s1ec3a1f4c02b8ee6"; let section = "section-s1ec3a1f4c02b8ee6"; let
+container = "container-s1ec3a1f4c02b8ee6"; let code =
+"code-s1ec3a1f4c02b8ee6"; let code_comment = "code_comment-s1ec3a1f4c02b8ee6";
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: div
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: svg
+Parsing element: circle
+Element::parse: Found closing tag sequence
+Found closing tag: </circle>  (expected </circle>)
+Parsing element: line
+Element::parse: Found closing tag sequence
+Found closing tag: </line>  (expected </line>)
+Parsing element: line
+Element::parse: Found closing tag sequence
+Found closing tag: </line>  (expected </line>)
+Element::parse: Found closing tag sequence
+Found closing tag: </svg>  (expected </svg>)
+Parsing element: div
+Parsing element: strong
+Element::parse: Found closing tag sequence
+Found closing tag: </strong>  (expected </strong>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: ul
+Parsing element: li
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Parsing element: div
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '@keyframes spin{ to { transform: "rotate(360deg)"; } }.error_state{
+    background: "#fef2f2"; color: "#991b1b"; padding: "1rem"; border-radius:
+    "8px"; display: "flex"; align_items: "center"; gap: "0.5rem";
+    margin-bottom: "1rem";
+}.user_list{ list-style: "none"; padding: "0"; }.user_item{
+    display: "flex"; align_items: "center"; gap: "1rem"; padding: "1rem";
+    border-bottom: "1px solid #f3f4f6";
+}.avatar{
+    width: "40px"; height: "40px"; background: "#e0e7ff"; color: "#4f46e5";
+    border-radius: "50%"; display: "flex"; align-items: "center";
+    justify-content: "center"; font-weight: "bold";
+}.controls{
+    display: "flex"; gap: "1rem"; justify-content: "center"; margin-top:
+    "2rem"; padding-top: "2rem"; border-top: "1px solid #e5e7eb";
+}.btn_primary{
+    padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "500";
+    border: "none"; cursor: "pointer"; transition: "all 0.2s"; background:
+    "#4f46e5"; color: "white";
+}.btn_primary:hover{ background: "#4338ca"; }.btn_danger{
+    padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "500";
+    border: "none"; cursor: "pointer"; transition: "all 0.2s"; background:
+    "#ef4444"; color: "white";
+}.btn_danger:hover{ background: "#dc2626"; }.btn_outline{
+    padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "500";
+    border: "none"; cursor: "pointer"; transition: "all 0.2s"; background:
+    "white"; border: "1px solid #d1d5db"; color: "#374151";
+}.btn_outline:hover{ background: "#f9fafb"; }.empty_state{ text-align: "center"; color: "#6b7280"; padding: "2rem"; } .container { max-width: 600px; margin: 2rem auto; padding: 2rem; } .card { background: white; border-radius: 12px; background: white; border-radius: 12px; padding: 2rem; border: 1px solid #e5e7eb; } .header { text-align: center; margin-bottom: 2rem; } .loading_state { text-align: center; padding: 3rem; color: #6b7280; } .spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; } '
+DEBUG: extracted classes: {"avatar", "user_list", "error_state", "btn_danger", "user_item", "spinner", "controls", "container", "btn_primary", "empty_state", "header", "card", "loading_state", "btn_outline"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '@keyframes spin { to { transform: "rotate(360deg)"; }}.error_state-s9a7ce5303085c895 {
+    background: "#fef2f2"; color: "#991b1b"; padding: "1rem"; border-radius:
+    "8px"; display: "flex"; align_items: "center"; gap: "0.5rem";
+    margin-bottom: "1rem";
+}.user_list-s9a7ce5303085c895 { list-style: "none"; padding: "0"; }.user_item-s9a7ce5303085c895 {
+    display: "flex"; align_items: "center"; gap: "1rem"; padding: "1rem";
+    border-bottom: "1px solid #f3f4f6";
+}.avatar-s9a7ce5303085c895 {
+    width: "40px"; height: "40px"; background: "#e0e7ff"; color: "#4f46e5";
+    border-radius: "50%"; display: "flex"; align-items: "center";
+    justify-content: "center"; font-weight: "bold";
+}.controls-s9a7ce5303085c895 {
+    display: "flex"; gap: "1rem"; justify-content: "center"; margin-top:
+    "2rem"; padding-top: "2rem"; border-top: "1px solid #e5e7eb";
+}.btn_primary-s9a7ce5303085c895 {
+    padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "500";
+    border: "none"; cursor: "pointer"; transition: "all 0.2s"; background:
+    "#4f46e5"; color: "white";
+}.btn_primary-s9a7ce5303085c895:hover { background: "#4338ca"; }.btn_danger-s9a7ce5303085c895 {
+    padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "500";
+    border: "none"; cursor: "pointer"; transition: "all 0.2s"; background:
+    "#ef4444"; color: "white";
+}.btn_danger-s9a7ce5303085c895:hover { background: "#dc2626"; }.btn_outline-s9a7ce5303085c895 {
+    padding: "0.75rem 1.5rem"; border-radius: "6px"; font-weight: "500";
+    border: "none"; cursor: "pointer"; transition: "all 0.2s"; background:
+    "white"; border: "1px solid #d1d5db"; color: "#374151";
+}.btn_outline-s9a7ce5303085c895:hover { background: "#f9fafb"; }.empty_state-s9a7ce5303085c895 { text-align: "center"; color: "#6b7280"; padding: "2rem"; }.container-s9a7ce5303085c895 { max-width: 600px; margin: 2rem auto; padding: 2rem; }.card-s9a7ce5303085c895 { background: white; border-radius: 12px; background: white; border-radius: 12px; padding: 2rem; border: 1px solid #e5e7eb; }.header-s9a7ce5303085c895 { text-align: center; margin-bottom: 2rem; }.loading_state-s9a7ce5303085c895 { text-align: center; padding: 3rem; color: #6b7280; }.spinner-s9a7ce5303085c895 { display: inline-block; width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }'
+DEBUG: bindings tokens: let avatar = "avatar-s9a7ce5303085c895"; let user_list =
+"user_list-s9a7ce5303085c895"; let error_state =
+"error_state-s9a7ce5303085c895"; let btn_danger =
+"btn_danger-s9a7ce5303085c895"; let user_item = "user_item-s9a7ce5303085c895";
+let spinner = "spinner-s9a7ce5303085c895"; let controls =
+"controls-s9a7ce5303085c895"; let container = "container-s9a7ce5303085c895";
+let btn_primary = "btn_primary-s9a7ce5303085c895"; let empty_state =
+"empty_state-s9a7ce5303085c895"; let header = "header-s9a7ce5303085c895"; let
+card = "card-s9a7ce5303085c895"; let loading_state =
+"loading_state-s9a7ce5303085c895"; let btn_outline =
+"btn_outline-s9a7ce5303085c895";
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: div
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Parsing element: button
+Element::parse: Found closing tag sequence
+Found closing tag: </button>  (expected </button>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: div
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: div
+Parsing element: span
+Element::parse: Found closing tag sequence
+Found closing tag: </span>  (expected </span>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Parsing element: strong
+Element::parse: Found closing tag sequence
+Found closing tag: </strong>  (expected </strong>)
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Parsing element: strong
+Element::parse: Found closing tag sequence
+Found closing tag: </strong>  (expected </strong>)
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG: raw_css: '.container { max-width: 800px; margin: 0 auto; padding: 2rem; } .card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 2rem; margin-bottom: 2rem; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); } .title { color: #333; margin-bottom: 1rem; } .explanation { color: #666; line-height: 1.6; margin-bottom: 2rem; } .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 1rem; } .tab_btn { padding: 0.75rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: bold; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; } .tab_btn.active { color: #667eea; border-bottom-color: #667eea; } .tab_content { display: none; padding: 1rem 0; } .tab_content.active { display: block; } .accordion_item { border: 1px solid #eee; border-radius: 4px; margin-bottom: 0.5rem; } .accordion_header { padding: 1rem; background: #f8f9fa; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; } .accordion_body { display: none; padding: 1rem; border-top: 1px solid #eee; } .accordion_body.open { display: block; } .code { background: #f5f5f5; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; } '
+DEBUG: extracted classes: {"open", "card", "explanation", "code", "title", "container", "tabs", "tab_content", "accordion_item", "accordion_body", "tab_btn", "accordion_header", "active"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-scb4f4fd77da6a2b3 { max-width: 800px; margin: 0 auto; padding: 2rem; }.card-scb4f4fd77da6a2b3 { border: 1px solid #e0e0e0; border-radius: 8px; padding: 2rem; margin-bottom: 2rem; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }.title-scb4f4fd77da6a2b3 { color: #333; margin-bottom: 1rem; }.explanation-scb4f4fd77da6a2b3 { color: #666; line-height: 1.6; margin-bottom: 2rem; }.tabs-scb4f4fd77da6a2b3 { display: flex; border-bottom: 2px solid #eee; margin-bottom: 1rem; }.tab_btn-scb4f4fd77da6a2b3 { padding: 0.75rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: bold; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; }.tab_btn-scb4f4fd77da6a2b3.active-scb4f4fd77da6a2b3 { color: #667eea; border-bottom-color: #667eea; }.tab_content-scb4f4fd77da6a2b3 { display: none; padding: 1rem 0; }.tab_content-scb4f4fd77da6a2b3.active-scb4f4fd77da6a2b3 { display: block; }.accordion_item-scb4f4fd77da6a2b3 { border: 1px solid #eee; border-radius: 4px; margin-bottom: 0.5rem; }.accordion_header-scb4f4fd77da6a2b3 { padding: 1rem; background: #f8f9fa; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; }.accordion_body-scb4f4fd77da6a2b3 { display: none; padding: 1rem; border-top: 1px solid #eee; }.accordion_body-scb4f4fd77da6a2b3.open-scb4f4fd77da6a2b3 { display: block; }.code-scb4f4fd77da6a2b3 { background: #f5f5f5; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; }'
+DEBUG: bindings tokens: let open = "open-scb4f4fd77da6a2b3"; let card = "card-scb4f4fd77da6a2b3"; let
+explanation = "explanation-scb4f4fd77da6a2b3"; let code =
+"code-scb4f4fd77da6a2b3"; let title = "title-scb4f4fd77da6a2b3"; let container
+= "container-scb4f4fd77da6a2b3"; let tabs = "tabs-scb4f4fd77da6a2b3"; let
+tab_content = "tab_content-scb4f4fd77da6a2b3"; let accordion_item =
+"accordion_item-scb4f4fd77da6a2b3"; let accordion_body =
+"accordion_body-scb4f4fd77da6a2b3"; let tab_btn = "tab_btn-scb4f4fd77da6a2b3";
+let accordion_header = "accordion_header-scb4f4fd77da6a2b3"; let active =
+"active-scb4f4fd77da6a2b3";
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 6 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: validate_css_value checking 'white' for property 'background'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"point", "key_points", "main_title", "example_card", "section_title", "header", "subtitle", "points_list", "container", "examples"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let point = "point-s5e01d6a09ae0fa76"; let key_points =
+"key_points-s5e01d6a09ae0fa76"; let main_title =
+"main_title-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let section_title =
+"section_title-s5e01d6a09ae0fa76"; let header = "header-s5e01d6a09ae0fa76";
+let subtitle = "subtitle-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let container =
+"container-s5e01d6a09ae0fa76"; let examples = "examples-s5e01d6a09ae0fa76";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.valid_container { padding: 20px; background: #f9f9f9; } .valid_title { color: #2196f3; font-size: 1.2rem; } .valid_text { color: #666; } '
+DEBUG: extracted classes: {"valid_title", "valid_text", "valid_container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.valid_container-se8ef5e64fd2294e2 { padding: 20px; background: #f9f9f9; }.valid_title-se8ef5e64fd2294e2 { color: #2196f3; font-size: 1.2rem; }.valid_text-se8ef5e64fd2294e2 { color: #666; }'
+DEBUG: bindings tokens: let valid_title = "valid_title-se8ef5e64fd2294e2"; let valid_text =
+"valid_text-se8ef5e64fd2294e2"; let valid_container =
+"valid_container-se8ef5e64fd2294e2";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.card { padding: 1rem; margin: 0.5rem; border: 1px solid #eee; } .card_title { font-weight: bold; color: #1976d2; } '
+DEBUG: extracted classes: {"card_title", "card"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.card-s811816e62aaa4e47 { padding: 1rem; margin: 0.5rem; border: 1px solid #eee; }.card_title-s811816e62aaa4e47 { font-weight: bold; color: #1976d2; }'
+DEBUG: bindings tokens: let card_title = "card_title-s811816e62aaa4e47"; let card =
+"card-s811816e62aaa4e47";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 1rem; border: 1px solid #ddd; } .title { color: #2196f3; } '
+DEBUG: extracted classes: {"title", "container"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s579ebc369d2881ac { padding: 1rem; border: 1px solid #ddd; }.title-s579ebc369d2881ac { color: #2196f3; }'
+DEBUG: bindings tokens: let title = "title-s579ebc369d2881ac"; let container =
+"container-s579ebc369d2881ac";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: header
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </header>  (expected </header>)
+Parsing element: section
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: ul
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Parsing element: li
+Element::parse: Found closing tag sequence
+Found closing tag: </li>  (expected </li>)
+Element::parse: Found closing tag sequence
+Found closing tag: </ul>  (expected </ul>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Parsing element: section
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </section>  (expected </section>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 20px; } .header { text-align: center; margin-bottom: 30px; } .main_title { font-size: 32px; color: #333; } .subtitle { font-size: 18px; color: #666; } .key_points { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; } .section_title { font-size: 20px; margin-bottom: 15px; } .points_list { list-style: none; padding: 0; } .point { margin-bottom: 10px; } .examples { display: grid; gap: 20px; } .example_card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; } '
+DEBUG: extracted classes: {"examples", "points_list", "main_title", "section_title", "subtitle", "example_card", "key_points", "header", "container", "point"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s5e01d6a09ae0fa76 { padding: 20px; }.header-s5e01d6a09ae0fa76 { text-align: center; margin-bottom: 30px; }.main_title-s5e01d6a09ae0fa76 { font-size: 32px; color: #333; }.subtitle-s5e01d6a09ae0fa76 { font-size: 18px; color: #666; }.key_points-s5e01d6a09ae0fa76 { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }.section_title-s5e01d6a09ae0fa76 { font-size: 20px; margin-bottom: 15px; }.points_list-s5e01d6a09ae0fa76 { list-style: none; padding: 0; }.point-s5e01d6a09ae0fa76 { margin-bottom: 10px; }.examples-s5e01d6a09ae0fa76 { display: grid; gap: 20px; }.example_card-s5e01d6a09ae0fa76 { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }'
+DEBUG: bindings tokens: let examples = "examples-s5e01d6a09ae0fa76"; let points_list =
+"points_list-s5e01d6a09ae0fa76"; let main_title =
+"main_title-s5e01d6a09ae0fa76"; let section_title =
+"section_title-s5e01d6a09ae0fa76"; let subtitle =
+"subtitle-s5e01d6a09ae0fa76"; let example_card =
+"example_card-s5e01d6a09ae0fa76"; let key_points =
+"key_points-s5e01d6a09ae0fa76"; let header = "header-s5e01d6a09ae0fa76"; let
+container = "container-s5e01d6a09ae0fa76"; let point =
+"point-s5e01d6a09ae0fa76";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 5 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h2
+Element::parse: Found closing tag sequence
+Found closing tag: </h2>  (expected </h2>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.card { padding: 1.5rem; margin: 1rem 0; border: 1px solid #eee; border-radius: 8px; } .card_title { font-size: 1.2rem; color: #1976d2; margin-bottom: 0.5rem; } .card_content { color: #666; } '
+DEBUG: extracted classes: {"card", "card_content", "card_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.card-s7bee44ace956c029 { padding: 1.5rem; margin: 1rem 0; border: 1px solid #eee; border-radius: 8px; }.card_title-s7bee44ace956c029 { font-size: 1.2rem; color: #1976d2; margin-bottom: 0.5rem; }.card_content-s7bee44ace956c029 { color: #666; }'
+DEBUG: bindings tokens: let card = "card-s7bee44ace956c029"; let card_content =
+"card_content-s7bee44ace956c029"; let card_title =
+"card_title-s7bee44ace956c029";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.container { padding: 1rem; border: 1px solid #ddd; } .title { color: #2196f3; } '
+DEBUG: extracted classes: {"container", "title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.container-s579ebc369d2881ac { padding: 1rem; border: 1px solid #ddd; }.title-s579ebc369d2881ac { color: #2196f3; }'
+DEBUG: bindings tokens: let container = "container-s579ebc369d2881ac"; let title =
+"title-s579ebc369d2881ac";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.greeting { color: #1976d2; font-size: 1.5rem; } '
+DEBUG: extracted classes: {"greeting"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.greeting-se5471f7a8a1e85ce { color: #1976d2; font-size: 1.5rem; }'
+DEBUG: bindings tokens: let greeting = "greeting-se5471f7a8a1e85ce";
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: h3
+Element::parse: Found closing tag sequence
+Found closing tag: </h3>  (expected </h3>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Parsing element: a
+Element::parse: Found closing tag sequence
+Found closing tag: </a>  (expected </a>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.lesson_card { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 200px; height: 200px; border-radius: 8px; background: #1e293b; color: #f3f4f6; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); transition: all 0.2s; } .card_number { font-size: 1.5rem; font-weight: 700; color: #60a5fa; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; } .card_title { font-size: 1.5rem; font-weight: 700; color: #f3f4f6; margin-bottom: 1rem; line-height: 1.2; } .card_desc { color: #9ca3af; margin-bottom: 1rem; } .card_link { display: inline-flex; align-items: center; color: #fff; text-decoration: none; font-weight: 600; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 8px; transition: all 0.2s; align-self: start; } '
+DEBUG: extracted classes: {"card_desc", "card_title", "card_link", "lesson_card", "card_number"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.lesson_card-s3df1f21e85ba81c1 { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 200px; height: 200px; border-radius: 8px; background: #1e293b; color: #f3f4f6; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); transition: all 0.2s; }.card_number-s3df1f21e85ba81c1 { font-size: 1.5rem; font-weight: 700; color: #60a5fa; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }.card_title-s3df1f21e85ba81c1 { font-size: 1.5rem; font-weight: 700; color: #f3f4f6; margin-bottom: 1rem; line-height: 1.2; }.card_desc-s3df1f21e85ba81c1 { color: #9ca3af; margin-bottom: 1rem; }.card_link-s3df1f21e85ba81c1 { display: inline-flex; align-items: center; color: #fff; text-decoration: none; font-weight: 600; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 8px; transition: all 0.2s; align-self: start; }'
+DEBUG: bindings tokens: let card_desc = "card_desc-s3df1f21e85ba81c1"; let card_title =
+"card_title-s3df1f21e85ba81c1"; let card_link = "card_link-s3df1f21e85ba81c1";
+let lesson_card = "lesson_card-s3df1f21e85ba81c1"; let card_number =
+"card_number-s3df1f21e85ba81c1";
+DEBUG: process_styles called with 4 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: div
+Parsing element: h1
+Element::parse: Found closing tag sequence
+Found closing tag: </h1>  (expected </h1>)
+Parsing element: p
+Element::parse: Found closing tag sequence
+Found closing tag: </p>  (expected </p>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '@keyframes fadeIn{
+    from { opacity: "0"; transform: "translateY(20px)"; } to
+    { opacity: "1"; transform: "translateY(0)"; }
+} .hero_section { text-align: center; padding: 4rem 1rem; margin-bottom: 2rem; animation: fadeIn 0.8s ease-out; } .hero_title { font-size: 4rem; font-weight: 800; margin-bottom: 1rem; background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); } .hero_subtitle { font-size: 1.25rem; color: #9ca3af; max-width: 600px; margin: 0 auto; line-height: 1.6; } .grid_container { max-width: 1200px; margin: 0 auto; padding: 0 1rem 4rem 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; } .lesson_card { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 2rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(10px); display: flex; flex-direction: column; height: 100%; position: relative; overflow: hidden; } .lesson_card:hover { transform: translateY(-5px); background: rgba(30, 41, 59, 0.9); border-color: #60a5fa; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1); } .lesson_card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #60a5fa, #a78bfa); opacity: 0; transition: opacity 0.3s; } .lesson_card:hover::before { opacity: 1; } .card_number { font-size: 0.875rem; font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; } .card_title { font-size: 1.5rem; font-weight: 700; color: #f3f4f6; margin-bottom: 1rem; line-height: 1.2; } .card_desc { color: #9ca3af; margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5; } .card_link { display: inline-flex; align-items: center; color: #fff; text-decoration: none; font-weight: 600; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 8px; transition: all 0.2s; align-self: start; } .card_link:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); transform: translateX(2px); } '
+DEBUG: extracted classes: {"card_title", "hero_subtitle", "lesson_card", "grid_container", "card_number", "card_desc", "card_link", "hero_section", "hero_title"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '@keyframes fadeIn {
+    from { opacity: "0"; transform: "translateY(20px)"; }to { opacity: "1"; transform: "translateY(0)"; }} .hero_section-s35b3f6cd7f67e769 { text-align: center; padding: 4rem 1rem; margin-bottom: 2rem; animation: fadeIn 0.8s ease-out; }.hero_title-s35b3f6cd7f67e769 { font-size: 4rem; font-weight: 800; margin-bottom: 1rem; background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }.hero_subtitle-s35b3f6cd7f67e769 { font-size: 1.25rem; color: #9ca3af; max-width: 600px; margin: 0 auto; line-height: 1.6; }.grid_container-s35b3f6cd7f67e769 { max-width: 1200px; margin: 0 auto; padding: 0 1rem 4rem 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }.lesson_card-s35b3f6cd7f67e769 { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 2rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(10px); display: flex; flex-direction: column; height: 100%; position: relative; overflow: hidden; }.lesson_card-s35b3f6cd7f67e769:hover { transform: translateY(-5px); background: rgba(30, 41, 59, 0.9); border-color: #60a5fa; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1); }.lesson_card-s35b3f6cd7f67e769::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #60a5fa, #a78bfa); opacity: 0; transition: opacity 0.3s; }.lesson_card-s35b3f6cd7f67e769:hover::before { opacity: 1; }.card_number-s35b3f6cd7f67e769 { font-size: 0.875rem; font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }.card_title-s35b3f6cd7f67e769 { font-size: 1.5rem; font-weight: 700; color: #f3f4f6; margin-bottom: 1rem; line-height: 1.2; }.card_desc-s35b3f6cd7f67e769 { color: #9ca3af; margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5; }.card_link-s35b3f6cd7f67e769 { display: inline-flex; align-items: center; color: #fff; text-decoration: none; font-weight: 600; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 8px; transition: all 0.2s; align-self: start; }.card_link-s35b3f6cd7f67e769:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); transform: translateX(2px); }'
+DEBUG: bindings tokens: let card_title = "card_title-s35b3f6cd7f67e769"; let hero_subtitle =
+"hero_subtitle-s35b3f6cd7f67e769"; let lesson_card =
+"lesson_card-s35b3f6cd7f67e769"; let grid_container =
+"grid_container-s35b3f6cd7f67e769"; let card_number =
+"card_number-s35b3f6cd7f67e769"; let card_desc =
+"card_desc-s35b3f6cd7f67e769"; let card_link = "card_link-s35b3f6cd7f67e769";
+let hero_section = "hero_section-s35b3f6cd7f67e769"; let hero_title =
+"hero_title-s35b3f6cd7f67e769";
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 16 nodes
+DEBUG: process_styles called with 1 nodes
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: script
+parse_script_content starting for tag: script
+Found closing tag: </script>
+Element::parse: Found closing tag sequence
+Found closing tag: </script>  (expected </script>)
+Parsing element: script
+parse_script_content starting for tag: script
+Found closing tag: </script>
+Element::parse: Found closing tag sequence
+Found closing tag: </script>  (expected </script>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 2 nodes
+DEBUG: process_styles found style block
+DEBUG GLOBAL: input tokens: : root
+{
+    --azumi-bg: "#1e1e1e"; --azumi-text: "#fff"; --azumi-text-dim: "#ccc";
+    --azumi-primary: "#6366f1";
+}.dark_layout
+{
+    min-height: "100vh"; background: "var(--azumi-bg)"; color:
+    "var(--azumi-text)"; font-family: "var(--font-sans)";
+}.content_container
+{
+    max-width: "1200px"; margin: "0 auto"; padding: "var(--spacing-lg)";
+}.header_section
+{
+    background:
+    "linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%)";
+    backdrop-filter: "blur(10px)"; border-bottom:
+    "1px solid rgba(148, 163, 184, 0.1)"; padding: "var(--spacing-md) 0";
+    margin-bottom: "var(--spacing-lg)";
+}.main_content
+{
+    background:
+    "linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.6) 100%)";
+    backdrop-filter: "blur(8px)"; border:
+    "1px solid rgba(148, 163, 184, 0.1)"; border-radius: "var(--radius-md)";
+    padding: "var(--spacing-lg)"; box-shadow: "0 4px 6px rgba(0, 0, 0, 0.1)";
+}.footer_section
+{
+    background:
+    "linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%)";
+    backdrop-filter: "blur(10px)"; border-top:
+    "1px solid rgba(148, 163, 184, 0.1)"; padding: "var(--spacing-md) 0";
+    margin-top: "var(--spacing-lg)"; text-align: "center"; color:
+    "var(--azumi-text-dim)"; font-size: "0.875rem";
+}.modern_card
+{
+    background:
+    "linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(30, 41, 59, 0.4) 100%)";
+    backdrop-filter: "blur(8px)"; border:
+    "1px solid rgba(148, 163, 184, 0.1)"; border-radius: "var(--radius-md)";
+    padding: "var(--spacing-md)"; transition: "all 0.3s ease"; box-shadow:
+    "0 2px 4px rgba(0, 0, 0, 0.1)";
+}.modern_card : hover
+{
+    transform: "translateY(-2px)"; box-shadow:
+    "0 4px 12px rgba(79, 70, 229, 0.2)"; border-color:
+    "rgba(79, 70, 229, 0.3)";
+}.modern_btn
+{
+    background:
+    "linear-gradient(135deg, var(--azumi-primary) 0%, #5b51e5 100%)"; color:
+    "white"; padding: "var(--spacing-xs) var(--spacing-sm)"; border: "none";
+    border-radius: "var(--radius-md)"; font-weight: "600"; cursor: "pointer";
+    transition: "all 0.3s ease"; box-shadow:
+    "0 2px 4px rgba(79, 70, 229, 0.2)";
+}.modern_btn : hover
+{
+    transform: "translateY(-1px)"; box-shadow:
+    "0 4px 8px rgba(79, 70, 229, 0.3)"; background:
+    "linear-gradient(135deg, #5b51e5 0%, #4f46e5 100%)";
+}.modern_btn : active { transform: "translateY(0)"; }.modern_link
+{
+    color: "var(--azumi-primary)"; text-decoration: "none"; font-weight:
+    "500"; transition: "all 0.2s ease"; position: "relative"; padding-bottom:
+    "2px";
+}.modern_link : hover { color: "#6366f1"; }.modern_link :: after
+{
+    content: ""; position: "absolute"; bottom: "0"; left: "0"; width: "0";
+    height: "2px"; background: "var(--azumi-primary)"; transition:
+    "width 0.3s ease";
+}.modern_link : hover :: after { width: "100%"; }.responsive_grid
+{
+    display: "grid"; grid-template-columns:
+    "repeat(auto-fill, minmax(300px, 1fr))"; gap: "var(--spacing-md)";
+}.glass_effect
+{
+    background: "rgba(15, 23, 42, 0.5)"; backdrop-filter: "blur(12px)";
+    -webkit-backdrop-filter: "blur(12px)"; border:
+    "1px solid rgba(148, 163, 184, 0.1)";
+}.modern_h1
+{
+    font-size: "2.5rem"; font-weight: "700"; background:
+    "linear-gradient(135deg, var(--azumi-primary), #6366f1)";
+    -webkit-background-clip: "text"; -webkit-text-fill-color: "transparent";
+    background-clip: "text"; margin-bottom: "var(--spacing-md)";
+}.modern_h2
+{
+    font-size: "2rem"; font-weight: "600"; color: "var(--azumi-primary)";
+    margin-bottom: "var(--spacing-sm)"; border-bottom:
+    "2px solid rgba(79, 70, 229, 0.3)"; padding-bottom: "var(--spacing-xs)";
+} @ container(width > 700px)
+{
+    .modern_h1
+    { background: "linear-gradient(135deg, var(--azumi-primary), #6366f1)"; }
+} @ keyframes fadeInUp
+{
+    from { opacity: "0"; transform: "translateY(20px)"; } to
+    { opacity: "1"; transform: "translateY(0)"; }
+}.fade_in_up { animation: "fadeInUp 0.6s ease-out"; } @
+media(max-width: "1200px")
+{ .content_container { padding: "var(--spacing-md)"; } }
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+DEBUG GLOBAL: Parse SUCCESS
+DEBUG GLOBAL: number of parsed rules: 19, at_rules: 1
+DEBUG GLOBAL: raw_css: '@container (width > 700px){
+    .modern_h1
+    { background: "linear-gradient(135deg, var(--azumi-primary), #6366f1)"; }
+}@keyframesfadeInUp{
+    from { opacity: "0"; transform: "translateY(20px)"; } to
+    { opacity: "1"; transform: "translateY(0)"; }
+}.fade_in_up{ animation: "fadeInUp 0.6s ease-out"; }@media(max-width: "1200px"){ .content_container { padding: "var(--spacing-md)"; } } :root { --azumi-bg: #1e1e1e; --azumi-text: #fff; --azumi-text-dim: #ccc; --azumi-primary: #6366f1; } .dark_layout { min-height: 100vh; background: var(--azumi-bg); color: var(--azumi-text); font-family: var(--font-sans); } .content_container { max-width: 1200px; margin: 0 auto; padding: var(--spacing-lg); } .header_section { background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(148, 163, 184, 0.1); padding: var(--spacing-md) 0; margin-bottom: var(--spacing-lg); } .main_content { background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.6) 100%); backdrop-filter: blur(8px); border: 1px solid rgba(148, 163, 184, 0.1); border-radius: var(--radius-md); padding: var(--spacing-lg); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); } .footer_section { background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%); backdrop-filter: blur(10px); border-top: 1px solid rgba(148, 163, 184, 0.1); padding: var(--spacing-md) 0; margin-top: var(--spacing-lg); text-align: center; color: var(--azumi-text-dim); font-size: 0.875rem; } .modern_card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(30, 41, 59, 0.4) 100%); backdrop-filter: blur(8px); border: 1px solid rgba(148, 163, 184, 0.1); border-radius: var(--radius-md); padding: var(--spacing-md); transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } .modern_card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); border-color: rgba(79, 70, 229, 0.3); } .modern_btn { background: linear-gradient(135deg, var(--azumi-primary) 0%, #5b51e5 100%); color: white; padding: var(--spacing-xs) var(--spacing-sm); border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); } .modern_btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3); background: linear-gradient(135deg, #5b51e5 0%, #4f46e5 100%); } .modern_btn:active { transform: translateY(0); } .modern_link { color: var(--azumi-primary); text-decoration: none; font-weight: 500; transition: all 0.2s ease; position: relative; padding-bottom: 2px; } .modern_link:hover { color: #6366f1; } .modern_link::after { content: ; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--azumi-primary); transition: width 0.3s ease; } .modern_link:hover::after { width: 100%; } .responsive_grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--spacing-md); } .glass_effect { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); } .modern_h1 { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, var(--azumi-primary), #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: var(--spacing-md); } .modern_h2 { font-size: 2rem; font-weight: 600; color: var(--azumi-primary); margin-bottom: var(--spacing-sm); border-bottom: 2px solid rgba(79, 70, 229, 0.3); padding-bottom: var(--spacing-xs); } '
+DEBUG GLOBAL: extracted classes: {"fade_in_up", "dark_layout", "header_section", "modern_card", "glass_effect", "modern_h1", "modern_btn", "main_content", "responsive_grid", "content_container", "footer_section", "modern_link", "modern_h2"}
+DEBUG GLOBAL: extracted ids: {}
+DEBUG GLOBAL: bindings tokens: let fade_in_up = "fade_in_up"; let dark_layout = "dark_layout"; let
+header_section = "header_section"; let modern_card = "modern_card"; let
+glass_effect = "glass_effect"; let modern_h1 = "modern_h1"; let modern_btn =
+"modern_btn"; let main_content = "main_content"; let responsive_grid =
+"responsive_grid"; let content_container = "content_container"; let
+footer_section = "footer_section"; let modern_link = "modern_link"; let
+modern_h2 = "modern_h2";
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: validate_css_value checking 'white' for property 'color'. contains space? false
+DEBUG: validate_css_value PASSED space check for 'white'
+Parsing element: div
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+Parsing element: div
+Element::parse: Found closing tag sequence
+Found closing tag: </div>  (expected </div>)
+DEBUG: process_styles called with 3 nodes
+DEBUG: process_styles found style block
+DEBUG: raw_css: '.progress_bar { background-color: #e0e0e0; border-radius: 4px; height: 20px; width: 100%; } .progress_value { background-color: #76c7c0; border-radius: 4px; height: 100%; width: var(--width); transition: width 0.5s ease-in-out; } '
+DEBUG: extracted classes: {"progress_value", "progress_bar"}
+DEBUG: extracted ids: {}
+DEBUG: scoped_css: '.progress_bar-sd2e334a8f061087c { background-color: #e0e0e0; border-radius: 4px; height: 20px; width: 100%; }.progress_value-sd2e334a8f061087c { background-color: #76c7c0; border-radius: 4px; height: 100%; width: var(--width); transition: width 0.5s ease-in-out; }'
+DEBUG: bindings tokens: let progress_value = "progress_value-sd2e334a8f061087c"; let progress_bar =
+"progress_bar-sd2e334a8f061087c";
+DEBUG: process_styles called with 1 nodes
+DEBUG: process_styles called with 0 nodes
+DEBUG: process_styles called with 1 nodes
+error[E0106]: missing lifetime specifier
+   --> demo/src/examples/lessons/pages/homepage.rs:164:20
+    |
+164 | fn LessonCard(num: &str, title: &str, desc: &str, link: &str) -> impl Component {
+    |                    ^ expected named lifetime parameter
+    |
+help: consider introducing a named lifetime parameter
+    |
+163 ~ #[azumi::component]<'a>
+164 ~ fn LessonCard(num: &'a str, title: &str, desc: &str, link: &str) -> impl Component {
+    |
+
+error[E0106]: missing lifetime specifier
+   --> demo/src/examples/lessons/pages/homepage.rs:164:33
+    |
+164 | fn LessonCard(num: &str, title: &str, desc: &str, link: &str) -> impl Component {
+    |                                 ^ expected named lifetime parameter
+    |
+help: consider introducing a named lifetime parameter
+    |
+163 ~ #[azumi::component]<'a>
+164 ~ fn LessonCard(num: &str, title: &'a str, desc: &str, link: &str) -> impl Component {
+    |
+
+error[E0106]: missing lifetime specifier
+   --> demo/src/examples/lessons/pages/homepage.rs:164:45
+    |
+164 | fn LessonCard(num: &str, title: &str, desc: &str, link: &str) -> impl Component {
+    |                                             ^ expected named lifetime parameter
+    |
+help: consider introducing a named lifetime parameter
+    |
+163 ~ #[azumi::component]<'a>
+164 ~ fn LessonCard(num: &str, title: &str, desc: &'a str, link: &str) -> impl Component {
+    |
+
+error[E0106]: missing lifetime specifier
+   --> demo/src/examples/lessons/pages/homepage.rs:164:57
+    |
+164 | fn LessonCard(num: &str, title: &str, desc: &str, link: &str) -> impl Component {
+    |                                                         ^ expected named lifetime parameter
+    |
+help: consider introducing a named lifetime parameter
+    |
+163 ~ #[azumi::component]<'a>
+164 ~ fn LessonCard(num: &str, title: &str, desc: &str, link: &'a str) -> impl Component {
+    |
+
+warning: unused import: `toggle_like`
+ --> demo/src/actions/mod.rs:4:29
+  |
+4 | pub use like::{like_button, toggle_like, LikeState};
+  |                             ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `color`
+ --> demo/src/examples/css_variables.rs:6:9
+  |
+6 |     let color = "yellow";
+  |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_color`
+  |
+  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `total_price`
+  --> demo/src/examples/lessons/pages/lesson5.rs:29:18
+   |
+29 |             @let total_price = base_price * (1.0 + tax_rate);
+   |                  ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_total_price`
+
+For more information about this error, try `rustc --explain E0106`.
+warning: `azumi-demo` (bin "azumi-demo") generated 3 warnings
+error: could not compile `azumi-demo` (bin "azumi-demo") due to 4 previous errors; 3 warnings emitted
