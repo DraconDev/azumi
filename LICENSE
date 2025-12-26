@@ -15,28 +15,30 @@ Copyright (c) 2024-2025 Dracon
 
 ### 1.1 Free Use
 
-You may use, copy, modify, and distribute this software for **free** if:
+You may use, copy, modify, and distribute commercial or non-commercial applications built with this software for **FREE** if:
 
 -   You are an individual or sole proprietor.
 -   You are a team or company with **fewer than 5 total employees/contractors**.
 -   You are a non-profit organization or educational institution.
--   You are using the software solely for **evaluation, development, or testing** (non-production).
 
 ### 1.2 Commercial License Required
 
-A Commercial License is required if you are an organization with **5 or more employees/contractors** and you are using the software for **Production Use** (powering business operations or external applications).
+A Commercial License is required **ONLY** if:
 
-**Pricing & Purchase:** https://dracon.uk/azumi/license
+-   You are an organization with **5 or more total employees/contractors**, AND
+-   You are using the software for **Production** purposes.
+
+**Purchase a License:** https://dracon.uk/azumi/license
 
 ## 2. Restrictions
 
 ### 2.1 Competitive Use
 
-You may **not** use this software to build, develop, or distribute a product that competes directly with the core functionality of this software.
+You may **not** use this software to build, develop, or distribute a product that competes directly with the core functionality of this software (e.g., a derivative web framework or tunneling SDK).
 
 ### 2.2 Proprietary Software
 
-This software is **not Open Source**. Dracon retains all ownership and intellectual property rights. You may not sublicense this software.
+This software is **not Open Source**. Dracon retains all ownership and intellectual property rights. You may not sublicense the source code itself.
 
 ## 3. Contributions
 
@@ -44,7 +46,7 @@ By submitting contributions (Pull Requests, bug fixes, etc.) to this project, yo
 
 ## 4. Termination
 
-Your rights under this license terminate automatically if you fail to comply with its terms, including the requirement to purchase a license under Section 1.2.
+Your rights under this license terminate automatically if you fail to comply with its terms.
 
 ## 5. No Warranty
 
