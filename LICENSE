@@ -1,43 +1,56 @@
 # Dracon License v1.0
 
-Copyright (c) 2024 Dracon
+Copyright (c) 2024-2025 Dracon
 
 ## Summary
 
-**Free** for individuals and small teams (under 5 employees).  
-**Paid** for companies with 5 or more employees.  
-**Forbidden** to use for building competing products.
+-   **Free** for individuals and small teams (under 5 employees).
+-   **Free** for everyone for evaluation, development, and testing.
+-   **Paid Commercial License** required for companies with 5+ employees in production.
+-   **Forbidden** to build competing products.
 
 ---
 
-## 1. Free Use
+## 1. License Grants
+
+### 1.1 Free Use
 
 You may use, copy, modify, and distribute this software for **free** if:
 
--   You are an individual or sole proprietor
--   You are a team or company with **fewer than 5 employees/contractors**
--   You are a non-profit or educational institution
--   You are evaluating the software (non-production)
+-   You are an individual or sole proprietor.
+-   You are a team or company with **fewer than 5 total employees/contractors**.
+-   You are a non-profit organization or educational institution.
+-   You are using the software solely for **evaluation, development, or testing** (non-production).
 
-## 2. Commercial License Required
+### 1.2 Commercial License Required
 
-A commercial license is required if you are a company or organization with **5 or more employees/contractors**, regardless of how the software is used.
+A Commercial License is required if you are an organization with **5 or more employees/contractors** and you are using the software for **Production Use** (powering business operations or external applications).
 
-**Purchase a license:** https://dracon.uk/azumi/license
+**Pricing & Purchase:** https://dracon.uk/licensing
 
-## 3. Competitive Use Prohibited
+## 2. Restrictions
 
-You may **not** use this software to build, develop, or distribute a product that competes directly with this software.
+### 2.1 Competitive Use
 
-## 4. No Warranty
+You may **not** use this software to build, develop, or distribute a product that competes directly with the core functionality of this software.
+
+### 2.2 Proprietary Software
+
+This software is **not Open Source**. Dracon retains all ownership and intellectual property rights. You may not sublicense this software.
+
+## 3. Contributions
+
+By submitting contributions (Pull Requests, bug fixes, etc.) to this project, you grant Dracon a perpetual, irrevocable, worldwide license to use, modify, and distribute those contributions under any terms, including commercial terms, without compensation to you.
+
+## 4. Termination
+
+Your rights under this license terminate automatically if you fail to comply with its terms, including the requirement to purchase a license under Section 1.2.
+
+## 5. No Warranty
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
 
-## 5. Contributions
-
-By submitting contributions to this project, you grant Dracon a perpetual, worldwide license to use, modify, and distribute your contributions under any terms.
-
 ---
 
-**Full terms & pricing:** https://dracon.uk/azumi/license  
-**Contact:** license@dracon.uk
+**Contact:** license@dracon.uk  
+**Website:** https://dracon.uk
