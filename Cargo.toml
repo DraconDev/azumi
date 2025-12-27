@@ -10,7 +10,7 @@ keywords = ["html", "template", "macro", "web"]
 categories = ["template-engine", "web-programming"]
 
 [workspace]
-members = ["macros", "demo", "../dracon-homepage"]
+members = ["macros", "demo"]
 resolver = "2"
 
 [features]
