@@ -1,7 +1,5 @@
 use axum::{extract::Request, middleware::Next, response::Response, Router};
 use std::path::Path;
-use std::time::Duration;
-use walkdir::WalkDir;
 
 /// Returns the router for Azumi development tools
 /// currently includes the hot reload websocket endpoint
