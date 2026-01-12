@@ -14,6 +14,17 @@ html! {
 
 No runtime errors. No "works on my machine". No surprises.
 
+
+## 🛠️ Development Experience
+
+Azumi includes a smart development runner that provides **Sub-second Hot Reloading** for HTML and CSS changes.
+
+```bash
+# Start the smart dev server
+cargo run --bin dev
+```
+
+See [HOT_RELOAD.md](./HOT_RELOAD.md) for more details.
 ---
 
 ## ⚡ The Pitch

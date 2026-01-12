@@ -1,65 +1,48 @@
 # 🔥 Hot Reload in Azumi
 
-Azumi supports hot reload to improve your development experience. Since Azumi uses Rust macros for compile-time safety, "hot reload" effectively means **automatic server restart and browser refresh**.
+Azumi supports two modes of hot reload to maximize your development speed.
 
-## Prerequisites
+## 🚀 1. Quick Mode (Recommended)
 
-You need `cargo-watch` to detect file changes and restart the server.
+Quick mode uses a native Rust runner to watch your files. It can patch HTML structure and CSS classes **instantly** without restarting the server or re-running the Rust compiler.
 
+### Usage
+Run the `dev` runner provided in the demo:
+
+```bash
+cargo run --bin dev
+```
+
+- **HTML Changes**: Patched in sub-second time.
+- **Logic Changes**: Triggers an automatic server restart.
+
+---
+
+## 🐌 2. Classic Mode (Fallback)
+
+Classic mode uses `cargo-watch` to restart the server on every change. This is reliable but slower (5-15s per change).
+
+### Prerequisites
+Install `cargo-watch`:
 ```bash
 cargo install cargo-watch
 ```
 
-## How It Works
-
-1.  **Server Side**: The Azumi server (in development mode) exposes a WebSocket endpoint at `/_azumi/live_reload`.
-2.  **Client Side**: Use `cargo watch` to recompiles and restarts the server on file change.
-3.  **Browser**: The client script (`azumi.js`) connects to this WebSocket.
-    -   When the WebSocket connection is lost, it knows the server is restarting.
-    -   It polls the server until it's back online.
-    -   Once online, it triggers a full page reload.
-
-## Enabling Hot Reload
-
-### 1. Cargo.toml
-
-Ensure `azumi` is enabled, and your `axum` dependency has the `ws` feature (Azumi handles the internal logic, but you need `tokio` and `axum` setup correctly).
-
-### 2. Server Setup
-
-Mount the hot reload router in your application.
-
-```rust
-use axum::Router;
-
-#[tokio::main]
-async fn main() {
-    let app = Router::new()
-        .route("/", get(home_handler))
-        // 👇 Add this line!
-        .merge(azumi::hot_reload::router());
-
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
-}
-```
-
-### 3. Run with cargo-watch
-
-Instead of `cargo run`, use:
-
+### Usage
 ```bash
 cargo watch -x run
 ```
 
-Or if you have a specific binary:
+---
 
-```bash
-cargo watch -x "run --bin my-app"
-```
+## 🛠️ How It Works
+
+1.  **Server Side**: The Azumi server exposes a WebSocket endpoint at `/_azumi/live_reload` and a patching endpoint at `/_azumi/update_template`.
+2.  **Dev Runner**: The `dev` binary (`demo/src/bin/dev.rs`) watches your source code.
+3.  **Patching**: When you save a file, the runner extracts the new `html!` structure and sends it to the running server.
+4.  **Browser**: The client script (`azumi.js`) receives a reload signal and refreshes the page.
 
 ## Troubleshooting
 
--   **"WebSocket connection failed"**: Ensure you are running the server and the route is mounted.
--   **Page doesn't reload**: Check the browser console. You should see "🔥 Hot Reload: Connected".
--   **Slow restarts**: Rust compilation speed can be a bottleneck. Use a faster linker like `mold` or `lld` to improve iteration times.
+- **"WebSocket connection failed"**: Ensure you are running the server and `azumi::hot_reload::router()` is merged in your Axum app.
+- **Slow restarts**: Use a faster linker like `mold` or `lld` to improve Iteration times during logic changes.
