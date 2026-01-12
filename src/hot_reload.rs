@@ -1,11 +1,12 @@
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
     response::IntoResponse,
-    routing::get,
-    Router,
+    routing::{get, post},
+    Json, Router,
 };
 use std::sync::OnceLock;
 use tokio::sync::broadcast;
+use crate::FallbackRender;
 
 static BROADCAST_CHANNEL: OnceLock<broadcast::Sender<String>> = OnceLock::new();
 
@@ -28,7 +29,9 @@ pub fn push_style_update(scope_id: &str, css: &str) {
 
 /// Mounts the hot reload route at `/_azumi/live_reload`
 pub fn router() -> Router {
-    Router::new().route("/_azumi/live_reload", get(ws_handler))
+    Router::new()
+        .route("/_azumi/live_reload", get(ws_handler))
+        .route("/_azumi/update_template", post(update_template_handler))
 }
 
 async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
@@ -59,4 +62,46 @@ async fn handle_socket(mut socket: WebSocket) {
             }
         }
     }
+}
+
+// Runtime Template Support
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+pub struct RuntimeTemplate {
+    pub static_parts: Vec<String>,
+}
+
+impl RuntimeTemplate {
+    pub fn render(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+        dynamics: &[&dyn FallbackRender],
+    ) -> std::fmt::Result {
+        for (i, part) in self.static_parts.iter().enumerate() {
+            write!(f, "{}", part)?;
+            if i < dynamics.len() {
+                dynamics[i].render_azumi(f)?;
+            }
+        }
+        Ok(())
+    }
+}
+
+static TEMPLATE_REGISTRY: OnceLock<std::sync::RwLock<std::collections::HashMap<String, RuntimeTemplate>>> = OnceLock::new();
+
+pub fn get_template(id: &str) -> Option<RuntimeTemplate> {
+    TEMPLATE_REGISTRY.get_or_init(Default::default).read().unwrap().get(id).cloned()
+}
+
+#[derive(serde::Deserialize)]
+struct TemplateUpdatePayload {
+    id: String,
+    parts: Vec<String>,
+}
+
+async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
+    let mut registry = TEMPLATE_REGISTRY.get_or_init(Default::default).write().unwrap();
+    registry.insert(payload.id.clone(), RuntimeTemplate { static_parts: payload.parts });
+    println!("🔥 Hot Reload: Updated template {}", payload.id);
+    // Trigger browser reload
+    let _ = get_broadcast_channel().send(serde_json::json!({"type": "reload"}).to_string());
 }
