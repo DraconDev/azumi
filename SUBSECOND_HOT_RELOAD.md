@@ -1,6 +1,6 @@
-# ⚡ Sub-second Template Hot Reloading
+# ⚡ Quick Template Hot Reloading
 
-Azumi now supports **Sub-second Hot Reloading** via a native development runner.
+Azumi now supports **Quick Hot Reloading**, allowing you to change your HTML structure and CSS classes without waiting for a full Rust recompilation.
 
 ## 🚀 Usage
 
@@ -14,13 +14,13 @@ This runner:
 1.  Starts your application.
 2.  Watches your source code for changes.
 3.  **Automatically restarts** the server when Rust logic changes.
-4.  **Hot patches** the running server when HTML templates change (Sub-second).
+4.  **Hot patches** the running server when HTML templates change (significantly faster than full recompile).
 
 ## 🛠️ Architecture
 
 The `dev` runner (`demo/src/bin/dev.rs`) uses:
 - `notify` to watch the file system.
-- `syn` to parse Rust code and identify `html!` macros.
+- A custom parser to identify `html!` macros.
 - `reqwest` to send template updates to the running server.
 
 When a change is detected:
