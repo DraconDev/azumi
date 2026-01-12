@@ -12,7 +12,7 @@ schema = []
 [dependencies]
 syn = { version = "2.0", features = ["full", "extra-traits"] }
 quote = "1.0"
-proc-macro2 = "1.0"
+proc-macro2 = { version = "1.0", features = ["span-locations"] }
 nom = "7.1"
 regex = "1.10"
 heck = "0.5"
