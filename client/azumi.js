@@ -52,7 +52,18 @@ class Azumi {
     }
 
     pollForReload() {
-        // ... (omitted)
+        const interval = setInterval(() => {
+            fetch(window.location.href, { method: "HEAD" })
+                .then((res) => {
+                    if (res.ok) {
+                        clearInterval(interval);
+                        window.location.reload();
+                    }
+                })
+                .catch(() => {
+                    /* keep polling */
+                });
+        }, 200);
     }
 
     handleStyleUpdate(msg) {
@@ -65,8 +76,6 @@ class Azumi {
             console.log(`✅ Style updated for scope: ${scopeId}`);
         } else {
             console.warn(`⚠️ Style tag not found for scope: ${scopeId}`);
-            // If not found, it might be a new component or global style.
-            // For now, we only handle scoped updates.
         }
     }
 
