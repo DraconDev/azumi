@@ -63,30 +63,30 @@ fn process_file_change(path: &Path) {
         Err(_) => return,
     };
 
-    // Very basic regex-like search for html! { ... <style> ... </style> ... }
-    // In a real implementation, we'd want a more robust parser.
-    // We search for all occurrences of html!
     let mut current_pos = 0;
     while let Some(start_idx) = content[current_pos..].find("html!") {
         let absolute_start = current_pos + start_idx;
-        // Find the opening brace of the macro
         if let Some(brace_idx) = content[absolute_start..].find('{') {
             let macro_content_start = absolute_start + brace_idx + 1;
             
-            // Try to find <style> and </style> inside this macro
-            // This is naive and doesn't handle nested braces perfectly, but works for most cases
+            // The macro uses nodes[0].span().start()
+            // Find the first non-whitespace character after the opening brace
+            let first_node_rel = content[macro_content_start..].find(|c: char| !c.is_whitespace()).unwrap_or(0);
+            let first_node_abs = macro_content_start + first_node_rel;
+
+            // Find <style> and </style>
             if let Some(style_start) = content[macro_content_start..].find("<style") {
-                let style_tag_end = content[macro_content_start + style_start..].find(">").unwrap_or(0);
-                let css_start = macro_content_start + style_start + style_tag_end + 1;
+                let style_tag_rel_end = content[macro_content_start + style_start..].find(">").unwrap_or(0);
+                let css_start = macro_content_start + style_start + style_tag_rel_end + 1;
                 
                 if let Some(style_end) = content[css_start..].find("</style>") {
                     let css_content = &content[css_start..css_start + style_end];
                     
-                    // Calculate stable ID matching the macro's logic: hash(line, col)
-                    let line = content[..absolute_start].lines().count();
-                    // Column is tricky due to finding! but we can approximate or improve the macro to match.
-                    // Let's use line and a simplified column for now.
-                    let col = absolute_start - content[..absolute_start].rfind('\n').unwrap_or(0);
+                    // Line (1-indexed)
+                    let line = content[..first_node_abs].lines().count();
+                    // Column (0-indexed in proc-macro2)
+                    let line_start = content[..first_node_abs].rfind('\n').map(|i| i + 1).unwrap_or(0);
+                    let col = first_node_abs - line_start;
 
                     use std::collections::hash_map::DefaultHasher;
                     use std::hash::{Hash, Hasher};
@@ -96,13 +96,12 @@ fn process_file_change(path: &Path) {
                     let hash = hasher.finish();
                     let scope_id = format!("s{:x}", hash);
 
-                    // Scope and push
                     let scoped_css = crate::scope_css(css_content, &scope_id);
                     crate::hot_reload::push_style_update(&scope_id, &scoped_css);
                 }
             }
         }
-        current_pos = absolute_start + 5; // Move past "html!"
+        current_pos = absolute_start + 5;
     }
 }
 
