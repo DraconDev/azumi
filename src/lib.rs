@@ -332,3 +332,11 @@ pub const AZUMI_JS: &str = include_str!("client.min.js");
 pub fn azumi_script() -> String {
     format!(r#"<script>{}</script>"#, AZUMI_JS)
 }
+
+pub struct HotReloadClosure<'a>(pub &'a dyn Fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result);
+
+impl<'a> FallbackRender for HotReloadClosure<'a> {
+    fn render_azumi(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        (self.0)(f)
+    }
+}
