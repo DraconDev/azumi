@@ -179,54 +179,125 @@ pub fn generate_scope_id() -> String {
 /// All CSS is automatically scoped - no escape hatches!
 pub fn scope_css(css: &str, scope_id: &str) -> String {
     let scope_attr = format!("[data-{}]", scope_id);
+    let mut iter = css.chars().peekable();
+    scope_css_level(&mut iter, &scope_attr, false)
+}
+
+fn scope_css_level(
+    iter: &mut std::iter::Peekable<std::str::Chars>,
+    scope_attr: &str,
+    finding_close: bool,
+) -> String {
     let mut result = String::new();
-    let mut in_rule = false;
-    let mut selector_buffer = String::new();
+    let mut buffer = String::new();
 
-    for ch in css.chars() {
+    while let Some(ch) = iter.next() {
         match ch {
-            '{' if !in_rule => {
-                // Found opening brace - scope the selector buffer
-                let selectors: Vec<&str> = selector_buffer.split(',').collect();
-                let scoped: Vec<String> = selectors
-                    .iter()
-                    .filter(|s| !s.trim().is_empty())
-                    .map(|s| {
-                        let trimmed = s.trim();
-                        // Skip @-rules and comments
-                        if trimmed.starts_with('@') || trimmed.starts_with("/*") {
-                            trimmed.to_string()
-                        } else {
-                            format!("{}{}", trimmed, scope_attr)
-                        }
-                    })
-                    .collect();
+            '{' => {
+                let selector_raw = buffer.trim().to_string();
 
-                result.push_str(&scoped.join(", "));
-                result.push('{');
-                selector_buffer.clear();
-                in_rule = true;
+                if is_grouping_rule(&selector_raw) {
+                    result.push_str(&buffer);
+                    result.push('{');
+                    buffer.clear();
+                    result.push_str(&scope_css_level(iter, scope_attr, true));
+                    result.push('}');
+                } else if is_keyframes(&selector_raw) {
+                    result.push_str(&buffer);
+                    result.push('{');
+                    buffer.clear();
+                    result.push_str(&extract_balanced_block(iter));
+                    result.push('}');
+                } else {
+                    let scoped_selector_str = if selector_raw.starts_with('@') {
+                        selector_raw.to_string()
+                    } else {
+                        let selectors: Vec<&str> = selector_raw.split(',').collect();
+                        selectors
+                            .iter()
+                            .filter(|s| !s.trim().is_empty())
+                            .map(|s| scope_selector(s.trim(), scope_attr))
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    };
+
+                    result.push_str(&scoped_selector_str);
+                    result.push('{');
+                    buffer.clear();
+                    result.push_str(&extract_balanced_block(iter));
+                    result.push('}');
+                }
             }
-            '}' if in_rule => {
-                result.push('}');
-                in_rule = false;
+            '}' => {
+                if finding_close {
+                    result.push_str(&buffer);
+                    return result;
+                } else {
+                    buffer.push(ch);
+                }
+            }
+            ';' => {
+                buffer.push(ch);
+                result.push_str(&buffer);
+                buffer.clear();
             }
             _ => {
-                if in_rule {
-                    result.push(ch);
-                } else {
-                    selector_buffer.push(ch);
-                }
+                buffer.push(ch);
             }
         }
     }
-
-    // Handle any remaining selector buffer (malformed CSS)
-    if !selector_buffer.trim().is_empty() {
-        result.push_str(&selector_buffer);
-    }
-
+    result.push_str(&buffer);
     result
+}
+
+fn is_grouping_rule(s: &str) -> bool {
+    s.starts_with("@media")
+        || s.starts_with("@supports")
+        || s.starts_with("@layer")
+        || s.starts_with("@container")
+}
+
+fn is_keyframes(s: &str) -> bool {
+    s.starts_with("@keyframes") || s.starts_with("@-webkit-keyframes")
+}
+
+fn extract_balanced_block(iter: &mut std::iter::Peekable<std::str::Chars>) -> String {
+    let mut content = String::new();
+    let mut depth = 1;
+    for ch in iter.by_ref() {
+        match ch {
+            '{' => {
+                depth += 1;
+                content.push(ch);
+            }
+            '}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return content;
+                }
+                content.push(ch);
+            }
+            _ => content.push(ch),
+        }
+    }
+    content
+}
+
+fn scope_selector(selector: &str, scope_attr: &str) -> String {
+    if selector.starts_with('@') || selector.starts_with("/*") {
+        return selector.to_string();
+    }
+    if let Some(pseudo_pos) = selector.find("::") {
+        let base = &selector[..pseudo_pos];
+        let pseudo = &selector[pseudo_pos..];
+        return format!("{}{}{}", base, scope_attr, pseudo);
+    }
+    if let Some(pseudo_pos) = selector.find(':') {
+        let base = &selector[..pseudo_pos];
+        let pseudo = &selector[pseudo_pos..];
+        return format!("{}{}{}", base, scope_attr, pseudo);
+    }
+    format!("{}{}", selector, scope_attr)
 }
 
 // ============================================================================
