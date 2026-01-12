@@ -74,7 +74,7 @@ pub fn lesson0() -> impl azumi::Component {
         @DarkModernLayout() {
             <div class={container}>
                 <header class={header}>
-                    <h1 class={main_title}>"Lesson 0: Introduction"</h1>
+                    <h1 class={main_title}>"Lesson 0: Quick Intro"</h1>
                     <p class={subtitle}>"Understanding the component structure."</p>
                 </header>
 
