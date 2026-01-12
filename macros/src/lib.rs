@@ -158,15 +158,28 @@ pub fn html(input: TokenStream) -> TokenStream {
              quote! { "unknown" }
          };
 
-         let dynamic_wrappers = dynamics.iter().map(|d| {
-             quote! { &azumi::RenderWrapper(&(#d)) }
+         let dynamic_blocks = dynamics.iter().enumerate().map(|(i, d)| {
+             let w_name = quote::format_ident!("__w{}", i);
+             let c_name = quote::format_ident!("__c{}", i);
+             let h_name = quote::format_ident!("__h{}", i);
+             quote! {
+                 let #w_name = azumi::RenderWrapper(&(#d));
+                 let #c_name = |f: &mut std::fmt::Formatter| #w_name.render_azumi(f);
+                 let #h_name = azumi::HotReloadClosure(&#c_name);
+             }
+         });
+         
+         let dynamic_refs = dynamics.iter().enumerate().map(|(i, _)| {
+             let h_name = quote::format_ident!("__h{}", i);
+             quote! { &#h_name }
          });
 
          quote! {
              #[cfg(debug_assertions)]
              {
                  if let Some(tmpl) = azumi::hot_reload::get_template(#id_lit) {
-                     let dyns: &[&dyn azumi::FallbackRender] = &[ #(#dynamic_wrappers),* ];
+                     #(#dynamic_blocks)*
+                     let dyns: &[&dyn azumi::FallbackRender] = &[ #(#dynamic_refs),* ];
                      return tmpl.render(f, dyns);
                  }
              }
