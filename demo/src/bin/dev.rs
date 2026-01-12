@@ -1,7 +1,7 @@
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use std::collections::HashMap;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::{Child, Command};
 use std::sync::mpsc::channel;
 use std::time::{Duration, Instant};
@@ -123,13 +123,11 @@ fn extract_templates(content: &str, file_path: &str) -> HashMap<String, Vec<Stri
             let mut parts = Vec::new();
             let mut last = 0;
             let mut d = 0;
-            let mut hole_start = 0;
             
             for (i, c) in body.char_indices() {
                 if c == '{' {
                     if d == 0 {
                         parts.push(body[last..i].to_string());
-                        hole_start = i;
                     }
                     d += 1;
                 } else if c == '}' {
