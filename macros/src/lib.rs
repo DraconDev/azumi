@@ -571,7 +571,17 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
 
         let (scoped_output, scope_id) = if has_scoped {
             let mut hasher = DefaultHasher::new();
-            scoped_css.hash(&mut hasher);
+            
+            // In debug mode, we use a stable ID based on position to allow CSS hot-reload.
+            // In release, we hash the content for maximum safety/caching.
+            if cfg!(debug_assertions) {
+                let span = nodes[0].span();
+                span.start().line.hash(&mut hasher);
+                span.start().column.hash(&mut hasher);
+            } else {
+                scoped_css.hash(&mut hasher);
+            }
+
             let hash = hasher.finish();
             let scope_id = format!("s{:x}", hash);
             (
@@ -583,19 +593,21 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         };
 
         let css_to_inject = if has_global {
-            if has_scoped {
+            if let Some(sid) = &scope_id {
                 format!(
-                    "<style>{}</style><style data-azumi-internal=\"true\">{}</style>",
-                    global_css, scoped_output
+                    "<style>{}</style><style data-azumi-internal=\"true\" data-azumi-scope=\"{}\">{}</style>",
+                    global_css, sid, scoped_output
                 )
             } else {
                 format!("<style>{}</style>", global_css)
             }
-        } else {
+        } else if let Some(sid) = &scope_id {
             format!(
-                "<style data-azumi-internal=\"true\">{}</style>",
-                scoped_output
+                "<style data-azumi-internal=\"true\" data-azumi-scope=\"{}\">{}</style>",
+                sid, scoped_output
             )
+        } else {
+            String::new()
         };
 
         let mut working_nodes = nodes.to_vec();
