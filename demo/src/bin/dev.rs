@@ -5,52 +5,42 @@ use std::path::{Path, PathBuf};
 use std::process::{Child, Command};
 use std::sync::mpsc::channel;
 use std::time::{Duration, Instant};
-use syn::visit::Visit;
 
 fn main() {
     println!("🚀 Azumi Smart Dev Server");
-    println!("   Compiling...");
-
     let mut server = start_server();
     let (tx, rx) = channel();
     let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();
     
-    watcher.watch(Path::new("src"), RecursiveMode::Recursive).unwrap();
-    println!("👀 Watching for changes in demo/src...");
+    // Watch possible src dirs
+    if Path::new("src").exists() {
+        watcher.watch(Path::new("src"), RecursiveMode::Recursive).unwrap();
+    } else if Path::new("demo/src").exists() {
+        watcher.watch(Path::new("demo/src"), RecursiveMode::Recursive).unwrap();
+    }
 
     let mut last_run = Instant::now();
 
     loop {
         match rx.recv() {
             Ok(Ok(event)) => {
-                if last_run.elapsed() < Duration::from_millis(200) {
-                    continue;
-                }
+                if last_run.elapsed() < Duration::from_millis(200) { continue; }
                 last_run = Instant::now();
 
                 let is_rs = event.paths.iter().any(|p| p.extension().map_or(false, |e| e == "rs"));
                 if !is_rs { continue; }
 
-                println!("📝 Change detected.");
-                
-                let mut hot_patched = false;
-                // Attempt hot patch for the first file in event
                 if let Some(path) = event.paths.first() {
-                    // For MVP: We restart by default unless parse logic is implemented
-                    // To enable hot patching, implement parse_simple_template fully
                     if let Ok(true) = try_hot_patch(path) {
-                        hot_patched = true;
+                        println!("⚡ Sub-second patch sent!");
+                        continue;
                     }
                 }
 
-                if hot_patched {
-                    println!("⚡ Sub-second patch sent!");
-                } else {
-                    println!("🔄 Logic change detected. Restarting server...");
-                    let _ = server.kill();
-                    let _ = server.wait();
-                    server = start_server();
-                }
+                println!("🔄 Logic change detected. Restarting server...");
+                let _ = server.kill();
+                let _ = server.wait();
+                server = start_server();
             }
             _ => {}
         }
@@ -66,74 +56,97 @@ fn start_server() -> Child {
 
 fn try_hot_patch(path: &Path) -> Result<bool, Box<dyn std::error::Error>> {
     let content = fs::read_to_string(path)?;
-    // If parse fails, we restart
-    let ast = match syn::parse_file(&content) {
-        Ok(a) => a,
-        Err(_) => return Ok(false),
-    };
+    // Need absolute or relative path matching the compiler's view?
+    // Compiler usually uses relative to crate root.
+    // path might be absolute or relative.
+    // Best effort: match suffix.
+    
+    let templates = extract_templates(&content, path.to_string_lossy().as_ref());
 
-    let mut visitor = HtmlVisitor::new(content.clone());
-    visitor.visit_file(&ast);
-
-    if visitor.found_templates.is_empty() {
+    if templates.is_empty() {
         return Ok(false);
     }
 
-    // Send patches
-    let mut patched_any = false;
-    for (id, parts) in visitor.found_templates {
+    let mut success = false;
+    for (id, parts) in templates {
         let client = reqwest::blocking::Client::new();
-        let payload = serde_json::json!({
-            "id": id,
-            "parts": parts
-        });
-
-        match client.post("http://localhost:3000/_azumi/update_template")
-            .json(&payload)
-            .timeout(Duration::from_millis(100))
-            .send() 
-        {
-            Ok(_) => patched_any = true,
-            Err(_) => return Ok(false),
+        let payload = serde_json::json!({ "id": id, "parts": parts });
+        // Use shorter timeout
+        if client.post("http://localhost:3000/_azumi/update_template")
+            .json(&payload).timeout(Duration::from_millis(100)).send().is_ok() {
+            success = true;
+        } else {
+            return Ok(false);
         }
     }
-
-    Ok(patched_any)
+    Ok(success)
 }
 
-struct HtmlVisitor {
-    source_code: String,
-    found_templates: HashMap<String, Vec<String>>,
-}
-
-impl HtmlVisitor {
-    fn new(source_code: String) -> Self {
-        Self { source_code, found_templates: HashMap::new() }
-    }
-}
-
-impl<'ast> Visit<'ast> for HtmlVisitor {
-    fn visit_macro(&mut self, i: &'ast syn::Macro) {
-        if i.path.is_ident("html") {
-            let start = i.bang_token.span.start();
-            // TODO: This ID generation needs to match exactly what macro uses
-            // For now, restarting is safer until this aligns perfectly
-            let id = format!("{}:{}:{}", "src/bin/dev.rs", start.line, start.column); 
+fn extract_templates(content: &str, file_path: &str) -> HashMap<String, Vec<String>> {
+    let mut templates = HashMap::new();
+    let mut current_idx = 0;
+    while let Some(idx) = content[current_idx..].find("html!") {
+        let start = current_idx + idx;
+        let open_brace = match content[start..].find('{') {
+            Some(i) => start + i,
+            None => { current_idx = start + 5; continue; }
+        };
+        
+        let pre = &content[..start];
+        // Line number 1-based
+        let line = pre.lines().count(); 
+        // If pre ends with newline, count is correct. If not, it's current line.
+        // Wait, lines().count() gives number of lines.
+        let line = if pre.ends_with('\n') { line + 1 } else { std::cmp::max(1, line) };
+        
+        let last_line = pre.lines().last().unwrap_or("");
+        let col = last_line.len() + 1;
+        
+        let mut depth = 1;
+        let mut inner_end = 0;
+        let mut chars = content[open_brace+1..].char_indices();
+        
+        while let Some((i, c)) = chars.next() {
+            if c == '{' { depth += 1; }
+            else if c == '}' { depth -= 1; }
             
-            let tokens = &i.tokens;
-            let s = tokens.to_string(); 
-            
-            let (statics, _dynamics) = parse_simple_template(&s);
-            if !statics.is_empty() {
-                // self.found_templates.insert(id, statics);
+            if depth == 0 {
+                inner_end = open_brace + 1 + i;
+                break;
             }
         }
-        syn::visit::visit_macro(self, i);
+        
+        if depth == 0 {
+            let body = &content[open_brace+1..inner_end];
+            // Split by { } blocks roughly to find static parts
+            // This is a naive split
+            let mut parts = Vec::new();
+            let mut last = 0;
+            let mut d = 0;
+            let mut hole_start = 0;
+            
+            for (i, c) in body.char_indices() {
+                if c == '{' {
+                    if d == 0 {
+                        parts.push(body[last..i].to_string());
+                        hole_start = i;
+                    }
+                    d += 1;
+                } else if c == '}' {
+                    d -= 1;
+                    if d == 0 {
+                        last = i + 1;
+                    }
+                }
+            }
+            parts.push(body[last..].to_string());
+            
+            let id = format!("{}:{}:{}", file_path, line, col);
+            templates.insert(id, parts);
+            current_idx = inner_end;
+        } else {
+            break;
+        }
     }
-}
-
-fn parse_simple_template(input: &str) -> (Vec<String>, usize) {
-    let mut statics = Vec::new();
-    let mut dynamics = 0;
-    (statics, dynamics)
+    templates
 }

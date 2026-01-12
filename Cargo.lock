@@ -202,7 +202,6 @@ dependencies = [
  "serde_json",
  "sha2",
  "sqlx",
- "syn 2.0.111",
  "tokio",
  "tower-http",
  "walkdir",
