@@ -16,6 +16,10 @@ mod style;
 mod test_spacing;
 mod token_parser;
 
+pub mod internal {
+    pub use crate::css::{extract_selectors, scope_css};
+}
+
 use proc_macro::TokenStream;
 use quote::{quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
