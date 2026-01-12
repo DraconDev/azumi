@@ -27,6 +27,17 @@ class Azumi {
                 console.log("🔥 Hot Reload: Connected");
             };
 
+            ws.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    if (msg.type === "style-update") {
+                        this.handleStyleUpdate(msg);
+                    }
+                } catch (e) {
+                    // Not a JSON message or malformed
+                }
+            };
+
             ws.onclose = () => {
                 if (connected) {
                     console.log(
@@ -53,6 +64,19 @@ class Azumi {
                     /* keep polling */
                 });
         }, 200);
+    }
+
+    handleStyleUpdate(msg) {
+        const { scopeId, css } = msg;
+        const styleTag = document.querySelector(
+            `style[data-azumi-scope="${scopeId}"]`
+        );
+        if (styleTag) {
+            styleTag.textContent = css;
+            console.log(`✅ Style updated for scope: ${scopeId}`);
+        } else {
+            console.warn(`⚠️ Style tag not found for scope: ${scopeId}`);
+        }
     }
 
     // Event delegation

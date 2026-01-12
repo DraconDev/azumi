@@ -15,6 +15,9 @@ pub mod assets {
 
 #[tokio::main]
 async fn main() {
+    // ⚡ Start the subsecond CSS watcher
+    azumi::devtools::subsecond_watch();
+
     // Initialize Global SEO
     azumi::seo::init_seo(azumi::seo::SeoConfig {
         title: "Azumi Demo".to_string(),

@@ -20,6 +20,28 @@ pub enum Node {
     Block(Block),
 }
 
+impl Node {
+    pub fn span(&self) -> Span {
+        match self {
+            Node::Element(e) => e.span,
+            Node::Text(t) => t.span,
+            Node::Expression(e) => e.span,
+            Node::Comment(c) => c.span,
+            Node::Doctype(d) => d.span,
+            Node::Fragment(f) => f.span,
+            Node::Block(b) => match b {
+                Block::If(i) => i.span,
+                Block::For(f) => f.span,
+                Block::Match(m) => m.span,
+                Block::Call(c) => c.span,
+                Block::Component(c) => c.span,
+                Block::Let(l) => l.span,
+                Block::Style(s) => s.span,
+            },
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Element {
     pub name: String,
