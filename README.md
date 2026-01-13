@@ -17,17 +17,20 @@ No runtime errors. No "works on my machine". No surprises.
 
 ## 🛠️ Development Experience
 
-Azumi includes a dual-layer hot reload system:
+Azumi includes a built-in, self-hosting hot reload system. Just add one line to your code:
 
-1.  **CSS Hot Reload**: Built-in, instant updates (<50ms).
-2.  **Smart Dev Server**: Sub-second HTML patching + auto-restart.
-
-```bash
-# Start the smart dev server (after setup)
-cargo run --bin dev
+```rust
+fn main() {
+    azumi::devtools::full_reload(); // ⚡ That's it!
+    // ...
+}
 ```
 
-See [HOT_RELOAD.md](./HOT_RELOAD.md) for setup instructions.
+- **CSS**: Instant, zero-reload updates.
+- **HTML**: Sub-second patching.
+- **Logic**: Auto-restart on change.
+
+See [HOT_RELOAD.md](./HOT_RELOAD.md) for details.
 ---
 
 ## ⚡ The Pitch

@@ -1,74 +1,36 @@
 # 🔥 Hot Reload in Azumi
 
-Azumi provides a dual-layer hot reload system to maximize development speed.
-
-1.  **CSS Hot Reload (Built-in)**: Instant updates for styles without reloading.
-2.  **Smart Dev Server (Optional)**: Handles HTML updates and auto-restarts the server.
+Azumi provides a built-in, self-hosting hot reload system that requires zero configuration and zero external binaries.
 
 ---
 
-## 🚀 1. CSS Hot Reload (Instant)
+## 🚀 The "Gold Standard" (Recommended)
 
-This is built into the Azumi server. It works automatically with standard `cargo run`.
+Just add one line to your `main.rs`. Azumi will automatically detect development mode, watch your files, and patch your UI in sub-second time.
 
--   **What it does:** Watches for changes to `<style>` blocks in your Rust code.
--   **Speed:** Instant (< 50ms). No recompile required.
--   **Setup:** Ensure you have added the watcher in your `main.rs`:
+### Setup
 
 ```rust
-// main.rs
+// src/main.rs
 #[tokio::main]
 async fn main() {
-    // ⚡ Start the subsecond CSS watcher
-    azumi::devtools::subsecond_watch();
+    // ⚡ Add this line at the VERY BEGINNING of main()
+    azumi::devtools::full_reload();
     
-    // ... rest of your app
+    // ... your normal Axum setup
 }
 ```
 
----
-
-## ⚡ 2. Smart Dev Server (Quick Mode)
-
-For a complete experience (HTML patching + Auto-restart), use the **Smart Dev Server**. 
-Since Azumi doesn't ship a CLI tool yet, you can add this runner to your project easily.
-
-### Setup (One-Time)
-
-1.  Create a directory `src/bin/` if it doesn't exist.
-2.  Create a file `src/bin/dev.rs` and copy the [reference dev runner](https://github.com/DraconDev/azumi/blob/main/demo/src/bin/dev.rs) code into it.
-3.  Add the binary and dependencies to your `Cargo.toml`:
-
-```toml
-[[bin]]
-name = "dev"
-path = "src/bin/dev.rs"
-
-[dependencies]
-# Required for the dev runner script
-reqwest = { version = "0.11", features = ["blocking", "json"] }
-notify = "6.1"
-serde_json = "1.0"
-```
-
-### Usage
-
-Run the dev server, passing the name of your application binary:
-
-```bash
-# Replace 'my-app' with the name of your bin in Cargo.toml
-cargo run --bin dev -- my-app
-```
-
--   **HTML Changes**: Patched in sub-second time (no reload).
--   **Logic Changes**: Triggers an automatic server restart.
--   **CSS Changes**: Ignored by this runner (handled instantly by layer 1).
+### How it works:
+1.  **CSS Changes**: Patched instantly (< 50ms) without page reload.
+2.  **HTML Changes**: Patched in sub-second time via WebSocket reload.
+3.  **Logic Changes**: Triggers an automatic server restart.
 
 ---
 
-## 🐌 3. Classic Mode (Fallback)
+## 🐌 Fallback: Classic Mode
 
-If you don't want to set up the dev runner, you can use `cargo-watch`. This is slower (5-15s) as it restarts on every change.
+If you prefer not to use the built-in watcher, you can use `cargo-watch`. This is slower (5-15s) as it restarts the entire compiler on every change.
 
 ```bash
 cargo install cargo-watch
@@ -77,8 +39,12 @@ cargo watch -x run
 
 ---
 
-## 🛠️ Troubleshooting
+## 🛠️ Requirements & Troubleshooting
 
--   **"WebSocket connection failed"**: Ensure you are running the server and `azumi::hot_reload::router()` is merged in your Axum app.
--   **Styles not updating**: Check console logs. If you see "Style updated" but no change, ensure your CSS selectors are correct.
--   **Slow restarts**: Use a faster linker like `mold` or `lld` to improve iteration times during logic changes.
+-   **Debug Mode**: Hot reload is only active in `debug` builds (not `--release`).
+-   **Terminal**: The master watcher only starts when running in an interactive terminal.
+-   **WebSocket**: Ensure `azumi::devtools::router()` is merged into your Axum app so the browser can receive signals.
+-   **Port**: By default, it expects the server on port `8080`. If you use a different port, set the `PORT` environment variable:
+    ```bash
+    PORT=3000 cargo run
+    ```
