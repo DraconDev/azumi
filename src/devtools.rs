@@ -12,7 +12,10 @@ use std::time::{Duration, Instant};
 
 /// Returns the router for Azumi development tools
 /// currently includes the hot reload websocket endpoint
-pub fn router() -> Router {
+pub fn router<S>() -> Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+{
     crate::hot_reload::router()
 }
 
