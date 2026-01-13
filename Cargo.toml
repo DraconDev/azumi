@@ -30,6 +30,7 @@ base64 = "0.21"
 tokio = { version = "1.0", features = ["sync", "macros"] }
 notify = "6.1"
 walkdir = "2.5"
+libc = "0.2"
 
 [dev-dependencies]
 azumi = { path = ".", features = ["test-utils"] }

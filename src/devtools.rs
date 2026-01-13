@@ -1,8 +1,9 @@
-use ax_core::extract::Request;
-use ax_core::middleware::Next;
-use ax_core::response::Response;
-use axum as ax_core;
-use axum::Router;
+use axum::{
+    extract::Request,
+    middleware::Next,
+    response::Response,
+    Router,
+};
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
