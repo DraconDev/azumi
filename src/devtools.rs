@@ -23,8 +23,7 @@ pub fn router() -> Router {
 ///
 /// # Usage
 /// ```rust,no_run
-/// #[tokio::main]
-/// async fn main() {
+/// fn main() {
 ///     azumi::devtools::full_reload();
 ///     // ... your app
 /// }
