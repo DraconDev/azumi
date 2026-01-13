@@ -15,10 +15,10 @@ Just add one line to your `main.rs`. Azumi will automatically detect development
 #[tokio::main]
 async fn main() {
     // ⚡ Add this line at the VERY BEGINNING of main()
-    azumi::devtools::full_reload();
+    azumi::devtools::auto_reload();
     
     // OR tie it to your own condition:
-    // azumi::devtools::full_reload_if(my_config.is_dev);
+    // azumi::devtools::auto_reload_if(my_config.is_dev);
 
     // ... your normal Axum setup
 }

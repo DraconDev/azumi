@@ -17,7 +17,7 @@ pub mod assets {
 async fn main() {
     // ⚡ Start the self-hosting hot reload system
     // Call this first! It manages sub-second patching and auto-restarts.
-    azumi::devtools::full_reload();
+    azumi::devtools::auto_reload();
 
     // Initialize Global SEO
     azumi::seo::init_seo(azumi::seo::SeoConfig {

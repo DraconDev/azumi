@@ -21,9 +21,9 @@ Azumi includes a built-in, self-hosting hot reload system. Just add one line to 
 
 ```rust
 fn main() {
-    azumi::devtools::full_reload(); // ⚡ That's it!
+    azumi::devtools::auto_reload(); // ⚡ That's it!
     // Or tie it to a custom check:
-    // azumi::devtools::full_reload_if(config.dev_mode);
+    // azumi::devtools::auto_reload_if(config.dev_mode);
 }
 ```
 
