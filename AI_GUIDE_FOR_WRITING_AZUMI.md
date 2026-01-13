@@ -1335,9 +1335,9 @@ In your `main.rs`:
 ```rust
 // Use the devtools router which matches development routes
 let app = Router::new()
-    .merge(azumi::devtools::router())
-    // ... your other routes
-    // Apply the no-cache middleware (active only in debug mode)
+    .route("/", get(home))
+    .with_state(my_state) // 1. Establish state first
+    .merge(azumi::devtools::router()) // 2. Merge devtools AFTER state
     .layer(axum::middleware::from_fn(azumi::devtools::no_cache_middleware));
 ```
 
