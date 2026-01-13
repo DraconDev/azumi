@@ -19,65 +19,60 @@ pub fn router() -> Router {
 /// The "Easiest Solution" for developers.
 ///
 /// Call this at the very beginning of your `main()` function.
-/// It automatically manages sub-second patching and server restarts.
+/// It automatically manages sub-second patching and server restarts
+/// during development (debug mode).
+pub fn full_reload() {
+    full_reload_if(cfg!(debug_assertions));
+}
+
+/// Start hot-reload only if the provided condition is true.
 ///
 /// # Usage
 /// ```rust,no_run
 /// fn main() {
-///     azumi::devtools::full_reload();
-///     // ... your app
+///     let is_dev = true; // or your own config check
+///     azumi::devtools::full_reload_if(is_dev);
+///     // ...
 /// }
 /// ```
-pub fn full_reload() {
-    #[cfg(debug_assertions)]
-    {
-        // If we are already the worker, just start the internal CSS watcher and return to main()
-        if std::env::var("AZUMI_IS_WORKER").is_ok() {
-            subsecond_watch();
-            return;
-        }
-
-        // If we aren't in a terminal or something went wrong, don't trap the user
-        if !std::io::stdin().is_terminal() && std::env::var("AZUMI_FORCE_WATCH").is_err() {
-            return;
-        }
-
-        println!("🔥 Azumi Smart Watcher Active");
-        run_master_loop();
-        std::process::exit(0);
+pub fn full_reload_if(enabled: bool) {
+    if !enabled {
+        return;
     }
-}
 
-trait IsTerminal {
-    fn is_terminal(&self) -> bool;
-}
-impl IsTerminal for std::io::Stdin {
-    fn is_terminal(&self) -> bool {
-        #[cfg(unix)]
-        {
-            use std::os::fd::AsRawFd;
-            unsafe { libc::isatty(self.as_raw_fd()) != 0 }
-        }
-        #[cfg(not(unix))]
-        {
-            false
-        }
+    // If we are already the worker, just start the internal CSS watcher and return to main()
+    if std::env::var("AZUMI_IS_WORKER").is_ok() {
+        subsecond_watch();
+        return;
     }
+
+    // If we aren't in a terminal or something went wrong, don't trap the user
+    // unless they explicitly forced it.
+    if !std::io::stdin().is_terminal() && std::env::var("AZUMI_FORCE_WATCH").is_err() {
+        return;
+    }
+
+    println!("🔥 Azumi Smart Watcher Active");
+    run_master_loop();
+    std::process::exit(0);
 }
 
 fn run_master_loop() {
     use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
     use std::sync::mpsc::channel;
 
-    // Try to infer binary name or just use cargo run
-    let mut server = start_worker();
+    // Detect the binary name to ensure we restart the correct target
+    let exe = std::env::current_exe().expect("Failed to get current exe path");
+    let bin_name = exe.file_name().and_then(|s| s.to_str()).unwrap_or("app");
+
+    let mut server = start_worker(bin_name);
     let (tx, rx) = channel();
     let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();
 
     // Watch common Rust directories
     for dir in ["src", "demo/src", "apps", "libs"] {
         if Path::new(dir).exists() {
-            let _ = watcher.watch(Path::new(dir), RecursiveMode::Recursive);
+            let _ = watcher.watch(Path::new(dir), RecursiveMode::Recursive).unwrap();
         }
     }
 
@@ -107,20 +102,26 @@ fn run_master_loop() {
                     }
                 }
 
-                println!("🔄 Logic change detected. Restarting...");
+                println!("🔄 Logic change detected. Rebuilding & Restarting...");
                 let _ = server.kill();
                 let _ = server.wait();
-                server = start_worker();
+                server = start_worker(bin_name);
             }
             _ => {}
         }
     }
 }
 
-fn start_worker() -> Child {
-    Command::new("cargo")
-        .args(&["run"])
-        .env("AZUMI_IS_WORKER", "1")
+fn start_worker(bin_name: &str) -> Child {
+    let mut cmd = Command::new("cargo");
+    // Use --bin to ensure we run the same target even in workspaces
+    cmd.args(&["run", "--bin", bin_name, "--"]);
+    
+    // Forward original CLI arguments to the worker
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    cmd.args(&args);
+
+    cmd.env("AZUMI_IS_WORKER", "1")
         .spawn()
         .expect("Failed to start azumi worker")
 }
