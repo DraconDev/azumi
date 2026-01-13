@@ -2017,6 +2017,9 @@ cargo run
 # Visit http://localhost:8080 (default)
 ```
 
+> [!NOTE]
+> Ensure you have merged `azumi::devtools::router()` into your app (see [Developer Tools](#🚀-auto-reload-the-gold-standard) section above) or the browser won't receive reload signals.
+
 ### Client Runtime Integration
 
 ### Client Runtime Integration
