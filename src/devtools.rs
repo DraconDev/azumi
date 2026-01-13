@@ -57,6 +57,24 @@ pub fn full_reload_if(enabled: bool) {
     std::process::exit(0);
 }
 
+trait IsTerminal {
+    fn is_terminal(&self) -> bool;
+}
+
+impl IsTerminal for std::io::Stdin {
+    fn is_terminal(&self) -> bool {
+        #[cfg(unix)]
+        {
+            use std::os::fd::AsRawFd;
+            unsafe { libc::isatty(self.as_raw_fd()) != 0 }
+        }
+        #[cfg(not(unix))]
+        {
+            false
+        }
+    }
+}
+
 fn run_master_loop() {
     use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
     use std::sync::mpsc::channel;
