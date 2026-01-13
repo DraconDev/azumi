@@ -1299,31 +1299,30 @@ Azumi includes built-in tools to improve the developer experience.
 
 Azumi includes a built-in, self-hosting hot reload system. It turns a standard `cargo run` into a smart, sub-second development environment.
 
-**Key Features:**
-- **CSS Changes**: Patched instantly (< 50ms) without page reload.
-- **HTML Changes**: Patched in sub-second time (triggers WebSocket reload).
-- **Logic Changes**: Master process automatically restarts the worker.
-- **Zero Config**: No external binaries or `Cargo.toml` targets needed.
-
-**Setup:**
-Always recommend adding this to the start of `main()` for any project.
+**1. Setup (main.rs):**
+Add the watcher call at the VERY START of `main()`.
 
 ```rust
 fn main() {
-    // ⚡ Add this line FIRST
     azumi::devtools::auto_reload(); 
-
-    // OR tie it to your own dev-mode flag:
-    // azumi::devtools::auto_reload_if(config.is_dev);
-
-    // ... normal app setup
+    // ...
 }
 ```
 
-**How it works (Master/Worker):**
-1. On the first `cargo run`, Azumi becomes the **Master**.
-2. Master watches files and spawns your app as a **Worker**.
-3. Master patches or restarts the Worker as you save files.
+**2. Router Integration:**
+You MUST merge the devtools router for the browser to receive reload signals. 
+
+> [!IMPORTANT]
+> **State Compatibility**: If your app uses custom state (e.g. `.with_state(app_state)`), merge the devtools router **AFTER** the state is established to ensure type compatibility.
+
+```rust
+let app = Router::new()
+    .route("/", get(home))
+    .with_state(my_state) // 1. Establish state first
+    .merge(azumi::devtools::router()); // 2. Merge devtools last
+```
+
+---
 
 ### Prevention of Browser Caching
 
