@@ -22,7 +22,7 @@ pub fn router() -> Router {
 /// It automatically manages sub-second patching and server restarts.
 ///
 /// # Usage
-/// ```rust
+/// ```rust,no_run
 /// #[tokio::main]
 /// async fn main() {
 ///     azumi::devtools::full_reload();
