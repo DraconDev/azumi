@@ -22,7 +22,7 @@ cargo run --bin dev
 
 Classic mode uses `cargo-watch` to restart the server on every change. This is reliable but slower (5-15s per change).
 
-### Prerequisites
+### Prerequisites nice
 Install `cargo-watch`:
 ```bash
 cargo install cargo-watch
