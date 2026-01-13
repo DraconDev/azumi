@@ -28,7 +28,10 @@ pub fn push_style_update(scope_id: &str, css: &str) {
 }
 
 /// Mounts the hot reload route at `/_azumi/live_reload`
-pub fn router() -> Router {
+pub fn router<S>() -> Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+{
     Router::new()
         .route("/_azumi/live_reload", get(ws_handler))
         .route("/_azumi/update_template", post(update_template_handler))
