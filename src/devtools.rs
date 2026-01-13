@@ -21,8 +21,8 @@ pub fn router() -> Router {
 /// Call this at the very beginning of your `main()` function.
 /// It automatically manages sub-second patching and server restarts
 /// during development (debug mode).
-pub fn full_reload() {
-    full_reload_if(cfg!(debug_assertions));
+pub fn auto_reload() {
+    auto_reload_if(cfg!(debug_assertions));
 }
 
 /// Start hot-reload only if the provided condition is true.
@@ -31,11 +31,11 @@ pub fn full_reload() {
 /// ```rust,no_run
 /// fn main() {
 ///     let is_dev = true; // or your own config check
-///     azumi::devtools::full_reload_if(is_dev);
+///     azumi::devtools::auto_reload_if(is_dev);
 ///     // ...
 /// }
 /// ```
-pub fn full_reload_if(enabled: bool) {
+pub fn auto_reload_if(enabled: bool) {
     if !enabled {
         return;
     }
