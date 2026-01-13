@@ -14,13 +14,19 @@ Just add one line to your `main.rs`. Azumi will automatically detect development
 // src/main.rs
 #[tokio::main]
 async fn main() {
-    // ⚡ Add this line at the VERY BEGINNING of main()
+    // 1. ⚡ Add this line at the VERY BEGINNING of main()
     azumi::devtools::auto_reload();
     
-    // OR tie it to your own condition:
-    // azumi::devtools::auto_reload_if(my_config.is_dev);
+    // ... setup state ...
 
-    // ... your normal Axum setup
+    // 2. 🔌 Merge the devtools router
+    // IMPORTANT: If using .with_state(), merge devtools AFTER!
+    let app = Router::new()
+        .route("/", get(handler))
+        .with_state(my_state) 
+        .merge(azumi::devtools::router());
+
+    // ... axum::serve ...
 }
 ```
 
