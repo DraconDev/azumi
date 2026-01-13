@@ -2009,11 +2009,13 @@ pub fn OptimizedComponent(state: &'a MyState) -> impl Component + 'a {
 
 ### Development Server
 
+With `azumi::devtools::auto_reload()`, a standard `cargo run` now handles everything.
+
 ```bash
-# Run the demo to see examples
-cd demo
+# Start the server with built-in hot reload
 cargo run
-# Visit http://localhost:3000
+
+# Visit http://localhost:8080 (default)
 ```
 
 ### Client Runtime Integration
