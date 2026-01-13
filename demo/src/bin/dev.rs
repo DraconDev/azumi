@@ -7,8 +7,15 @@ use std::sync::mpsc::channel;
 use std::time::{Duration, Instant};
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    let target_bin = args.get(1).map(|s| s.as_str()).unwrap_or("azumi-demo");
+    let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_string());
+
     println!("🚀 Azumi Smart Dev Server");
-    let mut server = start_server();
+    println!("   Target Binary: {}", target_bin);
+    println!("   Port: {}", port);
+
+    let mut server = start_server(target_bin);
     let (tx, rx) = channel();
     let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();
     
@@ -31,7 +38,9 @@ fn main() {
                 if !is_rs { continue; }
 
                 if let Some(path) = event.paths.first() {
-                    if let Ok(true) = try_hot_patch(path) {
+                    // Ignore changes that are ONLY CSS (handled by internal watcher)
+                    // We optimistically try to patch HTML
+                    if let Ok(true) = try_hot_patch(path, &port) {
                         println!("⚡ Sub-second patch sent!");
                         continue;
                     }
@@ -40,26 +49,22 @@ fn main() {
                 println!("🔄 Logic change detected. Restarting server...");
                 let _ = server.kill();
                 let _ = server.wait();
-                server = start_server();
+                server = start_server(target_bin);
             }
             _ => {}
         }
     }
 }
 
-fn start_server() -> Child {
+fn start_server(bin_name: &str) -> Child {
     Command::new("cargo")
-        .args(&["run", "--bin", "azumi-demo"])
+        .args(&["run", "--bin", bin_name])
         .spawn()
         .expect("Failed to start server")
 }
 
-fn try_hot_patch(path: &Path) -> Result<bool, Box<dyn std::error::Error>> {
+fn try_hot_patch(path: &Path, port: &str) -> Result<bool, Box<dyn std::error::Error>> {
     let content = fs::read_to_string(path)?;
-    // Need absolute or relative path matching the compiler's view?
-    // Compiler usually uses relative to crate root.
-    // path might be absolute or relative.
-    // Best effort: match suffix.
     
     let templates = extract_templates(&content, path.to_string_lossy().as_ref());
 
@@ -71,8 +76,10 @@ fn try_hot_patch(path: &Path) -> Result<bool, Box<dyn std::error::Error>> {
     for (id, parts) in templates {
         let client = reqwest::blocking::Client::new();
         let payload = serde_json::json!({ "id": id, "parts": parts });
+        let url = format!("http://localhost:{}/_azumi/update_template", port);
+        
         // Use shorter timeout
-        if client.post("http://localhost:8080/_azumi/update_template")
+        if client.post(&url)
             .json(&payload).timeout(Duration::from_millis(100)).send().is_ok() {
             success = true;
         } else {
