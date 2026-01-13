@@ -72,7 +72,7 @@ fn try_hot_patch(path: &Path) -> Result<bool, Box<dyn std::error::Error>> {
         let client = reqwest::blocking::Client::new();
         let payload = serde_json::json!({ "id": id, "parts": parts });
         // Use shorter timeout
-        if client.post("http://localhost:3000/_azumi/update_template")
+        if client.post("http://localhost:8080/_azumi/update_template")
             .json(&payload).timeout(Duration::from_millis(100)).send().is_ok() {
             success = true;
         } else {
