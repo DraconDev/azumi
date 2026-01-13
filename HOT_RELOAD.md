@@ -35,9 +35,21 @@ Since Azumi doesn't ship a CLI tool yet, you can add this runner to your project
 
 ### Setup (One-Time)
 
-1.  Create a file `src/bin/dev.rs` in your project.
-2.  Copy the content of the [reference dev runner](https://github.com/DraconDev/azumi/blob/main/demo/src/bin/dev.rs).
-3.  Add `reqwest`, `notify`, and `serde_json` to your `Cargo.toml` dev-dependencies.
+1.  Create a directory `src/bin/` if it doesn't exist.
+2.  Create a file `src/bin/dev.rs` and copy the [reference dev runner](https://github.com/DraconDev/azumi/blob/main/demo/src/bin/dev.rs) code into it.
+3.  Add the binary and dependencies to your `Cargo.toml`:
+
+```toml
+[[bin]]
+name = "dev"
+path = "src/bin/dev.rs"
+
+[dependencies]
+# Required for the dev runner script
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+notify = "6.1"
+serde_json = "1.0"
+```
 
 ### Usage
 
