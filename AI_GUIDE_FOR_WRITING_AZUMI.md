@@ -1295,6 +1295,36 @@ For complex mutations (vectors, structs, arbitrary logic), explicitly define the
 
 Azumi includes built-in tools to improve the developer experience.
 
+### 🚀 Auto Reload (The Gold Standard)
+
+Azumi includes a built-in, self-hosting hot reload system. It turns a standard `cargo run` into a smart, sub-second development environment.
+
+**Key Features:**
+- **CSS Changes**: Patched instantly (< 50ms) without page reload.
+- **HTML Changes**: Patched in sub-second time (triggers WebSocket reload).
+- **Logic Changes**: Master process automatically restarts the worker.
+- **Zero Config**: No external binaries or `Cargo.toml` targets needed.
+
+**Setup:**
+Always recommend adding this to the start of `main()` for any project.
+
+```rust
+fn main() {
+    // ⚡ Add this line FIRST
+    azumi::devtools::auto_reload(); 
+
+    // OR tie it to your own dev-mode flag:
+    // azumi::devtools::auto_reload_if(config.is_dev);
+
+    // ... normal app setup
+}
+```
+
+**How it works (Master/Worker):**
+1. On the first `cargo run`, Azumi becomes the **Master**.
+2. Master watches files and spawns your app as a **Worker**.
+3. Master patches or restarts the Worker as you save files.
+
 ### Prevention of Browser Caching
 
 During development, browsers may aggressively cache your JavaScript or static assets. Azumi provides a middleware to prevent this.
