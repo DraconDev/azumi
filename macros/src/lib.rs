@@ -1179,7 +1179,22 @@ fn generate_body_with_context(
                             #pat => { #body }
                         });
                     }
+                    instructions.push(quote! {
+                        match #expr {
+                            #(#arms),*
+                        }
+                    });
+                }
                 token_parser::Block::Component(comp_block) => {
+                    let func_path = &comp_block.name;
+                    let func_mod_path = transform_path_for_component(func_path);
+
+                    instructions.push(quote! {
+                        #func_mod_path::render(
+                            #func_mod_path::Props::builder().build().expect("Failed to build props")
+                        ).render(f)?;
+                    });
+                }
                     let func_path = &comp_block.name;
                     let func_mod_path = transform_path_for_component(func_path);
 
