@@ -42,6 +42,32 @@ pub trait LiveState:
     fn struct_name() -> &'static str;
 }
 
+/// Runtime helper to look up a prediction for a method on a state
+pub fn get_prediction<T: LiveState>(state: &T, method: &str) -> Option<&'static str> {
+    T::predictions()
+        .iter()
+        .find(|(m, _)| *m == method)
+        .map(|(_, p)| *p)
+}
+
+// Also handle references
+impl<T: LiveState> LiveState for &T {
+    fn predictions() -> &'static [(&'static str, &'static str)] {
+        T::predictions()
+    }
+    fn struct_name() -> &'static str {
+        T::struct_name()
+    }
+}
+impl<T: LiveState> LiveState for &mut T {
+    fn predictions() -> &'static [(&'static str, &'static str)] {
+        T::predictions()
+    }
+    fn struct_name() -> &'static str {
+        T::struct_name()
+    }
+}
+
 #[derive(Clone)]
 pub struct FnComponent<F>(F);
 
