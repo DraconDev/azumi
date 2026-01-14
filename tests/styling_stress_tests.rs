@@ -32,6 +32,7 @@ fn ParentComponent() -> impl Component {
 fn test_style_scoping_isolation() {
     let comp = html! { @ParentComponent() };
     let output = test::render(&comp);
+    eprintln!("DEBUG OUTPUT: {}", output);
 
     // Check that both classes exist but are mangled differently (scoped)
     // Azumi class scoping uses unique IDs (az-xxxx).
