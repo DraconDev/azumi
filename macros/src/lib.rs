@@ -1238,7 +1238,6 @@ fn generate_body_with_context(
                     });
                 }
                 token_parser::Block::Style(_) => {}
-                _ => {}
             },
             _ => {}
         }
