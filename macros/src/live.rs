@@ -232,9 +232,12 @@ pub fn expand_live(_attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     };
 
+    let struct_attrs = &input.attrs;
+
     // Generate the struct with derives
     let expanded = quote! {
         #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+        #(#struct_attrs)*
         #struct_vis struct #struct_name #struct_generics #struct_fields
 
         impl #struct_generics #struct_name #struct_generics {
