@@ -73,6 +73,8 @@ pub fn generate_head(
     title: &str,
     description: Option<&str>,
     image: Option<&str>,
+    url: Option<&str>,
+    type_: Option<&str>,
 ) -> crate::Raw<String> {
     let global = SITE_CONFIG.get();
 
