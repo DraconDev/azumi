@@ -162,7 +162,7 @@ pub async fn handler(CurrentUser(user): CurrentUser) -> impl IntoResponse {
         username: user.map(|u| u.username),
     };
 
-    use lesson19_page_component::*;
+    use lesson19_page::*;
     let component = render(Props::builder().state(&state).build().unwrap());
     axum::response::Html(azumi::render_to_string(&component))
 }
