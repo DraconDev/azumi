@@ -968,29 +968,34 @@ fn generate_body_with_context(
 
                     if attr_name.starts_with("on:") {
                         match &attr.value {
-                                let (s, base) = if let Ok(expr) = syn::parse2::<syn::Expr>(tokens.clone()) {
-                                    match expr {
-                                        syn::Expr::Field(f) => {
-                                            if let syn::Member::Named(ident) = f.member {
-                                                let base = &f.base;
-                                                (ident.to_string(), Some(quote! { #base }))
-                                            } else {
-                                                (tokens.to_string().replace(" ", ""), None)
+                            token_parser::AttributeValue::Dynamic(tokens) => {
+                                let (s, base) =
+                                    if let Ok(expr) = syn::parse2::<syn::Expr>(tokens.clone()) {
+                                        match expr {
+                                            syn::Expr::Field(f) => {
+                                                if let syn::Member::Named(ident) = f.member {
+                                                    let base = &f.base;
+                                                    (ident.to_string(), Some(quote! { #base }))
+                                                } else {
+                                                    (tokens.to_string().replace(" ", ""), None)
+                                                }
                                             }
-                                        }
-                                        syn::Expr::Path(p) => {
-                                            if let Some(ident) = p.path.get_ident() {
-                                                (ident.to_string(), None)
-                                            } else {
-                                                (tokens.to_string().replace(" ", ""), None)
+                                            syn::Expr::Path(p) => {
+                                                if let Some(ident) = p.path.get_ident() {
+                                                    (ident.to_string(), None)
+                                                } else {
+                                                    (tokens.to_string().replace(" ", ""), None)
+                                                }
                                             }
+                                            syn::Expr::MethodCall(m) => {
+                                                let receiver = &m.receiver;
+                                                (m.method.to_string(), Some(quote! { #receiver }))
+                                            }
+                                            _ => (tokens.to_string().replace(" ", ""), None),
                                         }
-                                        syn::Expr::MethodCall(m) => (m.method.to_string(), Some(quote! { #m.receiver })),
-                                        _ => (tokens.to_string().replace(" ", ""), None),
-                                    }
-                                } else {
-                                    (tokens.to_string().replace(" ", ""), None)
-                                };
+                                    } else {
+                                        (tokens.to_string().replace(" ", ""), None)
+                                    };
 
                                 let event_name = attr_name.strip_prefix("on:").unwrap_or(attr_name);
                                 let dsl = format!("{} call {}", event_name, s);
@@ -1005,6 +1010,7 @@ fn generate_body_with_context(
                                         }
                                     });
                                 }
+                            }
                             token_parser::AttributeValue::Static(val) => {
                                 let clean = strip_outer_quotes(val);
                                 let event_name = attr_name.strip_prefix("on:").unwrap_or(attr_name);

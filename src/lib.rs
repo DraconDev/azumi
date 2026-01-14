@@ -50,24 +50,6 @@ pub fn get_prediction<T: LiveState>(state: &T, method: &str) -> Option<&'static 
         .map(|(_, p)| *p)
 }
 
-// Also handle references
-impl<T: LiveState> LiveState for &T {
-    fn predictions() -> &'static [(&'static str, &'static str)] {
-        T::predictions()
-    }
-    fn struct_name() -> &'static str {
-        T::struct_name()
-    }
-}
-impl<T: LiveState> LiveState for &mut T {
-    fn predictions() -> &'static [(&'static str, &'static str)] {
-        T::predictions()
-    }
-    fn struct_name() -> &'static str {
-        T::struct_name()
-    }
-}
-
 #[derive(Clone)]
 pub struct FnComponent<F>(F);
 
