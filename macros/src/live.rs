@@ -24,6 +24,8 @@ pub enum Prediction {
     Add { field: String, value: String },
     /// self.field -= value (decrement)
     Sub { field: String, value: String },
+    /// Manual prediction string from #[azumi::predict]
+    Manual(String),
 }
 
 impl Prediction {
@@ -42,6 +44,7 @@ impl Prediction {
             Prediction::Sub { field, value } => {
                 format!("{} = {} - {}", field, field, value)
             }
+            Prediction::Manual(s) => s.clone(),
         }
     }
 }
@@ -153,6 +156,19 @@ pub fn analyze_method(method: &ImplItemFn) -> MethodAnalysis {
     let name = method.sig.ident.to_string();
     let mut predictions = Vec::new();
     let mut has_unpredictable = false;
+
+    // Check for #[azumi::predict("...")] attribute
+    for attr in &method.attrs {
+        if attr.path().is_ident("predict") {
+            if let Ok(syn::Expr::Lit(syn::ExprLit {
+                lit: syn::Lit::Str(lit),
+                ..
+            })) = attr.parse_args()
+            {
+                predictions.push(Prediction::Manual(lit.value()));
+            }
+        }
+    }
 
     for stmt in &method.block.stmts {
         if let Some(prediction) = analyze_statement(stmt) {
