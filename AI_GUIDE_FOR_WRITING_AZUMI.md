@@ -6,10 +6,10 @@
 
 Azumi is a **compiler-driven optimistic UI framework** that generates client-side predictions from Rust code. Write logic once, get instant UI updates everywhere.
 
--   **Single Source of Truth**: Rust code is the only source of truth
--   **Compile-Time Safety**: Macros catch errors before runtime
--   **Zero JavaScript**: Compiler generates all client logic
--   **Server-Side Truth**: Server always wins, client predictions are optimistic
+- **Single Source of Truth**: Rust code is the only source of truth
+- **Compile-Time Safety**: Macros catch errors before runtime
+- **Zero JavaScript**: Compiler generates all client logic
+- **Server-Side Truth**: Server always wins, client predictions are optimistic
 
 ---
 
@@ -36,10 +36,10 @@ Azumi is a **compiler-driven optimistic UI framework** that generates client-sid
 
 ### 2. CSS Classes (`class={...}`) - **STRICT MODE**
 
--   **Strict Snake Case:** All CSS classes MUST be `snake_case`. Dashes (`-`) are **BANNED** in class names (e.g., Use `.my_card`, NOT `.my-card`). The compiler will reject dashed names.
--   **Bracket Syntax ONLY:** You must use brackets with variables `class={my_class}`. Static strings usage (`class="my_class"`) is **BANNED** and will cause a compile error.
--   **No Magic:** Automatic scoping handles everything via variables.
--   **Expression Lists:** You can combine multiple class variables: `class={card active}`.
+- **Strict Snake Case:** All CSS classes MUST be `snake_case`. Dashes (`-`) are **BANNED** in class names (e.g., Use `.my_card`, NOT `.my-card`). The compiler will reject dashed names.
+- **Bracket Syntax ONLY:** You must use brackets with variables `class={my_class}`. Static strings usage (`class="my_class"`) is **BANNED** and will cause a compile error.
+- **No Magic:** Automatic scoping handles everything via variables.
+- **Expression Lists:** You can combine multiple class variables: `class={card active}`.
 
 ```rust
 html! {
@@ -64,8 +64,8 @@ html! {
 
 ### 3. IDs (`id={...}`)
 
--   Same rules as classes: **Snake Case** and **Bracket Syntax ONLY**.
--   `id="..."` is **BANNED**.
+- Same rules as classes: **Snake Case** and **Bracket Syntax ONLY**.
+- `id="..."` is **BANNED**.
 
 ```rust
 html! {
@@ -78,8 +78,8 @@ html! {
 
 ### 4. Inline Styles (`style={...}`)
 
--   Use the **Style DSL** with brackets.
--   `style="..."` string syntax is **BANNED**.
+- Use the **Style DSL** with brackets.
+- `style="..."` string syntax is **BANNED**.
 
 ```rust
 // ✅ CORRECT
@@ -246,8 +246,8 @@ Azumi offers two ways to handle interactivity.
 
 Use **Live** when you have state that stays on the page and updates interactively.
 
--   **Best for**: Toggles, Counters, Tabs, Wizards, Filters.
--   **Features**: Optimistic UI (instant updates), Type-safe bindings.
+- **Best for**: Toggles, Counters, Tabs, Wizards, Filters.
+- **Features**: Optimistic UI (instant updates), Type-safe bindings.
 
 ```rust
 #[azumi::live]
@@ -259,8 +259,8 @@ pub struct Counter { count: i32 }
 
 Use **Actions** when you want to handle an event or submit data without maintaining UI state.
 
--   **Best for**: Forms (Login, Contact), One-off buttons (Logout, Delete), Redirects.
--   **Features**: Zero-overhead (no state serialization), works with standard `<form>`.
+- **Best for**: Forms (Login, Contact), One-off buttons (Logout, Delete), Redirects.
+- **Features**: Zero-overhead (no state serialization), works with standard `<form>`.
 
 ```rust
 // A basic payload (or use axum::Form for standard forms)
@@ -453,10 +453,10 @@ Azumi includes a production-ready asset pipeline that handles hashing, rewriting
 
 ### 1. Automatic Asset Hashing (Cache Busting)
 
--   Place your static assets (images, fonts, etc.) in the `demo/static/` directory.
--   At build time, Azumi moves them to `target/assets/` and renames them with a content hash:
-    -   `static/logo.png` -> `assets/logo.a8b9c7d6.png`
--   This enables **immutable caching** (1 year cache lifetime), as file names change whenever content changes.
+- Place your static assets (images, fonts, etc.) in the `demo/static/` directory.
+- At build time, Azumi moves them to `target/assets/` and renames them with a content hash:
+  - `static/logo.png` -> `assets/logo.a8b9c7d6.png`
+- This enables **immutable caching** (1 year cache lifetime), as file names change whenever content changes.
 
 ### 2. Automatic Path Rewriting
 
@@ -472,14 +472,14 @@ html! {
 }
 ```
 
--   The macro reads `assets_manifest.json` at compile time to rewrite paths.
--   Works for `src`, `href` (link tags), and `srcset`.
+- The macro reads `assets_manifest.json` at compile time to rewrite paths.
+- Works for `src`, `href` (link tags), and `srcset`.
 
 ### 3. CSS Minification
 
--   Styles defined in `<style>` blocks are automatically parsed and minified at compile time.
--   Comments and whitespace are removed to reduce payload size.
--   No configuration needed.
+- Styles defined in `<style>` blocks are automatically parsed and minified at compile time.
+- Comments and whitespace are removed to reduce payload size.
+- No configuration needed.
 
 ---
 
@@ -585,8 +585,8 @@ pub fn about_us() -> impl Component {
 <meta name="description" content="We are a team of passionate developers..." />
 <meta property="og:title" content="About Us | My App" />
 <meta
-    property="og:description"
-    content="We are a team of passionate developers..."
+  property="og:description"
+  content="We are a team of passionate developers..."
 />
 ```
 
@@ -995,15 +995,15 @@ Azumi validates all CSS at compile time:
 
 **Allowed:**
 
--   Standard CSS properties with quoted values
--   CSS custom properties (`--variable-name`)
--   CSS functions like `calc()`, `var()`, etc.
+- Standard CSS properties with quoted values
+- CSS custom properties (`--variable-name`)
+- CSS functions like `calc()`, `var()`, etc.
 
 **Not Allowed:**
 
--   External CSS imports (`@import`)
--   Inline CSS properties without custom properties
--   Invalid CSS syntax
+- External CSS imports (`@import`)
+- Inline CSS properties without custom properties
+- Invalid CSS syntax
 
 ---
 
@@ -1285,9 +1285,9 @@ For complex mutations (vectors, structs, arbitrary logic), explicitly define the
 
 **Key Benefits:**
 
--   **Zero Latency**: UI feels native.
--   **Automatic Synchronization**: If the server response differs from the prediction, Azumi automatically reconciles the state.
--   **Declarative**: No manual DOM manipulation.
+- **Zero Latency**: UI feels native.
+- **Automatic Synchronization**: If the server response differs from the prediction, Azumi automatically reconciles the state.
+- **Declarative**: No manual DOM manipulation.
 
 ---
 
@@ -1304,16 +1304,15 @@ Add the watcher call at the VERY START of `main()`.
 
 ```rust
 fn main() {
-    azumi::devtools::auto_reload(); 
+    azumi::devtools::auto_reload();
     // ...
 }
 ```
 
 **2. Router Integration:**
-You MUST merge the devtools router for the browser to receive reload signals. 
+You MUST merge the devtools router for the browser to receive reload signals.
 
-> [!IMPORTANT]
-> **State Compatibility**: If your app uses custom state (e.g. `.with_state(app_state)`), merge the devtools router **AFTER** the state is established to ensure type compatibility.
+> [!IMPORTANT] > **State Compatibility**: If your app uses custom state (e.g. `.with_state(app_state)`), merge the devtools router **AFTER** the state is established to ensure type compatibility.
 
 ```rust
 let app = Router::new()
@@ -1429,9 +1428,9 @@ pub fn LiveCounter(state: &Counter) -> impl Component {
 
 **How it works:**
 
--   The `data-bind="count"` attribute binds the `count` property from state
--   When a prediction updates `count`, the corresponding DOM element updates instantly
--   Supports nested properties: `data-bind="user.profile.name"`
+- The `data-bind="count"` attribute binds the `count` property from state
+- When a prediction updates `count`, the corresponding DOM element updates instantly
+- Supports nested properties: `data-bind="user.profile.name"`
 
 ### Form Binding with Structs
 
@@ -1486,10 +1485,10 @@ pub fn ProfileForm() -> impl Component {
 
 **Form Binding Rules:**
 
--   Field names must match struct field names (case-sensitive)
--   Nested fields use dot notation: `address.street`
--   Compile-time validation prevents typos in field names
--   Supports all form elements: `<input>`, `<select>`, `<textarea>`
+- Field names must match struct field names (case-sensitive)
+- Nested fields use dot notation: `address.street`
+- Compile-time validation prevents typos in field names
+- Supports all form elements: `<input>`, `<select>`, `<textarea>`
 
 ---
 
@@ -1557,6 +1556,12 @@ pub fn PageLayout(children: impl Component) -> impl Component {
             .header { border-bottom: "1px solid #eee"; margin-bottom: "2rem"; }
         </style>
     }
+}
+
+// Usage:
+@PageLayout {
+    <h2>"Welcome"</h2>
+    "Strings can now be used as children directly!"
 }
 ```
 
@@ -1836,9 +1841,9 @@ impl Counter { /* ... */ }
 
 Azumi protects all Live Component state with **HMAC-SHA256 signatures**.
 
--   **Mechanism:** When state is serialized to the client, it is signed with a server-side secret.
--   **Protection:** If a client manipulates the `az-scope` JSON (e.g. changing `is_admin: false` to `true`), the signature verification will fail on the next action.
--   **Result:** The server rejects the action with `400 Bad Request`.
+- **Mechanism:** When state is serialized to the client, it is signed with a server-side secret.
+- **Protection:** If a client manipulates the `az-scope` JSON (e.g. changing `is_admin: false` to `true`), the signature verification will fail on the next action.
+- **Result:** The server rejects the action with `400 Bad Request`.
 
 You do not need to "enable" this; it is on by default for all `#[azumi::live]` components.
 
