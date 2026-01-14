@@ -129,6 +129,7 @@ fn test_high_iteration_loop() {
 }
 
 #[test]
+fn test_large_static_content() {
     let lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(100);
     let comp = html! {
         <div>
@@ -143,7 +144,11 @@ fn test_high_iteration_loop() {
     };
     let output = test::render(&comp);
     assert!(output.contains("Item 99"));
-    assert!(output.len() > 5000, "Output length was only {}", output.len());
+    assert!(
+        output.len() > 5000,
+        "Output length was only {}",
+        output.len()
+    );
 }
 
 // ════════════════════════════════════════════════════════════════════════════
