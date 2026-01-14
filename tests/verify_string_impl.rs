@@ -25,11 +25,13 @@ fn test_container(children: impl Component) -> impl Component {
 
 #[test]
 fn test_nested_string() {
-    // verifying that String can be passed to implicit Component bound
-    let text = "Hello".to_string();
-    let comp = html! {
-        @test_container { {text} }
-    };
+    // Manually instantiate to bypass html! macro wrapping behavior
+    // and prove that String satisfies "impl Component"
+    let props = test_container_component::Props::builder().build().unwrap();
+    let comp = test_container_component::render(props, "Hello".to_string());
+
+    // Note: render returns impl Component (the rendered structure)
+    // We can verify it renders to string
     let result = render_to_string(&comp);
     assert_eq!(result, "<div>Hello</div>");
 }
