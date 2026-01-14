@@ -19,7 +19,7 @@ fn test_escaping() {
 }
 
 #[azumi::component]
-fn test_container<'a>(children: impl azumi::Component + 'a) -> impl azumi::Component + 'a {
+fn test_container(children: impl azumi::Component) -> impl azumi::Component {
     html! { <div>{children}</div> }
 }
 

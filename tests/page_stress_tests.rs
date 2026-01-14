@@ -7,7 +7,7 @@ use azumi::{html, seo, test};
 // ════════════════════════════════════════════════════════════════════════════
 
 #[azumi::page]
-fn seo_page_simple() -> impl Component {
+fn seo_page_simple() -> impl azumi::Component {
     html! { <h1>"Simple"</h1> }
 }
 
@@ -21,7 +21,7 @@ fn test_seo_inference_simple() {
 
 /// My Page Description
 #[azumi::page]
-fn seo_page_with_desc() -> impl Component {
+fn seo_page_with_desc() -> impl azumi::Component {
     html! { <h1>"Desc"</h1> }
 }
 
@@ -138,7 +138,7 @@ fn test_schema_person() {
 // ════════════════════════════════════════════════════════════════════════════
 
 #[azumi::component]
-fn SeoLayout(children: impl Component) -> impl Component {
+fn SeoLayout(children: impl azumi::Component) -> impl azumi::Component {
     html! {
         <html>
             <head>
@@ -151,7 +151,7 @@ fn SeoLayout(children: impl Component) -> impl Component {
 
 /// Nested SEO Page
 #[azumi::page]
-fn nested_page() -> impl Component {
+fn nested_page() -> impl azumi::Component {
     html! {
         @SeoLayout {
             "Content"
