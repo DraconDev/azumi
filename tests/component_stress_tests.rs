@@ -180,7 +180,7 @@ fn test_enum_rendering() {
 
     let r1 = html! {
         <div>
-            @match s1 {
+            @match &s1 {
                 Status::Active => { "ACTIVE" }
                 Status::Inactive => { "INACTIVE" }
                 Status::Pending(msg) => { "PENDING: " {msg} }
@@ -189,7 +189,7 @@ fn test_enum_rendering() {
     };
     let r2 = html! {
         <div>
-            @match s2 {
+            @match &s2 {
                 Status::Active => { "ACTIVE" }
                 Status::Inactive => { "INACTIVE" }
                 Status::Pending(msg) => { "PENDING: " {msg} }
@@ -198,7 +198,7 @@ fn test_enum_rendering() {
     };
     let r3 = html! {
         <div>
-            @match s3 {
+            @match &s3 {
                 Status::Active => { "ACTIVE" }
                 Status::Inactive => { "INACTIVE" }
                 Status::Pending(msg) => { "PENDING: " {msg} }
