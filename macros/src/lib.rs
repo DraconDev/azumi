@@ -214,6 +214,12 @@ pub fn html(input: TokenStream) -> TokenStream {
         }
     };
 
+    if std::env::var("AZUMI_DEBUG_MACRO").is_ok() {
+        eprintln!("--- DEBUG MACRO EXPANSION ---");
+        eprintln!("{}", expanded);
+        eprintln!("--- END DEBUG ---");
+    }
+
     TokenStream::from(expanded)
 }
 
