@@ -191,7 +191,7 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
     let is_snake_case = name_str.chars().next().is_some_and(|c| c.is_lowercase());
 
     let (mod_name, wrapper_fn) = if is_snake_case {
-        let mod_ident = syn::Ident::new(&format!("{}_component", name_str), fn_name.span());
+        let mod_ident = syn::Ident::new(&name_str, fn_name.span());
 
         // Generate wrapper function for direct calls (e.g. @snake_case())
         // Note: This only works for components with no required props or children
