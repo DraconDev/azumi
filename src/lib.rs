@@ -26,20 +26,51 @@ pub trait Component {
     fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
 }
 
-/// Marker trait for live state structs
-/// Auto-implemented by #[azumi::live]
-pub trait LiveState:
-    serde::Serialize + for<'de> serde::de::Deserialize<'de> + Send + Sync + 'static
-{
-    fn to_scope(&self) -> String {
-        let json = serde_json::to_string(self).unwrap_or_default();
-        crate::security::sign_state(&json)
-    }
+/// Metadata for live state (predictions and namespacing)
+/// Implemented for both the state struct and its references
+pub trait LiveStateMetadata {
     /// Returns predictions for optimistic UI (method_name -> dsl)
     fn predictions() -> &'static [(&'static str, &'static str)];
 
     /// Returns the struct name for namespacing actions
     fn struct_name() -> &'static str;
+}
+
+/// Marker trait for live state structs
+/// Auto-implemented by #[azumi::live]
+pub trait LiveState:
+    LiveStateMetadata + serde::Serialize + for<'de> serde::de::Deserialize<'de> + Send + Sync + 'static
+{
+    fn to_scope(&self) -> String {
+        let json = serde_json::to_string(self).unwrap_or_default();
+        crate::security::sign_state(&json)
+    }
+}
+
+/// Runtime helper to look up a prediction for a method on a state
+pub fn get_prediction<T: LiveStateMetadata>(_state: &T, method: &str) -> Option<&'static str> {
+    T::predictions()
+        .iter()
+        .find(|(m, _)| *m == method)
+        .map(|(_, p)| *p)
+}
+
+// Handle references for metadata (no Deserialize needed)
+impl<T: LiveStateMetadata> LiveStateMetadata for &T {
+    fn predictions() -> &'static [(&'static str, &'static str)] {
+        T::predictions()
+    }
+    fn struct_name() -> &'static str {
+        T::struct_name()
+    }
+}
+impl<T: LiveStateMetadata> LiveStateMetadata for &mut T {
+    fn predictions() -> &'static [(&'static str, &'static str)] {
+        T::predictions()
+    }
+    fn struct_name() -> &'static str {
+        T::struct_name()
+    }
 }
 
 /// Runtime helper to look up a prediction for a method on a state
