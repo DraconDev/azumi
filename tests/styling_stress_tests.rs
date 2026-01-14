@@ -7,9 +7,9 @@ use azumi::{html, test, Component};
 #[azumi::component]
 fn ChildComponent() -> impl Component {
     html! {
-        <div class={box}>"Child"</div>
+        <div class={inner_box}>"Child"</div>
         <style>
-            .box { color: "red"; }
+            .inner_box { color: "red"; }
         </style>
     }
 }
@@ -18,30 +18,28 @@ fn ChildComponent() -> impl Component {
 fn ParentComponent() -> impl Component {
     html! {
         <div class={container}>
-            <div class={box}>"Parent"</div>
+            <div class={outer_box}>"Parent"</div>
             @ChildComponent()
         </div>
         <style>
             .container { padding: "1rem"; }
-            .box { color: "blue"; }
+            .outer_box { color: "blue"; }
         </style>
     }
 }
 
 #[test]
 fn test_style_scoping_isolation() {
-    let output = test::render(&ParentComponent());
+    let comp = html! { @ParentComponent() };
+    let output = test::render(&comp);
 
     // Check that both classes exist but are mangled differently (scoped)
-    // The macro generates variables like `box` which are replaced by unique IDs.
-    // We expect to find two different mangled class names.
-
-    // Scraper doesn't give us the mangled names easily, but we can check for unique strings.
-    // In Azumi, scoped classes look like `az-xxxx`.
+    // Azumi class scoping uses unique IDs (az-xxxx).
     let count = output.matches("class=\"az-").count();
+    // We have: container, outer_box, inner_box (from child)
     assert!(
-        count >= 2,
-        "Expected at least 2 scoped classes, found {}",
+        count >= 3,
+        "Expected at least 3 scoped classes, found {}",
         count
     );
 }
@@ -62,7 +60,8 @@ fn GlobalStyled() -> impl Component {
 
 #[test]
 fn test_global_style_unmangled() {
-    let output = test::render(&GlobalStyled());
+    let comp = html! { @GlobalStyled() };
+    let output = test::render(&comp);
     assert!(
         output.contains("class=\"global_box\""),
         "Global class should not be mangled"
@@ -80,19 +79,20 @@ fn test_global_style_unmangled() {
 #[azumi::component]
 fn Progress(width: f64) -> impl Component {
     html! {
-        <div class={track}>
-            <div class={fill} style={--w: format!("{}%", width)}></div>
+        <div class={track_id}>
+            <div class={fill_id} style={--w: format!("{}%", width)}></div>
         </div>
         <style>
-            .track { width: "100px"; height: "10px"; background: "#eee"; }
-            .fill { width: "var(--w)"; height: "100%"; background: "blue"; }
+            .track_id { width: "100px"; height: "10px"; background: "#eee"; }
+            .fill_id { width: "var(--w)"; height: "100%"; background: "blue"; }
         </style>
     }
 }
 
 #[test]
 fn test_dynamic_custom_properties() {
-    let output = test::render(&Progress(75.5));
+    let comp = html! { @Progress(width = 75.5) };
+    let output = test::render(&comp);
     assert!(
         output.contains("style=\"--w:75.5%\""),
         "Custom property should be rendered correctly"
@@ -115,16 +115,17 @@ fn test_multiple_custom_properties() {
 #[test]
 fn test_style_variable_shadowing() {
     // Test that @let variables don't conflict with @style variables
-    let output = test::render(&html! {
+    let comp = html! {
         <div>
-            @let my_class = "manual";
-            <div class={my_class}>"Manual"</div>
+            @let my_manual_class = "manual";
+            <div class={my_manual_class}>"Manual"</div>
             <div class={scoped_class}>"Scoped"</div>
         </div>
         <style>
             .scoped_class { color: "yellow"; }
         </style>
-    });
+    };
+    let output = test::render(&comp);
 
     // "manual" should be literal because it's from @let
     assert!(output.contains("class=\"manual\""));
