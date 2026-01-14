@@ -14,7 +14,6 @@ html! {
 
 No runtime errors. No "works on my machine". No surprises.
 
-
 ## 🛠️ Development Experience
 
 Azumi includes a built-in, self-hosting hot reload system. Just add one line to your code:
@@ -31,8 +30,7 @@ fn main() {
 - **HTML**: Sub-second patching.
 - **Logic**: Auto-restart on change.
 
-See [HOT_RELOAD.md](./HOT_RELOAD.md) for details.
----
+## See [HOT_RELOAD.md](./HOT_RELOAD.md) for details.
 
 ## ⚡ The Pitch
 
@@ -114,9 +112,9 @@ pub fn about_us() -> impl Component { ... }
 
 ### 5. Production-Ready Asset Pipeline
 
--   **Content-hashed filenames** → Immutable caching (1 year)
--   **Automatic path rewriting** → Write `/static/logo.png`, get `/assets/logo.a8f3c2.png`
--   **CSS minification** → Zero config
+- **Content-hashed filenames** → Immutable caching (1 year)
+- **Automatic path rewriting** → Write `/static/logo.png`, get `/assets/logo.a8f3c2.png`
+- **CSS minification** → Zero config
 
 ---
 
@@ -143,10 +141,10 @@ pub fn about_us() -> impl Component { ... }
 
 ### 2. CSS Classes (`class={...}`)
 
--   **Strict Snake Case:** All CSS classes MUST be `snake_case`. Dashes (`-`) are **BANNED** in class names (e.g., Use `.my_card`, NOT `.my-card`).
--   **Bracket Syntax ONLY:** You must use brackets with variables. Static strings usage (`class="..."`) is **BANNED**.
--   **No Magic:** Automatic scoping handles everything via variables.
--   **Expression Lists:** You can combine multiple class variables.
+- **Strict Snake Case:** All CSS classes MUST be `snake_case`. Dashes (`-`) are **BANNED** in class names (e.g., Use `.my_card`, NOT `.my-card`).
+- **Bracket Syntax ONLY:** You must use brackets with variables. Static strings usage (`class="..."`) is **BANNED**.
+- **No Magic:** Automatic scoping handles everything via variables.
+- **Expression Lists:** You can combine multiple class variables.
 
 ```rust
 html! {
@@ -171,8 +169,8 @@ html! {
 
 ### 3. IDs (`id={...}`)
 
--   Same rules as classes: **Snake Case** and **Bracket Syntax ONLY**.
--   `id="..."` is **BANNED**.
+- Same rules as classes: **Snake Case** and **Bracket Syntax ONLY**.
+- `id="..."` is **BANNED**.
 
 ```rust
 html! {
@@ -185,8 +183,8 @@ html! {
 
 ### 4. Inline Styles (`style={...}`)
 
--   Use the **Style DSL** with brackets.
--   `style="..."` string syntax is **BANNED**.
+- Use the **Style DSL** with brackets.
+- `style="..."` string syntax is **BANNED**.
 
 ```rust
 // ✅ CORRECT
@@ -262,8 +260,8 @@ html! {
 
 Azumi is **Static by Default**. It does NOT automatically inject the client runtime.
 
--   **Manual Injection (Required)**: You must manually include `<script src="azumi.js" />` in your layout if you want interactivity.
--   **Static Optimized**: Pages without the script are pure, zero-JS static HTML.
+- **Manual Injection (Required)**: You must manually include `<script src="azumi.js" />` in your layout if you want interactivity.
+- **Static Optimized**: Pages without the script are pure, zero-JS static HTML.
 
 ```rust
 #[azumi::component]
@@ -296,10 +294,10 @@ Azumi includes a production-ready asset pipeline that handles hashing, rewriting
 
 ### 1. Automatic Asset Hashing (Cache Busting)
 
--   Place your static assets (images, fonts, etc.) in the `demo/static/` directory.
--   At build time, Azumi moves them to `target/assets/` and renames them with a content hash:
-    -   `static/logo.png` -> `assets/logo.a8b9c7d6.png`
--   This enables **immutable caching** (1 year cache lifetime), as file names change whenever content changes.
+- Place your static assets (images, fonts, etc.) in the `demo/static/` directory.
+- At build time, Azumi moves them to `target/assets/` and renames them with a content hash:
+  - `static/logo.png` -> `assets/logo.a8b9c7d6.png`
+- This enables **immutable caching** (1 year cache lifetime), as file names change whenever content changes.
 
 ### 2. Automatic Path Rewriting
 
@@ -315,14 +313,14 @@ html! {
 }
 ```
 
--   The macro reads `assets_manifest.json` at compile time to rewrite paths.
--   Works for `src`, `href` (link tags), and `srcset`.
+- The macro reads `assets_manifest.json` at compile time to rewrite paths.
+- Works for `src`, `href` (link tags), and `srcset`.
 
 ### 3. CSS Minification
 
--   Styles defined in `<style>` blocks are automatically parsed and minified at compile time.
--   Comments and whitespace are removed to reduce payload size.
--   No configuration needed.
+- Styles defined in `<style>` blocks are automatically parsed and minified at compile time.
+- Comments and whitespace are removed to reduce payload size.
+- No configuration needed.
 
 ---
 
@@ -364,8 +362,11 @@ pub fn Container(children: impl Component) -> impl Component {
 // Usage with curly braces
 @Container {
     <p>"Content inside container"</p>
-    <div>"Multiple elements"</div>
+    "Explicit strings are also components"
 }
+
+// Direct usage (String implements Component)
+let my_comp = @Container(children = "Hello".to_string());
 ```
 
 ### Component Composition
@@ -464,15 +465,15 @@ Azumi validates all CSS at compile time:
 
 **Allowed:**
 
--   Standard CSS properties with quoted values
--   CSS custom properties (`--variable-name`)
--   CSS functions like `calc()`, `var()`, etc.
+- Standard CSS properties with quoted values
+- CSS custom properties (`--variable-name`)
+- CSS functions like `calc()`, `var()`, etc.
 
 **Not Allowed:**
 
--   External CSS imports (`@import`)
--   Inline CSS properties without custom properties
--   Invalid CSS syntax
+- External CSS imports (`@import`)
+- Inline CSS properties without custom properties
+- Invalid CSS syntax
 
 ---
 
@@ -820,9 +821,9 @@ pub fn LiveCounter(state: &Counter) -> impl Component {
 
 **How it works:**
 
--   The `data-bind="count"` attribute binds the `count` property from state
--   When a prediction updates `count`, the corresponding DOM element updates instantly
--   Supports nested properties: `data-bind="user.profile.name"`
+- The `data-bind="count"` attribute binds the `count` property from state
+- When a prediction updates `count`, the corresponding DOM element updates instantly
+- Supports nested properties: `data-bind="user.profile.name"`
 
 ### Form Binding with Structs
 
@@ -877,10 +878,10 @@ pub fn ProfileForm() -> impl Component {
 
 **Form Binding Rules:**
 
--   Field names must match struct field names (case-sensitive)
--   Nested fields use dot notation: `address.street`
--   Compile-time validation prevents typos in field names
--   Supports all form elements: `<input>`, `<select>`, `<textarea>`
+- Field names must match struct field names (case-sensitive)
+- Nested fields use dot notation: `address.street`
+- Compile-time validation prevents typos in field names
+- Supports all form elements: `<input>`, `<select>`, `<textarea>`
 
 ---
 
@@ -948,37 +949,37 @@ Instead of manually extracting `Extension` or implementing complex traits in eve
 1. **Define Infrastructure (Once)**:
    Create a reusable extractor in `auth.rs`:
 
-    ```rust
-    // auth.rs
-    pub struct CurrentUser(pub Option<User>);
+   ```rust
+   // auth.rs
+   pub struct CurrentUser(pub Option<User>);
 
-    #[async_trait]
-    impl<S> FromRequestParts<S> for CurrentUser where S: Send + Sync {
-        async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
-            let Extension(user) = parts.extract::<Extension<Option<User>>>().await.unwrap_or(Extension(None));
-            Ok(CurrentUser(user))
-        }
-    }
-    ```
+   #[async_trait]
+   impl<S> FromRequestParts<S> for CurrentUser where S: Send + Sync {
+       async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+           let Extension(user) = parts.extract::<Extension<Option<User>>>().await.unwrap_or(Extension(None));
+           Ok(CurrentUser(user))
+       }
+   }
+   ```
 
 2. **Use it Everywhere**:
    Now your handlers remain clean and Type-Safe:
 
-    ```rust
-    // page.rs
-    use crate::auth::CurrentUser;
+   ```rust
+   // page.rs
+   use crate::auth::CurrentUser;
 
-    pub async fn my_handler(
-        // Look how clean this is!
-        CurrentUser(user): CurrentUser
-    ) -> impl IntoResponse {
-        // Initialize state directly from the user object
-        let state = MyState {
-            name: user.map(|u| u.name)
-        };
-        azumi::render(&view(&state))
-    }
-    ```
+   pub async fn my_handler(
+       // Look how clean this is!
+       CurrentUser(user): CurrentUser
+   ) -> impl IntoResponse {
+       // Initialize state directly from the user object
+       let state = MyState {
+           name: user.map(|u| u.name)
+       };
+       azumi::render(&view(&state))
+   }
+   ```
 
 ---
 
@@ -1181,7 +1182,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a { }
 | Form Bind     | `bind={StructName}`                    | `form bind={UserRegistration}`                       |
 | Data Bind     | `data-bind="property"`                 | `data-bind="count"`                                  |
 | Client Script | `Auto / {azumi::azumi_script()}`       | `html! { <head>...` (Auto)                           |
-| Text          | Quoted strings                         | `"Hello world"`                                      |
+| Text          | Quoted strings / Component             | `"Hello world"` / `String`                           |
 
 ---
 
@@ -1258,33 +1259,33 @@ cargo run
 
 **Correctness**
 
--   **CSS-HTML co-validation** — Typos, missing classes, invalid HTML caught at compile time
--   **End-to-end type safety** — DB struct → component state → HTML, zero schema drift
--   **XSS prevention by default** — Rust's type system enforces escaping
+- **CSS-HTML co-validation** — Typos, missing classes, invalid HTML caught at compile time
+- **End-to-end type safety** — DB struct → component state → HTML, zero schema drift
+- **XSS prevention by default** — Rust's type system enforces escaping
 
 **Performance**
 
--   **Zero hydration** — No JS bundle replay, no `__NEXT_DATA__` blob, HTML is truth
--   **~3kb runtime** — Compare to Next.js (~80kb), Leptos (~150kb)
--   **Instant TTI** — No WASM download, no JS parse delay
+- **Zero hydration** — No JS bundle replay, no `__NEXT_DATA__` blob, HTML is truth
+- **~3kb runtime** — Compare to Next.js (~80kb), Leptos (~150kb)
+- **Instant TTI** — No WASM download, no JS parse delay
 
 **Developer Experience**
 
--   **No API layer** — DB queries live next to your components (no REST/tRPC ceremony)
--   **Browserless testing** — Unit test components without JSDOM or Cypress
--   **Asset pipeline built-in** — Content-hashed, immutable caching, zero config
+- **No API layer** — DB queries live next to your components (no REST/tRPC ceremony)
+- **Browserless testing** — Unit test components without JSDOM or Cypress
+- **Asset pipeline built-in** — Content-hashed, immutable caching, zero config
 
 **Production**
 
--   **~90% cloud cost vs Node** — Rust concurrency + low memory footprint
--   **Signed state** — HMAC prevents client-side tampering (no `isAdmin: true` hacks)
--   **Edge-cacheable** — Deterministic HTML, hashed assets, stateless servers
+- **~90% cloud cost vs Node** — Rust concurrency + low memory footprint
+- **Signed state** — HMAC prevents client-side tampering (no `isAdmin: true` hacks)
+- **Edge-cacheable** — Deterministic HTML, hashed assets, stateless servers
 
 ### 🎯 **Outside Core Scope:**
 
--   **Offline-first apps** — Azumi assumes server is truth; offline requires separate sync layer
--   **Continuous real-time sync** — Collaborative editing, multiplayer games → pair with dedicated real-time layer
--   **Mobile native** — Web-first → wrap in Tauri/Capacitor for native distribution
+- **Offline-first apps** — Azumi assumes server is truth; offline requires separate sync layer
+- **Continuous real-time sync** — Collaborative editing, multiplayer games → pair with dedicated real-time layer
+- **Mobile native** — Web-first → wrap in Tauri/Capacitor for native distribution
 
 Azumi is opinionated: logic runs on the server, UI updates are predicted, the server is truth. These aren't gaps — they're the design.
 
