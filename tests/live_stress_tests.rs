@@ -1,44 +1,49 @@
 use azumi::{html, test, Component};
-use serde::{Deserialize, Serialize};
 
 // ════════════════════════════════════════════════════════════════════════════
-// Live State Setup
+// Counter Component Module
 // ════════════════════════════════════════════════════════════════════════════
 
-#[azumi::live]
-#[derive(Serialize, Deserialize, Default)]
-pub struct CounterState {
-    pub count: i32,
-    pub active: bool,
+mod counter {
+    use super::*;
+
+    #[azumi::live]
+    #[derive(Default)] // Serialize/Deserialize are added by #[azumi::live]
+    pub struct CounterState {
+        pub count: i32,
+        pub active: bool,
+    }
+
+    #[azumi::live_impl(component = "counter_view")]
+    impl CounterState {
+        pub fn increment(&mut self) {
+            self.count += 1;
+        }
+
+        pub fn toggle(&mut self) {
+            self.active = !self.active;
+        }
+
+        #[azumi::predict("count = 0")]
+        pub fn reset(&mut self) {
+            self.count = 0;
+        }
+    }
+
+    #[azumi::component]
+    pub fn counter_view<'a>(state: &'a CounterState) -> impl Component + 'a {
+        html! {
+            <div>
+                <span data-bind="count">{state.count}</span>
+                <button on:click={state.increment}>"+1"</button>
+                <button on:click={state.toggle}>"Toggle"</button>
+                <button on:click={state.reset}>"Reset"</button>
+            </div>
+        }
+    }
 }
 
-#[azumi::live_impl(component = "counter_view")]
-impl CounterState {
-    pub fn increment(&mut self) {
-        self.count += 1;
-    }
-
-    pub fn toggle(&mut self) {
-        self.active = !self.active;
-    }
-
-    #[azumi::predict("count = 0")]
-    pub fn reset(&mut self) {
-        self.count = 0;
-    }
-}
-
-#[azumi::component]
-pub fn counter_view<'a>(state: &'a CounterState) -> impl Component + 'a {
-    html! {
-        <div>
-            <span data-bind="count">{state.count}</span>
-            <button on:click={state.increment}>"+1"</button>
-            <button on:click={state.toggle}>"Toggle"</button>
-            <button on:click={state.reset}>"Reset"</button>
-        </div>
-    }
-}
+use counter::*;
 
 // ════════════════════════════════════════════════════════════════════════════
 // Tests
@@ -65,7 +70,6 @@ fn test_automatic_predictions() {
     let output = test::render(&comp);
 
     // increment() -> self.count += 1
-    // The compiler should generate a prediction for this simple mutation.
     assert!(
         output.contains("data-predict=\"count = count + 1\""),
         "Automatic prediction for increment missing"
@@ -120,26 +124,32 @@ fn test_data_bind_attribute() {
 // Complex Live State (Nested/Multiple)
 // ════════════════════════════════════════════════════════════════════════════
 
-#[azumi::live]
-#[derive(Serialize, Deserialize, Default)]
-pub struct NestedState {
-    pub child: CounterState,
-}
+mod nested {
+    use super::*;
 
-#[azumi::live_impl(component = "nested_view")]
-impl NestedState {
-    pub fn do_nothing(&mut self) {}
-}
+    #[azumi::live]
+    #[derive(Default)]
+    pub struct NestedState {
+        pub child: CounterState,
+    }
 
-#[azumi::component]
-fn nested_view<'a>(state: &'a NestedState) -> impl Component + 'a {
-    html! {
-        <div>
-            @counter_view(state = &state.child)
-            <button on:click={state.do_nothing}>"Action"</button>
-        </div>
+    #[azumi::live_impl(component = "nested_view")]
+    impl NestedState {
+        pub fn do_nothing(&mut self) {}
+    }
+
+    #[azumi::component]
+    pub fn nested_view<'a>(state: &'a NestedState) -> impl Component + 'a {
+        html! {
+            <div>
+                @counter_view(state = &state.child)
+                <button on:click={state.do_nothing}>"Action"</button>
+            </div>
+        }
     }
 }
+
+use nested::*;
 
 #[test]
 fn test_nested_live_scopes() {
