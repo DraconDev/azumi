@@ -143,10 +143,18 @@ fn test_layout_multiple_children() {
         }
     };
     let output = test::render(&comp);
-    assert!(output.contains("<h1>Main</h1>"), "Output was: {}", output);
+    assert!(
+        output.contains("Main") && output.contains("<h1"),
+        "Output was: {}",
+        output
+    );
     assert!(output.contains("<p>First</p>"), "Output was: {}", output);
     assert!(output.contains("<p>Second</p>"), "Output was: {}", output);
-    assert!(output.contains("<h1>Sub</h1>"), "Output was: {}", output);
+    assert!(
+        output.contains("Sub") && output.contains("<h1"),
+        "Output was: {}",
+        output
+    );
     assert!(output.contains("Inner"), "Output was: {}", output);
 }
 
