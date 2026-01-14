@@ -147,7 +147,7 @@ pub fn html(input: TokenStream) -> TokenStream {
 
     let css_deps: Vec<proc_macro2::TokenStream> = Vec::new();
 
-    /* HOT RELOAD INJECTION START
+    // HOT RELOAD INJECTION START
     let hot_reload_code = if let Some((_statics, dynamics)) = try_extract_template(&nodes) {
         let id_lit = if !nodes.is_empty() {
             let _span = nodes[0].span();
@@ -187,8 +187,6 @@ pub fn html(input: TokenStream) -> TokenStream {
     } else {
         quote! {}
     };
-    */
-    let hot_reload_code = quote! {};
     // HOT RELOAD INJECTION END
 
     let html_construction = generate_nodes(&nodes);

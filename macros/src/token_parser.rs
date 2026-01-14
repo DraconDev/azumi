@@ -842,9 +842,24 @@ impl Parse for Block {
                     span,
                 }))
             } else {
-                // Component variable @foo
+                // Component variable @foo or call with children @foo { ... }
                 let span = path.span();
-                Ok(Block::Component(ComponentBlock { name: path, span }))
+
+                // Optional children { ... }
+                if input.peek(Brace) {
+                    let child_content;
+                    syn::braced!(child_content in input);
+                    let children = parse_nodes(&child_content)?;
+
+                    Ok(Block::Call(CallBlock {
+                        name: path,
+                        args: TokenStream::new(),
+                        children,
+                        span,
+                    }))
+                } else {
+                    Ok(Block::Component(ComponentBlock { name: path, span }))
+                }
             }
         }
     }
