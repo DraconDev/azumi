@@ -214,14 +214,6 @@ pub fn html(input: TokenStream) -> TokenStream {
         }
     };
 
-    /*
-    if std::env::var("AZUMI_DEBUG_MACRO").is_ok() {
-        eprintln!("--- DEBUG MACRO EXPANSION ---");
-        eprintln!("{}", expanded);
-        eprintln!("--- END DEBUG ---");
-    }
-    */
-
     TokenStream::from(expanded)
 }
 
@@ -1186,15 +1178,6 @@ fn generate_body_with_context(
                     });
                 }
                 token_parser::Block::Component(comp_block) => {
-                    let func_path = &comp_block.name;
-                    let func_mod_path = transform_path_for_component(func_path);
-
-                    instructions.push(quote! {
-                        #func_mod_path::render(
-                            #func_mod_path::Props::builder().build().expect("Failed to build props")
-                        ).render(f)?;
-                    });
-                }
                     let func_path = &comp_block.name;
                     let func_mod_path = transform_path_for_component(func_path);
 
