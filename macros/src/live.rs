@@ -408,10 +408,7 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             #(#original_methods)*
         }
 
-        impl azumi::LiveState for #struct_name {
-            fn to_scope(&self) -> String {
-                self.to_scope()
-            }
+        impl azumi::LiveStateMetadata for #struct_name {
             fn predictions() -> &'static [(&'static str, &'static str)] {
                 &[
                     #(#predictions_entries),*
@@ -419,6 +416,12 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             }
             fn struct_name() -> &'static str {
                 #struct_name_str
+            }
+        }
+
+        impl azumi::LiveState for #struct_name {
+            fn to_scope(&self) -> String {
+                self.to_scope()
             }
         }
 

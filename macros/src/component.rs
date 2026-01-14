@@ -132,7 +132,7 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
                     // Auto-generated az-scope wrapper
                     let scope_json = <_ as azumi::LiveState>::to_scope(#state_ident);
                     // Use captured type to get struct name path
-                    let struct_name = <#live_state_type as azumi::LiveState>::struct_name();
+                    let struct_name = <#live_state_type as azumi::LiveStateMetadata>::struct_name();
                     // Parse as string and escape double quotes to match HTML spec safely
                     let scope_escaped = scope_json.replace("\"", "&quot;");
                     write!(f, "<div az-scope=\"{}\" az-struct=\"{}\" style=\"display: contents\">", scope_escaped, struct_name)?;
