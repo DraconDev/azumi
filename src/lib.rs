@@ -73,14 +73,6 @@ impl<T: LiveStateMetadata> LiveStateMetadata for &mut T {
     }
 }
 
-/// Runtime helper to look up a prediction for a method on a state
-pub fn get_prediction<T: LiveState>(state: &T, method: &str) -> Option<&'static str> {
-    T::predictions()
-        .iter()
-        .find(|(m, _)| *m == method)
-        .map(|(_, p)| *p)
-}
-
 #[derive(Clone)]
 pub struct FnComponent<F>(F);
 
