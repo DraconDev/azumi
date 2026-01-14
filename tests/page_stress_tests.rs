@@ -10,6 +10,39 @@ fn init_test_seo() {
     seo::init_seo(config);
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// SEO Tests Matrix
+// ════════════════════════════════════════════════════════════════════════════
+
+#[azumi::page]
+fn seo_page_simple() -> impl azumi::Component {
+    html! { <h1>"Simple"</h1> }
+}
+
+#[test]
+fn test_seo_inference_simple() {
+    init_test_seo();
+    let _view = seo_page_simple();
+    let head = seo::render_automatic_seo();
+    let html = test::render(&head);
+    assert!(html.contains("<title>Seo Page Simple"));
+}
+
+/// My Page Description
+#[azumi::page]
+fn seo_page_with_desc() -> impl azumi::Component {
+    html! { <h1>"Desc"</h1> }
+}
+
+#[test]
+fn test_seo_inference_desc() {
+    init_test_seo();
+    let _view = seo_page_with_desc();
+    let head = seo::render_automatic_seo();
+    let html = test::render(&head);
+    assert!(html.contains("content=\"My Page Description\""));
+}
+
 #[test]
 fn test_manual_head_macro() {
     init_test_seo();
@@ -24,36 +57,13 @@ fn test_manual_head_macro() {
     assert!(html.contains("<title>Manual Title"));
     assert!(html.contains("content=\"Manual Desc\""));
     assert!(html.contains("property=\"og:url\" content=\"https://ex.com\""));
+    assert!(html.contains("property=\"og:type\" content=\"website\""));
 }
 
-#[azumi::component]
-fn TraceLayout(children: impl azumi::Component) -> impl azumi::Component {
-    html! {
-        <div id={"trace-id"}>
-            {children}
-        </div>
-    }
-}
+// ════════════════════════════════════════════════════════════════════════════
+// Schema.org Matrix
+// ════════════════════════════════════════════════════════════════════════════
 
-#[azumi::page]
-fn trace_page() -> impl azumi::Component {
-    html! {
-        @TraceLayout() {
-            "TraceContent"
-        }
-    }
-}
-
-#[test]
-fn test_trace_layout() {
-    init_test_seo();
-    let comp = trace_page();
-    let html = test::render(&comp);
-    println!("DEBUG TRACE: {}", html);
-    assert!(html.contains("trace-id"), "HTML was: {}", html);
-}
-
-// Keep Schema tests as they were passing
 #[cfg(feature = "schema")]
 #[derive(Schema)]
 #[schema(type = "BlogPosting")]
@@ -64,10 +74,69 @@ struct Post {
 
 #[cfg(feature = "schema")]
 #[test]
-fn test_schema_works() {
+fn test_schema_blog_posting() {
     let post = Post {
-        headline: "Hi".into(),
-        date_published: "2024".into(),
+        headline: "News".into(),
+        date_published: "2024-01-01".into(),
     };
-    assert!(post.to_schema_script().contains("BlogPosting"));
+    let script = post.to_schema_script();
+    assert!(script.contains("BlogPosting"));
+    assert!(script.contains("News"));
+}
+
+#[cfg(feature = "schema")]
+#[derive(Schema)]
+#[schema(type = "Product")]
+struct Product {
+    name: String,
+    sku: String,
+    price: f64,
+}
+
+#[cfg(feature = "schema")]
+#[test]
+fn test_schema_product() {
+    let p = Product {
+        name: "Gear".into(),
+        sku: "G1".into(),
+        price: 99.0,
+    };
+    let script = p.to_schema_script();
+    assert!(script.contains("Product"));
+    assert!(script.contains("G1"));
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Layout Interactions
+// ════════════════════════════════════════════════════════════════════════════
+
+#[azumi::component]
+fn ComplexLayout(children: impl azumi::Component) -> impl azumi::Component {
+    html! {
+        <div id={"layout-root"}>
+            <header>
+                {seo::render_automatic_seo()}
+            </header>
+            <main>{children}</main>
+        </div>
+    }
+}
+
+/// Nested SEO Page
+#[azumi::page]
+fn nested_page() -> impl azumi::Component {
+    html! {
+        @ComplexLayout {
+            "Content"
+        }
+    }
+}
+
+#[test]
+fn test_layout_seo_propagation() {
+    init_test_seo();
+    let comp = nested_page();
+    let html = test::render(&comp);
+    assert!(html.contains("<title>Nested Page"));
+    assert!(html.contains("id=\"layout-root\""));
 }
