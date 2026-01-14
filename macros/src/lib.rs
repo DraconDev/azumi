@@ -968,28 +968,28 @@ fn generate_body_with_context(
 
                     if attr_name.starts_with("on:") {
                         match &attr.value {
-                            token_parser::AttributeValue::Dynamic(tokens) => {
-                                let s = if let Ok(expr) = syn::parse2::<syn::Expr>(tokens.clone()) {
+                                let (s, base) = if let Ok(expr) = syn::parse2::<syn::Expr>(tokens.clone()) {
                                     match expr {
                                         syn::Expr::Field(f) => {
                                             if let syn::Member::Named(ident) = f.member {
-                                                ident.to_string()
+                                                let base = &f.base;
+                                                (ident.to_string(), Some(quote! { #base }))
                                             } else {
-                                                tokens.to_string().replace(" ", "")
+                                                (tokens.to_string().replace(" ", ""), None)
                                             }
                                         }
                                         syn::Expr::Path(p) => {
                                             if let Some(ident) = p.path.get_ident() {
-                                                ident.to_string()
+                                                (ident.to_string(), None)
                                             } else {
-                                                tokens.to_string().replace(" ", "")
+                                                (tokens.to_string().replace(" ", ""), None)
                                             }
                                         }
-                                        syn::Expr::MethodCall(m) => m.method.to_string(),
-                                        _ => tokens.to_string().replace(" ", ""),
+                                        syn::Expr::MethodCall(m) => (m.method.to_string(), Some(quote! { #m.receiver })),
+                                        _ => (tokens.to_string().replace(" ", ""), None),
                                     }
                                 } else {
-                                    tokens.to_string().replace(" ", "")
+                                    (tokens.to_string().replace(" ", ""), None)
                                 };
 
                                 let event_name = attr_name.strip_prefix("on:").unwrap_or(attr_name);
@@ -997,7 +997,14 @@ fn generate_body_with_context(
                                 instructions.push(quote! {
                                     write!(f, " az-on=\"{}\"", #dsl)?;
                                 });
-                            }
+
+                                if let Some(base_expr) = base {
+                                    instructions.push(quote! {
+                                        if let Some(pred) = azumi::get_prediction(&(#base_expr), #s) {
+                                            write!(f, " data-predict=\"{}\"", pred)?;
+                                        }
+                                    });
+                                }
                             token_parser::AttributeValue::Static(val) => {
                                 let clean = strip_outer_quotes(val);
                                 let event_name = attr_name.strip_prefix("on:").unwrap_or(attr_name);
