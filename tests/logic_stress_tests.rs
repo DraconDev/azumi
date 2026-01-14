@@ -129,11 +129,11 @@ fn test_high_iteration_loop() {
 }
 
 #[test]
-fn test_large_static_content() {
+    let lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(10);
     let comp = html! {
         <div>
             <h1>"Title"</h1>
-            <p>{ "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(10) }</p>
+            <p>{lorem}</p>
             <ul>
                 @for i in 0..100 {
                     <li>"Item "{i}</li>
