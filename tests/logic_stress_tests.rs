@@ -174,3 +174,62 @@ fn test_optional_attributes_logic() {
     assert!(output.contains("id=\"my-id\""));
     assert!(!output.contains("Should not exist"));
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// Advanced Logic & Scoping
+// ════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_variable_shadowing_in_loops() {
+    let output = test::render(&html! {
+        <div>
+            @for i in 0..2 {
+                // Outer i
+                <span>"Outer: " {i}</span>
+                <div>
+                    @let i = i + 10;
+                    <span>"Inner: " {i}</span>
+                </div>
+            }
+        </div>
+    });
+    assert!(output.contains("Outer: 0"));
+    assert!(output.contains("Inner: 10"));
+    assert!(output.contains("Outer: 1"));
+    assert!(output.contains("Inner: 11"));
+}
+
+#[test]
+fn test_deep_nesting_conditionals() {
+    let output = test::render(&html! {
+        <div>
+            @if true {
+                <div>
+                    @if true {
+                        <div>
+                            @if false {
+                                "Unreachable"
+                            } else {
+                                "Deep"
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    });
+    assert!(output.contains("Deep"));
+    assert!(!output.contains("Unreachable"));
+}
+
+#[test]
+fn test_complex_attribute_expressions() {
+    let a = 10;
+    let b = 20;
+    let output = test::render(&html! {
+        <div data-val={ if a > b { "gt" } else { "lt" } }>
+            "Content"
+        </div>
+    });
+    assert!(output.contains("data-val=\"lt\""));
+}
