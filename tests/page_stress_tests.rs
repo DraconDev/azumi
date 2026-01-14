@@ -38,7 +38,7 @@ fn TraceLayout(children: impl azumi::Component) -> impl azumi::Component {
 #[azumi::page]
 fn trace_page() -> impl azumi::Component {
     html! {
-        @TraceLayout {
+        @TraceLayout() {
             "TraceContent"
         }
     }
