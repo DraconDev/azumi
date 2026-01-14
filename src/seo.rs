@@ -122,19 +122,28 @@ pub fn generate_head(
     let current_path = crate::context::get_current_path();
     let base_url = global.and_then(|g| g.base_url.as_deref());
 
-    let full_url = match (base_url, &current_path) {
-        (Some(base), Some(path)) => {
-            let base_clean = base.trim_end_matches('/');
-            let path_clean = if let Some(stripped) = path.strip_prefix('/') {
-                stripped
-            } else {
-                path
-            };
-            Some(format!("{}/{}", base_clean, path_clean))
+    // Resolve effective URL
+    // Priority: Explicit Arg > Context (inferred from Base + Path) > Global Default (Base)
+    let full_url = if let Some(u) = url {
+        Some(u.to_string())
+    } else {
+        match (base_url, &current_path) {
+            (Some(base), Some(path)) => {
+                let base_clean = base.trim_end_matches('/');
+                let path_clean = if let Some(stripped) = path.strip_prefix('/') {
+                    stripped
+                } else {
+                    path
+                };
+                Some(format!("{}/{}", base_clean, path_clean))
+            }
+            (Some(base), None) => Some(base.to_string()),
+            _ => None,
         }
-        (::std::option::Option::Some(base), ::std::option::Option::None) => Some(base.to_string()),
-        _ => None,
     };
+
+    // Resolve effective Type
+    let effective_type = type_.unwrap_or("website");
 
     // 5. Build Output
     let mut html = String::new();
@@ -179,9 +188,12 @@ pub fn generate_head(
                 let _ = write!(html, r#"<meta property="og:site_name" content="{}">"#, s);
             }
 
-            // Type (Default to website)
-            let type_ = og.type_.as_deref().unwrap_or("website");
-            let _ = write!(html, r#"<meta property="og:type" content="{}">"#, type_);
+            // Type
+            let _ = write!(
+                html,
+                r#"<meta property="og:type" content="{}">"#,
+                effective_type
+            );
         }
     }
 
@@ -217,7 +229,7 @@ pub fn generate_head(
 /// Call this inside your Layout's <head>.
 pub fn render_automatic_seo() -> crate::Raw<String> {
     // Pass empty strings to force reading from Context/Global
-    generate_head("", None, None)
+    generate_head("", None, None, None, None)
 }
 
 /// Simple Sitemap Builder
