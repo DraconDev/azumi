@@ -1,4 +1,4 @@
-use azumi::{html, render_to_string, Component};
+use azumi::{html, render_to_string};
 
 #[test]
 fn test_string_render() {

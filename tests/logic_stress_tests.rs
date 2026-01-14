@@ -129,6 +129,7 @@ fn test_high_iteration_loop() {
 }
 
 #[test]
+fn test_large_static_content() {
     let lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(10);
     let comp = html! {
         <div>
