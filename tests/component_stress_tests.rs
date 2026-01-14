@@ -1,27 +1,5 @@
 use azumi::{html, test, Component};
 
-macro_rules! generate_numeric_tests {
-    ($($t:ty),*) => {
-        $(
-            #[test]
-            fn [<test_ $t _render>]() {
-                let val: $t = 42 as $t;
-                let component = html! { <div>{val}</div> };
-                let output = test::render(&component);
-                assert!(output.contains("42"), "Failed for {}", stringify!($t));
-            }
-
-            #[test]
-            fn [<test_ $t _zero_render>]() {
-                let val: $t = 0 as $t;
-                let component = html! { <div>{val}</div> };
-                let output = test::render(&component);
-                assert!(output.contains("0"), "Failed for zero {}", stringify!($t));
-            }
-        )*
-    };
-}
-
 // Since I don't have paste crate available in the workspace easily without adding it,
 // I will just write a macro that takes the name manually or just create them.
 // Actually, I can use a simpler approach.
@@ -138,14 +116,18 @@ fn test_deep_nesting() {
 
 // Multiple children permutations
 #[azumi::component]
-fn Layout(title: &str, children: impl Component) -> impl Component {
+fn Layout<'a>(title: &'a str, children: impl Component + 'a) -> impl Component + 'a {
+    // Avoid undefined class error - using a static class name literal
     html! {
         <section>
             <h1>{title}</h1>
-            <div class={content}>
+            <div class={"content_class"}>
                 {children}
             </div>
         </section>
+        <style>
+            .content_class { padding: "1rem"; }
+        </style>
     }
 }
 
@@ -196,19 +178,35 @@ fn test_enum_rendering() {
     let s2 = Status::Inactive;
     let s3 = Status::Pending("Wait".to_string());
 
-    let render_status = |s: &Status| {
-        html! {
-            <div>
-                @match s {
-                    Status::Active => { "ACTIVE" }
-                    Status::Inactive => { "INACTIVE" }
-                    Status::Pending(msg) => { "PENDING: " {msg} }
-                }
-            </div>
-        }
+    let r1 = html! {
+        <div>
+            @match s1 {
+                Status::Active => { "ACTIVE" }
+                Status::Inactive => { "INACTIVE" }
+                Status::Pending(msg) => { "PENDING: " {msg} }
+            }
+        </div>
+    };
+    let r2 = html! {
+        <div>
+            @match s2 {
+                Status::Active => { "ACTIVE" }
+                Status::Inactive => { "INACTIVE" }
+                Status::Pending(msg) => { "PENDING: " {msg} }
+            }
+        </div>
+    };
+    let r3 = html! {
+        <div>
+            @match s3 {
+                Status::Active => { "ACTIVE" }
+                Status::Inactive => { "INACTIVE" }
+                Status::Pending(msg) => { "PENDING: " {msg} }
+            }
+        </div>
     };
 
-    assert!(test::render(&render_status(&s1)).contains("ACTIVE"));
-    assert!(test::render(&render_status(&s2)).contains("INACTIVE"));
-    assert!(test::render(&render_status(&s3)).contains("PENDING: Wait"));
+    assert!(test::render(&r1).contains("ACTIVE"));
+    assert!(test::render(&r2).contains("INACTIVE"));
+    assert!(test::render(&r3).contains("PENDING: Wait"));
 }

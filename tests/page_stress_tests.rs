@@ -1,4 +1,6 @@
-use azumi::{html, seo, test, Component, Schema};
+#[cfg(feature = "schema")]
+use azumi::Schema;
+use azumi::{html, seo, test, Component};
 
 // ════════════════════════════════════════════════════════════════════════════
 // SEO Tests Matrix
