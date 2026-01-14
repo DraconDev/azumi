@@ -1,0 +1,1 @@
+lets write hundreds of tests testing component and page types making sure all is valid

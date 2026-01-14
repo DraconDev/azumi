@@ -78,6 +78,18 @@ impl<T: Component + ?Sized> Component for std::sync::Arc<T> {
     }
 }
 
+impl Component for String {
+    fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", Escaped(self))
+    }
+}
+
+impl Component for str {
+    fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", Escaped(self))
+    }
+}
+
 pub fn from_fn<F>(f: F) -> FnComponent<F>
 where
     F: Fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result,

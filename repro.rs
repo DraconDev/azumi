@@ -21,10 +21,6 @@ impl Component for MyComponent {
     fn render(&self) {}
 }
 
-impl Component for String {
-    fn render(&self) {}
-}
-
 fn from_fn<F>(f: F)
 where
     F: Fn(),
