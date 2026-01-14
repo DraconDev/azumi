@@ -77,12 +77,26 @@ pub fn expand_head(input: TokenStream) -> TokenStream {
         quote! { None }
     };
 
+    let url = if let Some(u) = args.url {
+        quote! { Some(#u) }
+    } else {
+        quote! { None }
+    };
+
+    let type_ = if let Some(t) = args.type_ {
+        quote! { Some(#t) }
+    } else {
+        quote! { None }
+    };
+
     let expanded = quote! {
         {
             azumi::seo::generate_head(
                 #title,
                 #description,
                 #image,
+                #url,
+                #type_,
             )
         }
     };
