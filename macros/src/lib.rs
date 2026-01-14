@@ -1,4 +1,4 @@
-// Force rebuild 14
+// Force rebuild 15
 mod component;
 
 mod accessibility_validator;
@@ -149,41 +149,41 @@ pub fn html(input: TokenStream) -> TokenStream {
 
     // HOT RELOAD INJECTION START
     let hot_reload_code = if let Some((_statics, dynamics)) = try_extract_template(&nodes) {
-         let id_lit = if !nodes.is_empty() {
-             let _span = nodes[0].span();
-             quote! {
-                concat!(file!(), ":", line!(), ":", column!())
-             }
-         } else {
-             quote! { "unknown" }
-         };
+        let id_lit = if !nodes.is_empty() {
+            let _span = nodes[0].span();
+            quote! {
+               concat!(file!(), ":", line!(), ":", column!())
+            }
+        } else {
+            quote! { "unknown" }
+        };
 
-         let dynamic_blocks = dynamics.iter().enumerate().map(|(i, d)| {
-             let w_name = quote::format_ident!("__w{}", i);
-             let c_name = quote::format_ident!("__c{}", i);
-             let h_name = quote::format_ident!("__h{}", i);
-             quote! {
-                 let #w_name = azumi::RenderWrapper(&(#d));
-                 let #c_name = |f: &mut std::fmt::Formatter| #w_name.render_azumi(f);
-                 let #h_name = azumi::HotReloadClosure(&#c_name);
-             }
-         });
-         
-         let dynamic_refs = dynamics.iter().enumerate().map(|(i, _)| {
-             let h_name = quote::format_ident!("__h{}", i);
-             quote! { &#h_name }
-         });
+        let dynamic_blocks = dynamics.iter().enumerate().map(|(i, d)| {
+            let w_name = quote::format_ident!("__w{}", i);
+            let c_name = quote::format_ident!("__c{}", i);
+            let h_name = quote::format_ident!("__h{}", i);
+            quote! {
+                let #w_name = azumi::RenderWrapper(&(#d));
+                let #c_name = |f: &mut std::fmt::Formatter| #w_name.render_azumi(f);
+                let #h_name = azumi::HotReloadClosure(&#c_name);
+            }
+        });
 
-         quote! {
-             #[cfg(debug_assertions)]
-             {
-                 if let Some(tmpl) = azumi::hot_reload::get_template(#id_lit) {
-                     #(#dynamic_blocks)*
-                     let dyns: &[&dyn azumi::FallbackRender] = &[ #(#dynamic_refs),* ];
-                     return tmpl.render(f, dyns);
-                 }
-             }
-         }
+        let dynamic_refs = dynamics.iter().enumerate().map(|(i, _)| {
+            let h_name = quote::format_ident!("__h{}", i);
+            quote! { &#h_name }
+        });
+
+        quote! {
+            #[cfg(debug_assertions)]
+            {
+                if let Some(tmpl) = azumi::hot_reload::get_template(#id_lit) {
+                    #(#dynamic_blocks)*
+                    let dyns: &[&dyn azumi::FallbackRender] = &[ #(#dynamic_refs),* ];
+                    return tmpl.render(f, dyns);
+                }
+            }
+        }
     } else {
         quote! {}
     };
@@ -985,9 +985,7 @@ fn generate_body_with_context(
                                                 tokens.to_string().replace(" ", "")
                                             }
                                         }
-                                        syn::Expr::MethodCall(m) => {
-                                            m.method.to_string()
-                                        }
+                                        syn::Expr::MethodCall(m) => m.method.to_string(),
                                         _ => tokens.to_string().replace(" ", ""),
                                     }
                                 } else {
@@ -1135,106 +1133,103 @@ fn generate_body_with_context(
             token_parser::Node::Fragment(frag) => {
                 instructions.push(generate_body_with_context(&frag.children, ctx));
             }
-            token_parser::Node::Block(block) => {
-                match block {
-                    token_parser::Block::If(if_block) => {
-                        let cond = &if_block.condition;
-                        let then_body = generate_body_with_context(&if_block.then_branch, ctx);
-                        let else_part = if let Some(else_branch) = &if_block.else_branch {
-                            let else_body = generate_body_with_context(else_branch, ctx);
-                            quote! { else { #else_body } }
-                        } else {
-                            quote! {}
-                        };
+            token_parser::Node::Block(block) => match block {
+                token_parser::Block::If(if_block) => {
+                    let cond = &if_block.condition;
+                    let then_body = generate_body_with_context(&if_block.then_branch, ctx);
+                    let else_part = if let Some(else_branch) = &if_block.else_branch {
+                        let else_body = generate_body_with_context(else_branch, ctx);
+                        quote! { else { #else_body } }
+                    } else {
+                        quote! {}
+                    };
 
-                        instructions.push(quote! {
-                            if #cond {
-                                #then_body
-                            } #else_part
-                        });
-                    }
-                    token_parser::Block::For(for_block) => {
-                        let pat = &for_block.pattern;
-                        let iter = &for_block.iterator;
-                        let body = generate_body_with_context(&for_block.body, ctx);
-
-                        instructions.push(quote! {
-                            for #pat in #iter {
-                                #body
-                            }
-                        });
-                    }
-                    token_parser::Block::Match(match_block) => {
-                        let expr = &match_block.expr;
-                        let mut arms = Vec::new();
-                        for arm in &match_block.arms {
-                            let pat = &arm.pattern;
-                            let body = generate_body_with_context(&arm.body, ctx);
-                            arms.push(quote! {
-                                #pat => { #body }
-                            });
-                        }
-                        instructions.push(quote! {
-                            match #expr {
-                                #(#arms),*
-                            }
-                        });
-                    }
-                    token_parser::Block::Call(call_block) => {
-                        let func_path = &call_block.name;
-                        let func_mod_path = transform_path_for_component(func_path);
-
-                        let args_list = match parse_args(call_block.args.clone()) {
-                            Ok(a) => a,
-                            Err(e) => {
-                                instructions.push(e.to_compile_error());
-                                Vec::new()
-                            }
-                        };
-
-                        let setters = args_list.iter().map(|arg| {
-                            let key = &arg.key;
-                            let val = &arg.value;
-                            quote! { .#key(#val) }
-                        });
-
-                        let builder_expr = quote! {
-                            #func_mod_path::Props::builder()
-                            #(#setters)*
-                            .build()
-                            .expect("Failed to build props")
-                        };
-
-                        if call_block.children.is_empty() {
-                            instructions.push(quote! {
-                                #func_mod_path::render(#builder_expr).render(f)?;
-                            });
-                        } else {
-                            let children_body =
-                                generate_body_with_context(&call_block.children, ctx);
-                            let children_arg = quote! {
-                                azumi::from_fn(|f| {
-                                    #children_body
-                                    Ok(())
-                                })
-                            };
-
-                            instructions.push(quote! {
-                                #func_mod_path::render(#builder_expr, #children_arg).render(f)?;
-                            });
-                        }
-                    }
-                    token_parser::Block::Let(let_block) => {
-                        let pat = &let_block.pattern;
-                        let val = &let_block.value;
-                        instructions.push(quote! {
-                            let #pat = #val;
-                        });
-                    }
-                    token_parser::Block::Style(_) => {}
-                    _ => {}
+                    instructions.push(quote! {
+                        if #cond {
+                            #then_body
+                        } #else_part
+                    });
                 }
-            }
+                token_parser::Block::For(for_block) => {
+                    let pat = &for_block.pattern;
+                    let iter = &for_block.iterator;
+                    let body = generate_body_with_context(&for_block.body, ctx);
+
+                    instructions.push(quote! {
+                        for #pat in #iter {
+                            #body
+                        }
+                    });
+                }
+                token_parser::Block::Match(match_block) => {
+                    let expr = &match_block.expr;
+                    let mut arms = Vec::new();
+                    for arm in &match_block.arms {
+                        let pat = &arm.pattern;
+                        let body = generate_body_with_context(&arm.body, ctx);
+                        arms.push(quote! {
+                            #pat => { #body }
+                        });
+                    }
+                    instructions.push(quote! {
+                        match #expr {
+                            #(#arms),*
+                        }
+                    });
+                }
+                token_parser::Block::Call(call_block) => {
+                    let func_path = &call_block.name;
+                    let func_mod_path = transform_path_for_component(func_path);
+
+                    let args_list = match parse_args(call_block.args.clone()) {
+                        Ok(a) => a,
+                        Err(e) => {
+                            instructions.push(e.to_compile_error());
+                            Vec::new()
+                        }
+                    };
+
+                    let setters = args_list.iter().map(|arg| {
+                        let key = &arg.key;
+                        let val = &arg.value;
+                        quote! { .#key(#val) }
+                    });
+
+                    let builder_expr = quote! {
+                        #func_mod_path::Props::builder()
+                        #(#setters)*
+                        .build()
+                        .expect("Failed to build props")
+                    };
+
+                    if call_block.children.is_empty() {
+                        instructions.push(quote! {
+                            #func_mod_path::render(#builder_expr).render(f)?;
+                        });
+                    } else {
+                        let children_body = generate_body_with_context(&call_block.children, ctx);
+                        let children_arg = quote! {
+                            azumi::from_fn(|f| {
+                                #children_body
+                                Ok(())
+                            })
+                        };
+
+                        instructions.push(quote! {
+                            #func_mod_path::render(#builder_expr, #children_arg).render(f)?;
+                        });
+                    }
+                }
+                token_parser::Block::Let(let_block) => {
+                    let pat = &let_block.pattern;
+                    let val = &let_block.value;
+                    instructions.push(quote! {
+                        let #pat = #val;
+                    });
+                }
+                token_parser::Block::Style(_) => {}
+                _ => {}
+            },
             _ => {}
         }
     }
@@ -1245,7 +1240,9 @@ fn generate_body_with_context(
 }
 
 // Helper: try_extract_template implementation
-fn try_extract_template(nodes: &[token_parser::Node]) -> Option<(Vec<String>, Vec<proc_macro2::TokenStream>)> {
+fn try_extract_template(
+    nodes: &[token_parser::Node],
+) -> Option<(Vec<String>, Vec<proc_macro2::TokenStream>)> {
     let mut statics = Vec::new();
     let mut dynamics = Vec::new();
     let mut current_static = String::new();
@@ -1261,7 +1258,7 @@ fn extract_recursive(
     nodes: &[token_parser::Node],
     current_static: &mut String,
     statics: &mut Vec<String>,
-    dynamics: &mut Vec<proc_macro2::TokenStream>
+    dynamics: &mut Vec<proc_macro2::TokenStream>,
 ) -> bool {
     for node in nodes {
         match node {
@@ -1298,7 +1295,7 @@ fn extract_recursive(
                 dynamics.push(expr.content.clone());
             }
             token_parser::Node::Fragment(frag) => {
-                 if !extract_recursive(&frag.children, current_static, statics, dynamics) {
+                if !extract_recursive(&frag.children, current_static, statics, dynamics) {
                     return false;
                 }
             }
