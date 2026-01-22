@@ -67,9 +67,9 @@ __pycache__/
 *.pyc
 .venv/
 venv/
-demon/
-demon/keys/
-demon/shadow/
+demon/data/backups/
+demon/data/keys/
+demon/data/shadow/
 *.key
 *.age
 *.pem
