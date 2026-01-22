@@ -752,6 +752,7 @@ fn is_valid_css_property(name: &str) -> bool {
         "align-items",
         "align-self",
         "all",
+        "appearance",
         "animation",
         "animation-delay",
         "animation-direction",
@@ -978,6 +979,7 @@ fn is_valid_css_property(name: &str) -> bool {
         "z-index",
         // Vendor prefixes
         "-webkit-backdrop-filter",
+        "-webkit-appearance",
         "-webkit-background-clip",
         "-webkit-font-smoothing",
         "-webkit-overflow-scrolling",

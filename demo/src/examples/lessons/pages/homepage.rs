@@ -96,6 +96,7 @@ pub fn Lessons() -> impl Component {
                     @LessonCard(num="17", title="Testing", desc="Unit and Integration testing strategies.", link="/lesson-17-testing", accent="#ef4444")
                     @LessonCard(num="18", title="Security", desc="XSS prevention and safe practices.", link="/lesson-18-security", accent="#ef4444")
                     @LessonCard(num="19", title="Authentication", desc="User sessions and login flows.", link="/lesson-19-auth", accent="#ef4444")
+                    @LessonCard(num="20", title="Premium Sliders", desc="Modernized UI with 'appearance' property.", link="/lesson-20", accent="#ef4444")
                 </div>
             </section>
         </div>
