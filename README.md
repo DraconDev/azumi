@@ -1425,7 +1425,7 @@ cargo add azumi
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+Dracon License v1.0 - see [LICENSE](LICENSE) for details.
 
 ---
 
