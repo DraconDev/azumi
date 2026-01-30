@@ -4,14 +4,16 @@ use azumi::prelude::*;
 /// Component to be tested
 #[azumi::component]
 fn SimpleCard(title: String, content: String) -> impl Component {
-    let card = "card";
-    let title_class = "title";
-    let content_class = "content";
     html! {
         <div class={card}>
             <h2 class={title_class}>{title}</h2>
             <p class={content_class}>{content}</p>
         </div>
+        <style>
+            .card { padding: "1rem"; border: "1px solid #ddd"; }
+            .title { font-size: "1.25rem"; font-weight: "bold"; }
+            .content { color: "#666"; }
+        </style>
     }
 }
 
