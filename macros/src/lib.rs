@@ -893,6 +893,28 @@ fn validate_nodes(
                                             errors.push(quote_spanned! { ident.span() =>
                                                 compile_error!(#msg);
                                             });
+                                        } else if !valid_classes.contains(&var_name)
+                                            && !let_bindings.contains(&var_name)
+                                        {
+                                            // The class is not defined in <style> and not a let binding
+                                            // This catches: let nice = "..."; class={nice}
+                                            let msg = format!(
+                                                "CSS class '{0}' is not defined.\n\n\
+                                                Variable '{0}' used in class={{{{0}}}} does not match any\n\
+                                                CSS class defined in the <style> block.\n\n\
+                                                CORRECT - Define the class in <style> block:\n\
+                                                    <div class={{{{0}}}}>...</div>\n\
+                                                    <style>\n\
+                                                        .{0} {{ ... }}\n\
+                                                    </style>\n\n\
+                                                If '{0}' is a string variable (e.g., let {0} = \"...\"),\n\
+                                                you may have accidentally used text content as a class name.\n\n\
+                                                See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules",
+                                                var_name
+                                            );
+                                            errors.push(quote_spanned! { ident.span() =>
+                                                compile_error!(#msg);
+                                            });
                                         }
                                     }
                                 }
