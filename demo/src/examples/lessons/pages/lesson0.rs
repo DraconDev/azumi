@@ -30,6 +30,7 @@ pub fn basic_component() -> impl azumi::Component {
         <div class={container}>
             <h1 class={title}>"Basic Azumi Component"</h1>
             <p class={desc}>"This demonstrates the basic component structure"</p>
+            
         </div>
         <style>
             .container {
