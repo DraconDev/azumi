@@ -416,10 +416,14 @@ fn test_loop_with_take() {
 
 #[test]
 fn test_dynamic_class() {
-    let cls = "active";
-    let component = html! { <div class={cls}>"Content"</div> };
+    let component = html! { 
+        <div class={active}>"Content"</div>
+        <style>
+            .active { font-weight: "bold"; }
+        </style>
+    };
     let html = test::render(&component);
-    assert!(html.contains("class=\"active\"") || html.contains("class="));
+    assert!(html.contains("class=\"active\""));
 }
 
 #[test]
