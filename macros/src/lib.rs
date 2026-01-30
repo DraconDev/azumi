@@ -855,13 +855,13 @@ fn validate_nodes(
                                                 Variable '{0}' was defined with @let, but CSS classes\n\
                                                 should be defined in <style> blocks, not as @let variables.\n\n\
                                                 CORRECT:\n\
-                                                    <div class={{{{0}}}>...</div>\n\
+                                                    <div class={{{{0}}}}>...</div>\n\
                                                     <style>\n\
-                                                        .{0}{{ ... }}\n\
+                                                        .{0} {{ ... }}\n\
                                                     </style>\n\n\
                                                 INCORRECT:\n\
                                                     @let {0} = \"...\";\n\
-                                                    <div class={{{{0}}}>...</div>\n\n\
+                                                    <div class={{{{0}}}}>...</div>\n\n\
                                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules",
                                                 var_name
                                             );
