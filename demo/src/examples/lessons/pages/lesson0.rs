@@ -30,7 +30,7 @@ pub fn basic_component() -> impl azumi::Component {
         <div class={container}>
             <h1 class={title}>"Basic Azumi Component"</h1>
             <p class={desc}>"This demonstrates the basic component structure"</p>
-            <p class={desc}>"All CSS is automatically scoped to this component"</p>
+            <p class={nice}>"All CSS is automatically scoped to this component"</p>
         </div>
         <style>
             .container {
