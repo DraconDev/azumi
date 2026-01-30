@@ -54,7 +54,6 @@ pub fn multi_element_component() -> impl azumi::Component {
             <h2 class={card_title}>"Multi-Element Component"</h2>
             <p class={card_content}>"Components can contain multiple elements with proper styling"</p>
             <p class={card_content}>"All CSS is automatically scoped to this component"</p>
-            <p class={highlight}>"All CSS is automatically scoped to this component"</p>
         </div>
         <style>
             .card {
