@@ -49,7 +49,7 @@ pub fn basic_component() -> impl azumi::Component {
 /// Example: Component with multiple elements
 #[azumi::component]
 pub fn multi_element_component() -> impl azumi::Component {
-    l
+    let highlight = "highlight";
     html! {
         <div class={card}>
             <h2 class={card_title}>"Multi-Element Component"</h2>
