@@ -62,7 +62,60 @@ html! {
     }
 ```
 
-### 3. IDs (`id={...}`)
+### 3. NEVER Use `@let` for CSS Class Names (ANTI-PATTERN)
+
+**This is a common AI mistake.** CSS classes must be defined in `<style>` blocks, NOT as `@let` variables. The `<style>` block automatically generates variables for you.
+
+```rust
+// ❌ WRONG - ANTI-PATTERN: @let for class names
+html! {
+    @let my_class = "my_class";  // DON'T DO THIS!
+    @let button_style = "btn_primary";  // DON'T DO THIS!
+    
+    <div class={my_class}>...</div>
+    <button class={button_style}>...</button>
+    
+    <style>
+        .my_class { color: "red"; }
+        .btn_primary { background: "blue"; }
+    </style>
+}
+
+// ✅ CORRECT - Define classes in <style> blocks only
+html! {
+    <div class={my_class}>...</div>
+    <button class={btn_primary}>...</button>
+    
+    <style>
+        .my_class { color: "red"; }
+        .btn_primary { background: "blue"; }
+    </style>
+}
+// The <style> block automatically creates `my_class` and `btn_primary` variables
+```
+
+**Why this matters:**
+- Using `@let` for class names bypasses compile-time CSS validation
+- It shadows the CSS-generated variable, causing confusing bugs
+- The `<style>` block already creates the variable for you
+
+**@let is for LOCAL VARIABLES (text content, calculations):**
+```rust
+// ✅ CORRECT - Use @let for text content or computed values
+html! {
+    @let user_name = "Alice";  // Text content is OK
+    @let item_count = items.len();  // Computed values are OK
+    
+    <h1>{user_name}</h1>
+    <p>"Items: " {item_count}</p>
+    
+    <style>
+        .h1 { font-size: "2rem"; }
+    </style>
+}
+```
+
+### 4. IDs (`id={...}`)
 
 - Same rules as classes: **Snake Case** and **Bracket Syntax ONLY**.
 - `id="..."` is **BANNED**.
