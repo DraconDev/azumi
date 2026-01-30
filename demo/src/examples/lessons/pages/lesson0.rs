@@ -26,12 +26,11 @@ pub fn hello_world() -> impl azumi::Component {
 /// Example: Component with styling and structure
 #[azumi::component]
 pub fn basic_component() -> impl azumi::Component {
-    let nice = "All CSS is automatically scoped to this component";
     html! {
         <div class={container}>
             <h1 class={title}>"Basic Azumi Component"</h1>
             <p class={desc}>"This demonstrates the basic component structure"</p>
-            <p class={nice}>"All CSS is automatically scoped to this component"</p>
+            <p class={highlight}>"All CSS is automatically scoped to this component"</p>
         </div>
         <style>
             .container {
@@ -42,6 +41,7 @@ pub fn basic_component() -> impl azumi::Component {
             }
             .title { color: "#38bdf8"; margin-bottom: "0.5rem"; font-size: "1.25rem"; }
             .desc { color: "#94a3b8"; }
+            .highlight { color: "#a5f3fc"; font-style: "italic"; }
         </style>
     }
 }
