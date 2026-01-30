@@ -1,1 +1,1 @@
-ai seems to make one bug that it writes class names with let = instead of using the css, what do you think should we disallow that ? and give a proper error message about what to read
+ai seems to make one bug that it writes class names with let = instead of using the css, what do you think should we disallow that ? and give a proper error message about what to read and what to do
