@@ -745,24 +745,25 @@ fn collect_let_bindings(nodes: &[token_parser::Node]) -> std::collections::HashS
 }
 
 /// Check if a value looks like a CSS class name definition
-/// This catches patterns like: "my_class", "btn-primary", "btn primary"
+/// This catches patterns like: "my_class", "btn-primary"
 /// But NOT regular text like: "Dynamic Component", "Hello World"
 fn looks_like_class_name(value: &str) -> bool {
     // Must be a reasonable length for a class name (not a sentence)
-    if value.len() > 30 {
+    if value.len() > 40 {
         return false;
     }
     
-    // Check for snake_case, kebab-case, or space-separated classes
-    // e.g., "my_class", "btn-primary", "btn primary"
-    let has_class_indicator = value.contains('_') || value.contains('-');
+    // Only catch explicit CSS naming patterns:
+    // - snake_case: "my_class", "button_primary"
+    // - kebab-case: "btn-primary", "my-class"
+    // NOT regular text like "Hello World" or "Dynamic Component"
+    // 
+    // Heuristic: snake_case or kebab-case uses consistent casing
+    // and no uppercase letters (except maybe first char)
+    let is_snake_case = value.contains('_') && !value.chars().any(|c| c.is_uppercase());
+    let is_kebab_case = value.contains('-') && !value.chars().any(|c| c.is_uppercase());
     
-    // Also check for multiple short words separated by spaces (likely class names)
-    // e.g., "btn primary", "card large"
-    let words: Vec<&str> = value.split_whitespace().collect();
-    let looks_like_class_list = words.len() > 1 && words.iter().all(|w| w.len() <= 15);
-    
-    has_class_indicator || looks_like_class_list
+    is_snake_case || is_kebab_case
 }
 
 /// Check if a let binding value is a string literal defining a class name
