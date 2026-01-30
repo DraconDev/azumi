@@ -32,12 +32,14 @@ impl TestCounter {
 
 #[azumi::component]
 fn counter_view<'a>(state: &'a TestCounter) -> impl Component + 'a {
-    let count_class = "count";
     html! {
         <div>
             <span class={count_class}>{state.count}</span>
             <button on:click={state.increment}>"Inc"</button>
         </div>
+        <style>
+            .count_class { font-size: "1.5rem"; font-weight: "bold"; }
+        </style>
     }
 }
 
