@@ -137,22 +137,22 @@ pub fn let_with_conditions() -> impl azumi::Component {
 pub fn let_composition_example() -> impl azumi::Component {
     html! {
         <div class={composition_demo}>
-            <h3 class={title}>"@let for Composition"</h3>
+            <h3 class={section_title}>"@let for Composition"</h3>
 
-            @let title = "Dynamic Component";
-            @let content = "This component uses @let variables";
+            @let card_title = "Dynamic Component";
+            @let card_content = "This component uses @let variables";
 
             <div class={component_container}>
                 <div class={icon}>"✨"</div>
                 <div>
-                    <h4 class={comp_title}>{title}</h4>
-                    <p class={comp_text}>{content}</p>
+                    <h4 class={comp_title}>{card_title}</h4>
+                    <p class={comp_text}>{card_content}</p>
                 </div>
             </div>
         </div>
         <style>
             .composition_demo { padding: "1.5rem"; }
-            .title { color: "#e2e8f0"; margin-bottom: "1rem"; font-size: "1.25rem"; }
+            .section_title { color: "#e2e8f0"; margin-bottom: "1rem"; font-size: "1.25rem"; }
             .component_container {
                 margin: "1rem 0";
                 padding: "1.5rem";
