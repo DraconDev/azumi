@@ -54,16 +54,16 @@ mod tests {
     #[test]
     fn test_simple_card_render() {
         let card = SimpleCard::Props::builder()
-            .title("Test Title".to_string())
-            .content("Test Content".to_string())
+            ._title("Test Title".to_string())
+            ._content("Test Content".to_string())
             .build()
             .unwrap();
 
         let html = test::render(&SimpleCard::render(card));
 
         // Assert text content
-        test::assert_selector(&html, ".title", Some("Test Title"));
-        test::assert_selector(&html, ".content", Some("Test Content"));
+        test::assert_selector(&html, ".card_title", Some("Test Title"));
+        test::assert_selector(&html, ".card_content", Some("Test Content"));
     }
 
     #[test]
