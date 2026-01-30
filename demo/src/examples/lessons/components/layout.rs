@@ -77,6 +77,10 @@ pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Componen
             }
 
             /* Layout */
+            .html_root {
+                height: "100%";
+            }
+
             .dark_layout {
                 min-height: "100vh";
                 display: "flex";
