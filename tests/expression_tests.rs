@@ -187,10 +187,14 @@ fn test_expr_reference_deref() {
 
 #[test]
 fn test_attr_expr_string() {
-    let cls = "btn-primary";
-    let component = html! { <button class={cls}>"Click"</button> };
+    let component = html! { 
+        <button class={btn_primary}>"Click"</button>
+        <style>
+            .btn_primary { background: "blue"; padding: "0.5rem 1rem"; }
+        </style>
+    };
     let html = test::render(&component);
-    assert!(html.contains("class=\"btn-primary\""));
+    assert!(html.contains("class=\"btn_primary\""));
 }
 
 #[test]
