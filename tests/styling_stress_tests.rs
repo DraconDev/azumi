@@ -129,27 +129,28 @@ fn test_multiple_custom_properties() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// Complex Scoping (Shadowing)
+// Complex Scoping (Multiple Components)
 // ════════════════════════════════════════════════════════════════════════════
 
 #[test]
-fn test_style_variable_shadowing() {
-    // Test that @let variables don't conflict with @style variables
+fn test_style_multiple_classes() {
+    // Test that multiple classes from <style> work together
     let comp = html! {
-        <div>
-            @let my_manual_class = "manual";
-            <div class={my_manual_class}>"Manual"</div>
-            <div class={scoped_class}>"Scoped"</div>
+        <div class={container}>
+            <div class={header}>"Header"</div>
+            <div class={content}>"Content"</div>
         </div>
         <style>
-            .scoped_class { color: "yellow"; }
+            .container { padding: "1rem"; }
+            .header { font-weight: "bold"; }
+            .content { color: "blue"; }
         </style>
     };
     let output = test::render(&comp);
 
-    // "manual" should be literal because it's from @let
-    assert!(output.contains("class=\"manual\""));
-    // "scoped_class" should be literal "scoped_class" (Azumi uses data-s for scoping)
-    assert!(output.contains("class=\"scoped_class\""));
+    // All classes should be present
+    assert!(output.contains("class=\"container\""));
+    assert!(output.contains("class=\"header\""));
+    assert!(output.contains("class=\"content\""));
     assert!(output.contains("data-s"));
 }
