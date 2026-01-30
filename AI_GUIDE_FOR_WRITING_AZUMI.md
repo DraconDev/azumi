@@ -147,7 +147,7 @@ html! {
 }
 ```
 
-### 4. IDs (`id={...}`)
+### 5. IDs (`id={...}`)
 
 - Same rules as classes: **Snake Case** and **Bracket Syntax ONLY**.
 - `id="..."` is **BANNED**.
