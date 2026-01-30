@@ -4,10 +4,9 @@ use azumi::html;
 #[azumi::component]
 #[allow(non_snake_case)]
 pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Component {
-    let html_classes = "h-full antialiased selection:bg-indigo-500 selection:text-white";
     html! {
         <!DOCTYPE html>
-        <html lang="en" class={html_classes}>
+        <html lang="en" class={html_root}>
         <head>
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1" />
