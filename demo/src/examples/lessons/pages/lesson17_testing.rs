@@ -6,8 +6,8 @@ use azumi::prelude::*;
 fn SimpleCard(title: String, content: String) -> impl Component {
     html! {
         <div class={card}>
-            <h2 class={title_class}>{title}</h2>
-            <p class={content_class}>{content}</p>
+            <h2 class={title}>{title}</h2>
+            <p class={content}>{content}</p>
         </div>
         <style>
             .card { padding: "1rem"; border: "1px solid #ddd"; }
