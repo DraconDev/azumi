@@ -26,6 +26,7 @@ pub fn hello_world() -> impl azumi::Component {
 /// Example: Component with styling and structure
 #[azumi::component]
 pub fn basic_component() -> impl azumi::Component {
+    let nice
     html! {
         <div class={container}>
             <h1 class={title}>"Basic Azumi Component"</h1>
