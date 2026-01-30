@@ -469,8 +469,13 @@ fn test_dynamic_data_attribute() {
 #[test]
 fn test_conditional_class() {
     let is_active = true;
-    let cls = if is_active { "active" } else { "inactive" };
-    let component = html! { <div class={cls}>"Toggle"</div> };
+    let component = html! { 
+        <div class={if is_active { active } else { inactive }}>"Toggle"</div>
+        <style>
+            .active { font-weight: "bold"; }
+            .inactive { opacity: "0.5"; }
+        </style>
+    };
     let html = test::render(&component);
     assert!(html.contains("active"));
 }
