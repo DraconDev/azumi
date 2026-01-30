@@ -26,7 +26,7 @@ pub fn hello_world() -> impl azumi::Component {
 /// Example: Component with styling and structure
 #[azumi::component]
 pub fn basic_component() -> impl azumi::Component {
-    let nice
+    let nice = "All CSS is automatically scoped to this component";
     html! {
         <div class={container}>
             <h1 class={title}>"Basic Azumi Component"</h1>
