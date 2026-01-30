@@ -1722,8 +1722,19 @@ Azumi validates HTML structure at compile time:
 <button on:click={state.action}>"Click me"</button>
 <input on:input={state.update} />
 
-// Skip links for keyboard users
-<a href="#main-content" class={skip_link}>"Skip to main content"</a>
+// Skip links for keyboard users (with sr_only style for accessibility)
+<a href="#main-content" class={sr_only}>"Skip to main content"</a>
+
+<style>
+    // Screen reader only - visually hidden but accessible
+    .sr_only { 
+        position: "absolute"; 
+        left: "-10000px"; 
+        width: "1px"; 
+        height: "1px"; 
+        overflow: "hidden"; 
+    }
+</style>
 ```
 
 ---
