@@ -848,23 +848,18 @@ fn validate_nodes(
                                         // Check if this variable is a let binding (anti-pattern)
                                         if let_bindings.contains(&var_name) {
                                             let msg = format!(
-                                                "ANTI-PATTERN: class={{{{}}}} uses a @let binding.\n\
-                                                \n\
-                                                Variable '{}' was defined with @let, but CSS classes\n\
-                                                should be defined in <style> blocks, not as @let variables.\n\
-                                                \n\
-                                                ✅ CORRECT:\n\
-                                                    <div class={{{{}}}}>...</div>\n\
+                                                "ANTI-PATTERN: class={{{{var}}}} uses a @let binding.\n\n\
+                                                Variable '{var}' was defined with @let, but CSS classes\n\
+                                                should be defined in <style> blocks, not as @let variables.\n\n\
+                                                CORRECT:\n\
+                                                    <div class={{{{var}}}>...</div>\n\
                                                     <style>\n\
-                                                        .{}{{ ... }}\n\
-                                                    </style>\n\
-                                                \n\
-                                                ❌ INCORRECT:\n\
-                                                    @let {} = \"...\";\n\
-                                                    <div class={{{{}}}}>...</div>\n\
-                                                \n\
-                                                See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules",
-                                                var_name, var_name, var_name, var_name, var_name, var_name
+                                                        .{var}{{ ... }}\n\
+                                                    </style>\n\n\
+                                                INCORRECT:\n\
+                                                    @let {var} = \"...\";\n\
+                                                    <div class={{{{var}}}>...</div>\n\n\
+                                                See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules"
                                             );
                                             errors.push(quote_spanned! { ident.span() =>
                                                 compile_error!(#msg);
