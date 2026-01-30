@@ -1,1 +1,1 @@
-ai seems to make one bug that it writes class names with let = instead of using the css, what d
+ai seems to make one bug that it writes class names with let = instead of using the css, what do you think should we 
