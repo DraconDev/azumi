@@ -579,7 +579,14 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
     }
 
     let (global_css, scoped_css) = collect_all_styles(nodes);
-    let (valid_classes, valid_ids) = crate::css::extract_selectors(&scoped_css);
+    let (scoped_classes, scoped_ids) = crate::css::extract_selectors(&scoped_css);
+    let (global_classes, global_ids) = crate::css::extract_selectors(&global_css);
+    
+    // Combine scoped and global classes/IDs for validation
+    let valid_classes: std::collections::HashSet<String> = 
+        scoped_classes.into_iter().chain(global_classes.into_iter()).collect();
+    let valid_ids: std::collections::HashSet<String> = 
+        scoped_ids.into_iter().chain(global_ids.into_iter()).collect();
 
     let style_validation_errors =
         validate_nodes(nodes, &valid_classes, &valid_ids, !scoped_css.is_empty());
