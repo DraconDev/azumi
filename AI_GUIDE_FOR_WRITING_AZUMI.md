@@ -161,7 +161,7 @@ html! {
 }
 ```
 
-### 4. Inline Styles (`style={...}`)
+### 6. Inline Styles (`style={...}`)
 
 - Use the **Style DSL** with brackets.
 - `style="..."` string syntax is **BANNED**.
@@ -174,7 +174,7 @@ html! {
 // <div style="--color: red">...</div>
 ```
 
-### 5. Live State Requires Component Link
+### 7. Live State Requires Component Link
 
 ```rust
 // State definition
@@ -194,7 +194,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 }
 ```
 
-### 6. Event Binding Syntax
+### 8. Event Binding Syntax
 
 ```rust
 // ✅ CORRECT - use on:event={state.method}
@@ -205,7 +205,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 <button on:click={state.increment()}>"Click"</button>
 ```
 
-### 7. Text Content Must Be Quoted
+### 9. Text Content Must Be Quoted
 
 ```rust
 // ✅ CORRECT - all text in quotes
@@ -216,7 +216,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 <p>Hello world</p>
 ```
 
-### 8. Style Order: HTML First, Style Last
+### 10. Style Order: HTML First, Style Last
 
 For readability and consistency, always place your `<style>` block **after** your HTML content.
 
