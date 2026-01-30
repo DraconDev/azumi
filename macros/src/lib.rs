@@ -744,6 +744,27 @@ fn collect_let_bindings(nodes: &[token_parser::Node]) -> std::collections::HashS
     bindings
 }
 
+/// Check if a value looks like a CSS class name (contains dashes, spaces, or is snake_case)
+fn looks_like_class_name(value: &str) -> bool {
+    // Check if it's a string that looks like a CSS class
+    // e.g., "my_class", "btn-primary", "btn primary"
+    value.contains('_') || value.contains('-') || value.contains(' ')
+}
+
+/// Check if a let binding value is a string literal defining a class name
+fn is_let_class_definition(value: &proc_macro2::TokenStream) -> bool {
+    let value_str = value.to_string();
+    // Check if it's a quoted string
+    if (value_str.starts_with('"') && value_str.ends_with('"'))
+        || (value_str.starts_with("\"") && value_str.ends_with("\""))
+    {
+        let inner = value_str.trim_matches('"');
+        looks_like_class_name(inner)
+    } else {
+        false
+    }
+}
+
 fn validate_nodes(
     nodes: &[token_parser::Node],
     valid_classes: &std::collections::HashSet<String>,
@@ -770,6 +791,42 @@ fn validate_nodes(
     ) {
         for node in nodes {
             match node {
+                token_parser::Node::Block(token_parser::Block::Let(let_block)) => {
+                    // Check for anti-pattern: @let my_class = "my_class" or @let btn = "btn-primary"
+                    if is_let_class_definition(&let_block.value) {
+                        if let Ok(ident) = syn::parse2::<syn::Ident>(let_block.pattern.clone()) {
+                            let var_name = ident.to_string();
+                            let value_str = let_block.value.to_string().trim_matches('"').to_string();
+                            
+                            let msg = format!(
+                                "ANTI-PATTERN: @let {} = \"{}\"\n\
+                                \n\
+                                Using @let to define CSS class names is NOT allowed in Azumi.\n\
+                                CSS classes must be defined in <style> blocks, not as variables.\n\
+                                \n\
+                                ✅ CORRECT - Define in <style> block:\n\
+                                    <div class={{{{}}}}>...</div>\n\
+                                    <style>\n\
+                                        .{}{{ ... }}\n\
+                                    </style>\n\
+                                \n\
+                                ❌ INCORRECT - Using @let for classes:\n\
+                                    @let {} = \"{}\";  // DON'T DO THIS!\n\
+                                    <div class={{{{}}}}>...</div>\n\
+                                \n\
+                                The <style> block automatically creates the variable for you.\n\
+                                See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules section",
+                                var_name, value_str,
+                                var_name, 
+                                var_name,
+                                var_name, value_str, var_name
+                            );
+                            errors.push(quote_spanned! { let_block.span =>
+                                compile_error!(#msg);
+                            });
+                        }
+                    }
+                }
                 token_parser::Node::Element(elem) => {
                     for attr in &elem.attrs {
                         let name = &attr.name;
@@ -794,7 +851,32 @@ fn validate_nodes(
                                 token_parser::AttributeValue::Dynamic(tokens) => {
                                     if let Ok(ident) = syn::parse2::<syn::Ident>(tokens.clone()) {
                                         let var_name = ident.to_string();
-                                        if valid_ids.contains(&var_name)
+                                        
+                                        // Check if this variable is a let binding (anti-pattern)
+                                        if let_bindings.contains(&var_name) {
+                                            let msg = format!(
+                                                "ANTI-PATTERN: class={{{{}}}} uses a @let binding.\n\
+                                                \n\
+                                                Variable '{}' was defined with @let, but CSS classes\n\
+                                                should be defined in <style> blocks, not as @let variables.\n\
+                                                \n\
+                                                ✅ CORRECT:\n\
+                                                    <div class={{{{}}}}>...</div>\n\
+                                                    <style>\n\
+                                                        .{}{{ ... }}\n\
+                                                    </style>\n\
+                                                \n\
+                                                ❌ INCORRECT:\n\
+                                                    @let {} = \"...\";\n\
+                                                    <div class={{{{}}}}>...</div>\n\
+                                                \n\
+                                                See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules",
+                                                var_name, var_name, var_name, var_name, var_name, var_name
+                                            );
+                                            errors.push(quote_spanned! { ident.span() =>
+                                                compile_error!(#msg);
+                                            });
+                                        } else if valid_ids.contains(&var_name)
                                             && !valid_classes.contains(&var_name)
                                         {
                                             let msg = format!(
