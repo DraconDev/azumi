@@ -695,6 +695,55 @@ fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool 
     false
 }
 
+/// Collect all let binding variable names from the AST
+fn collect_let_bindings(nodes: &[token_parser::Node]) -> std::collections::HashSet<String> {
+    let mut bindings = std::collections::HashSet::new();
+    
+    fn collect_recursive(nodes: &[token_parser::Node], bindings: &mut std::collections::HashSet<String>) {
+        for node in nodes {
+            match node {
+                token_parser::Node::Block(token_parser::Block::Let(let_block)) => {
+                    // Extract the variable name from the pattern
+                    // The pattern is a TokenStream, usually just an identifier
+                    if let Ok(ident) = syn::parse2::<syn::Ident>(let_block.pattern.clone()) {
+                        bindings.insert(ident.to_string());
+                    }
+                }
+                token_parser::Node::Element(elem) => {
+                    collect_recursive(&elem.children, bindings);
+                }
+                token_parser::Node::Fragment(frag) => {
+                    collect_recursive(&frag.children, bindings);
+                }
+                token_parser::Node::Block(block) => match block {
+                    token_parser::Block::If(if_block) => {
+                        collect_recursive(&if_block.then_branch, bindings);
+                        if let Some(else_branch) = &if_block.else_branch {
+                            collect_recursive(else_branch, bindings);
+                        }
+                    }
+                    token_parser::Block::For(for_block) => {
+                        collect_recursive(&for_block.body, bindings);
+                    }
+                    token_parser::Block::Match(match_block) => {
+                        for arm in &match_block.arms {
+                            collect_recursive(&arm.body, bindings);
+                        }
+                    }
+                    token_parser::Block::Call(call_block) => {
+                        collect_recursive(&call_block.children, bindings);
+                    }
+                    _ => {}
+                },
+                _ => {}
+            }
+        }
+    }
+    
+    collect_recursive(nodes, &mut bindings);
+    bindings
+}
+
 fn validate_nodes(
     nodes: &[token_parser::Node],
     valid_classes: &std::collections::HashSet<String>,
@@ -703,12 +752,16 @@ fn validate_nodes(
 ) -> proc_macro2::TokenStream {
     use quote::quote_spanned;
     let mut errors = vec![];
+    
+    // Collect all let bindings to detect shadowing anti-pattern
+    let let_bindings = collect_let_bindings(nodes);
 
     #[allow(clippy::too_many_arguments)]
     fn collect_errors_recursive(
         nodes: &[token_parser::Node],
         valid_classes: &std::collections::HashSet<String>,
         valid_ids: &std::collections::HashSet<String>,
+        let_bindings: &std::collections::HashSet<String>,
         _has_scoped_css: bool,
         errors: &mut Vec<proc_macro2::TokenStream>,
         _is_inside_form: bool,
