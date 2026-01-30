@@ -492,10 +492,14 @@ fn test_computed_attribute() {
 
 #[test]
 fn test_multiple_dynamic_attrs() {
-    let cls = "card";
     let item_id = "card-1";
     let title = "Card Title";
-    let component = html! { <div class={cls} id={item_id} title={title}>"Content"</div> };
+    let component = html! { 
+        <div class={card} id={item_id} title={title}>"Content"</div>
+        <style>
+            .card { padding: "1rem"; border: "1px solid #ddd"; }
+        </style>
+    };
     let html = test::render(&component);
     assert!(html.contains("card") && html.contains("card-1"));
 }
