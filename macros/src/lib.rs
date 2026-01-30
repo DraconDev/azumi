@@ -798,18 +798,21 @@ fn validate_nodes(
                             let var_name = ident.to_string();
                             let value_str = let_block.value.to_string().trim_matches('"').to_string();
                             
+                            // To get literal braces in format! output: {{ and }}
+                            // To get format argument: {0}, {1}, etc.
+                            // So {{{{0}}}} produces: {{ + var_name + }} = {var_name}
                             let msg = format!(
                                 "ANTI-PATTERN: @let {0} = \"{1}\"\n\n\
                                 Using @let to define CSS class names is NOT allowed in Azumi.\n\
                                 CSS classes must be defined in <style> blocks, not as variables.\n\n\
                                 CORRECT - Define in <style> block:\n\
-                                    <div class={{{{0}}}>...</div>\n\
+                                    <div class={{{{0}}}}>...</div>\n\
                                     <style>\n\
-                                        .{0}{{ ... }}\n\
+                                        .{0} {{ ... }}\n\
                                     </style>\n\n\
                                 INCORRECT - Using @let for classes:\n\
                                     @let {0} = \"{1}\";  // DON'T DO THIS!\n\
-                                    <div class={{{{0}}}>...</div>\n\n\
+                                    <div class={{{{0}}}}>...</div>\n\n\
                                 The <style> block automatically creates the variable for you.\n\
                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules section",
                                 var_name, value_str
