@@ -1,1 +1,1 @@
-ai seems to make one bug that it writes 
+ai seems to make one bug that it writes class n
