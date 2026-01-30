@@ -799,27 +799,20 @@ fn validate_nodes(
                             let value_str = let_block.value.to_string().trim_matches('"').to_string();
                             
                             let msg = format!(
-                                "ANTI-PATTERN: @let {} = \"{}\"\n\
-                                \n\
+                                "ANTI-PATTERN: @let {} = \"{}\"\n\n\
                                 Using @let to define CSS class names is NOT allowed in Azumi.\n\
-                                CSS classes must be defined in <style> blocks, not as variables.\n\
-                                \n\
-                                ✅ CORRECT - Define in <style> block:\n\
-                                    <div class={{{{}}}}>...</div>\n\
+                                CSS classes must be defined in <style> blocks, not as variables.\n\n\
+                                CORRECT - Define in <style> block:\n\
+                                    <div class={{{{var}}}>...</div>\n\
                                     <style>\n\
                                         .{}{{ ... }}\n\
-                                    </style>\n\
-                                \n\
-                                ❌ INCORRECT - Using @let for classes:\n\
-                                    @let {} = \"{}\";  // DON'T DO THIS!\n\
-                                    <div class={{{{}}}}>...</div>\n\
-                                \n\
+                                    </style>\n\n\
+                                INCORRECT - Using @let for classes:\n\
+                                    @let {var} = \"{}\";  // DON'T DO THIS!\n\
+                                    <div class={{{{var}}}>...</div>\n\n\
                                 The <style> block automatically creates the variable for you.\n\
                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules section",
-                                var_name, value_str,
-                                var_name, 
-                                var_name,
-                                var_name, value_str, var_name
+                                var_name, value_str, var_name, value_str
                             );
                             errors.push(quote_spanned! { let_block.span =>
                                 compile_error!(#msg);
