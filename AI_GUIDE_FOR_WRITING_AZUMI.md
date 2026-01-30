@@ -99,6 +99,38 @@ html! {
 - It shadows the CSS-generated variable, causing confusing bugs
 - The `<style>` block already creates the variable for you
 
+### 4. CSS Classes MUST Be Defined in `<style>` Block
+
+**This is a common AI mistake.** Every class used in `class={...}` MUST have a corresponding `.classname` definition in the `<style>` block (or `<style global>`). The compiler will reject undefined classes.
+
+```rust
+// ❌ WRONG - 'nice' is not defined in <style>
+let nice = "All CSS is automatically scoped to this component";
+html! {
+    <p class={nice}>{nice}</p>  // ERROR: CSS class 'nice' is not defined
+    <style>
+        // No .nice here!
+    </style>
+}
+
+// ❌ WRONG - 'highlight' is used but not defined
+html! {
+    <p class={highlight}>"Highlighted text"</p>  // ERROR: CSS class 'highlight' is not defined
+    <style>
+        .container { padding: "1rem"; }
+        // No .highlight here!
+    </style>
+}
+
+// ✅ CORRECT - Define every used class in <style>
+html! {
+    <p class={highlight}>"Highlighted text"</p>
+    <style>
+        .highlight { background: "yellow"; font-weight: "bold"; }
+    </style>
+}
+```
+
 **@let is for LOCAL VARIABLES (text content, calculations):**
 ```rust
 // ✅ CORRECT - Use @let for text content or computed values
