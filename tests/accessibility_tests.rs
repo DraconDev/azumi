@@ -453,18 +453,26 @@ fn test_spellcheck() {
 
 #[test]
 fn test_sr_only_class() {
-    let sr_only = "sr-only";
-    let component = html! { <span class={sr_only}>"Screen reader only"</span> };
+    let component = html! { 
+        <span class={sr_only}>"Screen reader only"</span>
+        <style>
+            .sr_only { position: "absolute"; width: "1px"; height: "1px"; overflow: "hidden"; }
+        </style>
+    };
     let html = test::render(&component);
-    assert!(html.contains("sr-only"));
+    assert!(html.contains("class=\"sr_only\""));
 }
 
 #[test]
 fn test_visually_hidden() {
-    let vh = "visually-hidden";
-    let component = html! { <span class={vh}>"Hidden text"</span> };
+    let component = html! { 
+        <span class={visually_hidden}>"Hidden text"</span>
+        <style>
+            .visually_hidden { position: "absolute"; left: "-9999px"; }
+        </style>
+    };
     let html = test::render(&component);
-    assert!(html.contains("visually-hidden"));
+    assert!(html.contains("class=\"visually_hidden\""));
 }
 
 #[test]
