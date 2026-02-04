@@ -581,12 +581,16 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
     let (global_css, scoped_css) = collect_all_styles(nodes);
     let (scoped_classes, scoped_ids) = crate::css::extract_selectors(&scoped_css);
     let (global_classes, global_ids) = crate::css::extract_selectors(&global_css);
-    
+
     // Combine scoped and global classes/IDs for validation
-    let valid_classes: std::collections::HashSet<String> = 
-        scoped_classes.into_iter().chain(global_classes.into_iter()).collect();
-    let valid_ids: std::collections::HashSet<String> = 
-        scoped_ids.into_iter().chain(global_ids.into_iter()).collect();
+    let valid_classes: std::collections::HashSet<String> = scoped_classes
+        .into_iter()
+        .chain(global_classes.into_iter())
+        .collect();
+    let valid_ids: std::collections::HashSet<String> = scoped_ids
+        .into_iter()
+        .chain(global_ids.into_iter())
+        .collect();
 
     let style_validation_errors =
         validate_nodes(nodes, &valid_classes, &valid_ids, !scoped_css.is_empty());
@@ -705,8 +709,11 @@ fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool 
 /// Collect all let binding variable names from the AST
 fn collect_let_bindings(nodes: &[token_parser::Node]) -> std::collections::HashSet<String> {
     let mut bindings = std::collections::HashSet::new();
-    
-    fn collect_recursive(nodes: &[token_parser::Node], bindings: &mut std::collections::HashSet<String>) {
+
+    fn collect_recursive(
+        nodes: &[token_parser::Node],
+        bindings: &mut std::collections::HashSet<String>,
+    ) {
         for node in nodes {
             match node {
                 token_parser::Node::Block(token_parser::Block::Let(let_block)) => {
@@ -746,7 +753,7 @@ fn collect_let_bindings(nodes: &[token_parser::Node]) -> std::collections::HashS
             }
         }
     }
-    
+
     collect_recursive(nodes, &mut bindings);
     bindings
 }
@@ -759,17 +766,17 @@ fn looks_like_class_name(value: &str) -> bool {
     if value.len() > 40 {
         return false;
     }
-    
+
     // Only catch explicit CSS naming patterns:
     // - snake_case: "my_class", "button_primary"
     // - kebab-case: "btn-primary", "my-class"
     // NOT regular text like "Hello World" or "Dynamic Component"
-    // 
+    //
     // Heuristic: snake_case or kebab-case uses consistent casing
     // and no uppercase letters (except maybe first char)
     let is_snake_case = value.contains('_') && !value.chars().any(|c| c.is_uppercase());
     let is_kebab_case = value.contains('-') && !value.chars().any(|c| c.is_uppercase());
-    
+
     is_snake_case || is_kebab_case
 }
 
@@ -795,7 +802,7 @@ fn validate_nodes(
 ) -> proc_macro2::TokenStream {
     use quote::quote_spanned;
     let mut errors = vec![];
-    
+
     // Collect all let bindings to detect shadowing anti-pattern
     let let_bindings = collect_let_bindings(nodes);
 
@@ -818,8 +825,9 @@ fn validate_nodes(
                     if is_let_class_definition(&let_block.value) {
                         if let Ok(ident) = syn::parse2::<syn::Ident>(let_block.pattern.clone()) {
                             let var_name = ident.to_string();
-                            let value_str = let_block.value.to_string().trim_matches('"').to_string();
-                            
+                            let value_str =
+                                let_block.value.to_string().trim_matches('"').to_string();
+
                             // To get literal braces in format! output: {{ and }}
                             // To get format argument: {0}, {1}, etc.
                             // So {{{{0}}}} produces: {{ + var_name + }} = {var_name}
@@ -869,7 +877,7 @@ fn validate_nodes(
                                 token_parser::AttributeValue::Dynamic(tokens) => {
                                     if let Ok(ident) = syn::parse2::<syn::Ident>(tokens.clone()) {
                                         let var_name = ident.to_string();
-                                        
+
                                         // Check if this variable is a let binding (anti-pattern)
                                         if let_bindings.contains(&var_name) {
                                             let msg = format!(
@@ -1102,8 +1110,90 @@ fn generate_body_with_context(
                    write!(f, "<{}", #name)?;
                 });
 
+                // === FIX: Merge duplicate class attributes ===
+                // Collect all class attribute values to emit as a single class="..."
+                let mut class_static_parts: Vec<String> = Vec::new();
+                let mut class_dynamic_parts: Vec<proc_macro2::TokenStream> = Vec::new();
+
+                // Track attribute names to detect duplicates (non-class)
+                let mut seen_attrs: std::collections::HashSet<String> =
+                    std::collections::HashSet::new();
+
+                for attr in &elem.attrs {
+                    if attr.name == "class" {
+                        match &attr.value {
+                            token_parser::AttributeValue::Static(val) => {
+                                let clean = strip_outer_quotes(val);
+                                if !clean.is_empty() {
+                                    class_static_parts.push(clean);
+                                }
+                            }
+                            token_parser::AttributeValue::Dynamic(tokens) => {
+                                let exprs_res =
+                                    syn::parse::Parser::parse2(parse_multi_exprs, tokens.clone());
+                                match exprs_res {
+                                    Ok(exprs) if !exprs.is_empty() => {
+                                        for e in exprs {
+                                            class_dynamic_parts.push(quote! { #e });
+                                        }
+                                    }
+                                    _ => {
+                                        class_dynamic_parts.push(tokens.clone());
+                                    }
+                                }
+                            }
+                            _ => {}
+                        }
+                    } else if attr.name != "style" {
+                        // style has special merging too, skip for now
+                        // Check for duplicate non-class attributes
+                        if !seen_attrs.insert(attr.name.clone()) {
+                            let err_msg = format!(
+                                "Duplicate attribute '{}' on element <{}>. Only 'class' attributes can be merged.",
+                                attr.name, name
+                            );
+                            instructions.push(quote_spanned! { attr.span =>
+                                compile_error!(#err_msg);
+                            });
+                        }
+                    }
+                }
+
+                // Emit the merged class attribute (if any)
+                if !class_static_parts.is_empty() || !class_dynamic_parts.is_empty() {
+                    if class_dynamic_parts.is_empty() {
+                        // All static
+                        let merged = class_static_parts.join(" ");
+                        instructions.push(quote! {
+                            write!(f, " class=\"{}\"", #merged)?;
+                        });
+                    } else {
+                        // Has dynamic parts - build format string
+                        let total_parts = class_static_parts.len() + class_dynamic_parts.len();
+                        let fmt = vec!["{}"; total_parts].join(" ");
+
+                        let mut all_args: Vec<proc_macro2::TokenStream> = Vec::new();
+                        for s in &class_static_parts {
+                            all_args.push(quote! { #s });
+                        }
+                        for d in &class_dynamic_parts {
+                            all_args.push(quote! { #d });
+                        }
+
+                        instructions.push(quote! {
+                            write!(f, " class=\"{}\"", azumi::Escaped(&format!(#fmt, #(#all_args),*)))?;
+                        });
+                    }
+                }
+                // === END FIX ===
+
                 for attr in &elem.attrs {
                     let attr_name = &attr.name;
+
+                    // Skip class - already handled above
+                    if attr_name == "class" {
+                        continue;
+                    }
 
                     if attr_name.starts_with("az-") {
                         if attr_name == "az-scope" {
@@ -1196,40 +1286,6 @@ fn generate_body_with_context(
                                 instructions.push(quote! {
                                     write!(f, " az-on=\"{}\"", #dsl)?;
                                 });
-                            }
-                            _ => {}
-                        }
-                        continue;
-                    }
-
-                    if attr_name == "class" {
-                        match &attr.value {
-                            token_parser::AttributeValue::Static(val) => {
-                                let clean = strip_outer_quotes(val);
-                                instructions.push(quote! {
-                                    write!(f, " class=\"{}\"", #clean)?;
-                                });
-                            }
-                            token_parser::AttributeValue::Dynamic(tokens) => {
-                                let exprs_res =
-                                    syn::parse::Parser::parse2(parse_multi_exprs, tokens.clone());
-                                match exprs_res {
-                                    Ok(exprs) if !exprs.is_empty() => {
-                                        let fmt = vec!["{}"; exprs.len()].join(" ");
-                                        let mut format_args = Vec::new();
-                                        for e in exprs {
-                                            format_args.push(quote! { #e });
-                                        }
-                                        instructions.push(quote! {
-                                            write!(f, " class=\"{}\"", azumi::Escaped(&format!(#fmt, #(#format_args),*)))?;
-                                        });
-                                    }
-                                    _ => {
-                                        instructions.push(quote! {
-                                            write!(f, " class=\"{}\"", azumi::Escaped(&#tokens))?;
-                                        });
-                                    }
-                                }
                             }
                             _ => {}
                         }
