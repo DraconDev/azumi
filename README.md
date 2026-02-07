@@ -42,6 +42,7 @@ Traditional web frameworks let bugs slip through to production. Azumi doesn't.
 | Missing class → invisible bug | Missing class → **compile error**      |
 | Invalid HTML → maybe works?   | Invalid HTML → **compile error**       |
 | Click handler typo → 💀       | Click handler typo → **compile error** |
+| Duplicate attributes → shrug  | Duplicate attributes → **compile error** |
 
 **Everything happens at compile time.** Your IDE shows errors before you save. Your CI fails before it deploys. Your users never see a broken page.
 

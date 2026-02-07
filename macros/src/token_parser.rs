@@ -324,7 +324,7 @@ impl Parse for Element {
         input.parse::<Token![<]>()?;
         let (name, name_span) = parse_html_name(input, false)?; // false = don't allow double dash in tag names
 
-        let mut attrs = Vec::new();
+        let mut attrs: Vec<Attribute> = Vec::new();
         let mut bind_struct = None;
         let mut full_span = start_span;
 
@@ -345,6 +345,28 @@ impl Parse for Element {
                 }
             }
             attrs.push(input.parse()?);
+        }
+
+        // Azumi is strict: duplicate HTML attributes are invalid and lead to silent overrides in browsers.
+        // Fail closed at compile time so markup can't "almost work".
+        {
+            let mut seen: std::collections::HashSet<String> = std::collections::HashSet::new();
+            for attr in &attrs {
+                if !seen.insert(attr.name.clone()) {
+                    let guidance = match attr.name.as_str() {
+                        "class" => "Use a single `class={...}` and combine classes in one expression, e.g. `class={card active}`.",
+                        "style" => "Use a single `style={...}` attribute (prefer the Azumi style DSL / CSS variables).",
+                        _ => "Remove the duplicate attribute and compute the final value before rendering.",
+                    };
+                    return Err(Error::new(
+                        attr.name_span,
+                        format!(
+                            "Duplicate attribute `{}` on <{}> is not allowed.\n\n{}",
+                            attr.name, name, guidance
+                        ),
+                    ));
+                }
+            }
         }
 
         // Azumi 2.0: Magic "src" attributes
@@ -540,7 +562,7 @@ For dynamic styles: use style attribute with expressions"
                 return Err(Error::new(
                     if let Some(joined) = start_span.join(name_span) { joined } else { name_span },
                     format!(
-                        "Inline <{}> tags not allowed in Azumi 2.0\n\n{}\n\nWhy? External files get full IDE support (linting, autocomplete, error checking).",
+                        "Inline <{}> tags not allowed in Azumi 2.0\n\n{}\n\nNote: the escape hatch is explicit expressions only (`@{{azumi::Raw(...)}}`) and should be used sparingly.\n\nWhy? External files get full IDE support (linting, autocomplete, error checking).",
                         name, tag_help
                     ),
                 ));
@@ -991,6 +1013,7 @@ fn is_css_at_rule(input: ParseStream) -> bool {
 }
 
 fn parse_script_content(input: ParseStream, tag_name: &str) -> Result<Vec<Node>> {
+    let debug = std::env::var("AZUMI_DEBUG").is_ok();
     let mut nodes = Vec::new();
     // eprintln!("parse_script_content starting for tag: {}", tag_name);
     while !input.is_empty() {
@@ -1007,20 +1030,30 @@ fn parse_script_content(input: ParseStream, tag_name: &str) -> Result<Vec<Node>>
 
         if input.peek(Token![@]) {
             let is_css = is_css_at_rule(input);
-            eprintln!("Found @ in script, is_css_at_rule: {}", is_css);
+            if debug {
+                eprintln!("Found @ in script, is_css_at_rule: {}", is_css);
+            }
             if !is_css {
-                eprintln!("Not CSS, checking if it's a Brace...");
+                if debug {
+                    eprintln!("Not CSS, checking if it's a Brace...");
+                }
                 if input.peek2(Brace) {
                     // @{ ... } -> Expression
-                    eprintln!("Found @{{ ... }} expression!");
+                    if debug {
+                        eprintln!("Found @{{ ... }} expression!");
+                    }
                     input.parse::<Token![@]>()?;
                     nodes.push(Node::Expression(input.parse()?));
                 } else {
-                    eprintln!("Found Block (not brace)");
+                    if debug {
+                        eprintln!("Found Block (not brace)");
+                    }
                     nodes.push(Node::Block(input.parse()?));
                 }
             } else {
-                eprintln!("IS CSS, treating as text");
+                if debug {
+                    eprintln!("IS CSS, treating as text");
+                }
             }
         }
 
@@ -1028,10 +1061,14 @@ fn parse_script_content(input: ParseStream, tag_name: &str) -> Result<Vec<Node>>
             // Parse as text until @ (if not CSS) or </tag_name>
             let span = input.span();
             let mut tokens = Vec::new();
-            eprintln!("Parsing text...");
+            if debug {
+                eprintln!("Parsing text...");
+            }
             while !input.is_empty() {
                 if input.peek(Token![@]) && !is_css_at_rule(input) {
-                    eprintln!("Stopped text at @");
+                    if debug {
+                        eprintln!("Stopped text at @");
+                    }
                     break;
                 }
                 if input.peek(Token![<]) && input.peek2(Token![/]) {
@@ -1040,20 +1077,26 @@ fn parse_script_content(input: ParseStream, tag_name: &str) -> Result<Vec<Node>>
                     fork.parse::<Token![/]>()?;
                     if let Ok((name, _)) = parse_html_name(&fork, false) {
                         if name == tag_name {
-                            eprintln!("Stopped text at closing tag");
+                            if debug {
+                                eprintln!("Stopped text at closing tag");
+                            }
                             break;
                         }
                     }
                 }
 
                 let tt: TokenTree = input.parse()?;
-                eprintln!("Consumed token: {:?}", tt);
+                if debug {
+                    eprintln!("Consumed token: {:?}", tt);
+                }
                 tokens.push(tt);
             }
 
             if !tokens.is_empty() {
                 let content = tokens_to_string(&tokens);
-                eprintln!("Created Text node: {:?}", content);
+                if debug {
+                    eprintln!("Created Text node: {:?}", content);
+                }
                 nodes.push(Node::Text(Text { content, span }));
             }
         }

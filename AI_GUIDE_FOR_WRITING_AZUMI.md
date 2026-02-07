@@ -40,6 +40,7 @@ Azumi is a **compiler-driven optimistic UI framework** that generates client-sid
 - **Bracket Syntax ONLY:** You must use brackets with variables `class={my_class}`. Static strings usage (`class="my_class"`) is **BANNED** and will cause a compile error.
 - **No Magic:** Automatic scoping handles everything via variables.
 - **Expression Lists:** You can combine multiple class variables: `class={card active}`.
+- **No Duplicate Attributes:** `class={...} class={...}` (or any duplicate attribute name) is invalid HTML and is a **compile error** in Azumi. Combine into a single `class={...}`.
 
 ```rust
 html! {
