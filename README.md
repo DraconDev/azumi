@@ -1426,7 +1426,7 @@ cargo add azumi
 
 ## 📄 License
 
-Dracon License v1.1 - this project is covered by the umbrella Dracon License; see [LICENSE](LICENSE) for details and https://dracon.uk/licensing for current terms.
+Dracon License v1.1 - this project is covered by the umbrella Dracon License. Small teams can use included software for free; larger organizations need the annual commercial license described in [LICENSE](LICENSE). Current pricing and included products: https://dracon.uk/licensing
 
 ---
 
