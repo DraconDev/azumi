@@ -4,10 +4,16 @@ Copyright (c) 2024-2025 Dracon
 
 ## Summary
 
--   **Free** for individuals and small teams (under 5 employees).
+-   This software is an included non-service product under the umbrella **Dracon License**.
+-   **Free** where the current Dracon License free tier allows it.
 -   **Free** for everyone for evaluation, development, and testing.
--   **Paid Commercial License** required for companies with 5+ employees in production.
+-   **Paid Commercial License** required for production use outside the current free tier.
 -   **Forbidden** to build competing products.
+
+The current included-products list, tier thresholds, pricing, and public commercial terms
+are published at:
+
+**https://dracon.uk/licensing**
 
 ---
 
@@ -18,15 +24,18 @@ Copyright (c) 2024-2025 Dracon
 You may use, copy, modify, and distribute commercial or non-commercial applications built with this software for **FREE** if:
 
 -   You are an individual or sole proprietor.
--   You are a team or company with **fewer than 5 total employees/contractors**.
+-   You are an organization that falls within the current **Dracon License** free tier published at `https://dracon.uk/licensing`.
 -   You are a non-profit organization or educational institution.
+-   You are using the software only for evaluation, development, testing, or other non-production purposes.
 
 ### 1.2 Commercial License Required
 
 A Commercial License is required **ONLY** if:
 
--   You are an organization with **5 or more total employees/contractors**, AND
+-   You are an organization that does **not** fall within the current free tier published at `https://dracon.uk/licensing`, AND
 -   You are using the software for **Production** purposes.
+
+This software is covered through the umbrella **Dracon License**, not a separate product-specific commercial license.
 
 **Purchase a License:** https://dracon.uk/licensing
 
