@@ -14,13 +14,13 @@ outside the Free Use grant in Section 2.
 
 "Production Use" means use of the Software:
 
-- in a live environment;
-- in an internal business environment;
-- in a customer-facing environment;
-- in connection with commercial operations, revenue-generating activity, or the
-  delivery of products or services to third parties;
-- or in a staging, pre-production, or substantially similar environment that
-  supports or mirrors any of the above.
+(a) in a live environment;
+(b) in an internal business environment;
+(c) in a customer-facing environment;
+(d) in connection with commercial operations, revenue-generating activity, or
+the delivery of products or services to third parties; or
+(e) in a staging, pre-production, or substantially similar environment that
+supports or mirrors any of the foregoing.
 
 Production Use does not include evaluation, development, testing, continuous
 integration, security review, local experimentation, or other non-production
@@ -37,18 +37,18 @@ You may use, internally copy, modify, and deploy the Software, and you may
 distribute applications, binaries, or other works built with the Software,
 without a Commercial License if any of the following is true:
 
-- you are an individual or sole proprietor;
-- you are a nonprofit organization or educational institution;
-- you are an organization with fewer than 10 total employees and contractors;
-- or you are using the Software only for evaluation, development, testing, or
-  other non-production purposes.
+(a) you are an individual or sole proprietor;
+(b) you are a nonprofit organization or educational institution;
+(c) you are an organization with fewer than 10 total employees and contractors; or
+(d) you are using the Software only for evaluation, development, testing, or
+other non-production purposes.
 
 3. COMMERCIAL LICENSE REQUIRED
 
 A Commercial License is required if:
 
-- you are an organization with 10 or more total employees and contractors; and
-- you are making Production Use of the Software.
+(a) you are an organization with 10 or more total employees and contractors; and
+(b) you are making Production Use of the Software.
 
 This Software is covered under the umbrella Dracon License commercial model, not
 under a separate product-specific commercial license.
