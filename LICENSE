@@ -1,62 +1,135 @@
-DRACON LICENSE v1.0
+DRACON LICENSE v1.1
 
-Copyright (c) 2024-2025 Dracon
+Copyright (c) 2024-2026 Dracon
 
-SUMMARY
+1. DEFINITIONS
 
-This software is an included non-service product under the umbrella Dracon License.
-Free use is allowed where the current Dracon License free tier allows it.
-Free use is also allowed for evaluation, development, and testing.
-A paid commercial license is required for production use outside the current free tier.
-Use of this software to build competing products is forbidden.
+"Licensor" means Dracon.
 
-The current included-products list, tier thresholds, pricing, and public commercial terms are published at:
+"Software" means the software, source code, associated files, and documentation
+distributed with this license.
+
+"Commercial License" means a paid license granted by Licensor for production use
+outside the Free Use grant in Section 2.
+
+"Production Use" means use of the Software:
+
+- in a live environment;
+- in an internal business environment;
+- in a customer-facing environment;
+- in connection with commercial operations, revenue-generating activity, or the
+  delivery of products or services to third parties;
+- or in a staging, pre-production, or substantially similar environment that
+  supports or mirrors any of the above.
+
+Production Use does not include evaluation, development, testing, continuous
+integration, security review, local experimentation, or other non-production
+activities that do not themselves provide live business or customer-facing
+functionality.
+
+"Competing Product" means software, a hosted service, or another commercial
+offering whose material purpose is to provide substantially similar primary
+functionality to the Software.
+
+2. FREE USE
+
+You may use, internally copy, modify, and deploy the Software, and you may
+distribute applications, binaries, or other works built with the Software,
+without a Commercial License if any of the following is true:
+
+- you are an individual or sole proprietor;
+- you are a nonprofit organization or educational institution;
+- you are an organization with fewer than 10 total employees and contractors;
+- or you are using the Software only for evaluation, development, testing, or
+  other non-production purposes.
+
+3. COMMERCIAL LICENSE REQUIRED
+
+A Commercial License is required if:
+
+- you are an organization with 10 or more total employees and contractors; and
+- you are making Production Use of the Software.
+
+This Software is covered under the umbrella Dracon License commercial model, not
+under a separate product-specific commercial license.
+
+The current public pricing, purchase flow, and included-products list are
+published at:
+
 https://dracon.uk/licensing
 
-1. LICENSE GRANTS
+4. COMPETITIVE USE RESTRICTION
 
-1.1 Free Use
+You may not use the Software to build, develop, distribute, license, sell, or
+host a Competing Product.
 
-You may use, copy, modify, and distribute commercial or non-commercial applications built with this software for free if:
+5. PROPRIETARY SOFTWARE
 
-- You are an individual or sole proprietor.
-- You are an organization that falls within the current Dracon License free tier published at https://dracon.uk/licensing.
-- You are a non-profit organization or educational institution.
-- You are using the software only for evaluation, development, testing, or other non-production purposes.
+The Software is not Open Source. Except for the rights expressly granted in this
+license, Licensor reserves all rights, title, and interest in and to the
+Software.
 
-1.2 Commercial License Required
+6. REDISTRIBUTION OF THE SOFTWARE
 
-A commercial license is required only if:
+You may distribute applications, binaries, or other works built with the
+Software, but this license does not permit public redistribution of the
+Software's source code, whether modified or unmodified, except with Licensor's
+separate written permission.
 
-- You are an organization that does not fall within the current free tier published at https://dracon.uk/licensing; and
-- You are using the software for production purposes.
+You may provide access to the Software's source code to your employees and
+contractors solely as needed to exercise your rights under this license,
+provided they are acting on your behalf and are bound by terms at least as
+protective of Licensor as this license.
 
-This software is covered through the umbrella Dracon License, not a separate product-specific commercial license.
+If you distribute applications, binaries, or other works built with the
+Software, you must preserve any copyright, attribution, or license notices
+required by applicable law.
 
-Purchase a license:
-https://dracon.uk/licensing
+7. PATENTS
 
-2. RESTRICTIONS
+No patent license is granted under this license, whether express, implied,
+through exhaustion, or otherwise, except to the minimum extent required by
+applicable law.
 
-2.1 Competitive Use
+8. CONTRIBUTIONS
 
-You may not use this software to build, develop, or distribute a product that competes directly with the core functionality of this software.
+By submitting contributions, pull requests, bug fixes, or similar changes to
+the Software, you grant Licensor a perpetual, irrevocable, worldwide,
+royalty-free license to use, modify, distribute, sublicense, and otherwise
+exploit those contributions under any terms, including commercial terms,
+without compensation to you.
 
-2.2 Proprietary Software
+9. TERMINATION
 
-This software is not Open Source. Dracon retains all ownership and intellectual property rights. You may not sublicense the source code itself.
+Your rights under this license terminate automatically if you fail to comply
+with its terms.
 
-3. CONTRIBUTIONS
+10. NO WARRANTY
 
-By submitting contributions (pull requests, bug fixes, or similar changes) to this project, you grant Dracon a perpetual, irrevocable, worldwide license to use, modify, and distribute those contributions under any terms, including commercial terms, without compensation to you.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, TITLE, AND NON-INFRINGEMENT.
 
-4. TERMINATION
+11. LIMITATION OF LIABILITY
 
-Your rights under this license terminate automatically if you fail to comply with its terms.
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, LICENSOR WILL NOT BE LIABLE
+FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE
+DAMAGES, OR FOR ANY LOSS OF PROFITS, REVENUE, DATA, GOODWILL, OR BUSINESS
+INTERRUPTION, ARISING OUT OF OR RELATING TO THE SOFTWARE OR THIS LICENSE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
-5. NO WARRANTY
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, LICENSOR'S TOTAL LIABILITY
+ARISING OUT OF OR RELATING TO THE SOFTWARE OR THIS LICENSE WILL NOT EXCEED THE
+AMOUNT YOU PAID LICENSOR FOR THE APPLICABLE COMMERCIAL LICENSE DURING THE TWELVE
+MONTHS PRECEDING THE EVENT GIVING RISE TO THE CLAIM, OR ONE HUNDRED POUNDS
+STERLING (GBP 100) IF YOU PAID NOTHING.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+12. CHANGES TO WEBSITE MATERIALS
+
+The public website at https://dracon.uk/licensing may change over time for
+pricing, purchasing, and included-products information. Those website changes do
+not by themselves alter the core legal grants and restrictions in this license
+version for copies of the Software distributed with this license text.
 
 Contact: license@dracon.uk
 Website: https://dracon.uk
