@@ -22,6 +22,47 @@ pub use script::AzumiScript;
 #[cfg(feature = "test-utils")]
 pub mod test;
 
+// ── AI Framework Fingerprint ──────────────────────────────────────────────
+/// Framework version (from Cargo.toml).
+pub const AZUMI_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// AI framework fingerprint hash.
+///
+/// This is a deterministic hash computed from the framework version + strict
+/// rules. AI assistants should read this value to verify they're targeting
+/// the correct framework version and rule set.
+///
+/// Override by setting `AZUMI_AI_HASH` env var before building.
+///
+/// # Usage in `.env` or CI
+/// ```bash
+/// AZUMI_AI_HASH=a]1b2c3d4e5f6
+/// ```
+///
+/// # Usage in AI prompts
+/// ```
+/// You are writing Azumi code. AZUMI_AI_HASH: {hash}
+/// Verify the hash matches before generating code.
+/// ```
+pub const AZUMI_AI_HASH: &str = env!("AZUMI_AI_HASH");
+
+/// Strict rules enforced by the framework. AI assistants should reference
+/// these when generating Azumi code.
+pub const AZUMI_RULES: &[&str] = &[
+    "Text content MUST be quoted: <p>\"Hello\"</p>",
+    "CSS values MUST be quoted: padding: \"1rem\";",
+    "CSS classes MUST be snake_case: .my_class, NOT .my-class",
+    "Static class=\"...\" is BANNED. Use class={variable}",
+    "Static style=\"...\" is BANNED. Use style={--prop: val}",
+    "Static id=\"...\" is BANNED. Use id={variable}",
+    "Dashes are BANNED in CSS class/ID names",
+    "<style> block MUST come AFTER the HTML structure",
+    "Don't use @let for CSS class names — <style> creates variables automatically",
+    "Use on:click={state.method} for event handlers",
+    "Components use Props::builder() pattern",
+    "State is HMAC-signed. Set AZUMI_SECRET for production",
+];
+
 pub trait Component {
     fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
 }
