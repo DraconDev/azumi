@@ -241,72 +241,92 @@ class Azumi {
 
     /**
      * Apply a single prediction to state
-     * Format: "field = expression"
+     * Format: "field = expression" or "field.sub.path = expression"
      */
     applyPrediction(state, pred) {
-        // Parse: "field = expr"
-        const match = pred.match(/^(\w+)\s*=\s*(.+)$/);
+        // Parse: "field = expr" (supports nested paths like "user.count")
+        const match = pred.match(/^([\w.]+)\s*=\s*(.+)$/);
         if (!match) return;
 
-        const [, field, expr] = match;
+        const [, fieldPath, expr] = match;
         const trimmedExpr = expr.trim();
+        const pathParts = fieldPath.split(".");
+
+        // Helper: get nested property
+        const getNested = (obj, path) =>
+            path.reduce((o, k) => (o != null ? o[k] : undefined), obj);
+        // Helper: set nested property
+        const setNested = (obj, path, value) => {
+            const last = path[path.length - 1];
+            const target = path.slice(0, -1).reduce((o, k) => (o != null ? o[k] : undefined), obj);
+            if (target != null) target[last] = value;
+        };
+
+        const currentVal = getNested(state, pathParts);
 
         // Toggle: "!field"
         if (trimmedExpr.startsWith("!")) {
-            const toggleField = trimmedExpr.slice(1).trim();
-            if (toggleField === field) {
-                state[field] = !state[field];
+            const togglePath = trimmedExpr.slice(1).trim().split(".");
+            if (togglePath.join(".") === fieldPath) {
+                setNested(state, pathParts, !currentVal);
                 return;
             }
         }
 
         // Increment: "field + value"
-        const addMatch = trimmedExpr.match(/^(\w+)\s*\+\s*(\d+)$/);
-        if (addMatch && addMatch[1] === field) {
-            state[field] = (state[field] || 0) + parseInt(addMatch[2], 10);
+        const addMatch = trimmedExpr.match(/^([\w.]+)\s*\+\s*(\d+)$/);
+        if (addMatch && addMatch[1] === fieldPath) {
+            setNested(state, pathParts, (currentVal || 0) + parseInt(addMatch[2], 10));
             return;
         }
 
         // Decrement: "field - value"
-        const subMatch = trimmedExpr.match(/^(\w+)\s*-\s*(\d+)$/);
-        if (subMatch && subMatch[1] === field) {
-            state[field] = (state[field] || 0) - parseInt(subMatch[2], 10);
+        const subMatch = trimmedExpr.match(/^([\w.]+)\s*-\s*(\d+)$/);
+        if (subMatch && subMatch[1] === fieldPath) {
+            setNested(state, pathParts, (currentVal || 0) - parseInt(subMatch[2], 10));
             return;
         }
 
         // Literal assignment
         if (trimmedExpr === "true") {
-            state[field] = true;
+            setNested(state, pathParts, true);
         } else if (trimmedExpr === "false") {
-            state[field] = false;
+            setNested(state, pathParts, false);
         } else if (/^-?\d+$/.test(trimmedExpr)) {
-            state[field] = parseInt(trimmedExpr, 10);
+            setNested(state, pathParts, parseInt(trimmedExpr, 10));
         } else if (/^-?\d+\.\d+$/.test(trimmedExpr)) {
-            state[field] = parseFloat(trimmedExpr);
+            setNested(state, pathParts, parseFloat(trimmedExpr));
         } else if (trimmedExpr.startsWith('"') && trimmedExpr.endsWith('"')) {
-            state[field] = trimmedExpr.slice(1, -1);
+            setNested(state, pathParts, trimmedExpr.slice(1, -1));
         } else {
             // Fallback: treat as string
-            state[field] = trimmedExpr;
+            setNested(state, pathParts, trimmedExpr);
         }
     }
 
     /**
      * Update DOM elements that display state values
-     * Looks for elements with data-bind="fieldName" attribute
+     * Looks for elements with data-bind="fieldName" or data-bind="user.profile.name" attribute
      */
     updateBindings(scopeElement, state) {
         // Find all elements with data-bind within the scope
         const bindings = scopeElement.querySelectorAll("[data-bind]");
         bindings.forEach((el) => {
             const field = el.getAttribute("data-bind");
-            if (field && state.hasOwnProperty(field)) {
+            if (!field) return;
+
+            // Support nested paths like "user.profile.name"
+            if (field.includes(".")) {
+                const parts = field.split(".");
+                const val = parts.reduce(
+                    (o, k) => (o != null ? o[k] : undefined),
+                    state
+                );
+                if (val !== undefined) el.textContent = val;
+            } else if (state.hasOwnProperty(field)) {
                 el.textContent = state[field];
             }
         });
-
-        // Also update text content that might be interpolated
-        // This is a simple approach - for complex cases, re-render from server
     }
 
     /**
