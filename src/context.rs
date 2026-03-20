@@ -41,8 +41,12 @@ impl Drop for PageMetaGuard {
 }
 
 /// Set the metadata for the current page render.
-/// Returns a guard that clears the metadata on drop.
-/// The caller MUST hold this guard for the duration of the render.
+/// This should be called by the #[azumi::page] wrapper.
+///
+/// NOTE: Page metadata is stored in thread-local storage. It persists until
+/// the next call to `set_page_meta` or until the thread is reused.
+/// For most usage (render then discard), this is fine. If you need strict
+/// cleanup, hold the returned `PageMetaGuard` for the duration of the render.
 pub fn set_page_meta(
     title: Option<String>,
     description: Option<String>,
