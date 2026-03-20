@@ -11,36 +11,68 @@ fn init_test_seo() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// Layout that renders SEO tags (the correct pattern)
+// ════════════════════════════════════════════════════════════════════════════
+
+#[azumi::component]
+fn SeoLayout(children: impl azumi::Component) -> impl azumi::Component {
+    html! {
+        <html>
+            <head>
+                {seo::render_automatic_seo()}
+            </head>
+            <body>
+                {children}
+            </body>
+        </html>
+    }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // SEO Tests Matrix
 // ════════════════════════════════════════════════════════════════════════════
 
 #[azumi::page]
 fn seo_page_simple() -> impl azumi::Component {
-    html! { <h1>"Simple"</h1> }
+    html! {
+        @SeoLayout {
+            <h1>"Simple"</h1>
+        }
+    }
 }
 
 #[test]
 fn test_seo_inference_simple() {
     init_test_seo();
-    let _view = seo_page_simple();
-    let head = seo::render_automatic_seo();
-    let html = test::render(&head);
-    assert!(html.contains("<title>Seo Page Simple"));
+    let comp = seo_page_simple();
+    let html = test::render(&comp);
+    assert!(
+        html.contains("<title>Seo Page Simple"),
+        "Expected title 'Seo Page Simple' in:\n{}",
+        html
+    );
 }
 
 /// My Page Description
 #[azumi::page]
 fn seo_page_with_desc() -> impl azumi::Component {
-    html! { <h1>"Desc"</h1> }
+    html! {
+        @SeoLayout {
+            <h1>"Desc"</h1>
+        }
+    }
 }
 
 #[test]
 fn test_seo_inference_desc() {
     init_test_seo();
-    let _view = seo_page_with_desc();
-    let head = seo::render_automatic_seo();
-    let html = test::render(&head);
-    assert!(html.contains("content=\"My Page Description\""));
+    let comp = seo_page_with_desc();
+    let html = test::render(&comp);
+    assert!(
+        html.contains("content=\"My Page Description\""),
+        "Expected description in:\n{}",
+        html
+    );
 }
 
 #[test]
@@ -127,7 +159,7 @@ fn ComplexLayout(children: impl azumi::Component) -> impl azumi::Component {
 fn nested_page() -> impl azumi::Component {
     html! {
         @ComplexLayout {
-            "Content"
+            <h1>"Nested Content"</h1>
         }
     }
 }
@@ -137,6 +169,14 @@ fn test_layout_seo_propagation() {
     init_test_seo();
     let comp = nested_page();
     let html = test::render(&comp);
-    assert!(html.contains("<title>Nested Page"));
-    assert!(html.contains("id=\"layout-root\""));
+    assert!(
+        html.contains("<title>Nested Page"),
+        "Expected title 'Nested Page' in:\n{}",
+        html
+    );
+    assert!(
+        html.contains("id=\"layout-root\""),
+        "Expected layout-root in:\n{}",
+        html
+    );
 }
