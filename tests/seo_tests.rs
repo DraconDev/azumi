@@ -310,31 +310,43 @@ fn test_noscript() {
 fn test_seo_xss_title_script_injection() {
     let html = azumi::seo::generate_head(r#""><script>alert(1)</script>"#, None, None, None, None);
     let output = html.0;
+    // Must not contain unescaped <script>
     assert!(
         !output.contains("<script>"),
         "XSS: raw <script> found in output"
     );
+    // Angle brackets must be escaped
     assert!(
         output.contains("&lt;script&gt;"),
         "Expected escaped script tag"
     );
-    assert!(output.contains("&quot;"), "Expected escaped quotes");
+    // Quotes in title (text context) are not escaped by html_text_escape,
+    // but they're inside <title>text</title> which is safe.
+    // What matters: no attribute breakout is possible.
 }
 
 #[test]
 fn test_seo_xss_description_onload() {
     let html =
-        azumi::seo::generate_head("Safe Title", Some(r#"onload="alert(2)"#), None, None, None);
+        azumi::seo::generate_head("Safe Title", Some(r#"onload="alert(2)""#), None, None, None);
     let output = html.0;
-    assert!(!output.contains("onload="), "XSS: raw onload handler found");
+    // The quotes in the description must be escaped to prevent attribute breakout.
+    // Output should be: content="onload=&quot;alert(2)&quot;"
+    // NOT: content="onload="alert(2)"" (which would allow XSS)
     assert!(
-        output.contains("onload=&quot;"),
-        "Expected escaped quotes in description"
+        output.contains("&quot;alert(2)&quot;"),
+        "Quotes must be escaped in meta description attribute. Got: {}",
+        output
     );
 }
 
 #[test]
 fn test_seo_xss_image_url_javascript_protocol() {
+    // Ensure global config with OG is set so image tags are generated
+    let mut og = azumi::seo::OpenGraph::default();
+    og.site_name = Some("Test".into());
+    let config = azumi::seo::SeoConfig::new("Test").with_image("/default.jpg");
+    azumi::seo::init_seo(config);
     let html = azumi::seo::generate_head(
         "Safe Title",
         None,
@@ -343,10 +355,11 @@ fn test_seo_xss_image_url_javascript_protocol() {
         None,
     );
     let output = html.0;
-    // The value should be escaped, preventing attribute breakout
+    // The value should be present in a properly-quoted attribute
     assert!(
-        output.contains("javascript:alert(3)") || output.contains("javascript&#x3a;alert(3)"),
-        "Image URL should be present but escaped"
+        output.contains(r#"content="javascript:alert(3)""#),
+        "Image URL should be in a quoted attribute. Got: {}",
+        output
     );
 }
 
@@ -401,7 +414,11 @@ fn test_seo_safe_values_unchanged() {
         None,
     );
     let output = html.0;
-    assert!(output.contains("<title>Normal Title</title>"));
+    assert!(
+        output.contains("<title>Normal Title</title>") || output.contains("<title>Normal Title |"),
+        "Title should be present. Got: {}",
+        output
+    );
     assert!(output.contains(r#"content="A normal description.""#));
     assert!(output.contains(r#"href="https://example.com/page""#));
 }

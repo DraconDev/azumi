@@ -40,7 +40,7 @@ pub const AZUMI_VERSION: &str = env!("CARGO_PKG_VERSION");
 /// ```
 ///
 /// # Usage in AI prompts
-/// ```
+/// ```text
 /// You are writing Azumi code. AZUMI_AI_HASH: {hash}
 /// Verify the hash matches before generating code.
 /// ```

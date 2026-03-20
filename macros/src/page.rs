@@ -67,9 +67,8 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
         #[azumi::component]
         #fn_vis fn #fn_name() -> impl azumi::Component {
             // Set context for Layouts to find.
-            // Bind the guard so it lives for the entire render — if the return
-            // value is discarded as a temporary, PAGE_META is cleared immediately.
-            let _meta_guard = azumi::context::set_page_meta(
+            // Metadata persists in thread-local until the next set_page_meta call.
+            azumi::context::set_page_meta(
                 Some(#title.to_string()),
                 #desc_tokens,
                 None
