@@ -75,6 +75,10 @@ impl IsTerminal for std::io::Stdin {
     }
 }
 
+// The master loop runs forever, reaping child processes on each restart.
+// Clippy warns about zombie processes because the final Child isn't explicitly
+// waited on — but the loop never exits in normal operation.
+#[allow(clippy::zombie_processes)]
 fn run_master_loop() {
     use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
     use std::sync::mpsc::channel;
@@ -121,7 +125,7 @@ fn run_master_loop() {
 
             println!("🔄 Logic change detected. Rebuilding & Restarting...");
             let _ = server.kill();
-            let _ = server.wait();
+            let _ = server.wait(); // Reap zombie process before spawning new one
             server = start_worker(bin_name);
         }
     }
