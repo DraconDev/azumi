@@ -341,12 +341,19 @@ class Azumi {
         // without client-side signing keys.
         if (scopeElement) {
             if (scopeElement._azumi_pending) {
-                console.warn(
-                    "🚫 Action ignored: Request already pending for this component."
-                );
-                return;
+                // Clear stale locks after 30 seconds (server crash / network hang)
+                if (Date.now() - (scopeElement._azumi_pending_time || 0) > 30000) {
+                    console.warn("🔓 Clearing stale action lock (>30s timeout)");
+                    scopeElement._azumi_pending = false;
+                } else {
+                    console.warn(
+                        "🚫 Action ignored: Request already pending for this component."
+                    );
+                    return;
+                }
             }
             scopeElement._azumi_pending = true;
+            scopeElement._azumi_pending_time = Date.now();
         }
 
         // IMPORTANT: Capture state BEFORE prediction
@@ -354,9 +361,13 @@ class Azumi {
         // If we predict first, we might dirty the state or invalidly sign it.
         let body = null;
         if (element.tagName === "FORM") {
-            // For forms, we send the form data, not the state
+            // For forms, we send the form data alongside the parent scope's signed state.
+            // This allows the server to verify the request context.
             body = new FormData(element);
             const data = Object.fromEntries(body.entries());
+            if (scopeElement) {
+                data._azumi_scope = scopeElement.getAttribute("az-scope") || "";
+            }
             body = JSON.stringify(data);
         } else {
             if (scopeElement) {

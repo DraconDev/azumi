@@ -344,18 +344,26 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                     ) -> axum::response::Response {
                         let json = match azumi::security::verify_state(&body) {
                             Ok(j) => j,
-                            Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
+                            Err(e) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))
+                            ),
                         };
-                        let mut state: #struct_name = serde_json::from_str(&json).unwrap();
+                        let mut state: #struct_name = match serde_json::from_str(&json) {
+                            Ok(s) => s,
+                            Err(e) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::BAD_REQUEST, format!("State deserialization error: {}", e))
+                            ),
+                        };
                         #method_call
 
                         // Re-render the component with new state
-                        let html = azumi::render_to_string(&#comp_mod::render(
-                            #comp_mod::Props::builder()
-                                .state(&state)
-                                .build()
-                                .expect("Live component re-render failed")
-                        ));
+                        let props = match #comp_mod::Props::builder().state(&state).build() {
+                            Ok(p) => p,
+                            Err(e) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::INTERNAL_SERVER_ERROR, format!("Live component re-render failed: {}", e))
+                            ),
+                        };
+                        let html = azumi::render_to_string(&#comp_mod::render(props));
 
                         axum::response::IntoResponse::into_response(axum::response::Html(html))
                     }
@@ -372,9 +380,16 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                     ) -> axum::response::Response {
                         let json = match azumi::security::verify_state(&body) {
                             Ok(j) => j,
-                            Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
+                            Err(e) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))
+                            ),
                         };
-                        let mut state: #struct_name = serde_json::from_str(&json).unwrap();
+                        let mut state: #struct_name = match serde_json::from_str(&json) {
+                            Ok(s) => s,
+                            Err(e) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::BAD_REQUEST, format!("State deserialization error: {}", e))
+                            ),
+                        };
                         #method_call
                         axum::response::IntoResponse::into_response(axum::response::Json(state))
                     }

@@ -1,6 +1,38 @@
 use std::fmt::Write;
 use std::sync::OnceLock;
 
+/// Escape a string for safe inclusion in an HTML attribute value (double-quoted).
+/// Prevents XSS by escaping `"`, `<`, `>`, `&`, and `'`.
+fn html_attr_escape(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("&quot;"),
+            '\'' => out.push_str("&#x27;"),
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
+            '&' => out.push_str("&amp;"),
+            _ => out.push(c),
+        }
+    }
+    out
+}
+
+/// Escape a string for safe inclusion as HTML text content.
+/// Escapes `<`, `>`, and `&`.
+fn html_text_escape(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
+            '&' => out.push_str("&amp;"),
+            _ => out.push(c),
+        }
+    }
+    out
+}
+
 static SITE_CONFIG: OnceLock<SeoConfig> = OnceLock::new();
 
 #[derive(Clone, Default, Debug)]
@@ -145,15 +177,20 @@ pub fn generate_head(
     // Resolve effective Type
     let effective_type = type_.unwrap_or("website");
 
-    // 5. Build Output
+    // 5. Build Output (all values escaped to prevent XSS)
     let mut html = String::new();
 
+    let safe_title = html_text_escape(&full_title);
+    let safe_desc = effective_desc.as_deref().map(html_attr_escape);
+    let safe_url = full_url.as_deref().map(html_attr_escape);
+    let safe_image = effective_image.as_deref().map(html_attr_escape);
+
     // Basic Tags
-    let _ = write!(html, "<title>{}</title>", full_title);
-    if let Some(d) = &effective_desc {
+    let _ = write!(html, "<title>{}</title>", safe_title);
+    if let Some(d) = &safe_desc {
         let _ = write!(html, r#"<meta name="description" content="{}">"#, d);
     }
-    if let Some(url) = &full_url {
+    if let Some(url) = &safe_url {
         let _ = write!(html, r#"<link rel="canonical" href="{}">"#, url);
     }
 
@@ -165,58 +202,70 @@ pub fn generate_head(
             let _ = write!(
                 html,
                 r#"<meta property="og:title" content="{}">"#,
-                full_title
+                safe_title
             );
 
             // Description
-            if let Some(d) = &effective_desc {
+            if let Some(d) = &safe_desc {
                 let _ = write!(html, r#"<meta property="og:description" content="{}">"#, d);
             }
 
             // URL
-            if let Some(u) = &full_url {
+            if let Some(u) = &safe_url {
                 let _ = write!(html, r#"<meta property="og:url" content="{}">"#, u);
             }
 
             // Image
-            if let Some(i) = &effective_image {
+            if let Some(i) = &safe_image {
                 let _ = write!(html, r#"<meta property="og:image" content="{}">"#, i);
             }
 
             // Site Name (Always from global)
             if let Some(s) = &og.site_name {
-                let _ = write!(html, r#"<meta property="og:site_name" content="{}">"#, s);
+                let safe_s = html_attr_escape(s);
+                let _ = write!(
+                    html,
+                    r#"<meta property="og:site_name" content="{}">"#,
+                    safe_s
+                );
             }
 
             // Type
-            let _ = write!(
-                html,
-                r#"<meta property="og:type" content="{}">"#,
-                effective_type
-            );
+            let safe_type = html_attr_escape(effective_type);
+            let _ = write!(html, r#"<meta property="og:type" content="{}">"#, safe_type);
         }
     }
 
     // Twitter
     if let Some(g) = global {
         if let Some(tw) = &g.twitter {
-            let _ = write!(html, r#"<meta name="twitter:card" content="{}">"#, tw.card);
+            let safe_card = html_attr_escape(&tw.card);
+            let _ = write!(
+                html,
+                r#"<meta name="twitter:card" content="{}">"#,
+                safe_card
+            );
             if let Some(s) = &tw.site {
-                let _ = write!(html, r#"<meta name="twitter:site" content="{}">"#, s);
+                let safe_s = html_attr_escape(s);
+                let _ = write!(html, r#"<meta name="twitter:site" content="{}">"#, safe_s);
             }
             if let Some(c) = &tw.creator {
-                let _ = write!(html, r#"<meta name="twitter:creator" content="{}">"#, c);
+                let safe_c = html_attr_escape(c);
+                let _ = write!(
+                    html,
+                    r#"<meta name="twitter:creator" content="{}">"#,
+                    safe_c
+                );
             }
-            // Fallbacks for title/desc/image if not explicitly overridden in twitter object
             let _ = write!(
                 html,
                 r#"<meta name="twitter:title" content="{}">"#,
-                full_title
-            ); // Simplified: Always use page title
-            if let Some(d) = &effective_desc {
+                safe_title
+            );
+            if let Some(d) = &safe_desc {
                 let _ = write!(html, r#"<meta name="twitter:description" content="{}">"#, d);
             }
-            if let Some(i) = &effective_image {
+            if let Some(i) = &safe_image {
                 let _ = write!(html, r#"<meta name="twitter:image" content="{}">"#, i);
             }
         }

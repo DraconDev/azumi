@@ -301,3 +301,107 @@ fn test_noscript() {
     let html = test::render(&component);
     assert!(html.contains("<noscript>") && html.contains("JavaScript"));
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// SECTION: Security — XSS Prevention in SEO (generate_head)
+// ════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_seo_xss_title_script_injection() {
+    let html = azumi::seo::generate_head(r#""><script>alert(1)</script>"#, None, None, None, None);
+    let output = html.0;
+    assert!(
+        !output.contains("<script>"),
+        "XSS: raw <script> found in output"
+    );
+    assert!(
+        output.contains("&lt;script&gt;"),
+        "Expected escaped script tag"
+    );
+    assert!(output.contains("&quot;"), "Expected escaped quotes");
+}
+
+#[test]
+fn test_seo_xss_description_onload() {
+    let html =
+        azumi::seo::generate_head("Safe Title", Some(r#"onload="alert(2)"#), None, None, None);
+    let output = html.0;
+    assert!(!output.contains("onload="), "XSS: raw onload handler found");
+    assert!(
+        output.contains("onload=&quot;"),
+        "Expected escaped quotes in description"
+    );
+}
+
+#[test]
+fn test_seo_xss_image_url_javascript_protocol() {
+    let html = azumi::seo::generate_head(
+        "Safe Title",
+        None,
+        Some(r#"javascript:alert(3)"#),
+        None,
+        None,
+    );
+    let output = html.0;
+    // The value should be escaped, preventing attribute breakout
+    assert!(
+        output.contains("javascript:alert(3)") || output.contains("javascript&#x3a;alert(3)"),
+        "Image URL should be present but escaped"
+    );
+}
+
+#[test]
+fn test_seo_xss_angle_brackets_in_title() {
+    let html = azumi::seo::generate_head("<script>alert('xss')</script>", None, None, None, None);
+    let output = html.0;
+    assert!(!output.contains("<script>"), "Raw <script> in title");
+    assert!(
+        output.contains("&lt;script&gt;"),
+        "Title should escape angle brackets"
+    );
+}
+
+#[test]
+fn test_seo_xss_ampersand_escaping() {
+    let html = azumi::seo::generate_head(
+        "Tom & Jerry's <Best> \"Show\"",
+        Some("A & B <C> 'D'"),
+        None,
+        None,
+        None,
+    );
+    let output = html.0;
+    // Title (text context) should escape <, >, &
+    assert!(
+        output.contains("Tom &amp; Jerry"),
+        "Ampersand should be escaped in title"
+    );
+    assert!(
+        output.contains("&lt;Best&gt;"),
+        "Angle brackets should be escaped in title"
+    );
+    // Description (attribute context) should escape ", <, >, &, '
+    assert!(
+        output.contains("A &amp; B"),
+        "Ampersand should be escaped in desc attribute"
+    );
+    assert!(
+        output.contains("&lt;C&gt;"),
+        "Angle brackets should be escaped in desc attribute"
+    );
+}
+
+#[test]
+fn test_seo_safe_values_unchanged() {
+    let html = azumi::seo::generate_head(
+        "Normal Title",
+        Some("A normal description."),
+        Some("/images/photo.jpg"),
+        Some("https://example.com/page"),
+        None,
+    );
+    let output = html.0;
+    assert!(output.contains("<title>Normal Title</title>"));
+    assert!(output.contains(r#"content="A normal description.""#));
+    assert!(output.contains(r#"href="https://example.com/page""#));
+}

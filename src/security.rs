@@ -8,7 +8,23 @@ type HmacSha256 = Hmac<Sha256>;
 const DEFAULT_SECRET: &str = "azumi-dev-secret-do-not-use-in-prod";
 
 fn get_secret() -> String {
-    env::var("AZUMI_SECRET").unwrap_or_else(|_| DEFAULT_SECRET.to_string())
+    env::var("AZUMI_SECRET").unwrap_or_else(|_| {
+        #[cfg(debug_assertions)]
+        {
+            eprintln!(
+                "⚠️  WARNING: Using default dev HMAC secret. Set AZUMI_SECRET for production!"
+            );
+            DEFAULT_SECRET.to_string()
+        }
+        #[cfg(not(debug_assertions))]
+        {
+            panic!(
+                "FATAL: AZUMI_SECRET environment variable is REQUIRED in release builds.\n\
+                 The default dev secret is publicly known and insecure.\n\
+                 Set AZUMI_SECRET to a random 64+ character string before deploying."
+            );
+        }
+    })
 }
 
 /// Signs a state string with HMAC-SHA256.
@@ -75,6 +91,52 @@ mod tests {
         // Tamper with the JSON part
         let tampered = signed.replace("10", "99");
         let result = verify_state(&tampered);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_default_secret_is_obviously_dev() {
+        // The default secret must be obviously a dev placeholder
+        assert!(
+            DEFAULT_SECRET.contains("dev"),
+            "Default secret should contain 'dev'"
+        );
+        assert!(
+            DEFAULT_SECRET.contains("do-not-use"),
+            "Default secret should contain 'do-not-use'"
+        );
+        assert!(
+            DEFAULT_SECRET.len() < 50,
+            "Default secret should be short enough to not look like a real key"
+        );
+    }
+
+    #[test]
+    fn test_sign_verify_empty_string() {
+        let json = "";
+        let signed = sign_state(json);
+        let verified = verify_state(&signed).unwrap();
+        assert_eq!(verified, json);
+    }
+
+    #[test]
+    fn test_sign_verify_with_pipes_in_json() {
+        // JSON containing '|' should not break the separator logic
+        let json = r#"{"msg": "a|b|c"}"#;
+        let signed = sign_state(json);
+        let verified = verify_state(&signed).unwrap();
+        assert_eq!(verified, json);
+    }
+
+    #[test]
+    fn test_invalid_base64_signature() {
+        let result = verify_state(r#"{"count": 10}|not-valid-base64!!!"#);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_missing_separator() {
+        let result = verify_state(r#"{"count": 10}"#);
         assert!(result.is_err());
     }
 }

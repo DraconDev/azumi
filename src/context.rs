@@ -30,9 +30,24 @@ std::thread_local! {
     static PAGE_META: RefCell<PageMeta> = RefCell::new(PageMeta::default());
 }
 
+/// RAII guard that clears page metadata when dropped.
+/// Prevents thread-local state from leaking between requests.
+pub struct PageMetaGuard;
+
+impl Drop for PageMetaGuard {
+    fn drop(&mut self) {
+        PAGE_META.with(|p| *p.borrow_mut() = PageMeta::default());
+    }
+}
+
 /// Set the metadata for the current page render.
-/// This should be called by the #[azumi::page] wrapper.
-pub fn set_page_meta(title: Option<String>, description: Option<String>, image: Option<String>) {
+/// Returns a guard that clears the metadata on drop.
+/// The caller MUST hold this guard for the duration of the render.
+pub fn set_page_meta(
+    title: Option<String>,
+    description: Option<String>,
+    image: Option<String>,
+) -> PageMetaGuard {
     PAGE_META.with(|params| {
         *params.borrow_mut() = PageMeta {
             title,
@@ -40,6 +55,7 @@ pub fn set_page_meta(title: Option<String>, description: Option<String>, image: 
             image,
         };
     });
+    PageMetaGuard
 }
 
 /// Get the current page metadata.

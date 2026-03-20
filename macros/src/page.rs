@@ -66,8 +66,10 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
         // Public Wrapper
         #[azumi::component]
         #fn_vis fn #fn_name() -> impl azumi::Component {
-            // Set context for Layouts to find
-            azumi::context::set_page_meta(
+            // Set context for Layouts to find.
+            // The guard ensures metadata is cleared after this render completes,
+            // preventing thread-local state from leaking between requests.
+            let _meta_guard = azumi::context::set_page_meta(
                 Some(#title.to_string()),
                 #desc_tokens,
                 None

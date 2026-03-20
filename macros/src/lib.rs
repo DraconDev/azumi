@@ -673,7 +673,9 @@ fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool 
         match node {
             token_parser::Node::Element(elem) => {
                 if elem.name == "head" {
-                    let content = format!("{:?}", css);
+                    // Store CSS directly as a quoted string literal (not Debug format).
+                    // Debug format ({:?}) double-escapes characters and produces fragile output.
+                    let content = format!("\"{}\"", css.replace('\\', "\\\\").replace('"', "\\\""));
                     let text_node = token_parser::Node::Text(token_parser::Text {
                         content,
                         span: elem.span,
