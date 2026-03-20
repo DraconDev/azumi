@@ -210,12 +210,16 @@ pub fn js<T: std::fmt::Debug>(v: T) -> String {
     format!("{:?}", v)
 }
 
-/// Generate a unique scope ID for CSS scoping
-pub fn generate_scope_id() -> String {
-    use std::sync::atomic::{AtomicU64, Ordering};
-    static COUNTER: AtomicU64 = AtomicU64::new(0);
-    let id = COUNTER.fetch_add(1, Ordering::Relaxed);
-    format!("s{:x}", id)
+/// Compute a deterministic scope ID from source position (line, column).
+/// Used by both the proc-macro and the hot reload watcher to guarantee
+/// that scope IDs match at compile time and runtime.
+pub fn compute_scope_id(line: usize, col: usize) -> String {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+    let mut hasher = DefaultHasher::new();
+    line.hash(&mut hasher);
+    col.hash(&mut hasher);
+    format!("s{:x}", hasher.finish())
 }
 
 /// Transform CSS selectors to include scope attribute

@@ -13,6 +13,7 @@ mod page;
 #[cfg(feature = "schema")]
 mod schema;
 mod style;
+mod suggestions;
 mod test_spacing;
 mod token_parser;
 
@@ -93,17 +94,10 @@ fn parse_args(tokens: proc_macro2::TokenStream) -> syn::Result<Vec<KeyValueArg>>
     parser.parse2(tokens).map(|p| p.into_iter().collect())
 }
 
-// Helper to transform snake_case component paths to their module name (append _component)
+// Helper to transform component paths.
+// Currently just clones — the _component suffix was removed.
 fn transform_path_for_component(path: &syn::Path) -> syn::Path {
-    let mut new_path = path.clone();
-    if let Some(last) = new_path.segments.last_mut() {
-        let s = last.ident.to_string();
-        // If starts with lowercase, it's snake_case -> No longer appending _component suffix
-        if s.chars().next().map(|c| c.is_lowercase()).unwrap_or(false) {
-            // last.ident = syn::Ident::new(&format!("{}_component", s), last.ident.span());
-        }
-    }
-    new_path
+    path.clone()
 }
 
 // Helper for parsing space-separated expressions (e.g. class={expr1 expr2})
@@ -113,27 +107,6 @@ fn parse_multi_exprs(input: ParseStream) -> syn::Result<Vec<syn::Expr>> {
         exprs.push(input.parse()?);
     }
     Ok(exprs)
-}
-
-/// Validates that a style attribute only contains CSS custom properties (--variables).
-#[allow(dead_code)]
-fn validate_style_only_css_vars(style_value: &str) -> Result<(), String> {
-    for part in style_value.split(';') {
-        let part = part.trim();
-        if part.is_empty() {
-            continue;
-        }
-        if let Some(colon_pos) = part.find(':') {
-            let prop_name = part[..colon_pos].trim();
-            if !prop_name.starts_with("--") {
-                return Err(format!(
-                    "Invalid style property '{}'. Only CSS variables are allowed in inline styles.",
-                    prop_name
-                ));
-            }
-        }
-    }
-    Ok(())
 }
 
 #[proc_macro]
@@ -606,6 +579,8 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         use std::hash::{Hash, Hasher};
 
         let (scoped_output, scope_id) = if has_scoped {
+            // Compute scope ID from source position (line, col).
+            // This MUST match azumi::compute_scope_id() used by the hot reload watcher.
             let mut hasher = DefaultHasher::new();
             if cfg!(debug_assertions) {
                 let span = nodes[0].span();
@@ -834,19 +809,16 @@ fn validate_nodes(
                             // To get format argument: {0}, {1}, etc.
                             // So {{{{0}}}} produces: {{ + var_name + }} = {var_name}
                             let msg = format!(
-                                "ANTI-PATTERN: @let {0} = \"{1}\"\n\n\
-                                Using @let to define CSS class names is NOT allowed in Azumi.\n\
-                                CSS classes must be defined in <style> blocks, not as variables.\n\n\
-                                CORRECT - Define in <style> block:\n\
-                                    <div class={{{{0}}}}>...</div>\n\
-                                    <style>\n\
-                                        .{0} {{ ... }}\n\
-                                    </style>\n\n\
-                                INCORRECT - Using @let for classes:\n\
-                                    @let {0} = \"{1}\";  // DON'T DO THIS!\n\
-                                    <div class={{{{0}}}}>...</div>\n\n\
-                                The <style> block automatically creates the variable for you.\n\
-                                See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules section",
+                                "Don't use @let for CSS class names.\n\n\
+                                 You wrote:     @let {0} = \"{1}\";\n\
+                                 But <style> already creates the variable for you.\n\n\
+                                 Fix: Remove the @let line. Just use class={{{{0}}}} directly.\n\
+                                      The <style> block generates the variable automatically.\n\n\
+                                     <div class={{{{0}}}}>...</div>   ← This works!\n\
+                                     <style>\n\
+                                         .{0} {{ color: \"red\"; }}\n\
+                                     </style>\n\n\
+                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md § Critical Rules",
                                 var_name, value_str
                             );
                             errors.push(quote_spanned! { let_block.span =>
@@ -881,20 +853,35 @@ fn validate_nodes(
                                         let var_name = ident.to_string();
 
                                         // Check if this variable is a let binding (anti-pattern)
-                                        if let_bindings.contains(&var_name) {
+                                        if let_bindings.contains(&var_name)
+                                            && valid_classes.contains(&var_name)
+                                        {
+                                            // The @let shadows a CSS class — this is confusing and error-prone
                                             let msg = format!(
-                                                "ANTI-PATTERN: class={{{{0}}}} uses a @let binding.\n\n\
-                                                Variable '{0}' was defined with @let, but CSS classes\n\
-                                                should be defined in <style> blocks, not as @let variables.\n\n\
-                                                CORRECT:\n\
-                                                    <div class={{{{0}}}}>...</div>\n\
-                                                    <style>\n\
-                                                        .{0} {{ ... }}\n\
-                                                    </style>\n\n\
-                                                INCORRECT:\n\
-                                                    @let {0} = \"...\";\n\
-                                                    <div class={{{{0}}}}>...</div>\n\n\
-                                                See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules",
+                                                "'{0}' is both a @let variable AND a CSS class.\n\n\
+                                                 You wrote:     @let {0} = ...;  and  class={{{{0}}}}\n\
+                                                 The @let binding shadows the CSS-generated variable.\n\n\
+                                                 Fix: Either rename the @let variable or the CSS class.\n\n\
+                                                     @let {0}_text = \"hello\";   ← rename the variable\n\
+                                                     <div class={{{{0}}}}>{{{0}_text}}</div>\n\
+                                                     <style>.{0} {{ ... }}</style>\n\n\
+                                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md § @let Rules",
+                                                var_name
+                                            );
+                                            errors.push(quote_spanned! { ident.span() =>
+                                                compile_error!(#msg);
+                                            });
+                                        } else if let_bindings.contains(&var_name) {
+                                            let msg = format!(
+                                                "Don't use @let for CSS class names.\n\n\
+                                                 You wrote:     @let {0} = ...;  class={{{{0}}}}\n\
+                                                 But CSS classes should come from <style>, not @let.\n\n\
+                                                 Fix: Remove the @let. Use the <style> block instead.\n\n\
+                                                     <div class={{{{0}}}}>...</div>\n\
+                                                     <style>\n\
+                                                         .{0} {{ color: \"red\"; }}\n\
+                                                     </style>\n\n\
+                                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md § Critical Rules",
                                                 var_name
                                             );
                                             errors.push(quote_spanned! { ident.span() =>
@@ -904,8 +891,12 @@ fn validate_nodes(
                                             && !valid_classes.contains(&var_name)
                                         {
                                             let msg = format!(
-                                                "Variable '{}' refers to an ID selector (#{}) but is used in 'class' attribute. Did you mean to use 'id={}'?",
-                                                var_name, var_name, var_name
+                                                "'{0}' is an ID selector, not a class.\n\n\
+                                                 You wrote:     class={{{{0}}}}\n\
+                                                 But #{0} is defined in <style> as an ID.\n\n\
+                                                 Fix: Use id={{{{0}}}} instead of class={{{{0}}}}\n\n\
+                                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md § IDs",
+                                                var_name
                                             );
                                             errors.push(quote_spanned! { ident.span() =>
                                                 compile_error!(#msg);
@@ -915,20 +906,35 @@ fn validate_nodes(
                                         {
                                             // The class is not defined in <style> and not a let binding
                                             // This catches: let nice = "..."; class={nice}
-                                            let msg = format!(
-                                                "CSS class '{0}' is not defined.\n\n\
-                                                Variable '{0}' used in class={{{{0}}}} does not match any\n\
-                                                CSS class defined in the <style> block.\n\n\
-                                                CORRECT - Define the class in <style> block:\n\
-                                                    <div class={{{{0}}}}>...</div>\n\
-                                                    <style>\n\
-                                                        .{0} {{ ... }}\n\
-                                                    </style>\n\n\
-                                                If '{0}' is a string variable (e.g., let {0} = \"...\"),\n\
-                                                you may have accidentally used text content as a class name.\n\n\
-                                                See: AI_GUIDE_FOR_WRITING_AZUMI.md - Critical Rules",
-                                                var_name
+                                            let suggestion = crate::suggestions::closest_match(
+                                                &var_name,
+                                                valid_classes,
                                             );
+                                            let msg = if let Some(sug) = suggestion {
+                                                format!(
+                                                    "CSS class '{0}' is not defined. Did you mean '{1}'?\n\n\
+                                                    You wrote:     class={{{{0}}}}\n\
+                                                    The closest match in your <style> block is: .{1}\n\n\
+                                                    Fix:\n\
+                                                        <div class={{{{1}}}}>...</div>\n\n\
+                                                    Or define .{0} in your <style> block:\n\
+                                                        <style>\n\
+                                                            .{0} {{ ... }}\n\
+                                                        </style>\n\n\
+                                                    See: AI_GUIDE_FOR_WRITING_AZUMI.md § CSS Classes",
+                                                    var_name, sug
+                                                )
+                                            } else {
+                                                format!(
+                                                    "CSS class '{0}' is not defined.\n\n\
+                                                    You wrote:     class={{{{0}}}}\n\
+                                                    But no .{0} exists in your <style> block.\n\n\
+                                                    Fix: Add this to your <style>:\n\
+                                                        .{0} {{ background: \"#3b82f6\"; }}\n\n\
+                                                    See: AI_GUIDE_FOR_WRITING_AZUMI.md § CSS Classes",
+                                                    var_name
+                                                )
+                                            };
                                             errors.push(quote_spanned! { ident.span() =>
                                                 compile_error!(#msg);
                                             });
@@ -959,8 +965,12 @@ fn validate_nodes(
                                             && !valid_ids.contains(&var_name)
                                         {
                                             let msg = format!(
-                                                "Variable '{}' refers to a Class selector (.{}) but is used in 'id' attribute. Did you mean to use 'class={}'?",
-                                                var_name, var_name, var_name
+                                                "'{0}' is a class selector, not an ID.\n\n\
+                                                 You wrote:     id={{{{0}}}}\n\
+                                                 But .{0} is defined in <style> as a class.\n\n\
+                                                 Fix: Use class={{{{0}}}} instead of id={{{{0}}}}\n\n\
+                                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md § CSS Classes",
+                                                var_name
                                             );
                                             errors.push(quote_spanned! { ident.span() =>
                                                 compile_error!(#msg);

@@ -214,8 +214,17 @@ fn is_side_effect(expr: &Expr) -> bool {
     }
 }
 
+/// Check if a method call is a predictable self-field mutation.
+/// Currently returns false for all method calls — they are treated as side effects.
+///
+/// KNOWN LIMITATION: Patterns like `self.items.clear()` or `self.items.pop()`
+/// could theoretically be predicted but are not detected yet.
+/// Developers should use `#[azumi::predict("...")]` for complex mutations.
 fn is_self_field_mutation(_mc: &ExprMethodCall) -> bool {
-    // Check if this is something like self.field.push() which we can't predict
+    // TODO: Detect predictable self mutations:
+    //   self.field.clear()  → could predict "field = []"
+    //   self.field.pop()    → hard to predict (depends on current value)
+    //   self.field.push(v)  → hard to predict (needs value capture)
     false
 }
 
@@ -277,6 +286,9 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     let struct_name_str = quote!(#struct_name).to_string();
     // Clean up struct name (remove spaces)
     let struct_name_str = struct_name_str.replace(" ", "");
+
+    // Unique module name per struct to avoid collisions when multiple live_impls exist
+    let handler_mod = format_ident!("__azumi_live_{}", struct_name_str.to_lowercase());
 
     // Parse attributes to find component="name"
     let args = parse_macro_input!(attr with syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated);
@@ -440,9 +452,9 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        // Generated handlers module
+        // Generated handlers module (unique name per struct to avoid collisions)
         #[allow(non_snake_case)]
-        mod __azumi_live_handlers {
+        mod #handler_mod {
             use super::*;
             #(#method_handlers)*
         }

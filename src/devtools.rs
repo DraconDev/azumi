@@ -351,13 +351,8 @@ fn process_file_change(path: &Path) {
                         .unwrap_or(0);
                     let col = first_node_abs - line_start;
 
-                    use std::collections::hash_map::DefaultHasher;
-                    use std::hash::{Hash, Hasher};
-                    let mut hasher = DefaultHasher::new();
-                    line.hash(&mut hasher);
-                    col.hash(&mut hasher);
-                    let hash = hasher.finish();
-                    let scope_id = format!("s{:x}", hash);
+                    // Use shared scope ID function — must match the proc-macro
+                    let scope_id = crate::compute_scope_id(line, col);
 
                     let scoped_css = crate::scope_css(css_content, &scope_id);
                     crate::hot_reload::push_style_update(&scope_id, &scoped_css);
