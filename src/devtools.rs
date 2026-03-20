@@ -32,11 +32,8 @@ pub fn auto_reload() {
 ///
 /// # Usage
 /// ```rust,no_run
-/// fn main() {
-///     let is_dev = true; // or your own config check
-///     azumi::devtools::auto_reload_if(is_dev);
-///     // ...
-/// }
+/// let is_dev = true; // or your own config check
+/// azumi::devtools::auto_reload_if(is_dev);
 /// ```
 pub fn auto_reload_if(enabled: bool) {
     if !enabled {
@@ -93,7 +90,7 @@ fn run_master_loop() {
     // Watch common Rust directories
     for dir in ["src", "demo/src", "apps", "libs"] {
         if Path::new(dir).exists() {
-            let _ = watcher.watch(Path::new(dir), RecursiveMode::Recursive).unwrap();
+            watcher.watch(Path::new(dir), RecursiveMode::Recursive).unwrap();
         }
     }
 
@@ -101,34 +98,31 @@ fn run_master_loop() {
     let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_string());
 
     loop {
-        match rx.recv() {
-            Ok(Ok(event)) => {
-                if last_run.elapsed() < Duration::from_millis(200) {
-                    continue;
-                }
-                last_run = Instant::now();
-
-                let is_rs = event
-                    .paths
-                    .iter()
-                    .any(|p| p.extension().map_or(false, |e| e == "rs"));
-                if !is_rs {
-                    continue;
-                }
-
-                if let Some(path) = event.paths.first() {
-                    if let Ok(true) = try_hot_patch_internal(path, &port) {
-                        println!("⚡ Sub-second patch sent!");
-                        continue;
-                    }
-                }
-
-                println!("🔄 Logic change detected. Rebuilding & Restarting...");
-                let _ = server.kill();
-                let _ = server.wait();
-                server = start_worker(bin_name);
+        if let Ok(Ok(event)) = rx.recv() {
+            if last_run.elapsed() < Duration::from_millis(200) {
+                continue;
             }
-            _ => {}
+            last_run = Instant::now();
+
+            let is_rs = event
+                .paths
+                .iter()
+                .any(|p| p.extension().is_some_and(|e| e == "rs"));
+            if !is_rs {
+                continue;
+            }
+
+            if let Some(path) = event.paths.first() {
+                if let Ok(true) = try_hot_patch_internal(path, &port) {
+                    println!("⚡ Sub-second patch sent!");
+                    continue;
+                }
+            }
+
+            println!("🔄 Logic change detected. Rebuilding & Restarting...");
+            let _ = server.kill();
+            let _ = server.wait();
+            server = start_worker(bin_name);
         }
     }
 }
@@ -136,7 +130,7 @@ fn run_master_loop() {
 fn start_worker(bin_name: &str) -> Child {
     let mut cmd = Command::new("cargo");
     // Use --bin to ensure we run the same target even in workspaces
-    cmd.args(&["run", "--bin", bin_name, "--"]);
+    cmd.args(["run", "--bin", bin_name, "--"]);
     
     // Forward original CLI arguments to the worker
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -219,9 +213,9 @@ fn extract_templates_internal(content: &str, file_path: &str) -> HashMap<String,
 
         let mut depth = 1;
         let mut inner_end = 0;
-        let mut chars = content[open_brace + 1..].char_indices();
+        let chars = content[open_brace + 1..].char_indices();
 
-        while let Some((i, c)) = chars.next() {
+        for (i, c) in chars {
             if c == '{' {
                 depth += 1;
             } else if c == '}' {
@@ -300,7 +294,7 @@ fn watch_loop() -> Result<(), Box<dyn std::error::Error>> {
             Ok(Ok(event)) => {
                 if event.kind.is_modify() {
                     for path in event.paths {
-                        if path.extension().map_or(false, |ext| ext == "rs") {
+                        if path.extension().is_some_and(|ext| ext == "rs") {
                             process_file_change(&path);
                         }
                     }

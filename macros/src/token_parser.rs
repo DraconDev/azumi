@@ -1050,10 +1050,8 @@ fn parse_script_content(input: ParseStream, tag_name: &str) -> Result<Vec<Node>>
                     }
                     nodes.push(Node::Block(input.parse()?));
                 }
-            } else {
-                if debug {
-                    eprintln!("IS CSS, treating as text");
-                }
+            } else if debug {
+                eprintln!("IS CSS, treating as text");
             }
         }
 
