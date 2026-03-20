@@ -42,8 +42,11 @@ fn main() {
 /// This hash changes whenever the rules change, giving AI assistants
 /// a way to verify they're generating code for the correct rule set.
 fn compute_ai_hash() -> String {
+    let version = std::env::var("CARGO_PKG_VERSION").unwrap_or_else(|_| "unknown".into());
+
     let rules: &[&str] = &[
-        "version=0.8.11",
+        // Version is read from Cargo.toml at build time
+        "version=dynamic",
         // Syntax rules
         "text_must_be_quoted=true",
         "css_values_must_be_quoted=true",
@@ -64,6 +67,7 @@ fn compute_ai_hash() -> String {
     ];
 
     let mut hasher = DefaultHasher::new();
+    version.hash(&mut hasher);
     for rule in rules {
         rule.hash(&mut hasher);
     }

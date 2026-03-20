@@ -2,8 +2,8 @@
 # When you modify the AI rules, update this file to trigger a rebuild
 # and recompute AZUMI_AI_HASH.
 #
-# Current hash is computed in build.rs from the rules list.
+# Version hash is now computed dynamically from CARGO_PKG_VERSION.
 # Override with: AZUMI_AI_HASH=<your-hash> cargo build
 #
-# Version: 0.8.11
+# Version: 0.8.15
 # Last updated: 2026-03-20
