@@ -1,0 +1,9 @@
+# This file is a build marker — cargo watches it for changes.
+# When you modify the AI rules, update this file to trigger a rebuild
+# and recompute AZUMI_AI_HASH.
+#
+# Current hash is computed in build.rs from the rules list.
+# Override with: AZUMI_AI_HASH=<your-hash> cargo build
+#
+# Version: 0.8.11
+# Last updated: 2026-03-20
