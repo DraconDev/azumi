@@ -9,10 +9,12 @@ pub mod prelude {
 pub use azumi_macros::{action, component, head, html, live, live_impl, page, predict};
 pub mod action;
 pub mod context;
+#[cfg(feature = "devtools")]
 pub mod hot_reload;
 pub mod script;
 pub mod security;
 pub use inventory;
+#[cfg(feature = "devtools")]
 pub mod devtools;
 
 pub mod seo;
