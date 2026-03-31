@@ -1,12 +1,10 @@
-use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 
-// Global cache for the manifest to avoid re-reading file on every macro expansion
-static MANIFEST: Lazy<Mutex<Option<HashMap<String, String>>>> =
-    Lazy::new(|| Mutex::new(load_manifest()));
+static MANIFEST: LazyLock<Mutex<Option<HashMap<String, String>>>> =
+    LazyLock::new(|| Mutex::new(load_manifest()));
 
 fn load_manifest() -> Option<HashMap<String, String>> {
     let path = Path::new("assets_manifest.json");
