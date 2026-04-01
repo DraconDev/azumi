@@ -766,15 +766,71 @@ fn validate_nodes(
                         }
                     }
 
+                    // Accessibility validations
+                    if let Some(err) = accessibility_validator::validate_img_alt(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = accessibility_validator::validate_input_type(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = accessibility_validator::validate_aria_roles(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = accessibility_validator::validate_button_content(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = accessibility_validator::validate_anchor_target_blank(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = accessibility_validator::validate_iframe_title(elem) {
+                        errors.push(err);
+                    }
+
+                    // HTML structure validations
+                    for err in html_structure_validator::validate_table_children(elem) {
+                        errors.push(err);
+                    }
+                    for err in html_structure_validator::validate_list_children(elem) {
+                        errors.push(err);
+                    }
+                    for err in html_structure_validator::validate_nested_forms(elem, is_inside_form)
+                    {
+                        errors.push(err);
+                    }
+                    for err in html_structure_validator::validate_button_interactive(
+                        elem,
+                        is_inside_button,
+                    ) {
+                        errors.push(err);
+                    }
+                    for err in html_structure_validator::validate_paragraph_content(elem) {
+                        errors.push(err);
+                    }
+                    for err in
+                        html_structure_validator::validate_anchor_nesting(elem, is_inside_anchor)
+                    {
+                        errors.push(err);
+                    }
+                    for err in html_structure_validator::validate_heading_content(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = html_structure_validator::validate_tag_name(elem) {
+                        errors.push(err);
+                    }
+
+                    let new_inside_form = is_inside_form || elem.name == "form";
+                    let new_inside_button = is_inside_button || elem.name == "button";
+                    let new_inside_anchor = is_inside_anchor || elem.name == "a";
+
                     collect_errors_recursive(
                         &elem.children,
                         valid_classes,
                         valid_ids,
                         _has_scoped_css,
                         errors,
-                        _is_inside_form,
-                        _is_inside_button,
-                        _is_inside_anchor,
+                        new_inside_form,
+                        new_inside_button,
+                        new_inside_anchor,
                     );
                 }
                 token_parser::Node::Fragment(frag) => {
