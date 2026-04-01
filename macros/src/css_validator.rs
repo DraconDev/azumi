@@ -78,17 +78,8 @@ fn extract_html_classes_recursive(
                                 }
                             }
                         }
-                        AttributeValue::Dynamic(_expr) => {
-                            // For dynamic expressions, we can't validate at compile time
-                            // but we should warn about this
-                            eprintln!("Warning: Dynamic class attribute detected. Cannot validate at compile time.");
-                        }
-                        AttributeValue::StyleDsl(_) => {
-                            // Style DSL is not valid for class attribute
-                            eprintln!(
-                                "Warning: Style DSL used in class attribute. This is invalid."
-                            );
-                        }
+                        AttributeValue::Dynamic(_expr) => {}
+                        AttributeValue::StyleDsl(_) => {}
                         AttributeValue::None => {}
                     }
                 }

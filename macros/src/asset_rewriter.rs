@@ -8,30 +8,15 @@ static MANIFEST: LazyLock<Mutex<Option<HashMap<String, String>>>> =
 
 fn load_manifest() -> Option<HashMap<String, String>> {
     let path = Path::new("assets_manifest.json");
-    eprintln!(
-        "ASSET_REWRITER: Loading manifest from {:?}",
-        std::env::current_dir().unwrap().join(path)
-    );
-
     if let Ok(content) = fs::read_to_string(path) {
-        eprintln!(
-            "ASSET_REWRITER: Loaded manifest with {} bytes",
-            content.len()
-        );
         return serde_json::from_str(&content).ok();
     }
 
-    // Try looking in demo/ directory (common case if running from workspace root)
     let demo_path = Path::new("demo/assets_manifest.json");
     if let Ok(content) = fs::read_to_string(demo_path) {
-        eprintln!(
-            "ASSET_REWRITER: Loaded manifest from demo/ with {} bytes",
-            content.len()
-        );
         return serde_json::from_str(&content).ok();
     }
 
-    eprintln!("ASSET_REWRITER: Failed to load manifest");
     None
 }
 
@@ -92,7 +77,9 @@ pub fn rewrite_path(original: &str) -> Option<String> {
         return None;
     }
 
-    let guard = MANIFEST.lock().unwrap();
+    let Ok(guard) = MANIFEST.lock() else {
+        return None;
+    };
     if let Some(map) = &*guard {
         if let Some(hashed) = map.get(original) {
             return Some(hashed.clone());
