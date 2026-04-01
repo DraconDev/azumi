@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use crate::token_parser::{AttributeValue, Element};
 use proc_macro2::TokenStream;
 use quote::quote_spanned;

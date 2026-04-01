@@ -955,6 +955,26 @@ fn validate_nodes(
                         }
                     }
 
+                    // Accessibility validations
+                    if let Some(err) = accessibility_validator::validate_img_alt(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = accessibility_validator::validate_input_type(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = accessibility_validator::validate_aria_roles(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = accessibility_validator::validate_button_content(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = accessibility_validator::validate_anchor_target_blank(elem) {
+                        errors.push(err);
+                    }
+                    if let Some(err) = accessibility_validator::validate_iframe_title(elem) {
+                        errors.push(err);
+                    }
+
                     collect_errors_recursive(
                         &elem.children,
                         valid_classes,
