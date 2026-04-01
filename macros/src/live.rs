@@ -226,9 +226,7 @@ fn analyze_expr(expr: &Expr) -> Option<Prediction> {
 
 /// Analyze a method body for all predictable mutations
 pub fn analyze_method(method: &ImplItemFn) -> MethodAnalysis {
-    let name = method.sig.ident.to_string();
     let mut predictions = Vec::new();
-    let mut has_unpredictable = false;
 
     // Check for #[azumi::predict("...")] attribute
     for attr in &method.attrs {
@@ -240,6 +238,32 @@ pub fn analyze_method(method: &ImplItemFn) -> MethodAnalysis {
             {
                 predictions.push(Prediction::Manual(lit.value()));
             }
+        }
+    }
+
+    for stmt in &method.block.stmts {
+        if let Some(prediction) = analyze_statement(stmt) {
+            predictions.push(prediction);
+        }
+    }
+
+    MethodAnalysis {
+        predictions,
+    }
+}
+        }
+    }
+
+    for stmt in &method.block.stmts {
+        if let Some(prediction) = analyze_statement(stmt) {
+            predictions.push(prediction);
+        }
+    }
+
+    MethodAnalysis {
+        predictions,
+    }
+}
         }
     }
 
@@ -264,11 +288,7 @@ pub fn analyze_method(method: &ImplItemFn) -> MethodAnalysis {
         }
     }
 
-    MethodAnalysis {
-        name,
-        predictions,
-        has_unpredictable,
-    }
+    MethodAnalysis { predictions }
 }
 
 /// Check if an expression likely has side effects (async, await, method calls, etc.)
