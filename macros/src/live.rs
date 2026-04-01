@@ -247,64 +247,7 @@ pub fn analyze_method(method: &ImplItemFn) -> MethodAnalysis {
         }
     }
 
-    MethodAnalysis {
-        predictions,
-    }
-}
-        }
-    }
-
-    for stmt in &method.block.stmts {
-        if let Some(prediction) = analyze_statement(stmt) {
-            predictions.push(prediction);
-        }
-    }
-
-    MethodAnalysis {
-        predictions,
-    }
-}
-        }
-    }
-
-    for stmt in &method.block.stmts {
-        if let Some(prediction) = analyze_statement(stmt) {
-            predictions.push(prediction);
-        } else {
-            // Check if this is a statement that could have side effects
-            match stmt {
-                Stmt::Expr(expr, _semicolon) => {
-                    if is_side_effect(expr) {
-                        has_unpredictable = true;
-                    }
-                }
-                Stmt::Local(_) => {
-                    // Local variable bindings are fine
-                }
-                _ => {
-                    has_unpredictable = true;
-                }
-            }
-        }
-    }
-
     MethodAnalysis { predictions }
-}
-
-/// Check if an expression likely has side effects (async, await, method calls, etc.)
-fn is_side_effect(expr: &Expr) -> bool {
-    match expr {
-        Expr::Await(_) => true,
-        Expr::Call(_) => true, // Function calls might have side effects
-        Expr::MethodCall(mc) => {
-            // self.field mutations are handled separately
-            // External method calls are side effects
-            !is_self_field_mutation(mc)
-        }
-        Expr::Assign(_) => false, // Assignments to self are fine
-        Expr::Macro(_) => true,   // Macros are unpredictable
-        _ => false,
-    }
 }
 
 /// Check if a method call is a predictable self-field mutation.
