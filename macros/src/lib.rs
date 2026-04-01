@@ -676,9 +676,9 @@ fn validate_nodes(
         valid_ids: &std::collections::HashSet<String>,
         _has_scoped_css: bool,
         errors: &mut Vec<proc_macro2::TokenStream>,
-        _is_inside_form: bool,
-        _is_inside_button: bool,
-        _is_inside_anchor: bool,
+        is_inside_form: bool,
+        is_inside_button: bool,
+        is_inside_anchor: bool,
     ) {
         for node in nodes {
             match node {
