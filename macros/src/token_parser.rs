@@ -1015,7 +1015,6 @@ fn is_css_at_rule(input: ParseStream) -> bool {
 fn parse_script_content(input: ParseStream, tag_name: &str) -> Result<Vec<Node>> {
     let debug = std::env::var("AZUMI_DEBUG").is_ok();
     let mut nodes = Vec::new();
-    // eprintln!("parse_script_content starting for tag: {}", tag_name);
     while !input.is_empty() {
         if input.peek(Token![<]) && input.peek2(Token![/]) {
             let fork = input.fork();

@@ -20,7 +20,6 @@ use quote::{quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::parse_macro_input;
 use syn::Token;
-// use syn::spanned::Spanned;
 
 #[proc_macro]
 pub fn head(input: TokenStream) -> TokenStream {
