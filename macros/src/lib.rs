@@ -1104,6 +1104,12 @@ fn validate_nodes(
                             is_inside_anchor,
                         );
                     }
+                    _ => {}
+                },
+                _ => {}
+            }
+        }
+    }
                 token_parser::Node::Block(block) => match block {
                     token_parser::Block::If(if_block) => {
                         collect_errors_recursive(
