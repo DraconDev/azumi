@@ -250,28 +250,6 @@ pub fn analyze_method(method: &ImplItemFn) -> MethodAnalysis {
     MethodAnalysis { predictions }
 }
 
-/// Check if a method call is a predictable self-field mutation.
-/// Returns true for: self.field.clear(), self.field.pop(), self.field.push(v),
-/// self.map.insert(k, v), self.map.remove(k)
-fn is_self_field_mutation(mc: &ExprMethodCall) -> bool {
-    // Check if receiver is self.field
-    if let Expr::Field(ExprField { base, member, .. }) = &*mc.receiver {
-        if let Expr::Path(ExprPath { path, .. }) = &**base {
-            if path.is_ident("self") {
-                if let Member::Named(field) = member {
-                    let _field = field.to_string();
-                    let method_name = mc.method.to_string();
-                    return matches!(
-                        method_name.as_str(),
-                        "clear" | "pop" | "push" | "insert" | "remove"
-                    );
-                }
-            }
-        }
-    }
-    false
-}
-
 /// Main macro expansion for #[azumi::live]
 pub fn expand_live(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemStruct);
