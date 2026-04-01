@@ -244,17 +244,25 @@ fn is_side_effect(expr: &Expr) -> bool {
 }
 
 /// Check if a method call is a predictable self-field mutation.
-/// Currently returns false for all method calls — they are treated as side effects.
-///
-/// KNOWN LIMITATION: Patterns like `self.items.clear()` or `self.items.pop()`
-/// could theoretically be predicted but are not detected yet.
-/// Developers should use `#[azumi::predict("...")]` for complex mutations.
-fn is_self_field_mutation(_mc: &ExprMethodCall) -> bool {
-    // TODO: Detect predictable self mutations:
-    //   self.field.clear()  → could predict "field = []"
-    //   self.field.pop()    → hard to predict (depends on current value)
-    //   self.field.push(v)  → hard to predict (needs value capture)
-    false
+/// Returns true for: self.field.clear(), self.field.pop(), self.field.push(v),
+/// self.map.insert(k, v), self.map.remove(k)
+fn is_self_field_mutation(mc: &ExprMethodCall) -> bool {
+    // Check if receiver is self.field
+    let field = match extract_self_field(&Expr::Field(ExprField {
+        attrs: vec![],
+        base: mc.receiver.clone(),
+        dot_token: mc.dot_token.clone(),
+        member: mc.method.clone(),
+    })) {
+        Some(f) => f,
+        None => return false,
+    };
+
+    let method_name = mc.method.to_string();
+    matches!(
+        method_name.as_str(),
+        "clear" | "pop" | "push" | "insert" | "remove"
+    )
 }
 
 /// Main macro expansion for #[azumi::live]
