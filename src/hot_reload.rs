@@ -104,7 +104,13 @@ struct TemplateUpdatePayload {
 async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
     let mut registry = TEMPLATE_REGISTRY.get_or_init(Default::default).write().unwrap();
     registry.insert(payload.id.clone(), RuntimeTemplate { static_parts: payload.parts });
-    println!("🔥 Hot Reload: Updated template {}", payload.id);
+    #[cfg(debug_assertions)]
+    {
+        #[cfg(debug_assertions)]
+    {
+        println!("🔥 Hot Reload: Updated template {}", payload.id);
+    }
+    }
     // Trigger browser reload
     let _ = get_broadcast_channel().send(serde_json::json!({"type": "reload"}).to_string());
 }
