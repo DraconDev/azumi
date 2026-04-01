@@ -1028,11 +1028,147 @@ fn validate_nodes(
                         let_bindings,
                         _has_scoped_css,
                         errors,
-                        _is_inside_form,
-                        _is_inside_button,
-                        _is_inside_anchor,
+                        is_inside_form,
+                        is_inside_button,
+                        is_inside_anchor,
                     );
                 }
+                token_parser::Node::Block(block) => match block {
+                    token_parser::Block::If(if_block) => {
+                        collect_errors_recursive(
+                            &if_block.then_branch,
+                            valid_classes,
+                            valid_ids,
+                            let_bindings,
+                            _has_scoped_css,
+                            errors,
+                            is_inside_form,
+                            is_inside_button,
+                            is_inside_anchor,
+                        );
+                        if let Some(else_branch) = &if_block.else_branch {
+                            collect_errors_recursive(
+                                else_branch,
+                                valid_classes,
+                                valid_ids,
+                                let_bindings,
+                                _has_scoped_css,
+                                errors,
+                                is_inside_form,
+                                is_inside_button,
+                                is_inside_anchor,
+                            );
+                        }
+                    }
+                    token_parser::Block::For(for_block) => {
+                        collect_errors_recursive(
+                            &for_block.body,
+                            valid_classes,
+                            valid_ids,
+                            let_bindings,
+                            _has_scoped_css,
+                            errors,
+                            is_inside_form,
+                            is_inside_button,
+                            is_inside_anchor,
+                        );
+                    }
+                    token_parser::Block::Match(match_block) => {
+                        for arm in &match_block.arms {
+                            collect_errors_recursive(
+                                &arm.body,
+                                valid_classes,
+                                valid_ids,
+                                let_bindings,
+                                _has_scoped_css,
+                                errors,
+                                is_inside_form,
+                                is_inside_button,
+                                is_inside_anchor,
+                            );
+                        }
+                    }
+                    token_parser::Block::Call(call_block) => {
+                        collect_errors_recursive(
+                            &call_block.children,
+                            valid_classes,
+                            valid_ids,
+                            let_bindings,
+                            _has_scoped_css,
+                            errors,
+                            is_inside_form,
+                            is_inside_button,
+                            is_inside_anchor,
+                        );
+                    }
+                token_parser::Node::Block(block) => match block {
+                    token_parser::Block::If(if_block) => {
+                        collect_errors_recursive(
+                            &if_block.then_branch,
+                            valid_classes,
+                            valid_ids,
+                            let_bindings,
+                            _has_scoped_css,
+                            errors,
+                            is_inside_form,
+                            is_inside_button,
+                            is_inside_anchor,
+                        );
+                        if let Some(else_branch) = &if_block.else_branch {
+                            collect_errors_recursive(
+                                else_branch,
+                                valid_classes,
+                                valid_ids,
+                                let_bindings,
+                                _has_scoped_css,
+                                errors,
+                                is_inside_form,
+                                is_inside_button,
+                                is_inside_anchor,
+                            );
+                        }
+                    }
+                    token_parser::Block::For(for_block) => {
+                        collect_errors_recursive(
+                            &for_block.body,
+                            valid_classes,
+                            valid_ids,
+                            let_bindings,
+                            _has_scoped_css,
+                            errors,
+                            is_inside_form,
+                            is_inside_button,
+                            is_inside_anchor,
+                        );
+                    }
+                    token_parser::Block::Match(match_block) => {
+                        for arm in &match_block.arms {
+                            collect_errors_recursive(
+                                &arm.body,
+                                valid_classes,
+                                valid_ids,
+                                let_bindings,
+                                _has_scoped_css,
+                                errors,
+                                is_inside_form,
+                                is_inside_button,
+                                is_inside_anchor,
+                            );
+                        }
+                    }
+                    token_parser::Block::Call(call_block) => {
+                        collect_errors_recursive(
+                            &call_block.children,
+                            valid_classes,
+                            valid_ids,
+                            let_bindings,
+                            _has_scoped_css,
+                            errors,
+                            is_inside_form,
+                            is_inside_button,
+                            is_inside_anchor,
+                        );
+                    }
                 token_parser::Node::Block(block) => match block {
                     token_parser::Block::If(if_block) => {
                         collect_errors_recursive(
