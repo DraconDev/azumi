@@ -204,7 +204,6 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
             use super::*;
             use azumi::Component;
 
-            // #[derive(Debug)] // Removed to allow non-Debug props
             pub struct Props #fn_generics #where_clause {
                 #(#props_fields),*
             }
