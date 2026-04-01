@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use crate::token_parser::Element;
 use crate::token_parser::Node;
 use proc_macro2::TokenStream;

@@ -1003,6 +1003,9 @@ fn validate_nodes(
                     for err in html_structure_validator::validate_heading_content(elem) {
                         errors.push(err);
                     }
+                    if let Some(err) = html_structure_validator::validate_tag_name(elem) {
+                        errors.push(err);
+                    }
 
                     let new_inside_form = is_inside_form || elem.name == "form";
                     let new_inside_button = is_inside_button || elem.name == "button";
