@@ -9,15 +9,14 @@ use std::collections::{HashMap, HashSet};
 /// Re-export token_parser types for use in this module
 use crate::token_parser::{AttributeValue, Block, Node};
 
+#[cfg(test)]
+use regex::Regex;
+
 /// Parse CSS content and extract all defined class names - FAST VERSION using regex
-#[allow(dead_code)]
+#[cfg(test)]
 pub fn parse_css_classes(css_content: &str, _file_path: &str) -> HashSet<String> {
     let mut defined_classes = HashSet::new();
 
-    // Fast regex-based class extraction.
-    // Only matches snake_case identifiers — dashes are banned in Azumi CSS classes.
-    // Matches: .my_class, .button_primary, .foo123
-    // Does NOT match: .my-class, .btn-primary (kebab-case is banned)
     let class_pattern = Regex::new(r"\.([a-zA-Z_][a-zA-Z0-9_]*)").unwrap();
 
     for cap in class_pattern.captures_iter(css_content) {
@@ -29,6 +28,62 @@ pub fn parse_css_classes(css_content: &str, _file_path: &str) -> HashSet<String>
     defined_classes
 }
 
+#[cfg(test)]
+mod class_validation_tests {
+    use super::*;
+    use proc_macro2::Span;
+
+    #[test]
+    fn test_parse_css_classes() {
+        let css = r#"
+            .btn { padding: 10px; }
+            .card { border: 1px solid #ccc; }
+            /* Comment */
+            .header, .footer { background: #f0f0f0; }
+        "#;
+
+        let classes = parse_css_classes(css, "test.css");
+        assert!(classes.contains("btn"));
+        assert!(classes.contains("card"));
+        assert!(classes.contains("header"));
+        assert!(classes.contains("footer"));
+        assert_eq!(classes.len(), 4);
+    }
+
+    #[test]
+    fn test_validate_missing_classes() {
+        let mut used = HashMap::new();
+        used.insert("btn".to_string(), vec![Span::call_site()]);
+        used.insert("undefined-class".to_string(), vec![Span::call_site()]);
+
+        let defined = HashSet::from(["btn".to_string(), "card".to_string()]);
+
+        let result = validate_css_classes(&used, &defined);
+        assert!(result.is_err());
+
+        if let Err(errors) = result {
+            assert_eq!(errors.len(), 1);
+            match &errors[0] {
+                ValidationError::UndefinedClass { class_name, spans } => {
+                    assert_eq!(class_name, "undefined-class");
+                    assert_eq!(spans.len(), 1);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_validate_dead_css() {
+        let mut used = HashMap::new();
+        used.insert("btn".to_string(), vec![Span::call_site()]);
+
+        let defined = HashSet::from(["btn".to_string(), "unused-class".to_string()]);
+
+        let result = validate_css_classes(&used, &defined);
+        assert!(result.is_ok());
+    }
+}
+
 /// Create a better span for class validation by pointing to the class attribute value
 /// This gives a more precise error location than the generic attribute span
 #[allow(dead_code)]
@@ -36,8 +91,6 @@ fn create_class_span(
     class_attr: &crate::token_parser::Attribute,
     _class_name: &str,
 ) -> proc_macro2::Span {
-    // For class attributes, use the value span if available (points to string literal)
-    // Otherwise fall back to the attribute span (points to attribute name)
     if let Some(value_span) = &class_attr.value_span {
         *value_span
     } else {
@@ -61,13 +114,9 @@ fn extract_html_classes_recursive(
     for node in nodes {
         match node {
             Node::Element(elem) => {
-                // Check class attribute
                 if let Some(class_attr) = elem.attrs.iter().find(|attr| attr.name == "class") {
                     match &class_attr.value {
                         AttributeValue::Static(class_string) => {
-                            // For static class attributes, create a better span that points more precisely
-                            // We can't easily track exact character positions, so we'll use a span that
-                            // encompasses the entire attribute and adjust our error message
                             for class in class_string.split_whitespace() {
                                 if !class.is_empty() {
                                     used_classes
@@ -77,13 +126,11 @@ fn extract_html_classes_recursive(
                                 }
                             }
                         }
-                        AttributeValue::Dynamic(_expr) => {}
+                        AttributeValue::Dynamic(_) => {}
                         AttributeValue::StyleDsl(_) => {}
                         AttributeValue::None => {}
                     }
                 }
-
-                // Recurse into children
                 extract_html_classes_recursive(&elem.children, used_classes);
             }
             Node::Fragment(frag) => {
@@ -122,7 +169,6 @@ pub fn validate_css_classes(
 ) -> Result<(), Vec<ValidationError>> {
     let mut errors = Vec::new();
 
-    // Check for undefined classes (used but not defined)
     for (class_name, spans) in used_classes {
         if !defined_classes.contains(class_name) {
             errors.push(ValidationError::UndefinedClass {
@@ -153,12 +199,9 @@ impl std::fmt::Display for ValidationError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ValidationError::UndefinedClass { class_name, .. } => {
-                write!(f, "CSS Validation Error: Class '{}' is used in HTML but not defined in any CSS file.\n\
-                    \nThis could be:\n\
-                    • A typo in the class name\n\
-                    • Missing CSS definition\n\
-                    • Incorrect CSS file path\n\
-                    \n💡 Tip: Run 'cargo check' to see all CSS validation errors together.",
+                write!(
+                    f,
+                    "CSS Validation Error: Class '{}' is used in HTML but not defined in any CSS file.",
                     class_name
                 )
             }
