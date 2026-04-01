@@ -4,37 +4,36 @@
 
 ```rust
 html! {
-    <div class={button}>  // ❌ COMPILE ERROR: Did you mean `button`?
+    <div class={my_buttn}>  // ❌ COMPILE ERROR: 'my_buttn' not found. Did you mean 'my_button'?
         "Click me"
     </div>
+    <style>
+        .my_button { background: "#3b82f6"; }
+    </style>
 }
 ```
 
-**Azumi** is a **compile-time validated web framework** for Rust. Your CSS classes, your HTML structure, your UI logic — all verified before a single byte hits production.
+**Azumi** is a **compile-time validated web framework** for Rust. Your CSS classes, HTML structure, accessibility, and UI logic — all verified before a single byte hits production.
 
 No runtime errors. No "works on my machine". No surprises.
 
 ## 🛠️ Development Experience
 
-Azumi includes a built-in, self-hosting hot reload system. Just add one line to your code:
+Azumi includes a built-in hot reload system. Just add one line:
 
 ```rust
 fn main() {
     azumi::devtools::auto_reload(); // ⚡ That's it!
-    // Or tie it to a custom check:
-    // azumi::devtools::auto_reload_if(config.dev_mode);
 }
 ```
 
-- **CSS**: Instant, zero-reload updates.
-- **HTML**: Sub-second patching.
-- **Logic**: Auto-restart on change.
-
-## See [HOT_RELOAD.md](./HOT_RELOAD.md) for details.
+- **CSS**: Instant, zero-reload updates via WebSocket.
+- **HTML**: Sub-second template patching.
+- **Logic**: Auto-restart on Rust code changes.
 
 ## ⚡ The Pitch
 
-Traditional web frameworks let bugs slip through to production. Azumi doesn't.
+Traditional frameworks let bugs slip through to production. Azumi doesn't.
 
 | Other Frameworks              | Azumi                                  |
 | ----------------------------- | -------------------------------------- |
@@ -42,65 +41,95 @@ Traditional web frameworks let bugs slip through to production. Azumi doesn't.
 | Missing class → invisible bug | Missing class → **compile error**      |
 | Invalid HTML → maybe works?   | Invalid HTML → **compile error**       |
 | Click handler typo → 💀       | Click handler typo → **compile error** |
-| Duplicate attributes → shrug  | Duplicate attributes → **compile error** |
+| Nested forms → broken submit  | Nested forms → **compile error**       |
+| Missing alt text → a11y fail  | Missing alt text → **compile error**   |
 
 **Everything happens at compile time.** Your IDE shows errors before you save. Your CI fails before it deploys. Your users never see a broken page.
 
 ---
 
-## 🚀 Features That Actually Matter
+## 🚀 Features
 
 ### 1. CSS-HTML Co-Validation (Industry First)
 
-The compiler knows your styles. Use a class that doesn't exist? Error. Typo in a class name? Error. Define a class you never use? Warning.
+The compiler knows your styles. Use a class that doesn't exist? Error. Typo in a class name? Error.
 
 ```rust
 html! {
     <div class={my_buttn}>  // ❌ "my_buttn" not found. Did you mean "my_button"?
         "Oops"
     </div>
-
     <style>
         .my_button { background: "#3b82f6"; }
     </style>
 }
 ```
 
-### 2. Optimistic UI (Hybrid: Auto + Manual)
+### 2. HTML Structure Validation
+
+Invalid HTML nesting caught at compile time:
+- Tables can only contain valid children (`tr`, `thead`, `tbody`, etc.)
+- Lists can only contain `<li>`
+- Forms cannot be nested
+- `<p>` cannot contain block-level elements
+- `<a>` cannot contain other `<a>` tags
+- Headings can only contain phrasing content
+- Tag name validation (unknown tags flagged)
+
+### 3. Accessibility Validation
+
+Built-in a11y checks at compile time:
+- `<img>` must have `alt` attribute
+- `<input>` must have valid `type`
+- ARIA roles must be valid
+- Buttons must have accessible content
+- `<a target="_blank">` must have `rel="noopener noreferrer"`
+- `<iframe>` must have `title`
+
+### 4. Optimistic UI (Hybrid: Auto + Manual)
 
 Write Rust. Get instant UI. No JavaScript required.
 
-**Automatic:** Simple mutations (assignments, toggles) are predicted automatically by the compiler.
+**Automatic:** Simple mutations are predicted by the compiler.
 
 ```rust
-#[azumi::live_impl]
+#[azumi::live_impl(component = "counter_view")]
 impl Counter {
     pub fn increment(&mut self) {
-        self.count += 1;  // ✅ Compiler generates: data-predict="count = count + 1"
+        self.count += 1;  // ✅ Auto: data-predict="count = count + 1"
+    }
+    pub fn toggle(&mut self) {
+        self.active = !self.active;  // ✅ Auto: data-predict="active = !active"
     }
 }
 ```
 
-**Manual:** Complex mutations (structs, vectors) use explicit hints.
+**Expanded patterns** — the compiler now detects:
+- `self.items.push(value)` → `items.push(value)`
+- `self.items.pop()` → `items.pop()`
+- `self.items.clear()` → `items = []`
+- `self.map.insert(key, value)` → `map.insert(key, value)`
+- `self.map.remove(key)` → `map.remove(key)`
+
+**Manual:** Complex mutations use explicit hints.
 
 ```rust
-// 🚀 Instant feedback for complex data
-#[azumi::predict("todos.push(new_todo)")]
+#[azumi::predict("todos.push({ text: input, id: -1 })")]
 pub fn add_todo(&mut self) { ... }
 ```
 
-### 3. Signed State (Anti-Tampering)
+### 5. Signed State (Anti-Tampering)
 
-Every component's state is HMAC-signed. Users can't forge counts, bypass auth, or inject data. The server rejects tampered requests automatically.
+Every component's state is HMAC-signed. Users can't forge counts, bypass auth, or inject data.
 
 ```rust
 // User tries to edit az-scope JSON in DevTools...
 // → 400 Bad Request. Automatically. No code needed.
 ```
 
-### 4. Automatic SEO
+### 6. Automatic SEO
 
-Azumi infers metadata directly from your Rust code. Zero configuration required.
+Azumi infers metadata directly from your Rust code.
 
 ```rust
 /// About Us
@@ -109,58 +138,37 @@ Azumi infers metadata directly from your Rust code. Zero configuration required.
 pub fn about_us() -> impl Component { ... }
 ```
 
-**Generates:** `<title>About Us</title>`, `<meta name="description" ...>`, OpenGraph tags, and Twitter cards automatically.
+Generates `<title>`, `<meta description>`, OpenGraph tags, and Twitter cards automatically.
 
-### 5. Production-Ready Asset Pipeline
+### 7. Production-Ready Asset Pipeline
 
 - **Content-hashed filenames** → Immutable caching (1 year)
 - **Automatic path rewriting** → Write `/static/logo.png`, get `/assets/logo.a8f3c2.png`
-- **CSS minification** → Zero config
+- **CSS minification** → Zero config via `lightningcss`
 
 ---
 
-## 🚨 Critical Rules (Must-Know)
+## 🚨 Critical Rules
 
-### 1. CSS Values MUST Be Double-Quoted
+### 1. CSS Values Must Be Double-Quoted
 
 ```rust
-// ✅ CORRECT - all values quoted
-.btn {
-    padding: "1rem";
-    background: "#4CAF50";
-    color: "white";
-    border-radius: "8px";
-}
+// ✅ CORRECT
+.btn { padding: "1rem"; background: "#4CAF50"; }
 
-// ❌ WRONG - will cause compile errors or lexer issues
-.btn {
-    padding: 1rem;      // Lexer can't parse "1rem" as token
-    background: #4CAF50; // # causes parsing issues
-    color: white;        // Unquoted identifier
-}
+// ❌ WRONG
+.btn { padding: 1rem; background: #4CAF50; }
 ```
 
-### 2. CSS Classes (`class={...}`)
+### 2. CSS Classes: Snake Case + Bracket Syntax
 
-- **Strict Snake Case:** All CSS classes MUST be `snake_case`. Dashes (`-`) are **BANNED** in class names (e.g., Use `.my_card`, NOT `.my-card`).
-- **Bracket Syntax ONLY:** You must use brackets with variables. Static strings usage (`class="..."`) is **BANNED**.
-- **No Magic:** Automatic scoping handles everything via variables.
-- **Expression Lists:** You can combine multiple class variables.
+- All CSS classes MUST be `snake_case`. Dashes are **BANNED** in class names.
+- Use `class={variable}` — static `class="..."` is **BANNED**.
 
 ```rust
 html! {
-    // ✅ CORRECT: Use variables generated by macros
-    <div class={my_card}>...</div>
-
-    // ✅ CORRECT: Combine multiple classes
-    <div class={my_card active}>...</div>
-
-    // ❌ INCORRECT: Quoted strings are BANNED
-    // <div class="my_card">...</div>
-
-    // ❌ INCORRECT: Dashed names are invalid Rust identifiers
-    // <div class={my-card}>...</div>
-
+    <div class={my_card}>...</div>       // ✅
+    <div class={my_card active}>...</div> // ✅ multiple classes
     <style>
         .my_card { ... }
         .active { ... }
@@ -168,85 +176,64 @@ html! {
 }
 ```
 
-### 3. IDs (`id={...}`)
+### 3. IDs: Same Rules as Classes
 
-- Same rules as classes: **Snake Case** and **Bracket Syntax ONLY**.
-- `id="..."` is **BANNED**.
+`id="..."` is **BANNED**. Use `id={variable}` with snake_case.
 
-```rust
-html! {
-    <div id={my_unique_id}>...</div>
-    <style>
-        #my_unique_id { ... }
-    </style>
-}
-```
-
-### 4. Inline Styles (`style={...}`)
-
-- Use the **Style DSL** with brackets.
-- `style="..."` string syntax is **BANNED**.
+### 4. Inline Styles: Use the Style DSL
 
 ```rust
 // ✅ CORRECT
 <div style={ --color: "red"; --spacing: "1rem" }>...</div>
 
-// ❌ INCORRECT
-// <div style="--color: red">...</div>
+// ❌ WRONG
+<div style="--color: red">...</div>
 ```
 
 ### 5. Live State Requires Component Link
 
 ```rust
-// State definition
 #[azumi::live]
 pub struct Counter { pub count: i32 }
 
-// Implementation MUST specify component
 #[azumi::live_impl(component = "counter_view")]  // ← Required!
 impl Counter {
     pub fn increment(&mut self) { self.count += 1; }
 }
 
-// Component MUST match the name
 #[azumi::component]
 pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
     html! { /* ... */ }
 }
 ```
 
-### 6. Event Binding Syntax
+### 6. Event Binding: Direct Method References
 
 ```rust
-// ✅ CORRECT - use on:event={state.method}
+// ✅ CORRECT
 <button on:click={state.increment}>"Click"</button>
 
-// ❌ WRONG - don't use closures or function calls
-<button on:click={|| state.increment()}>"Click"</button>
-<button on:click={state.increment()}>"Click"</button>
+// ❌ WRONG — no closures, no function calls
+<button on:click={|| state.increment()}>
+<button on:click={state.increment()}>
 ```
 
 ### 7. Text Content Must Be Quoted
 
 ```rust
-// ✅ CORRECT - all text in quotes
+// ✅ CORRECT
 <p>"Hello world"</p>
 <p>"Count: " {count}</p>
 
-// ❌ WRONG - will cause parsing errors
+// ❌ WRONG
 <p>Hello world</p>
 ```
 
 ### 8. Style Order: HTML First, Style Last
 
-For readability and consistency, always place your `<style>` block **after** your HTML content.
-
 ```rust
 html! {
-    // 1. Structure
     <div class={container}>...</div>
-
-    // 2. Style
     <style>
         .container { ... }
     </style>
@@ -255,14 +242,13 @@ html! {
 
 ---
 
-## 🚀 Setup & Configuration
+## 🚀 Setup
 
 ### Injecting Client Runtime
 
-Azumi is **Static by Default**. It does NOT automatically inject the client runtime.
+Azumi is **static by default**. Pages render as pure HTML with zero JavaScript.
 
-- **Manual Injection (Required)**: You must manually include `<script src="azumi.js" />` in your layout if you want interactivity.
-- **Static Optimized**: Pages without the script are pure, zero-JS static HTML.
+To enable interactivity, include the runtime in your root layout:
 
 ```rust
 #[azumi::component]
@@ -276,10 +262,6 @@ pub fn RootLayout(children: impl Component) -> impl Component {
             </head>
             <body>
                 {children}
-
-                // ⚠️ REQUIRED: Manually include the runtime for interactivity
-                // This magic script is intercepted by the server.
-                // Place this in your ROOT layout to inherit it across all pages.
                 <script src="azumi.js" />
             </body>
         </html>
@@ -287,47 +269,28 @@ pub fn RootLayout(children: impl Component) -> impl Component {
 }
 ```
 
+**Why manual?** Static pages stay at 0KB JS. Interactive pages get only what they need (~3KB).
+
 ---
 
-## 📦 Asset Pipeline & Optimization
+## 📦 Features
 
-Azumi includes a production-ready asset pipeline that handles hashing, rewriting, and optimization automatically.
+| Feature | Flag | Description |
+|---------|------|-------------|
+| `devtools` | Default | Hot reload, file watcher, CSS patching |
+| `schema` | Optional | Schema.org JSON-LD derive macro |
+| `test-utils` | Optional | `azumi::test` module for testing |
 
-### 1. Automatic Asset Hashing (Cache Busting)
-
-- Place your static assets (images, fonts, etc.) in the `demo/static/` directory.
-- At build time, Azumi moves them to `target/assets/` and renames them with a content hash:
-  - `static/logo.png` -> `assets/logo.a8b9c7d6.png`
-- This enables **immutable caching** (1 year cache lifetime), as file names change whenever content changes.
-
-### 2. Automatic Path Rewriting
-
-You do not need to manually import or reference hashed files. Just use the original path in your `html!` macro:
-
-```rust
-html! {
-    // You write this:
-    <img src="/static/logo.png" />
-
-    // Compiler outputs this automatically:
-    // <img src="/assets/logo.a8b9c7d6.png" />
-}
+Production builds without devtools:
+```toml
+azumi = { version = "3.0", default-features = false }
 ```
-
-- The macro reads `assets_manifest.json` at compile time to rewrite paths.
-- Works for `src`, `href` (link tags), and `srcset`.
-
-### 3. CSS Minification
-
-- Styles defined in `<style>` blocks are automatically parsed and minified at compile time.
-- Comments and whitespace are removed to reduce payload size.
-- No configuration needed.
 
 ---
 
 ## 🏗️ Component Fundamentals
 
-### Basic Component Structure
+### Basic Component
 
 ```rust
 #[azumi::component]
@@ -351,252 +314,73 @@ pub fn MyComponent(title: &str, count: i32) -> impl Component {
 #[azumi::component]
 pub fn Container(children: impl Component) -> impl Component {
     html! {
-        <div class={container}>
-            {children}
-        </div>
-        <style>
-            .container { padding: "1rem"; border: "1px solid #ddd"; }
-        </style>
+        <div class={container}>{children}</div>
+        <style>.container { padding: "1rem"; }</style>
     }
 }
 
-// Usage with curly braces
+// Usage
 @Container {
     <p>"Content inside container"</p>
-    "Explicit strings are also components"
-}
-
-// Direct usage (String implements Component)
-let my_comp = @Container(children = "Hello".to_string());
-```
-
-### Component Composition
-
-```rust
-#[azumi::component]
-pub fn Card<'a>(title: &'a str, content: &'a str) -> impl Component + 'a {
-    html! {
-        <div class={card}>
-            <h3 class={title}>{title}</h3>
-            <p>{content}</p>
-        </div>
-        <style>
-            .card { border: "1px solid #eee"; padding: "1rem"; }
-            .title { font-weight: "bold"; margin-bottom: "0.5rem"; }
-        </style>
-    }
-}
-
-#[azumi::component]
-pub fn Dashboard() -> impl Component {
-    html! {
-        <div>
-            @Card(title="Welcome", content="Getting started")
-            @Card(title="Features", content="Type-safe components")
-        </div>
-    }
 }
 ```
 
 ---
 
-## 🎨 Styling System
+## 🧮 Control Flow
 
-### CSS Scoping: Component vs Global
-
-```rust
-#[azumi::component]
-pub fn StyledComponent() -> impl Component {
-    html! {
-        <div class={container}>
-            <h1 class={local_heading}>"Scoped (blue)"</h1>
-            <h2 class={global_heading}>"Global (purple)"</h2>
-        </div>
-
-        // Global styles - NOT scoped (use string literals)
-        <style global>
-            body { font-family: "Inter, sans-serif"; }
-            .global_heading { color: "purple"; }
-        </style>
-
-        // Component styles - automatically scoped (become variables)
-        <style>
-            .local_heading { color: "blue"; }
-            .container { padding: "1rem"; }
-        </style>
-    }
-}
-```
-
-### Dynamic CSS with Custom Properties
-
-```rust
-#[azumi::component]
-pub fn ProgressMeter(completion: f64, accent_color: &str) -> impl Component {
-    html! {
-        <div class={meter}>
-            // style="" ONLY allows CSS custom properties (--variables)
-            <div class={fill} style={--progress: completion; --accent: accent_color}></div>
-        </div>
-
-        <style>
-            .meter {
-                width: "100%";
-                height: "20px";
-                background: "#eee";
-                border-radius: "10px";
-                overflow: "hidden";
-            }
-            .fill {
-                height: "100%";
-                background: "var(--accent, #2196f3)";
-                width: "calc(var(--progress) * 100%)";
-                transition: "width 0.3s ease";
-            }
-        </style>
-    }
-}
-```
-
-**⚠️ Important**: Only CSS custom properties (`--var-name`) are allowed in `style=""` attributes. Direct properties like `style="width: 50%"` cause compile errors.
-
-### CSS Validation Rules
-
-Azumi validates all CSS at compile time:
-
-**Allowed:**
-
-- Standard CSS properties with quoted values
-- CSS custom properties (`--variable-name`)
-- CSS functions like `calc()`, `var()`, etc.
-
-**Not Allowed:**
-
-- External CSS imports (`@import`)
-- Inline CSS properties without custom properties
-- Invalid CSS syntax
-
----
-
-## 🧮 Control Flow & Logic
-
-### @let Pattern (Local Variables)
-
-```rust
-#[azumi::component]
-pub fn LetExample() -> impl Component {
-    html! {
-        <div>
-            // Basic variable declaration
-            @let name = "Azumi";
-            <p>"Hello, " {name} "!"</p>
-
-            // Calculated values
-            @let items = vec!["Item 1", "Item 2", "Item 3"];
-            @let item_count = items.len();
-            <p>"Total items: " {item_count}</p>
-
-            // Derived calculations
-            @let base_price = 100.0;
-            @let tax_rate = 0.08;
-            @let total_price = base_price * (1.0 + tax_rate);
-            <div class={result}>
-                <p>"Total: $" {total_price:.2}</p>
-            </div>
-
-            // With conditional logic
-            @let score = 85;
-            @let grade = if score >= 90 {
-                "A"
-            } else if score >= 80 {
-                "B"
-            } else {
-                "C"
-            };
-            <p>"Grade: " {grade}</p>
-        </div>
-        <style>
-            .result { background: "#f0f0f0"; padding: "0.5rem"; }
-        </style>
-    }
-}
-```
-
-### Conditional Rendering (@if)
+### @let — Local Variables
 
 ```rust
 html! {
-    // Simple conditional
+    @let name = "Azumi";
+    <p>"Hello, " {name} "!"</p>
+
+    @let items = vec!["Item 1", "Item 2"];
+    @let count = items.len();
+    <p>"Total: " {count}</p>
+}
+```
+
+### @if — Conditionals
+
+```rust
+html! {
     @if state.active {
         <div>"Active"</div>
-    }
-
-    // With else
-    @if state.user_type == "admin" {
-        <div>"Admin Panel"</div>
     } else {
-        <div>"User Dashboard"</div>
+        <div>"Inactive"</div>
     }
 
-    // Conditional class application
-    <div class={if state.active { "active_class" } else { "inactive_class" }}>
+    // Conditional class
+    <div class={if state.active { "active" } else { "inactive" }}>
         "Content"
     </div>
 }
 ```
 
-### Loops (@for)
+### @for — Loops
 
 ```rust
 html! {
-    // Basic loop
     @for item in &state.items {
         <div>{item}</div>
     }
-
-    // Loop with index
     @for (i, item) in state.items.iter().enumerate() {
         <div>{i + 1}". " {item}</div>
-    }
-
-    // Empty state handling
-    @if state.items.is_empty() {
-        <p>"No items found"</p>
-    } else {
-        @for item in &state.items {
-            <div>{item}</div>
-        }
     }
 }
 ```
 
-### Pattern Matching (@match)
+### @match — Pattern Matching
 
 ```rust
-#[azumi::component]
-pub fn StatusDisplay(status: &str) -> impl Component {
-    html! {
-        <div>
-            @match status {
-                "loading" => {
-                    <p class={loading}>"Loading..."</p>
-                }
-                "success" => {
-                    <p class={success}>"Operation successful!"</p>
-                }
-                "error" => {
-                    <p class={error}>"An error occurred"</p>
-                }
-                _ => {
-                    <p>"Unknown status"</p>
-                }
-            }
-        </div>
-        <style>
-            .loading { color: "blue"; }
-            .success { color: "green"; }
-            .error { color: "red"; }
-        </style>
+html! {
+    @match status {
+        "loading" => { <p>"Loading..."</p> }
+        "success" => { <p>"Done!"</p> }
+        "error" => { <p>"Failed"</p> }
+        _ => { <p>"Unknown"</p> }
     }
 }
 ```
@@ -605,765 +389,177 @@ pub fn StatusDisplay(status: &str) -> impl Component {
 
 ## ⚡ Live Interactive Components
 
-### Hybrid Optimistic UI
-
-Azumi uses a **Hybrid Approach** to optimistic UI:
-
-1.  **Automatic Predictions**: Simple updates are handled by the compiler.
-2.  **Manual Predictions**: Complex logic uses `data-predict`.
-
-#### 1. Automatic (Compiler-Driven)
-
-For simple scalar operations, just write Rust. The compiler generates the prediction logic for you.
+### State Definition
 
 ```rust
-#[azumi::live_impl]
-impl Counter {
-    // Compiler sees: self.active = !self.active
-    // Generates: data-predict="active = !active"
-    pub fn toggle(&mut self) {
-        self.active = !self.active;
-    }
+#[azumi::live]
+pub struct TodoList {
+    pub todos: Vec<TodoItem>,
+    pub input: String,
+}
 
-    // Compiler sees: self.count += 1
-    // Generates: data-predict="count = count + 1"
-    pub fn increment(&mut self) {
-        self.count += 1;
-    }
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+pub struct TodoItem {
+    pub id: i64,
+    pub text: String,
+    pub completed: bool,
 }
 ```
 
-#### 2. Manual (Developer-Driven)
-
-For complex types (Vectors, HashMaps) or logic the compiler can't predict safely, use the `data-predict` attribute manually.
+### Methods with Auto-Predictions
 
 ```rust
-html! {
-    <button
-        on:click={state.add_todo}
-        // Manual hint: "When clicked, optimistic append"
-        data-predict="todos.push({ text: input, id: -1 })"
-    >
-        "Add Todo"
-    </button>
-}
-```
-
-### Local State (Client-Only)
-
-For temporary UI state (dropdowns, modals, tabs) that doesn't need to persist to the server, use the `set` action.
-
-```rust
-html! {
-    // 🚀 updates state.open = true locally. No server request.
-    <button az-on="click set open = true">
-        "Open Modal"
-    </button>
-
-    // Toggle logic
-    <button az-on="click set open = !open">
-        "Toggle"
-    </button>
+#[azumi::live_impl(component = "todo_view")]
+impl TodoList {
+    pub fn add(&mut self) {
+        self.todos.push(TodoItem { id: -1, text: self.input.clone(), completed: false });
+        self.input.clear();
+    }
+    pub fn toggle(&mut self) { /* ... */ }
+    pub fn clear(&mut self) { self.todos.clear(); }
 }
 ```
 
 ### Async Database Integration
 
-You can use `sqlx` directly in your async live actions. The UI can update optimistically while the DB operation happens in the background.
-
 ```rust
 impl TodoList {
     pub async fn add_todo(&mut self) {
-        // 1. Optimistic Update (Instant feedback)
-        self.todos.push(Todo { id: -1, text: self.input.clone() });
-        let input_val = self.input.clone();
+        // 1. Optimistic update (instant)
+        self.todos.push(TodoItem { id: -1, text: self.input.clone(), completed: false });
+        let text = self.input.clone();
         self.input.clear();
 
-        // 2. Real Async DB Operation
+        // 2. Real async DB operation
         sqlx::query("INSERT INTO todos (text) VALUES (?)")
-            .bind(input_val)
-            .execute(&*POOL) // Use a global or injected pool
+            .bind(text)
+            .execute(&*POOL)
             .await
             .unwrap();
 
-        // 3. Re-fetch for consistency (updates IDs, etc.)
+        // 3. Re-fetch for consistency
         self.refresh_from_db().await;
     }
 }
 ```
 
-### Live Component View
-
-```rust
-#[azumi::component]
-pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
-    html! {
-        <div class={counter}>
-            <div class={value}>{state.count}</div>
-            <button class={btn} on:click={state.increment}>
-                "Increment"
-            </button>
-            <p>"Status: " {if state.active { "Active" } else { "Inactive" }}</p>
-        </div>
-        <style>
-            .counter { padding: "2rem"; text-align: "center"; }
-            .value { font-size: "3rem"; margin: "1rem 0"; }
-            .btn { padding: "1rem 2rem"; cursor: "pointer"; }
-        </style>
-    }
-}
-```
-
-### Auto-Detection of Live Components
-
-When the first parameter is `state: &T`, the component automatically detects live mode:
-
-```rust
-// Auto-wraps in <div az-scope="...">
-#[azumi::component]
-pub fn auto_detected_view<'a>(state: &'a MyState) -> impl Component + 'a {
-    html! {
-        <button on:click={state.my_action}>"Click me"</button>
-    }
-}
-```
-
 ---
 
-## 🎯 Event Binding Systems
-
-### Modern: on:event Syntax (Recommended)
-
-```rust
-<button on:click={state.increment}>"Click"</button>
-<input on:input={state.update_text} />
-<form on:submit={state.submit_form}>"Submit"</form>
-```
-
----
-
-## 📋 Form Handling
-
-### Basic Form with Live State
-
-```rust
-#[azumi::live]
-pub struct ContactForm {
-    pub submitted: bool,
-}
-
-#[azumi::live_impl]
-impl ContactForm {
-    pub fn submit(&mut self) {
-        self.submitted = true;
-    }
-
-    pub fn reset(&mut self) {
-        self.submitted = false;
-    }
-}
-
-#[azumi::component]
-pub fn contact_form_view<'a>(state: &'a ContactForm) -> impl Component + 'a {
-    html! {
-        @if state.submitted {
-            <div>"Thank you for your message!"</div>
-            <button on:click={state.reset}>"Send Another"</button>
-        }
-
-        @if !state.submitted {
-            <form class={form}>
-                <div class={field}>
-                    <label>"Name"</label>
-                    <input class={input} type="text" name="name" />
-                </div>
-                <div class={field}>
-                    <label>"Email"</label>
-                    <input class={input} type="email" name="email" />
-                </div>
-                <button class={btn} type="button" on:click={state.submit}>
-                    "Submit"
-                </button>
-            </form>
-        }
-        <style>
-            .form { display: "grid"; gap: "1rem"; max-width: "400px"; }
-            .field { display: "grid"; gap: "0.5rem"; }
-            .input { padding: "0.5rem"; border: "1px solid #ddd"; }
-            .btn { padding: "0.75rem"; background: "#2196f3"; color: "white"; }
-        </style>
-    }
-}
-```
-
-### Data Bind Attributes for Optimistic UI
-
-The `data-bind` attribute enables optimistic UI updates by binding state properties to DOM elements:
-
-```rust
-#[azumi::component]
-pub fn LiveCounter(state: &Counter) -> impl Component {
-    html! {
-        <div class={counter}>
-            <div class={value} data-bind="count">{state.count}</div>
-            <p>"Status: "
-                <span data-bind="active">
-                    {if state.active { "Active ✓" } else { "Inactive ✗" }}
-                </span>
-            </p>
-        </div>
-        <style>
-            .counter { padding: "2rem"; text-align: "center"; }
-            .value { font-size: "3rem"; color: "#2196f3"; }
-        </style>
-    }
-}
-```
-
-**How it works:**
-
-- The `data-bind="count"` attribute binds the `count` property from state
-- When a prediction updates `count`, the corresponding DOM element updates instantly
-- Supports nested properties: `data-bind="user.profile.name"`
-
-### Form Binding with Structs
-
-```rust
-struct UserRegistration {
-    username: String,
-    email: String,
-    password: String,
-}
-
-#[azumi::component]
-pub fn RegistrationForm() -> impl Component {
-    html! {
-        <form class={form} bind={UserRegistration}>
-            <input class={input} name="username" type="text" placeholder="Username" />
-            <input class={input} name="email" type="email" placeholder="Email" />
-            <input class={input} name="password" type="password" placeholder="Password" />
-            <button type="submit">"Register"</button>
-        </form>
-        <style>
-            .form { display: "grid"; gap: "1rem"; max-width: "400px"; }
-            .input { padding: "0.5rem"; border: "1px solid #ddd"; }
-        </style>
-    }
-}
-```
-
-### Nested Form Binding
-
-```rust
-struct UserProfile {
-    name: String,
-    address: Address,
-}
-
-struct Address {
-    street: String,
-    city: String,
-}
-
-#[azumi::component]
-pub fn ProfileForm() -> impl Component {
-    html! {
-        <form bind={UserProfile}>
-            <input name="name" type="text" placeholder="Full name" />
-            <input name="address.street" type="text" placeholder="Street address" />
-            <input name="address.city" type="text" placeholder="City" />
-        </form>
-    }
-}
-```
-
-**Form Binding Rules:**
-
-- Field names must match struct field names (case-sensitive)
-- Nested fields use dot notation: `address.street`
-- Compile-time validation prevents typos in field names
-- Supports all form elements: `<input>`, `<select>`, `<textarea>`
-
----
-
-## Authentication & Middleware
-
-### The Data Bridge Pattern
-
-Azumi components are pure Rust structs that know nothing about HTTP requests. Middleware is pure HTTP logic. You bridge them in your **Handler**.
-
-You don't need to change Azumi internals to support auth; you just need to **pass the data**.
-
-#### 1. The Guard (Middleware)
-
-Standard Axum middleware validates the request and puts a `User` object into the request's "pocket" (extensions).
-
-```rust
-async fn auth_middleware(req: Request, next: Next) -> Result<Response, StatusCode> {
-    // 1. Validate Session
-    let user = decode_session_cookie(&req)?;
-
-    // 2. data-passing: Put user in the request extensions
-    req.extensions_mut().insert(user);
-
-    Ok(next.run(req).await)
-}
-```
-
-#### 2. The Bridge (Handler)
-
-Your handler extracts that `User` object and gives it to the Azumi state.
-
-```rust
-async fn my_page_handler(
-    // 3. Extract from request extensions
-    Extension(user): Extension<User>
-) -> impl IntoResponse {
-    // 4. Initialize Azumi State
-    let state = MyState {
-        username: user.username,
-        role: user.role
-    };
-
-    // 5. Render
-    azumi::render_to_string(&MyComponent::render(
-        MyComponent::Props::builder().state(&state).build().unwrap()
-    ))
-}
-```
-
-#### 3. The UI (Component)
-
-The component just receives data. It doesn't care if it came from a cookie, a JWT, or a mock.
-
-```rust
-#[azumi::live]
-pub struct MyState {
-    pub username: String, // Just data!
-}
-```
-
-### The Reusable Extractor Pattern (Recommended)
-
-Instead of manually extracting `Extension` or implementing complex traits in every handler, we recommend creating a shared `CurrentUser` extractor in your project's infrastructure.
-
-1. **Define Infrastructure (Once)**:
-   Create a reusable extractor in `auth.rs`:
-
-   ```rust
-   // auth.rs
-   pub struct CurrentUser(pub Option<User>);
-
-   #[async_trait]
-   impl<S> FromRequestParts<S> for CurrentUser where S: Send + Sync {
-       async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
-           let Extension(user) = parts.extract::<Extension<Option<User>>>().await.unwrap_or(Extension(None));
-           Ok(CurrentUser(user))
-       }
-   }
-   ```
-
-2. **Use it Everywhere**:
-   Now your handlers remain clean and Type-Safe:
-
-   ```rust
-   // page.rs
-   use crate::auth::CurrentUser;
-
-   pub async fn my_handler(
-       // Look how clean this is!
-       CurrentUser(user): CurrentUser
-   ) -> impl IntoResponse {
-       // Initialize state directly from the user object
-       let state = MyState {
-           name: user.map(|u| u.name)
-       };
-       azumi::render(&view(&state))
-   }
-   ```
-
----
-
-## 🖼️ Image Optimization
-
-Azumi automatically optimizes images at compile time. You do not need a special image component.
-
-### Automatic Attributes
-
-Standard `<img>` tags automatically get performance attributes injected by the compiler:
-
-```rust
-// You write:
-<img src="/photo.jpg" alt="Description" />
-
-// Compiler generates:
-<img src="/photo.jpg" alt="Description" loading="lazy" decoding="async" />
-```
-
-### Overriding Defaults
-
-You can manually override these defaults for "above the fold" hero images:
-
-```rust
-// Hero image (loads immediately)
-<img src="/hero.jpg" alt="Hero" loading="eager" />
-// Compiler respects your choice and does NOT inject loading="lazy"
-```
-
-### Responsive Images
-
-Use standard HTML `srcset` for responsive sizing. The compiler leaves these alone (while still adding lazy/async if omitted).
-
-```rust
-<img
-    src="/photo-800.jpg"
-    srcset="/photo-400.jpg 400w, /photo-800.jpg 800w"
-    sizes="(max-width: 600px) 100vw, 800px"
-    alt="Responsive"
-/>
-```
-
----
-
-## 🚀 Performance Considerations
-
-### Optimized Patterns
-
-```rust
-// ✅ Good - minimal re-renders
-#[azumi::component]
-pub fn OptimizedComponent(state: &'a MyState) -> impl Component + 'a {
-    html! {
-        @let computed_value = expensive_calculation(&state.data);
-        <div>{computed_value}</div>
-    }
-}
-
-// ✅ Good - conditional rendering
-@if state.visible {
-    @ExpensiveComponent(data=state.data)
-}
-```
-
-### Avoid Anti-Patterns
-
-```rust
-// ❌ Bad - unnecessary computations in template
-<div>
-    {expensive_function(&state.data)}  // Runs on every render
-</div>
-
-// ❌ Bad - large components
-// Break into smaller components instead
-```
-
----
-
-## 🔧 Debugging & Development
+## 🔧 Debugging
 
 ### Development Server
 
 ```bash
-# Run the demo to see examples
-cd demo
-cargo run
+cd demo && cargo run
 # Visit http://localhost:3000
 ```
 
-### Client Runtime (Manual Opt-In)
+### Debug Macro Expansion
 
-Azumi is **static by default**. Pages render as pure HTML with zero JavaScript.
-
-To enable interactivity (Live components, optimistic UI), add the runtime script to your root layout:
-
-```rust
-#[azumi::component]
-pub fn RootLayout(children: impl Component) -> impl Component {
-    html! {
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8" />
-            <title>"My App"</title>
-        </head>
-        <body>
-            {children}
-
-            // ⚠️ REQUIRED for Live features
-            // This is a virtual file served by the framework
-            <script src="azumi.js" />
-        </body>
-        </html>
-    }
-}
-```
-
-**Why manual?** You control the bundle. Static pages stay at 0kb JS. Interactive pages get only what they need (~12kb).
-
-### CSS ID Handling
-
-```rust
-// IDs are NOT scoped like classes - they remain global
-<style>
-    #unique_id { color: "blue"; }  // ID not scoped
-    .my_class { padding: "1rem"; } // Class gets scoped
-</style>
-
-// Usage
-<div id={unique_id} class={my_class}>
-    "Content"
-</div>
-```
-
-### Error Messages
-
-Common error patterns and solutions:
-
-1. **CSS Parsing Errors**: Check all values are quoted
-2. **Component Link Errors**: Ensure `#[azumi::live_impl(component = "name")]` matches component name
-3. **Event Binding Errors**: Use `on:click={state.method}` not closures
-4. **HTML Validation Errors**: Check required attributes (alt, href, labels)
+Set `AZUMI_DEBUG=1` to see detailed parsing output during compilation.
 
 ---
 
-## ❌ Common Mistakes
+## 📊 Performance
 
-### Missing State Reference in Component
-
-```rust
-// WRONG - state must be first param for live components
-#[azumi::component]
-pub fn counter_view() -> impl Component { }
-
-// CORRECT
-#[azumi::component]
-pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a { }
-```
-
-### Using style Attribute Incorrectly
-
-```rust
-// WRONG - direct CSS properties
-<div style={width: "50%"; background: "red"}></div>
-
-// CORRECT - only CSS custom properties
-<div style={--width: "0.5"; --color: "red"}></div>
-```
-
-### Closure Event Handlers
-
-```rust
-// WRONG - don't use closures
-<button on:click={|| state.increment()}>
-
-// CORRECT - direct method reference
-<button on:click={state.increment}>
-```
-
----
-
-## 📚 Quick Reference
-
-| Feature       | Syntax                                 | Example                                              |
-| ------------- | -------------------------------------- | ---------------------------------------------------- |
-| Component     | `#[azumi::component]`                  | `#[azumi::component] fn MyComp() -> impl Component`  |
-| Live State    | `#[azumi::live]`                       | `#[azumi::live] pub struct State { }`                |
-| Live Methods  | `#[azumi::live_impl]`                  | `#[azumi::live_impl(component = "view")] impl State` |
-| Event         | `on:event={state.method}`              | `on:click={state.increment}`                         |
-| Class         | `class={class_name}`                   | `class={my_button}`                                  |
-| Style         | `<style>` or `<style global>`          | `<style> .btn { } </style>`                          |
-| Dynamic Style | `style={--var: value}`                 | `style={--color: "red"}`                             |
-| Conditional   | `{if cond { a } else { b }}`           | `{if active { "On" } else { "Off" }}`                |
-| Loop          | `@for item in items { }`               | `@for item in &list { <div>{item}</div> }`           |
-| Pattern Match | `@match value { }`                     | `@match status { "ok" => {} _ => {} }`               |
-| Local Var     | `@let name = value;`                   | `@let total = price * quantity;`                     |
-| Children      | `@Component { }`                       | `@Container { <p>"Content"</p> }`                    |
-| Head Meta     | `head! { title: "", description: "" }` | `head! { title: "Page", desc: "Desc" }`              |
-| Schema        | `#[derive(Schema)]`                    | `#[schema(type = "BlogPosting")]`                    |
-| Form Bind     | `bind={StructName}`                    | `form bind={UserRegistration}`                       |
-| Data Bind     | `data-bind="property"`                 | `data-bind="count"`                                  |
-| Client Script | `Auto / {azumi::azumi_script()}`       | `html! { <head>...` (Auto)                           |
-| Text          | Quoted strings / Component             | `"Hello world"` / `String`                           |
-
----
-
-## 📚 Complete Learning Journey (20 Interactive Lessons)
-
-Azumi includes the **most comprehensive web framework education platform** with hands-on lessons:
-
-| Lesson | Topic                   | What You'll Learn                                  |
-| ------ | ----------------------- | -------------------------------------------------- |
-| **0**  | Components Basics       | `#[azumi::component]`, `html!` macro, basic syntax |
-| **1**  | CSS Scoping             | Automatic CSS scoping, no naming conflicts         |
-| **2**  | Global vs Scoped        | `<style>` vs `<style global>` patterns             |
-| **3**  | Component Composition   | Building complex UIs from simple components        |
-| **4**  | Children Pattern        | `children: impl Component` parameter               |
-| **5**  | @let Variables          | Local variable declarations in templates           |
-| **6**  | Control Flow            | `@if`, `@for`, `@match` patterns                   |
-| **7**  | Form Handling           | Compile-time form validation                       |
-| **8**  | Server Actions          | `#[azumi::action]` for interactivity               |
-| **9**  | Azumi Live Intro        | Compiler-driven optimistic UI                      |
-| **10** | Live Components         | Auto-detecting live state in components            |
-| **11** | Event Binding           | `on:click={state.method}` declarative syntax       |
-| **12** | Optimistic UI Flow      | How predictions work → confirm                     |
-| **13** | Form Patterns           | Live forms with server validation                  |
-| **14** | Component Composition   | Complex UIs with live components                   |
-| **15** | Full Application        | Complete todo app pattern                          |
-| **16** | Async Database          | Real-world `sqlx` database integration             |
-| **17** | Testing Infrastructure  | `azumi::test` for unit & simulation tests          |
-| **18** | Security (Signed State) | HMAC-SHA256 protecting client-side state           |
-| **19** | Authentication          | Axum middleware integration patterns               |
-
-### 🎓 **Try the Interactive Learning Platform**
-
-```bash
-# Start the learning server
-cd demo
-cargo run
-
-# Visit: http://localhost:3000
-# - 20 interactive lessons with live examples
-# - Progressive difficulty from basics to full apps
-# - Real code examples you can modify and run
-```
-
----
-
-## 📊 Performance Characteristics
-
-| Metric                  | Azumi           | React      | Vue        | Svelte     |
-| ----------------------- | --------------- | ---------- | ---------- | ---------- |
-| **Bundle Size**         | ~5KB            | 100KB+     | 95KB+      | 50KB       |
-| **First Paint**         | 50ms            | 500ms      | 400ms      | 200ms      |
-| **Time to Interactive** | 100ms           | 1500ms     | 1200ms     | 400ms      |
-| **CSS Validation**      | ✅ Compile-time | ❌ Runtime | ❌ Runtime | ✅ Runtime |
-| **HTML Validation**     | ✅ Compile-time | ❌ Runtime | ❌ Runtime | ❌ Runtime |
-
----
-
-## 🔄 Comparison with Other Frameworks
-
-| Feature                     | Azumi      | Next.js    | Phoenix LiveView | HTMX    |
-| --------------------------- | ---------- | ---------- | ---------------- | ------- |
-| **CSS-HTML Co-validation**  | ✅         | ❌         | ❌               | ❌      |
-| **Compile-time HTML**       | ✅         | ❌         | ❌               | ❌      |
-| **Automatic optimistic UI** | ✅         | Manual     | Manual           | ❌      |
-| **Bundle size**             | 5KB        | 200KB+     | 10KB             | 14KB    |
-| **Type safety**             | Full Rust  | TypeScript | None             | None    |
-| **Learning platform**       | 20 lessons | Examples   | Docs             | Minimal |
+| Metric | Azumi | React | Vue | Svelte |
+|--------|-------|-------|-----|--------|
+| **Bundle Size** | ~3KB | 100KB+ | 95KB+ | 50KB |
+| **Hydration** | None | Required | Required | Required |
+| **CSS Validation** | Compile-time | Runtime | Runtime | Runtime |
+| **HTML Validation** | Compile-time | Runtime | Runtime | Runtime |
+| **Type Safety** | Full Rust | TypeScript | TypeScript | TypeScript |
 
 ---
 
 ## 🏢 When to Use Azumi
 
-### ✅ **Azumi Excels At:**
+### ✅ Excels At
 
-**Correctness**
+- **Correctness** — CSS-HTML co-validation, accessibility checks, end-to-end type safety
+- **Performance** — Zero hydration, ~3KB runtime, instant TTI
+- **Developer Experience** — No API layer, browserless testing, built-in asset pipeline
+- **Production** — Low memory footprint, signed state, edge-cacheable
 
-- **CSS-HTML co-validation** — Typos, missing classes, invalid HTML caught at compile time
-- **End-to-end type safety** — DB struct → component state → HTML, zero schema drift
-- **XSS prevention by default** — Rust's type system enforces escaping
+### 🎯 Outside Core Scope
 
-**Performance**
+- **Offline-first apps** — Requires separate sync layer
+- **Real-time collaboration** — Pair with dedicated real-time layer
+- **Mobile native** — Wrap in Tauri/Capacitor for native distribution
 
-- **Zero hydration** — No JS bundle replay, no `__NEXT_DATA__` blob, HTML is truth
-- **~3kb runtime** — Compare to Next.js (~80kb), Leptos (~150kb)
-- **Instant TTI** — No WASM download, no JS parse delay
+Azumi is opinionated: logic runs on the server, UI updates are predicted, the server is truth.
 
-**Developer Experience**
-
-- **No API layer** — DB queries live next to your components (no REST/tRPC ceremony)
-- **Browserless testing** — Unit test components without JSDOM or Cypress
-- **Asset pipeline built-in** — Content-hashed, immutable caching, zero config
-
-**Production**
-
-- **~90% cloud cost vs Node** — Rust concurrency + low memory footprint
-- **Signed state** — HMAC prevents client-side tampering (no `isAdmin: true` hacks)
-- **Edge-cacheable** — Deterministic HTML, hashed assets, stateless servers
-
-### 🎯 **Outside Core Scope:**
-
-- **Offline-first apps** — Azumi assumes server is truth; offline requires separate sync layer
-- **Continuous real-time sync** — Collaborative editing, multiplayer games → pair with dedicated real-time layer
-- **Mobile native** — Web-first → wrap in Tauri/Capacitor for native distribution
-
-Azumi is opinionated: logic runs on the server, UI updates are predicted, the server is truth. These aren't gaps — they're the design.
+---
 
 ## 📁 Project Structure
 
 ```
 azumi/
-├── src/                    # Core framework
-│   ├── lib.rs             # Component traits, LiveState
-│   └── action.rs          # Server actions
-├── macros/                # Procedural macros
-│   ├── src/lib.rs         # Main macro entry point
-│   ├── src/component.rs   # #[azumi::component]
-│   ├── src/live.rs        # #[azumi::live] + #[azumi::live_impl]
-│   ├── src/style.rs       # CSS validation & scoping
-│   ├── src/token_parser.rs # HTML parsing
-│   └── src/css_validator.rs # Compile-time validation
-├── demo/                  # Interactive learning platform
-│   ├── src/examples/lessons/
-│   │   ├── pages/lesson0.rs through lesson19.rs
-│   │   └── components/layout.rs
-│   └── src/main.rs        # Learning server
-└── client/                # Browser runtime (5KB)
-    ├── azumi.js           # Event handling, predictions
-    └── idiomorph.js       # DOM morphing
+├── src/                      # Core framework
+│   ├── lib.rs               # Component trait, LiveState, CSS scoping
+│   ├── security.rs          # HMAC-SHA256 state signing
+│   ├── action.rs            # Server action registry
+│   ├── devtools.rs          # Hot reload (feature-gated)
+│   ├── hot_reload.rs        # WebSocket + template updates
+│   ├── seo.rs               # SEO metadata generation
+│   └── script.rs            # AzumiScript component
+├── macros/                   # Procedural macros
+│   └── src/
+│       ├── lib.rs           # html! macro expansion
+│       ├── token_parser.rs  # HTML/CSS/JSX-like DSL parser
+│       ├── component.rs     # #[azumi::component]
+│       ├── live.rs          # #[azumi::live] + prediction analysis
+│       ├── style.rs         # CSS DSL + lightningcss validation
+│       ├── css_validator.rs # Compile-time CSS rules
+│       ├── accessibility_validator.rs  # A11y checks
+│       ├── html_structure_validator.rs # HTML nesting rules
+│       └── asset_rewriter.rs           # Asset path rewriting
+├── demo/                     # Interactive learning platform
+│   └── src/examples/lessons/ # 20 progressive lessons
+└── build.rs                  # Asset hashing + manifest generation
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Create Your First Component
+### 1. Create a Component
 
 ```rust
-use azumi::html;
+use azumi::prelude::*;
 
 #[azumi::component]
-pub fn WelcomeCard(name: &str) -> impl azumi::Component {
+pub fn WelcomeCard(name: &str) -> impl Component {
+    html! {
         <div class={welcome_card}>
             <h2 class={title}>"Welcome to Azumi!"</h2>
-            <p>{"Hello, "}{name}{" 👋"}</p>
+            <p>"Hello, " {name}</p>
         </div>
         <style>
-            .welcome_card {
-                padding: "1.5rem";
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
-                color: "white";
-                border-radius: "12px";
-            }
+            .welcome_card { padding: "1.5rem"; background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"; color: "white"; border-radius: "12px"; }
             .title { font-size: "1.5rem"; font-weight: "bold"; }
         </style>
     }
 }
 ```
 
-### 2. Add Interactivity with Azumi Live
+### 2. Add Interactivity
 
 ```rust
 use azumi::prelude::*;
 
-// Define reactive state
 #[azumi::live]
-pub struct Counter {
-    pub count: i32,
-    pub liked: bool,
-}
+pub struct Counter { pub count: i32, pub liked: bool }
 
-// Analyze mutations for predictions
 #[azumi::live_impl(component = "counter_view")]
 impl Counter {
     pub fn increment(&mut self) { self.count += 1; }
     pub fn toggle_like(&mut self) { self.liked = !self.liked; }
 }
 
-// Create live component
 #[azumi::component]
 pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
+    html! {
         <div class={counter}>
             <div class={value}>{state.count}</div>
             <button class={btn} on:click={state.increment}>
@@ -1373,7 +569,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
         <style>
             .counter { text-align: "center"; padding: "2rem"; }
             .value { font-size: "3rem"; margin: "1rem 0"; }
-            .btn { padding: "1rem 2rem"; margin: "0.5rem"; }
+            .btn { padding: "1rem 2rem"; margin: "0.5rem"; cursor: "pointer"; }
         </style>
     }
 }
@@ -1383,58 +579,58 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 
 ## 🤝 Getting Started
 
-### **Option 1: Try the Learning Platform**
+### Option 1: Try the Learning Platform
 
 ```bash
 git clone https://github.com/DraconDev/azumi
 cd azumi
-cargo run -p demo
+cargo run -p azumi-demo
 # Visit: http://localhost:3000
-# Now featuring the "Deep Space" premium dark theme!
 ```
 
-### **Option 2: Create a New Project**
+20 interactive lessons covering components through async database integration.
+
+### Option 2: Create a New Project
 
 ```bash
 cargo new my-azumi-app
 cd my-azumi-app
-# Add azumi to your Cargo.toml
 cargo add azumi
 ```
 
-### **Option 3: Follow the Lessons**
-
-1. Start with **Lesson 0**: Components Basics
-2. Progress through **Lessons 1-8**: Core framework features
-3. Master **Lessons 9-19**: Azumi Live and advanced patterns
-4. Build your first **full application**
-
 ---
 
-## 🎯 Key Takeaways
+## 📚 Lesson Index
 
-1. **Write Rust, get JavaScript**: The compiler does the heavy lifting
-2. **Quote everything**: CSS values, text content, class names
-3. **Component link required**: Live state needs `#[azumi::live_impl(component = "name")]`
-4. **Event binding is declarative**: `on:click={state.method}` not closures
-5. **Predictions are optimistic**: Server always wins if wrong
-6. **CSS scoping is automatic**: No manual CSS management needed
-7. **Forms are type-safe**: Compile-time validation for accessibility
-8. **Performance is built-in**: Compiler optimizations and efficient rendering
+| Lesson | Topic |
+|--------|-------|
+| **0** | Components Basics |
+| **1** | CSS Scoping |
+| **2** | Global vs Scoped Styles |
+| **3** | Component Composition |
+| **4** | Children Pattern |
+| **5** | @let Variables |
+| **6** | Control Flow (@if, @for, @match) |
+| **7** | Form Handling |
+| **8** | Server Actions |
+| **9** | Azumi Live Intro |
+| **10** | Live Components |
+| **11** | Event Binding |
+| **12** | Optimistic UI Flow |
+| **13** | Form Patterns |
+| **14** | Component Composition (Advanced) |
+| **15** | Full Application (Todo App) |
+| **16** | Async Database (sqlx) |
+| **17** | Testing Infrastructure |
+| **18** | Security (Signed State) |
+| **19** | Authentication (Axum Middleware) |
 
 ---
 
 ## 📄 License
 
-Dracon License v1.1 - this project is covered by the umbrella Dracon License. Small teams can use included software for free; larger organizations need the annual commercial license described in [LICENSE](LICENSE). Current pricing and included products: https://dracon.uk/licensing
+Dracon License v1.1 — small teams can use included software for free; larger organizations need the annual commercial license. See [LICENSE](LICENSE) for details.
 
 ---
 
-**🎓 Ready to revolutionize your web development with compile-time safety?**
-
-**[Start Learning →](http://localhost:3000)** | **[GitHub →](https://github.com/DraconDev/azumi)** | **[Documentation →](https://docs.rs/azumi)**
-
----
-
-_The only web framework that validates your HTML, scopes your CSS, and generates optimistic UI from Rust code—all at compile time._
-// dummy change
+_The only web framework that validates your HTML, scopes your CSS, checks accessibility, and generates optimistic UI from Rust code — all at compile time._
