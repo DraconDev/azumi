@@ -840,9 +840,9 @@ fn validate_nodes(
                         valid_ids,
                         _has_scoped_css,
                         errors,
-                        _is_inside_form,
-                        _is_inside_button,
-                        _is_inside_anchor,
+                        is_inside_form,
+                        is_inside_button,
+                        is_inside_anchor,
                     );
                 }
                 token_parser::Node::Block(block) => match block {
@@ -853,9 +853,9 @@ fn validate_nodes(
                             valid_ids,
                             _has_scoped_css,
                             errors,
-                            _is_inside_form,
-                            _is_inside_button,
-                            _is_inside_anchor,
+                            is_inside_form,
+                            is_inside_button,
+                            is_inside_anchor,
                         );
                         if let Some(else_branch) = &if_block.else_branch {
                             collect_errors_recursive(
@@ -864,9 +864,9 @@ fn validate_nodes(
                                 valid_ids,
                                 _has_scoped_css,
                                 errors,
-                                _is_inside_form,
-                                _is_inside_button,
-                                _is_inside_anchor,
+                                is_inside_form,
+                                is_inside_button,
+                                is_inside_anchor,
                             );
                         }
                     }
@@ -877,9 +877,9 @@ fn validate_nodes(
                             valid_ids,
                             _has_scoped_css,
                             errors,
-                            _is_inside_form,
-                            _is_inside_button,
-                            _is_inside_anchor,
+                            is_inside_form,
+                            is_inside_button,
+                            is_inside_anchor,
                         );
                     }
                     token_parser::Block::Match(match_block) => {
@@ -890,9 +890,9 @@ fn validate_nodes(
                                 valid_ids,
                                 _has_scoped_css,
                                 errors,
-                                _is_inside_form,
-                                _is_inside_button,
-                                _is_inside_anchor,
+                                is_inside_form,
+                                is_inside_button,
+                                is_inside_anchor,
                             );
                         }
                     }
