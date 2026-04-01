@@ -24,6 +24,20 @@ pub enum Prediction {
     Add { field: String, value: String },
     /// self.field -= value (decrement)
     Sub { field: String, value: String },
+    /// self.field.push(value)
+    Push { field: String, value: String },
+    /// self.field.pop()
+    Pop { field: String },
+    /// self.field.clear()
+    Clear { field: String },
+    /// self.map.insert(key, value)
+    Insert {
+        field: String,
+        key: String,
+        value: String,
+    },
+    /// self.map.remove(key)
+    Remove { field: String, key: String },
     /// Manual prediction string from #[azumi::predict]
     Manual(String),
 }
@@ -43,6 +57,21 @@ impl Prediction {
             }
             Prediction::Sub { field, value } => {
                 format!("{} = {} - {}", field, field, value)
+            }
+            Prediction::Push { field, value } => {
+                format!("{}.push({})", field, value)
+            }
+            Prediction::Pop { field } => {
+                format!("{}.pop()", field)
+            }
+            Prediction::Clear { field } => {
+                format!("{} = []", field)
+            }
+            Prediction::Insert { field, key, value } => {
+                format!("{}.insert({}, {})", field, key, value)
+            }
+            Prediction::Remove { field, key } => {
+                format!("{}.remove({})", field, key)
             }
             Prediction::Manual(s) => s.clone(),
         }
