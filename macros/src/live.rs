@@ -176,6 +176,54 @@ fn analyze_expr(expr: &Expr) -> Option<Prediction> {
             }
         }
 
+        // self.field.push(value)
+        Expr::MethodCall(mc) => {
+            let method_name = mc.method.to_string();
+            // Check if receiver is self.field
+            if let Expr::Field(ExprField { base, member, .. }) = &*mc.receiver {
+                if let Expr::Path(ExprPath { path, .. }) = &**base {
+                    if path.is_ident("self") {
+                        if let Member::Named(field) = member {
+                            let field = field.to_string();
+                            match method_name.as_str() {
+                                "clear" => return Some(Prediction::Clear { field }),
+                                "pop" => return Some(Prediction::Pop { field }),
+                                "push" => {
+                                    if let Some(arg) = mc.args.first() {
+                                        if let Some(value) = expr_to_literal_string(arg) {
+                                            return Some(Prediction::Push { field, value });
+                                        }
+                                    }
+                                }
+                                "insert" => {
+                                    if mc.args.len() == 2 {
+                                        let key = expr_to_literal_string(&mc.args[0]);
+                                        let value = expr_to_literal_string(&mc.args[1]);
+                                        if let (Some(k), Some(v)) = (key, value) {
+                                            return Some(Prediction::Insert {
+                                                field,
+                                                key: k,
+                                                value: v,
+                                            });
+                                        }
+                                    }
+                                }
+                                "remove" => {
+                                    if let Some(arg) = mc.args.first() {
+                                        if let Some(key) = expr_to_literal_string(arg) {
+                                            return Some(Prediction::Remove { field, key });
+                                        }
+                                    }
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                }
+            }
+            None
+        }
+
         _ => None,
     }
 }
