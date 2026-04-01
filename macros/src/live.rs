@@ -81,9 +81,7 @@ impl Prediction {
 /// Metadata about an analyzed method
 #[derive(Debug)]
 pub struct MethodAnalysis {
-    pub name: String,
     pub predictions: Vec<Prediction>,
-    pub has_unpredictable: bool,
 }
 
 /// Extract field name from `self.field` expression
