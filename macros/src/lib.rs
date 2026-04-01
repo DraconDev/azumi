@@ -20,28 +20,6 @@ use syn::parse::{Parse, ParseStream, Parser};
 use syn::parse_macro_input;
 use syn::Token;
 
-mod component;
-
-mod accessibility_validator;
-mod action;
-mod asset_rewriter;
-mod css;
-mod css_validator;
-mod head;
-mod html_structure_validator;
-mod live;
-mod page;
-#[cfg(feature = "schema")]
-mod schema;
-mod style;
-mod token_parser;
-
-use proc_macro::TokenStream;
-use quote::{quote, quote_spanned};
-use syn::parse::{Parse, ParseStream, Parser};
-use syn::parse_macro_input;
-use syn::Token;
-
 #[proc_macro]
 pub fn head(input: TokenStream) -> TokenStream {
     head::expand_head(input)
