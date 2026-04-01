@@ -63,6 +63,39 @@ pub fn predict(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+// Helpers for parsing Component arguments
+struct KeyValueArg {
+    key: syn::Ident,
+    value: syn::Expr,
+}
+
+impl Parse for KeyValueArg {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let key = input.parse()?;
+        input.parse::<Token![=]>()?;
+        let value = input.parse()?;
+        Ok(KeyValueArg { key, value })
+    }
+}
+
+fn parse_args(tokens: proc_macro2::TokenStream) -> syn::Result<Vec<KeyValueArg>> {
+    let parser = syn::punctuated::Punctuated::<KeyValueArg, Token![,]>::parse_terminated;
+    parser.parse2(tokens).map(|p| p.into_iter().collect())
+}
+
+fn transform_path_for_component(path: &syn::Path) -> syn::Path {
+    path.clone()
+}
+
+// Helper for parsing space-separated expressions (e.g. class={expr1 expr2})
+fn parse_multi_exprs(input: ParseStream) -> syn::Result<Vec<syn::Expr>> {
+    let mut exprs = Vec::new();
+    while !input.is_empty() {
+        exprs.push(input.parse()?);
+    }
+    Ok(exprs)
+}
+
 #[proc_macro]
 pub fn html(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as token_parser::HtmlInput);
