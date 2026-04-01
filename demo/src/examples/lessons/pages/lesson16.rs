@@ -143,7 +143,7 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
         <div class={card}>
             <h2 class={header_title}>"Async SQLite Todo List"</h2>
 
-            <div class={input_group}>
+            <form class={input_group} on:submit={state.add_todo}>
                 <input
                     class={input}
                     type="text"
@@ -153,14 +153,14 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
                     autofocus
                 />
 
-                <button class={btn} on:click={state.add_todo} disabled={state.loading}>
+                <button class={btn} type="submit" disabled={state.loading}>
                     @if state.loading {
                         <span>"Saving..."</span>
                     } else {
                         <span>"Add Task"</span>
                     }
                 </button>
-            </div>
+            </form>
 
             <ul class={list}>
                 @for todo in &state.todos {
@@ -211,9 +211,11 @@ pub fn database_todo_view<'a>(state: &'a DatabaseTodo) -> impl Component + 'a {
                 display: "flex";
                 gap: "0.75rem";
                 margin-bottom: "2rem";
+                align-items: "center";
             }
             .input {
-                flex: "1";
+                flex: "1 1 0";
+                min-width: "0";
                 padding: "0.75rem 1rem";
                 background: "rgba(15, 23, 42, 0.6)";
                 border: "1px solid rgba(255, 255, 255, 0.1)";
