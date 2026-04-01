@@ -13,7 +13,6 @@ mod page;
 #[cfg(feature = "schema")]
 mod schema;
 mod style;
-mod test_spacing;
 mod token_parser;
 
 use proc_macro::TokenStream;
