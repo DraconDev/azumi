@@ -75,8 +75,8 @@ fn run_master_loop() {
     let (tx, rx) = channel();
     let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();
 
-    // Watch common Rust directories
-    for dir in ["src", "demo/src", "apps", "libs"] {
+    // Watch src directory (the standard Rust project layout)
+    for dir in ["src"] {
         if Path::new(dir).exists() {
             watcher.watch(Path::new(dir), RecursiveMode::Recursive).unwrap();
         }
