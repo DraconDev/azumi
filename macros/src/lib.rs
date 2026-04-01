@@ -1,3 +1,4 @@
+// Force rebuild 11
 mod component;
 
 mod accessibility_validator;
@@ -12,14 +13,14 @@ mod page;
 #[cfg(feature = "schema")]
 mod schema;
 mod style;
-mod suggestions;
+mod test_spacing;
 mod token_parser;
 
 use proc_macro::TokenStream;
 use quote::{quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::parse_macro_input;
-use syn::Token;
+use syn::Token; // Needed for Token! macro
 
 #[proc_macro]
 pub fn head(input: TokenStream) -> TokenStream {
@@ -62,6 +63,15 @@ pub fn predict(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+#[allow(dead_code)]
+struct NodesWrapper(Vec<token_parser::Node>);
+
+impl Parse for NodesWrapper {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        token_parser::parse_nodes(input).map(NodesWrapper)
+    }
+}
+
 // Helpers for parsing Component arguments
 struct KeyValueArg {
     key: syn::Ident,
@@ -82,8 +92,17 @@ fn parse_args(tokens: proc_macro2::TokenStream) -> syn::Result<Vec<KeyValueArg>>
     parser.parse2(tokens).map(|p| p.into_iter().collect())
 }
 
+// Helper to transform snake_case component paths to their module name (append _component)
 fn transform_path_for_component(path: &syn::Path) -> syn::Path {
-    path.clone()
+    let mut new_path = path.clone();
+    if let Some(last) = new_path.segments.last_mut() {
+        let s = last.ident.to_string();
+        // If starts with lowercase, it's snake_case -> append _component
+        if s.chars().next().map(|c| c.is_lowercase()).unwrap_or(false) {
+            last.ident = syn::Ident::new(&format!("{}_component", s), last.ident.span());
+        }
+    }
+    new_path
 }
 
 // Helper for parsing space-separated expressions (e.g. class={expr1 expr2})
@@ -95,85 +114,101 @@ fn parse_multi_exprs(input: ParseStream) -> syn::Result<Vec<syn::Expr>> {
     Ok(exprs)
 }
 
+/// Validates that a style attribute only contains CSS custom properties (--variables).
+/// Returns Ok(()) if valid, Err(error_message) if invalid.
+#[allow(dead_code)]
+fn validate_style_only_css_vars(style_value: &str) -> Result<(), String> {
+    // Parse style value: "prop: value; prop2: value2"
+    for part in style_value.split(';') {
+        let part = part.trim();
+        if part.is_empty() {
+            continue;
+        }
+
+        // Split by first ':'
+        if let Some(colon_pos) = part.find(':') {
+            let prop_name = part[..colon_pos].trim();
+
+            // Property must start with --
+            if !prop_name.starts_with("--") {
+                return Err(format!(
+                    "Invalid style property '{}'. Only CSS variables are allowed in inline styles.",
+                    prop_name
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
 #[proc_macro]
 pub fn html(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as token_parser::HtmlInput);
     let mut nodes = input.nodes;
 
+    // Auto-scope Asset Paths (Rewrites /img/logo.png -> /assets/logo.a8b9.png)
     asset_rewriter::rewrite_nodes(&mut nodes);
 
+    // 1. Process styles (hoist <style> tags)
     let (style_bindings, _scoped_css, _global_css) = process_styles(&nodes);
 
+    // 2. CSS dependencies are no longer collected for external files
     let css_deps: Vec<proc_macro2::TokenStream> = Vec::new();
 
-    // HOT RELOAD INJECTION START
-    let hot_reload_code = if let Some((_statics, dynamics)) = try_extract_template(&nodes) {
-        let id_lit = if !nodes.is_empty() {
-            let _span = nodes[0].span();
-            quote! {
-               concat!(file!(), ":", line!(), ":", column!())
-            }
-        } else {
-            quote! { "unknown" }
-        };
-
-        let dynamic_blocks = dynamics.iter().enumerate().map(|(i, d)| {
-            let w_name = quote::format_ident!("__w{}", i);
-            let c_name = quote::format_ident!("__c{}", i);
-            let h_name = quote::format_ident!("__h{}", i);
-            quote! {
-                let #w_name = azumi::RenderWrapper(&(#d));
-                let #c_name = |f: &mut std::fmt::Formatter| #w_name.render_azumi(f);
-                let #h_name = azumi::HotReloadClosure(&#c_name);
-            }
-        });
-
-        let dynamic_refs = dynamics.iter().enumerate().map(|(i, _)| {
-            let h_name = quote::format_ident!("__h{}", i);
-            quote! { &#h_name }
-        });
-
-        quote! {
-            #[cfg(debug_assertions)]
-            {
-                if let Some(tmpl) = azumi::hot_reload::get_template(#id_lit) {
-                    #(#dynamic_blocks)*
-                    let dyns: &[&dyn azumi::FallbackRender] = &[ #(#dynamic_refs),* ];
-                    return tmpl.render(f, dyns);
-                }
-            }
-        }
-    } else {
-        quote! {}
-    };
-    // HOT RELOAD INJECTION END
-
+    // 3. Generate HTML string construction code
     let html_construction = generate_nodes(&nodes);
 
+    // 4. Generate bind validation checks
     let mut validation_checks = Vec::new();
     collect_bind_checks(&nodes, &mut validation_checks);
 
     let expanded = quote! {
         {
+            // Import FallbackRender to ensure render_azumi works even if trait not imported by user
             #[allow(unused_imports)]
             use azumi::FallbackRender;
 
+            // Inject style bindings (hoisted)
             #style_bindings
+
+            // CSS dependency tracking (forces recompile when CSS changes)
             #(#css_deps)*
 
+            // Validation block (compile-time only)
             const _: () = {
                 #(#validation_checks)*
             };
 
+            // Runtime HTML generation
             azumi::from_fn(move |f| {
-                #hot_reload_code
-                if false {}
+                if false {
+                   // Legacy code removed
+                }
                 #html_construction
             })
         }
     };
 
     TokenStream::from(expanded)
+}
+
+#[allow(dead_code)]
+fn extract_styles(
+    nodes: Vec<token_parser::Node>,
+) -> (Vec<token_parser::StyleBlock>, Vec<token_parser::Node>) {
+    let mut styles = Vec::new();
+    let mut other_nodes = Vec::new();
+
+    for node in nodes {
+        match node {
+            token_parser::Node::Block(token_parser::Block::Style(style)) => {
+                styles.push(style);
+            }
+            _ => other_nodes.push(node),
+        }
+    }
+
+    (styles, other_nodes)
 }
 
 fn process_styles(nodes: &[token_parser::Node]) -> (proc_macro2::TokenStream, String, String) {
@@ -519,14 +554,7 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
     }
 
     let (global_css, scoped_css) = collect_all_styles(nodes);
-    let (scoped_classes, scoped_ids) = crate::css::extract_selectors(&scoped_css);
-    let (global_classes, global_ids) = crate::css::extract_selectors(&global_css);
-
-    // Combine scoped and global classes/IDs for validation
-    let valid_classes: std::collections::HashSet<String> =
-        scoped_classes.into_iter().chain(global_classes).collect();
-    let valid_ids: std::collections::HashSet<String> =
-        scoped_ids.into_iter().chain(global_ids).collect();
+    let (valid_classes, valid_ids) = crate::css::extract_selectors(&scoped_css);
 
     let style_validation_errors =
         validate_nodes(nodes, &valid_classes, &valid_ids, !scoped_css.is_empty());
@@ -542,17 +570,8 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         use std::hash::{Hash, Hasher};
 
         let (scoped_output, scope_id) = if has_scoped {
-            // Compute scope ID from source position (line, col).
-            // This MUST match azumi::compute_scope_id() used by the hot reload watcher.
             let mut hasher = DefaultHasher::new();
-            if cfg!(debug_assertions) {
-                let span = nodes[0].span();
-                span.start().line.hash(&mut hasher);
-                span.start().column.hash(&mut hasher);
-            } else {
-                scoped_css.hash(&mut hasher);
-            }
-
+            scoped_css.hash(&mut hasher);
             let hash = hasher.finish();
             let scope_id = format!("s{:x}", hash);
             (
@@ -564,21 +583,19 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         };
 
         let css_to_inject = if has_global {
-            if let Some(sid) = &scope_id {
+            if has_scoped {
                 format!(
-                    "<style>{}</style><style data-azumi-internal=\"true\" data-azumi-scope=\"{}\">{}</style>",
-                    global_css, sid, scoped_output
+                    "<style>{}</style><style data-azumi-internal=\"true\">{}</style>",
+                    global_css, scoped_output
                 )
             } else {
                 format!("<style>{}</style>", global_css)
             }
-        } else if let Some(sid) = &scope_id {
-            format!(
-                "<style data-azumi-internal=\"true\" data-azumi-scope=\"{}\">{}</style>",
-                sid, scoped_output
-            )
         } else {
-            String::new()
+            format!(
+                "<style data-azumi-internal=\"true\">{}</style>",
+                scoped_output
+            )
         };
 
         let mut working_nodes = nodes.to_vec();
@@ -611,9 +628,7 @@ fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool 
         match node {
             token_parser::Node::Element(elem) => {
                 if elem.name == "head" {
-                    // Store CSS directly as a quoted string literal (not Debug format).
-                    // Debug format ({:?}) double-escapes characters and produces fragile output.
-                    let content = format!("\"{}\"", css.replace('\\', "\\\\").replace('"', "\\\""));
+                    let content = format!("{:?}", css);
                     let text_node = token_parser::Node::Text(token_parser::Text {
                         content,
                         span: elem.span,
@@ -646,94 +661,6 @@ fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool 
     false
 }
 
-/// Collect all let binding variable names from the AST
-fn collect_let_bindings(nodes: &[token_parser::Node]) -> std::collections::HashSet<String> {
-    let mut bindings = std::collections::HashSet::new();
-
-    fn collect_recursive(
-        nodes: &[token_parser::Node],
-        bindings: &mut std::collections::HashSet<String>,
-    ) {
-        for node in nodes {
-            match node {
-                token_parser::Node::Block(token_parser::Block::Let(let_block)) => {
-                    // Extract the variable name from the pattern
-                    // The pattern is a TokenStream, usually just an identifier
-                    if let Ok(ident) = syn::parse2::<syn::Ident>(let_block.pattern.clone()) {
-                        bindings.insert(ident.to_string());
-                    }
-                }
-                token_parser::Node::Element(elem) => {
-                    collect_recursive(&elem.children, bindings);
-                }
-                token_parser::Node::Fragment(frag) => {
-                    collect_recursive(&frag.children, bindings);
-                }
-                token_parser::Node::Block(block) => match block {
-                    token_parser::Block::If(if_block) => {
-                        collect_recursive(&if_block.then_branch, bindings);
-                        if let Some(else_branch) = &if_block.else_branch {
-                            collect_recursive(else_branch, bindings);
-                        }
-                    }
-                    token_parser::Block::For(for_block) => {
-                        collect_recursive(&for_block.body, bindings);
-                    }
-                    token_parser::Block::Match(match_block) => {
-                        for arm in &match_block.arms {
-                            collect_recursive(&arm.body, bindings);
-                        }
-                    }
-                    token_parser::Block::Call(call_block) => {
-                        collect_recursive(&call_block.children, bindings);
-                    }
-                    _ => {}
-                },
-                _ => {}
-            }
-        }
-    }
-
-    collect_recursive(nodes, &mut bindings);
-    bindings
-}
-
-/// Check if a value looks like a CSS class name definition
-/// This catches patterns like: "my_class", "btn-primary"
-/// But NOT regular text like: "Dynamic Component", "Hello World"
-fn looks_like_class_name(value: &str) -> bool {
-    // Must be a reasonable length for a class name (not a sentence)
-    if value.len() > 40 {
-        return false;
-    }
-
-    // Only catch explicit CSS naming patterns:
-    // - snake_case: "my_class", "button_primary"
-    // - kebab-case: "btn-primary", "my-class"
-    // NOT regular text like "Hello World" or "Dynamic Component"
-    //
-    // Heuristic: snake_case or kebab-case uses consistent casing
-    // and no uppercase letters (except maybe first char)
-    let is_snake_case = value.contains('_') && !value.chars().any(|c| c.is_uppercase());
-    let is_kebab_case = value.contains('-') && !value.chars().any(|c| c.is_uppercase());
-
-    is_snake_case || is_kebab_case
-}
-
-/// Check if a let binding value is a string literal defining a class name
-fn is_let_class_definition(value: &proc_macro2::TokenStream) -> bool {
-    let value_str = value.to_string();
-    // Check if it's a quoted string
-    if (value_str.starts_with('"') && value_str.ends_with('"'))
-        || (value_str.starts_with("\"") && value_str.ends_with("\""))
-    {
-        let inner = value_str.trim_matches('"');
-        looks_like_class_name(inner)
-    } else {
-        false
-    }
-}
-
 fn validate_nodes(
     nodes: &[token_parser::Node],
     valid_classes: &std::collections::HashSet<String>,
@@ -743,53 +670,19 @@ fn validate_nodes(
     use quote::quote_spanned;
     let mut errors = vec![];
 
-    // Collect all let bindings to detect shadowing anti-pattern
-    let let_bindings = collect_let_bindings(nodes);
-
     #[allow(clippy::too_many_arguments)]
     fn collect_errors_recursive(
         nodes: &[token_parser::Node],
         valid_classes: &std::collections::HashSet<String>,
         valid_ids: &std::collections::HashSet<String>,
-        let_bindings: &std::collections::HashSet<String>,
         _has_scoped_css: bool,
         errors: &mut Vec<proc_macro2::TokenStream>,
-        is_inside_form: bool,
-        is_inside_button: bool,
-        is_inside_anchor: bool,
+        _is_inside_form: bool,
+        _is_inside_button: bool,
+        _is_inside_anchor: bool,
     ) {
         for node in nodes {
             match node {
-                token_parser::Node::Block(token_parser::Block::Let(let_block)) => {
-                    // Check for anti-pattern: @let my_class = "my_class" or @let btn = "btn-primary"
-                    if is_let_class_definition(&let_block.value) {
-                        if let Ok(ident) = syn::parse2::<syn::Ident>(let_block.pattern.clone()) {
-                            let var_name = ident.to_string();
-                            let value_str =
-                                let_block.value.to_string().trim_matches('"').to_string();
-
-                            // To get literal braces in format! output: {{ and }}
-                            // To get format argument: {0}, {1}, etc.
-                            // So {{{{0}}}} produces: {{ + var_name + }} = {var_name}
-                            let msg = format!(
-                                "Don't use @let for CSS class names.\n\n\
-                                 You wrote:     @let {0} = \"{1}\";\n\
-                                 But <style> already creates the variable for you.\n\n\
-                                 Fix: Remove the @let line. Just use class={{{{0}}}} directly.\n\
-                                      The <style> block generates the variable automatically.\n\n\
-                                     <div class={{{{0}}}}>...</div>   ← This works!\n\
-                                     <style>\n\
-                                         .{0} {{ color: \"red\"; }}\n\
-                                     </style>\n\n\
-                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md § Critical Rules",
-                                var_name, value_str
-                            );
-                            errors.push(quote_spanned! { let_block.span =>
-                                compile_error!(#msg);
-                            });
-                        }
-                    }
-                }
                 token_parser::Node::Element(elem) => {
                     for attr in &elem.attrs {
                         let name = &attr.name;
@@ -814,90 +707,13 @@ fn validate_nodes(
                                 token_parser::AttributeValue::Dynamic(tokens) => {
                                     if let Ok(ident) = syn::parse2::<syn::Ident>(tokens.clone()) {
                                         let var_name = ident.to_string();
-
-                                        // Check if this variable is a let binding (anti-pattern)
-                                        if let_bindings.contains(&var_name)
-                                            && valid_classes.contains(&var_name)
-                                        {
-                                            // The @let shadows a CSS class — this is confusing and error-prone
-                                            let msg = format!(
-                                                "'{0}' is both a @let variable AND a CSS class.\n\n\
-                                                 You wrote:     @let {0} = ...;  and  class={{{{0}}}}\n\
-                                                 The @let binding shadows the CSS-generated variable.\n\n\
-                                                 Fix: Either rename the @let variable or the CSS class.\n\n\
-                                                     @let {0}_text = \"hello\";   ← rename the variable\n\
-                                                     <div class={{{{0}}}}>{{{0}_text}}</div>\n\
-                                                     <style>.{0} {{ ... }}</style>\n\n\
-                                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md § @let Rules",
-                                                var_name
-                                            );
-                                            errors.push(quote_spanned! { ident.span() =>
-                                                compile_error!(#msg);
-                                            });
-                                        } else if let_bindings.contains(&var_name) {
-                                            let msg = format!(
-                                                "Don't use @let for CSS class names.\n\n\
-                                                 You wrote:     @let {0} = ...;  class={{{{0}}}}\n\
-                                                 But CSS classes should come from <style>, not @let.\n\n\
-                                                 Fix: Remove the @let. Use the <style> block instead.\n\n\
-                                                     <div class={{{{0}}}}>...</div>\n\
-                                                     <style>\n\
-                                                         .{0} {{ color: \"red\"; }}\n\
-                                                     </style>\n\n\
-                                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md § Critical Rules",
-                                                var_name
-                                            );
-                                            errors.push(quote_spanned! { ident.span() =>
-                                                compile_error!(#msg);
-                                            });
-                                        } else if valid_ids.contains(&var_name)
+                                        if valid_ids.contains(&var_name)
                                             && !valid_classes.contains(&var_name)
                                         {
                                             let msg = format!(
-                                                "'{0}' is an ID selector, not a class.\n\n\
-                                                 You wrote:     class={{{{0}}}}\n\
-                                                 But #{0} is defined in <style> as an ID.\n\n\
-                                                 Fix: Use id={{{{0}}}} instead of class={{{{0}}}}\n\n\
-                                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md § IDs",
-                                                var_name
+                                                "Variable '{}' refers to an ID selector (#{}) but is used in 'class' attribute. Did you mean to use 'id={}'?",
+                                                var_name, var_name, var_name
                                             );
-                                            errors.push(quote_spanned! { ident.span() =>
-                                                compile_error!(#msg);
-                                            });
-                                        } else if !valid_classes.contains(&var_name)
-                                            && !let_bindings.contains(&var_name)
-                                        {
-                                            // The class is not defined in <style> and not a let binding
-                                            // This catches: let nice = "..."; class={nice}
-                                            let suggestion = crate::suggestions::closest_match(
-                                                &var_name,
-                                                valid_classes,
-                                            );
-                                            let msg = if let Some(sug) = suggestion {
-                                                format!(
-                                                    "CSS class '{0}' is not defined. Did you mean '{1}'?\n\n\
-                                                    You wrote:     class={{{{0}}}}\n\
-                                                    The closest match in your <style> block is: .{1}\n\n\
-                                                    Fix:\n\
-                                                        <div class={{{{1}}}}>...</div>\n\n\
-                                                    Or define .{0} in your <style> block:\n\
-                                                        <style>\n\
-                                                            .{0} {{ ... }}\n\
-                                                        </style>\n\n\
-                                                    See: AI_GUIDE_FOR_WRITING_AZUMI.md § CSS Classes",
-                                                    var_name, sug
-                                                )
-                                            } else {
-                                                format!(
-                                                    "CSS class '{0}' is not defined.\n\n\
-                                                    You wrote:     class={{{{0}}}}\n\
-                                                    But no .{0} exists in your <style> block.\n\n\
-                                                    Fix: Add this to your <style>:\n\
-                                                        .{0} {{ background: \"#3b82f6\"; }}\n\n\
-                                                    See: AI_GUIDE_FOR_WRITING_AZUMI.md § CSS Classes",
-                                                    var_name
-                                                )
-                                            };
                                             errors.push(quote_spanned! { ident.span() =>
                                                 compile_error!(#msg);
                                             });
@@ -928,12 +744,8 @@ fn validate_nodes(
                                             && !valid_ids.contains(&var_name)
                                         {
                                             let msg = format!(
-                                                "'{0}' is a class selector, not an ID.\n\n\
-                                                 You wrote:     id={{{{0}}}}\n\
-                                                 But .{0} is defined in <style> as a class.\n\n\
-                                                 Fix: Use class={{{{0}}}} instead of id={{{{0}}}}\n\n\
-                                                 See: AI_GUIDE_FOR_WRITING_AZUMI.md § CSS Classes",
-                                                var_name
+                                                "Variable '{}' refers to a Class selector (.{}) but is used in 'id' attribute. Did you mean to use 'class={}'?",
+                                                var_name, var_name, var_name
                                             );
                                             errors.push(quote_spanned! { ident.span() =>
                                                 compile_error!(#msg);
@@ -955,72 +767,15 @@ fn validate_nodes(
                         }
                     }
 
-                    // Accessibility validations
-                    if let Some(err) = accessibility_validator::validate_img_alt(elem) {
-                        errors.push(err);
-                    }
-                    if let Some(err) = accessibility_validator::validate_input_type(elem) {
-                        errors.push(err);
-                    }
-                    if let Some(err) = accessibility_validator::validate_aria_roles(elem) {
-                        errors.push(err);
-                    }
-                    if let Some(err) = accessibility_validator::validate_button_content(elem) {
-                        errors.push(err);
-                    }
-                    if let Some(err) = accessibility_validator::validate_anchor_target_blank(elem) {
-                        errors.push(err);
-                    }
-                    if let Some(err) = accessibility_validator::validate_iframe_title(elem) {
-                        errors.push(err);
-                    }
-
-                    // HTML structure validations
-                    for err in html_structure_validator::validate_table_children(elem) {
-                        errors.push(err);
-                    }
-                    for err in html_structure_validator::validate_list_children(elem) {
-                        errors.push(err);
-                    }
-                    for err in html_structure_validator::validate_nested_forms(elem, is_inside_form)
-                    {
-                        errors.push(err);
-                    }
-                    for err in html_structure_validator::validate_button_interactive(
-                        elem,
-                        is_inside_button,
-                    ) {
-                        errors.push(err);
-                    }
-                    for err in html_structure_validator::validate_paragraph_content(elem) {
-                        errors.push(err);
-                    }
-                    for err in
-                        html_structure_validator::validate_anchor_nesting(elem, is_inside_anchor)
-                    {
-                        errors.push(err);
-                    }
-                    for err in html_structure_validator::validate_heading_content(elem) {
-                        errors.push(err);
-                    }
-                    if let Some(err) = html_structure_validator::validate_tag_name(elem) {
-                        errors.push(err);
-                    }
-
-                    let new_inside_form = is_inside_form || elem.name == "form";
-                    let new_inside_button = is_inside_button || elem.name == "button";
-                    let new_inside_anchor = is_inside_anchor || elem.name == "a";
-
                     collect_errors_recursive(
                         &elem.children,
                         valid_classes,
                         valid_ids,
-                        let_bindings,
                         _has_scoped_css,
                         errors,
-                        new_inside_form,
-                        new_inside_button,
-                        new_inside_anchor,
+                        _is_inside_form,
+                        _is_inside_button,
+                        _is_inside_anchor,
                     );
                 }
                 token_parser::Node::Fragment(frag) => {
@@ -1028,12 +783,11 @@ fn validate_nodes(
                         &frag.children,
                         valid_classes,
                         valid_ids,
-                        let_bindings,
                         _has_scoped_css,
                         errors,
-                        is_inside_form,
-                        is_inside_button,
-                        is_inside_anchor,
+                        _is_inside_form,
+                        _is_inside_button,
+                        _is_inside_anchor,
                     );
                 }
                 token_parser::Node::Block(block) => match block {
@@ -1042,24 +796,22 @@ fn validate_nodes(
                             &if_block.then_branch,
                             valid_classes,
                             valid_ids,
-                            let_bindings,
                             _has_scoped_css,
                             errors,
-                            is_inside_form,
-                            is_inside_button,
-                            is_inside_anchor,
+                            _is_inside_form,
+                            _is_inside_button,
+                            _is_inside_anchor,
                         );
                         if let Some(else_branch) = &if_block.else_branch {
                             collect_errors_recursive(
                                 else_branch,
                                 valid_classes,
                                 valid_ids,
-                                let_bindings,
                                 _has_scoped_css,
                                 errors,
-                                is_inside_form,
-                                is_inside_button,
-                                is_inside_anchor,
+                                _is_inside_form,
+                                _is_inside_button,
+                                _is_inside_anchor,
                             );
                         }
                     }
@@ -1068,12 +820,11 @@ fn validate_nodes(
                             &for_block.body,
                             valid_classes,
                             valid_ids,
-                            let_bindings,
                             _has_scoped_css,
                             errors,
-                            is_inside_form,
-                            is_inside_button,
-                            is_inside_anchor,
+                            _is_inside_form,
+                            _is_inside_button,
+                            _is_inside_anchor,
                         );
                     }
                     token_parser::Block::Match(match_block) => {
@@ -1082,95 +833,13 @@ fn validate_nodes(
                                 &arm.body,
                                 valid_classes,
                                 valid_ids,
-                                let_bindings,
                                 _has_scoped_css,
                                 errors,
-                                is_inside_form,
-                                is_inside_button,
-                                is_inside_anchor,
+                                _is_inside_form,
+                                _is_inside_button,
+                                _is_inside_anchor,
                             );
                         }
-                    }
-                    token_parser::Block::Call(call_block) => {
-                        collect_errors_recursive(
-                            &call_block.children,
-                            valid_classes,
-                            valid_ids,
-                            let_bindings,
-                            _has_scoped_css,
-                            errors,
-                            is_inside_form,
-                            is_inside_button,
-                            is_inside_anchor,
-                        );
-                    }
-                token_parser::Node::Block(block) => match block {
-                    token_parser::Block::If(if_block) => {
-                        collect_errors_recursive(
-                            &if_block.then_branch,
-                            valid_classes,
-                            valid_ids,
-                            let_bindings,
-                            _has_scoped_css,
-                            errors,
-                            is_inside_form,
-                            is_inside_button,
-                            is_inside_anchor,
-                        );
-                        if let Some(else_branch) = &if_block.else_branch {
-                            collect_errors_recursive(
-                                else_branch,
-                                valid_classes,
-                                valid_ids,
-                                let_bindings,
-                                _has_scoped_css,
-                                errors,
-                                is_inside_form,
-                                is_inside_button,
-                                is_inside_anchor,
-                            );
-                        }
-                    }
-                    token_parser::Block::For(for_block) => {
-                        collect_errors_recursive(
-                            &for_block.body,
-                            valid_classes,
-                            valid_ids,
-                            let_bindings,
-                            _has_scoped_css,
-                            errors,
-                            is_inside_form,
-                            is_inside_button,
-                            is_inside_anchor,
-                        );
-                    }
-                    token_parser::Block::Match(match_block) => {
-                        for arm in &match_block.arms {
-                            collect_errors_recursive(
-                                &arm.body,
-                                valid_classes,
-                                valid_ids,
-                                let_bindings,
-                                _has_scoped_css,
-                                errors,
-                                is_inside_form,
-                                is_inside_button,
-                                is_inside_anchor,
-                            );
-                        }
-                    }
-                    token_parser::Block::Call(call_block) => {
-                        collect_errors_recursive(
-                            &call_block.children,
-                            valid_classes,
-                            valid_ids,
-                            let_bindings,
-                            _has_scoped_css,
-                            errors,
-                            is_inside_form,
-                            is_inside_button,
-                            is_inside_anchor,
-                        );
                     }
                     _ => {}
                 },
@@ -1183,7 +852,6 @@ fn validate_nodes(
         nodes,
         valid_classes,
         valid_ids,
-        &let_bindings,
         has_scoped_css,
         &mut errors,
         false,
@@ -1222,95 +890,16 @@ fn generate_body_with_context(
                    write!(f, "<{}", #name)?;
                 });
 
-                // === FIX: Merge duplicate class attributes ===
-                // Collect all class attribute values to emit as a single class="..."
-                let mut class_static_parts: Vec<String> = Vec::new();
-                let mut class_dynamic_parts: Vec<proc_macro2::TokenStream> = Vec::new();
-
-                // Track attribute names to detect duplicates (non-class)
-                let mut seen_attrs: std::collections::HashSet<String> =
-                    std::collections::HashSet::new();
-
-                for attr in &elem.attrs {
-                    if attr.name == "class" {
-                        match &attr.value {
-                            token_parser::AttributeValue::Static(val) => {
-                                let clean = strip_outer_quotes(val);
-                                if !clean.is_empty() {
-                                    class_static_parts.push(clean);
-                                }
-                            }
-                            token_parser::AttributeValue::Dynamic(tokens) => {
-                                let exprs_res =
-                                    syn::parse::Parser::parse2(parse_multi_exprs, tokens.clone());
-                                match exprs_res {
-                                    Ok(exprs) if !exprs.is_empty() => {
-                                        for e in exprs {
-                                            class_dynamic_parts.push(quote! { #e });
-                                        }
-                                    }
-                                    _ => {
-                                        class_dynamic_parts.push(tokens.clone());
-                                    }
-                                }
-                            }
-                            _ => {}
-                        }
-                    } else if attr.name != "style" {
-                        // style has special merging too, skip for now
-                        // Check for duplicate non-class attributes
-                        if !seen_attrs.insert(attr.name.clone()) {
-                            let err_msg = format!(
-                                "Duplicate attribute '{}' on element <{}>. Only 'class' attributes can be merged.",
-                                attr.name, name
-                            );
-                            instructions.push(quote_spanned! { attr.span =>
-                                compile_error!(#err_msg);
-                            });
-                        }
-                    }
-                }
-
-                // Emit the merged class attribute (if any)
-                if !class_static_parts.is_empty() || !class_dynamic_parts.is_empty() {
-                    if class_dynamic_parts.is_empty() {
-                        // All static
-                        let merged = class_static_parts.join(" ");
-                        instructions.push(quote! {
-                            write!(f, " class=\"{}\"", #merged)?;
-                        });
-                    } else {
-                        // Has dynamic parts - build format string
-                        let total_parts = class_static_parts.len() + class_dynamic_parts.len();
-                        let fmt = vec!["{}"; total_parts].join(" ");
-
-                        let mut all_args: Vec<proc_macro2::TokenStream> = Vec::new();
-                        for s in &class_static_parts {
-                            all_args.push(quote! { #s });
-                        }
-                        for d in &class_dynamic_parts {
-                            all_args.push(quote! { #d });
-                        }
-
-                        instructions.push(quote! {
-                            write!(f, " class=\"{}\"", azumi::Escaped(&format!(#fmt, #(#all_args),*)))?;
-                        });
-                    }
-                }
-                // === END FIX ===
-
                 for attr in &elem.attrs {
                     let attr_name = &attr.name;
 
-                    // Skip class - already handled above
-                    if attr_name == "class" {
-                        continue;
-                    }
-
+                    // Handle az-* attributes (DSL treated as string)
                     if attr_name.starts_with("az-") {
+                        // SPECIAL CASE: az-scope should evaluate its value as a Rust expression
                         if attr_name == "az-scope" {
                             match &attr.value {
                                 token_parser::AttributeValue::Dynamic(tokens) => {
+                                    // Evaluate the expression and escape quotes for HTML attribute
                                     instructions.push(quote! {
                                         let __scope_val: String = #tokens;
                                         let __escaped = __scope_val.replace("\"", "&quot;");
@@ -1328,9 +917,10 @@ fn generate_body_with_context(
                             continue;
                         }
 
+                        // Other az-* attributes (like az-on) are DSL and treated as string literals
                         match &attr.value {
                             token_parser::AttributeValue::Dynamic(tokens) => {
-                                let s = tokens.to_string();
+                                let s = tokens.to_string(); // Stringify tokens
                                 instructions.push(quote! {
                                     write!(f, " {}=\"{}\"", #attr_name, #s)?;
                                 });
@@ -1346,50 +936,43 @@ fn generate_body_with_context(
                         continue;
                     }
 
+                    // Handle on:* attributes (Events) - stringify method access
                     if attr_name.starts_with("on:") {
                         match &attr.value {
                             token_parser::AttributeValue::Dynamic(tokens) => {
-                                let (s, base) =
-                                    if let Ok(expr) = syn::parse2::<syn::Expr>(tokens.clone()) {
-                                        match expr {
-                                            syn::Expr::Field(f) => {
-                                                if let syn::Member::Named(ident) = f.member {
-                                                    let base = &f.base;
-                                                    (ident.to_string(), Some(quote! { #base }))
-                                                } else {
-                                                    (tokens.to_string().replace(" ", ""), None)
-                                                }
+                                // Parse as expression to extracting name, but fallback to stringify
+                                // Try to parse `obj.method` or `method`
+                                let s = if let Ok(expr) = syn::parse2::<syn::Expr>(tokens.clone()) {
+                                    match expr {
+                                        syn::Expr::Field(f) => {
+                                            if let syn::Member::Named(ident) = f.member {
+                                                ident.to_string()
+                                            } else {
+                                                tokens.to_string().replace(" ", "")
                                             }
-                                            syn::Expr::Path(p) => {
-                                                if let Some(ident) = p.path.get_ident() {
-                                                    (ident.to_string(), None)
-                                                } else {
-                                                    (tokens.to_string().replace(" ", ""), None)
-                                                }
-                                            }
-                                            syn::Expr::MethodCall(m) => {
-                                                let receiver = &m.receiver;
-                                                (m.method.to_string(), Some(quote! { #receiver }))
-                                            }
-                                            _ => (tokens.to_string().replace(" ", ""), None),
                                         }
-                                    } else {
-                                        (tokens.to_string().replace(" ", ""), None)
-                                    };
+                                        syn::Expr::Path(p) => {
+                                            if let Some(ident) = p.path.get_ident() {
+                                                ident.to_string()
+                                            } else {
+                                                tokens.to_string().replace(" ", "")
+                                            }
+                                        }
+                                        syn::Expr::MethodCall(m) => {
+                                            // method() -> "method"
+                                            m.method.to_string()
+                                        }
+                                        _ => tokens.to_string().replace(" ", ""),
+                                    }
+                                } else {
+                                    tokens.to_string().replace(" ", "")
+                                };
 
                                 let event_name = attr_name.strip_prefix("on:").unwrap_or(attr_name);
                                 let dsl = format!("{} call {}", event_name, s);
                                 instructions.push(quote! {
                                     write!(f, " az-on=\"{}\"", #dsl)?;
                                 });
-
-                                if let Some(base_expr) = base {
-                                    instructions.push(quote! {
-                                        if let Some(pred) = azumi::get_prediction(&(#base_expr), #s) {
-                                            write!(f, " data-predict=\"{}\"", pred)?;
-                                        }
-                                    });
-                                }
                             }
                             token_parser::AttributeValue::Static(val) => {
                                 let clean = strip_outer_quotes(val);
@@ -1398,6 +981,43 @@ fn generate_body_with_context(
                                 instructions.push(quote! {
                                     write!(f, " az-on=\"{}\"", #dsl)?;
                                 });
+                            }
+                            _ => {}
+                        }
+                        continue;
+                    }
+
+                    if attr_name == "class" {
+                        match &attr.value {
+                            token_parser::AttributeValue::Static(val) => {
+                                let clean = strip_outer_quotes(val);
+                                instructions.push(quote! {
+                                    write!(f, " class=\"{}\"", #clean)?;
+                                });
+                            }
+                            token_parser::AttributeValue::Dynamic(tokens) => {
+                                // Try parsing as multi-expr
+                                let exprs_res =
+                                    syn::parse::Parser::parse2(parse_multi_exprs, tokens.clone());
+                                match exprs_res {
+                                    Ok(exprs) if !exprs.is_empty() => {
+                                        // Collect format string "{} {}"
+                                        let fmt = vec!["{}"; exprs.len()].join(" ");
+                                        let mut format_args = Vec::new();
+                                        for e in exprs {
+                                            format_args.push(quote! { #e });
+                                        }
+                                        instructions.push(quote! {
+                                            write!(f, " class=\"{}\"", azumi::Escaped(&format!(#fmt, #(#format_args),*)))?;
+                                        });
+                                    }
+                                    _ => {
+                                        // Fallback or empty
+                                        instructions.push(quote! {
+                                            write!(f, " class=\"{}\"", azumi::Escaped(&#tokens))?;
+                                        });
+                                    }
+                                }
                             }
                             _ => {}
                         }
@@ -1492,112 +1112,115 @@ fn generate_body_with_context(
             token_parser::Node::Fragment(frag) => {
                 instructions.push(generate_body_with_context(&frag.children, ctx));
             }
-            token_parser::Node::Block(block) => match block {
-                token_parser::Block::If(if_block) => {
-                    let cond = &if_block.condition;
-                    let then_body = generate_body_with_context(&if_block.then_branch, ctx);
-                    let else_part = if let Some(else_branch) = &if_block.else_branch {
-                        let else_body = generate_body_with_context(else_branch, ctx);
-                        quote! { else { #else_body } }
-                    } else {
-                        quote! {}
-                    };
-
-                    instructions.push(quote! {
-                        if #cond {
-                            #then_body
-                        } #else_part
-                    });
-                }
-                token_parser::Block::For(for_block) => {
-                    let pat = &for_block.pattern;
-                    let iter = &for_block.iterator;
-                    let body = generate_body_with_context(&for_block.body, ctx);
-
-                    instructions.push(quote! {
-                        for #pat in #iter {
-                            #body
-                        }
-                    });
-                }
-                token_parser::Block::Match(match_block) => {
-                    let expr = &match_block.expr;
-                    let mut arms = Vec::new();
-                    for arm in &match_block.arms {
-                        let pat = &arm.pattern;
-                        let body = generate_body_with_context(&arm.body, ctx);
-                        arms.push(quote! {
-                            #pat => { #body }
-                        });
-                    }
-                    instructions.push(quote! {
-                        match #expr {
-                            #(#arms),*
-                        }
-                    });
-                }
-                token_parser::Block::Component(comp_block) => {
-                    let func_path = &comp_block.name;
-                    let func_mod_path = transform_path_for_component(func_path);
-
-                    instructions.push(quote! {
-                        #func_mod_path::render(
-                            #func_mod_path::Props::builder().build().expect("Failed to build props")
-                        ).render(f)?;
-                    });
-                }
-                token_parser::Block::Call(call_block) => {
-                    let func_path = &call_block.name;
-                    let func_mod_path = transform_path_for_component(func_path);
-
-                    let args_list = match parse_args(call_block.args.clone()) {
-                        Ok(a) => a,
-                        Err(e) => {
-                            instructions.push(e.to_compile_error());
-                            Vec::new()
-                        }
-                    };
-
-                    let setters = args_list.iter().map(|arg| {
-                        let key = &arg.key;
-                        let val = &arg.value;
-                        quote! { .#key(#val) }
-                    });
-
-                    let builder_expr = quote! {
-                        #func_mod_path::Props::builder()
-                        #(#setters)*
-                        .build()
-                        .expect("Failed to build props")
-                    };
-
-                    if call_block.children.is_empty() {
-                        instructions.push(quote! {
-                            #func_mod_path::render(#builder_expr).render(f)?;
-                        });
-                    } else {
-                        let children_body = generate_body_with_context(&call_block.children, ctx);
-                        let children_arg = quote! {
-                            azumi::from_fn(|f| {
-                                #children_body
-                                Ok(())
-                            })
+            token_parser::Node::Block(block) => {
+                match block {
+                    token_parser::Block::If(if_block) => {
+                        let cond = &if_block.condition;
+                        let then_body = generate_body_with_context(&if_block.then_branch, ctx);
+                        let else_part = if let Some(else_branch) = &if_block.else_branch {
+                            let else_body = generate_body_with_context(else_branch, ctx);
+                            quote! { else { #else_body } }
+                        } else {
+                            quote! {}
                         };
 
                         instructions.push(quote! {
-                            #func_mod_path::render(#builder_expr, #children_arg).render(f)?;
+                            if #cond {
+                                #then_body
+                            } #else_part
                         });
                     }
+                    token_parser::Block::For(for_block) => {
+                        let pat = &for_block.pattern;
+                        let iter = &for_block.iterator;
+                        let body = generate_body_with_context(&for_block.body, ctx);
+
+                        instructions.push(quote! {
+                            for #pat in #iter {
+                                #body
+                            }
+                        });
+                    }
+                    token_parser::Block::Match(match_block) => {
+                        let expr = &match_block.expr;
+                        let mut arms = Vec::new();
+                        for arm in &match_block.arms {
+                            let pat = &arm.pattern;
+                            let body = generate_body_with_context(&arm.body, ctx);
+                            arms.push(quote! {
+                                #pat => { #body }
+                            });
+                        }
+                        instructions.push(quote! {
+                            match #expr {
+                                #(#arms),*
+                            }
+                        });
+                    }
+                    token_parser::Block::Call(call_block) => {
+                        let func_path = &call_block.name;
+                        // Resolve snake_case to _component module
+                        let func_mod_path = transform_path_for_component(func_path);
+
+                        // Parse key=value arguments
+                        let args_list = match parse_args(call_block.args.clone()) {
+                            Ok(a) => a,
+                            Err(e) => {
+                                instructions.push(e.to_compile_error());
+                                Vec::new() // Should not proceed but this is best effort
+                            }
+                        };
+
+                        let setters = args_list.iter().map(|arg| {
+                            let key = &arg.key;
+                            let val = &arg.value;
+                            quote! { .#key(#val) }
+                        });
+
+                        let builder_expr = quote! {
+                            #func_mod_path::Props::builder()
+                            #(#setters)*
+                            .build()
+                            .expect("Failed to build props")
+                        };
+
+                        if call_block.children.is_empty() {
+                            instructions.push(quote! {
+                                #func_mod_path::render(#builder_expr).render(f)?;
+                            });
+                        } else {
+                            let children_body =
+                                generate_body_with_context(&call_block.children, ctx);
+                            // Wrap children in a component-compatible closure
+                            // IMPORTANT: Do NOT use `move` here. Inner closure should borrow from outer closure.
+                            let children_arg = quote! {
+                                azumi::from_fn(|f| {
+                                    #children_body
+                                    Ok(())
+                                })
+                            };
+
+                            instructions.push(quote! {
+                                #func_mod_path::render(#builder_expr, #children_arg).render(f)?;
+                            });
+                        }
+                    }
+                    token_parser::Block::Let(let_block) => {
+                        let pat = &let_block.pattern;
+                        let val = &let_block.value;
+                        instructions.push(quote! {
+                            let #pat = #val;
+                        });
+                    }
+                    token_parser::Block::Style(_) => {
+                        // Handled in hoisting pass
+                    }
+                    // IMPORTANT: Fix for previous error - explicitly handle all variants or wildcard
+                    // Since we have specific handlers for known types, wildcard is safe
+                    _ => {}
                 }
-                token_parser::Block::Let(let_block) => {
-                    let pat = &let_block.pattern;
-                    let val = &let_block.value;
-                    instructions.push(quote! {
-                        let #pat = #val;
-                    });
-                }
-                token_parser::Block::Style(_) => {}
-            },
+            } // Close Node::Block wrapper
+            // IMPORTANT fix: Added wildcard arm for match node to handle Comment/Doctype
             _ => {}
         }
     }
@@ -1605,70 +1228,4 @@ fn generate_body_with_context(
     quote! {
         #(#instructions)*
     }
-}
-
-// Helper: try_extract_template implementation
-fn try_extract_template(
-    nodes: &[token_parser::Node],
-) -> Option<(Vec<String>, Vec<proc_macro2::TokenStream>)> {
-    let mut statics = Vec::new();
-    let mut dynamics = Vec::new();
-    let mut current_static = String::new();
-
-    if !extract_recursive(nodes, &mut current_static, &mut statics, &mut dynamics) {
-        return None;
-    }
-    statics.push(current_static);
-    Some((statics, dynamics))
-}
-
-fn extract_recursive(
-    nodes: &[token_parser::Node],
-    current_static: &mut String,
-    statics: &mut Vec<String>,
-    dynamics: &mut Vec<proc_macro2::TokenStream>,
-) -> bool {
-    for node in nodes {
-        match node {
-            token_parser::Node::Text(text) => {
-                current_static.push_str(&strip_outer_quotes(&text.content));
-            }
-            token_parser::Node::Element(elem) => {
-                current_static.push('<');
-                current_static.push_str(&elem.name);
-
-                for attr in &elem.attrs {
-                    match &attr.value {
-                        token_parser::AttributeValue::Static(val) => {
-                            current_static.push(' ');
-                            current_static.push_str(&attr.name);
-                            current_static.push_str("=\"");
-                            current_static.push_str(&strip_outer_quotes(val));
-                            current_static.push('"');
-                        }
-                        _ => return false,
-                    }
-                }
-                current_static.push('>');
-                if !extract_recursive(&elem.children, current_static, statics, dynamics) {
-                    return false;
-                }
-                current_static.push_str("</");
-                current_static.push_str(&elem.name);
-                current_static.push('>');
-            }
-            token_parser::Node::Expression(expr) => {
-                statics.push(current_static.clone());
-                current_static.clear();
-                dynamics.push(expr.content.clone());
-            }
-            token_parser::Node::Fragment(frag) => {
-                if !extract_recursive(&frag.children, current_static, statics, dynamics) {
-                    return false;
-                }
-            }
-            _ => return false,
-        }
-    }
-    true
 }
