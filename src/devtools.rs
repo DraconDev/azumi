@@ -267,12 +267,9 @@ fn watch_loop() -> Result<(), Box<dyn std::error::Error>> {
     let (tx, rx) = channel();
     let mut watcher = notify::recommended_watcher(tx)?;
 
-    // Watch src and demo/src
+    // Watch src directory
     if Path::new("src").exists() {
         watcher.watch(Path::new("src"), RecursiveMode::Recursive)?;
-    }
-    if Path::new("demo/src").exists() {
-        watcher.watch(Path::new("demo/src"), RecursiveMode::Recursive)?;
     }
 
     println!("🔥 Azumi Subsecond Watcher: Active");

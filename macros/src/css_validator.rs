@@ -1,4 +1,3 @@
-use regex::Regex;
 /// CSS Class Validator - Revolutionary compile-time CSS type checking
 ///
 /// This system validates that:
