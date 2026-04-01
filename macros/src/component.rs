@@ -129,14 +129,9 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
         let body = if let Some(state_ident) = live_state_ident {
             quote! {
                 azumi::from_fn(move |f| {
-                    // Auto-generated az-scope wrapper
                     let scope_json = <_ as azumi::LiveState>::to_scope(#state_ident);
-                    // Use captured type to get struct name path
                     let struct_name = <#live_state_type as azumi::LiveStateMetadata>::struct_name();
-                    // Parse as string and escape double quotes to match HTML spec safely
-                    let scope_escaped = scope_json.replace("\"", "&quot;");
-                    write!(f, "<div az-scope=\"{}\" az-struct=\"{}\" style=\"display: contents\">", scope_escaped, struct_name)?;
-                    // Render the inner component
+                    write!(f, "<div az-scope=\"{}\" az-struct=\"{}\" style=\"display: contents\">", azumi::Escaped(&scope_json), struct_name)?;
                     let inner = #fn_block;
                     inner.render(f)?;
                     write!(f, "</div>")?;
@@ -144,7 +139,6 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
                 })
             }
         } else {
-            // For non-live components, just use the original block as-is
             quote! { #fn_block }
         };
 
@@ -155,18 +149,12 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
             }
         }
     } else {
-        // Only wrap in az-scope for live state components
         let body = if let Some(state_ident) = live_state_ident {
             quote! {
                 azumi::from_fn(move |f| {
-                    // Auto-generated az-scope wrapper
                     let scope_json = <_ as azumi::LiveState>::to_scope(#state_ident);
-                    // Use captured type to get struct name path
                     let struct_name = <#live_state_type as azumi::LiveStateMetadata>::struct_name();
-                    // Parse as string and escape double quotes to match HTML spec safely
-                    let scope_escaped = scope_json.replace("\"", "&quot;");
-                    write!(f, "<div az-scope=\"{}\" az-struct=\"{}\" style=\"display: contents\">", scope_escaped, struct_name)?;
-                    // Render the inner component
+                    write!(f, "<div az-scope=\"{}\" az-struct=\"{}\" style=\"display: contents\">", azumi::Escaped(&scope_json), struct_name)?;
                     let inner = #fn_block;
                     inner.render(f)?;
                     write!(f, "</div>")?;
@@ -174,7 +162,6 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
                 })
             }
         } else {
-            // For non-live components, just use the original block as-is
             quote! { #fn_block }
         };
 

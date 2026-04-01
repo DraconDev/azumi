@@ -298,52 +298,19 @@ fn collect_css_files(nodes: &[Node], css_files: &mut Vec<String>) {
     }
 }
 
-/// Enhanced CSS file path resolution
+/// Resolve CSS file path from CARGO_MANIFEST_DIR
 pub fn resolve_css_file_path(css_path: &str) -> String {
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set");
-
     let manifest_path = std::path::Path::new(&manifest_dir);
     let clean_path = css_path.trim_start_matches('/');
 
-    // Handle different project structures
     let possible_paths = vec![
-        // 1. Direct path from manifest dir (e.g. demo/static/style.css)
         manifest_path.join(clean_path).to_string_lossy().to_string(),
-        // 2. Inside static/ directory (e.g. demo/static/style.css)
         manifest_path
             .join("static")
             .join(clean_path)
             .to_string_lossy()
             .to_string(),
-        // 3. From workspace root -> demo/static (e.g. azumi/demo/static/style.css)
-        manifest_path
-            .join("demo")
-            .join("static")
-            .join(clean_path)
-            .to_string_lossy()
-            .to_string(),
-        // 4. From workspace root -> demo (e.g. azumi/demo/style.css)
-        manifest_path
-            .join("demo")
-            .join(clean_path)
-            .to_string_lossy()
-            .to_string(),
-        // 5. From manifest dir -> src/examples/lessons (e.g. demo/src/examples/lessons/style.css)
-        manifest_path
-            .join("src")
-            .join("examples")
-            .join("lessons")
-            .join(clean_path)
-            .to_string_lossy()
-            .to_string(),
-        // 6. From manifest dir -> src/examples (e.g. demo/src/examples/style.css)
-        manifest_path
-            .join("src")
-            .join("examples")
-            .join(clean_path)
-            .to_string_lossy()
-            .to_string(),
-        // 7. From manifest dir -> src (e.g. demo/src/style.css)
         manifest_path
             .join("src")
             .join(clean_path)
@@ -351,29 +318,13 @@ pub fn resolve_css_file_path(css_path: &str) -> String {
             .to_string(),
     ];
 
-    eprintln!(
-        "🔍 Resolving CSS path: '{}' from '{}'",
-        css_path, manifest_dir
-    );
-
-    // Try each possible path and return the first one that exists
     for path in &possible_paths {
         if std::path::Path::new(path).exists() {
-            eprintln!("✅ Found CSS file: {}", path);
             return path.clone();
-        } else {
-            // eprintln!("  Checked: {}", path); // Uncomment for verbose debugging
         }
     }
 
-    // If no file found, return the first constructed path (relative to manifest)
-    // This ensures the error message shows a reasonable path
-    let default_path = manifest_path.join(clean_path).to_string_lossy().to_string();
-    eprintln!(
-        "⚠️  CSS file not found. Checked {} locations.",
-        possible_paths.len()
-    );
-    default_path
+    manifest_path.join(clean_path).to_string_lossy().to_string()
 }
 
 #[cfg(test)]

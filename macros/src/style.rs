@@ -317,10 +317,11 @@ fn validate_css_value(property: &str, value: &str) -> Result<(), String> {
     }
 
     // Step 2: Use lightningcss for full syntax validation
-    let css = Box::leak(format!(".test {{ {}: {}; }}", property, value).into_boxed_str());
+    let css = format!(".test {{ {}: {}; }}", property, value);
     let parse_options = ParserOptions::default();
 
-    match StyleSheet::parse(css, parse_options) {
+    let result = StyleSheet::parse(&css, parse_options);
+    match result {
         Ok(_) => Ok(()),
         Err(e) => {
             let error_msg = format!("{:?}", e);

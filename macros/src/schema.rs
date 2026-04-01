@@ -177,16 +177,34 @@ fn extract_field_name(attrs: &[syn::Attribute]) -> Option<String> {
     name
 }
 
+/// Check if a syn::Type is an Option<T>
+fn is_option_type(ty: &syn::Type) -> bool {
+    if let syn::Type::Path(type_path) = ty {
+        if let Some(seg) = type_path.path.segments.last() {
+            return seg.ident == "Option";
+        }
+    }
+    false
+}
+
+/// Check if a syn::Type is a Vec<T>
+fn is_vec_type(ty: &syn::Type) -> bool {
+    if let syn::Type::Path(type_path) = ty {
+        if let Some(seg) = type_path.path.segments.last() {
+            return seg.ident == "Vec";
+        }
+    }
+    false
+}
+
 /// Generate field serialization code based on the type
 fn generate_field_serialization(
     field_name: &syn::Ident,
     field_type: &syn::Type,
     json_key: &str,
 ) -> proc_macro2::TokenStream {
-    let type_str = quote!(#field_type).to_string();
-
     // Handle Option<T>
-    if type_str.contains("Option") {
+    if is_option_type(field_type) {
         return quote! {
             if let Some(ref value) = self.#field_name {
                 map.insert(
@@ -198,7 +216,7 @@ fn generate_field_serialization(
     }
 
     // Handle Vec<T>
-    if type_str.contains("Vec") {
+    if is_vec_type(field_type) {
         return quote! {
             {
                 let array: Vec<Value> = self.#field_name

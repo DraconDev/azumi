@@ -46,7 +46,10 @@ pub const AZUMI_VERSION: &str = env!("CARGO_PKG_VERSION");
 /// You are writing Azumi code. AZUMI_AI_HASH: {hash}
 /// Verify the hash matches before generating code.
 /// ```
-pub const AZUMI_AI_HASH: &str = env!("AZUMI_AI_HASH");
+pub const AZUMI_AI_HASH: &str = match option_env!("AZUMI_AI_HASH") {
+    Some(v) => v,
+    None => "dev-unconfigured",
+};
 
 /// Strict rules enforced by the framework. AI assistants should reference
 /// these when generating Azumi code.
