@@ -754,9 +754,9 @@ fn validate_nodes(
         let_bindings: &std::collections::HashSet<String>,
         _has_scoped_css: bool,
         errors: &mut Vec<proc_macro2::TokenStream>,
-        _is_inside_form: bool,
-        _is_inside_button: bool,
-        _is_inside_anchor: bool,
+        is_inside_form: bool,
+        is_inside_button: bool,
+        is_inside_anchor: bool,
     ) {
         for node in nodes {
             match node {
@@ -975,6 +975,39 @@ fn validate_nodes(
                         errors.push(err);
                     }
 
+                    // HTML structure validations
+                    for err in html_structure_validator::validate_table_children(elem) {
+                        errors.push(err);
+                    }
+                    for err in html_structure_validator::validate_list_children(elem) {
+                        errors.push(err);
+                    }
+                    for err in html_structure_validator::validate_nested_forms(elem, is_inside_form)
+                    {
+                        errors.push(err);
+                    }
+                    for err in html_structure_validator::validate_button_interactive(
+                        elem,
+                        is_inside_button,
+                    ) {
+                        errors.push(err);
+                    }
+                    for err in html_structure_validator::validate_paragraph_content(elem) {
+                        errors.push(err);
+                    }
+                    for err in
+                        html_structure_validator::validate_anchor_nesting(elem, is_inside_anchor)
+                    {
+                        errors.push(err);
+                    }
+                    for err in html_structure_validator::validate_heading_content(elem) {
+                        errors.push(err);
+                    }
+
+                    let new_inside_form = is_inside_form || elem.name == "form";
+                    let new_inside_button = is_inside_button || elem.name == "button";
+                    let new_inside_anchor = is_inside_anchor || elem.name == "a";
+
                     collect_errors_recursive(
                         &elem.children,
                         valid_classes,
@@ -982,9 +1015,9 @@ fn validate_nodes(
                         let_bindings,
                         _has_scoped_css,
                         errors,
-                        _is_inside_form,
-                        _is_inside_button,
-                        _is_inside_anchor,
+                        new_inside_form,
+                        new_inside_button,
+                        new_inside_anchor,
                     );
                 }
                 token_parser::Node::Fragment(frag) => {
