@@ -177,25 +177,6 @@ pub fn html(input: TokenStream) -> TokenStream {
     TokenStream::from(expanded)
 }
 
-#[allow(dead_code)]
-fn extract_styles(
-    nodes: Vec<token_parser::Node>,
-) -> (Vec<token_parser::StyleBlock>, Vec<token_parser::Node>) {
-    let mut styles = Vec::new();
-    let mut other_nodes = Vec::new();
-
-    for node in nodes {
-        match node {
-            token_parser::Node::Block(token_parser::Block::Style(style)) => {
-                styles.push(style);
-            }
-            _ => other_nodes.push(node),
-        }
-    }
-
-    (styles, other_nodes)
-}
-
 fn process_styles(nodes: &[token_parser::Node]) -> (proc_macro2::TokenStream, String, String) {
     let mut bindings = proc_macro2::TokenStream::new();
     let mut scoped_css = String::new();
