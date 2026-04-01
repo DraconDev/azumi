@@ -9,8 +9,8 @@
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{
-    parse_macro_input, BinOp, Expr, ExprAssign, ExprBinary, ExprField, ExprMethodCall, ExprPath,
-    ExprUnary, Fields, ImplItem, ImplItemFn, ItemImpl, ItemStruct, Member, Stmt, UnOp,
+    parse_macro_input, BinOp, Expr, ExprAssign, ExprBinary, ExprField, ExprPath, ExprUnary, Fields,
+    ImplItem, ImplItemFn, ItemImpl, ItemStruct, Member, Stmt, UnOp,
 };
 
 /// Represents a predictable mutation that can be executed optimistically
