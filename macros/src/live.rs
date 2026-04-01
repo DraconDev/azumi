@@ -81,10 +81,8 @@ impl Prediction {
 /// Metadata about an analyzed method
 #[derive(Debug)]
 pub struct MethodAnalysis {
-    #[allow(dead_code)]
     pub name: String,
     pub predictions: Vec<Prediction>,
-    #[allow(dead_code)]
     pub has_unpredictable: bool,
 }
 
@@ -296,21 +294,21 @@ fn is_side_effect(expr: &Expr) -> bool {
 /// self.map.insert(k, v), self.map.remove(k)
 fn is_self_field_mutation(mc: &ExprMethodCall) -> bool {
     // Check if receiver is self.field
-    let field = match extract_self_field(&Expr::Field(ExprField {
-        attrs: vec![],
-        base: mc.receiver.clone(),
-        dot_token: mc.dot_token.clone(),
-        member: mc.method.clone(),
-    })) {
-        Some(f) => f,
-        None => return false,
-    };
-
-    let method_name = mc.method.to_string();
-    matches!(
-        method_name.as_str(),
-        "clear" | "pop" | "push" | "insert" | "remove"
-    )
+    if let Expr::Field(ExprField { base, member, .. }) = &*mc.receiver {
+        if let Expr::Path(ExprPath { path, .. }) = &**base {
+            if path.is_ident("self") {
+                if let Member::Named(field) = member {
+                    let _field = field.to_string();
+                    let method_name = mc.method.to_string();
+                    return matches!(
+                        method_name.as_str(),
+                        "clear" | "pop" | "push" | "insert" | "remove"
+                    );
+                }
+            }
+        }
+    }
+    false
 }
 
 /// Main macro expansion for #[azumi::live]
