@@ -92,7 +92,10 @@ impl RuntimeTemplate {
 static TEMPLATE_REGISTRY: OnceLock<std::sync::RwLock<std::collections::HashMap<String, RuntimeTemplate>>> = OnceLock::new();
 
 pub fn get_template(id: &str) -> Option<RuntimeTemplate> {
-    TEMPLATE_REGISTRY.get_or_init(Default::default).read().unwrap().get(id).cloned()
+    let Ok(registry) = TEMPLATE_REGISTRY.get_or_init(Default::default).read() else {
+        return None;
+    };
+    registry.get(id).cloned()
 }
 
 #[derive(serde::Deserialize)]
@@ -102,15 +105,11 @@ struct TemplateUpdatePayload {
 }
 
 async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
-    let mut registry = TEMPLATE_REGISTRY.get_or_init(Default::default).write().unwrap();
+    let Ok(mut registry) = TEMPLATE_REGISTRY.get_or_init(Default::default).write() else {
+        return;
+    };
     registry.insert(payload.id.clone(), RuntimeTemplate { static_parts: payload.parts });
     #[cfg(debug_assertions)]
-    {
-        #[cfg(debug_assertions)]
-    {
-        println!("🔥 Hot Reload: Updated template {}", payload.id);
-    }
-    }
-    // Trigger browser reload
+    println!("🔥 Hot Reload: Updated template {}", payload.id);
     let _ = get_broadcast_channel().send(serde_json::json!({"type": "reload"}).to_string());
 }

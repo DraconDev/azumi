@@ -252,10 +252,6 @@ impl<T: std::fmt::Display> Component for Raw<T> {
     }
 }
 
-pub fn js<T: std::fmt::Debug>(v: T) -> String {
-    format!("{:?}", v)
-}
-
 /// Compute a deterministic scope ID from source position (line, column).
 /// Used by both the proc-macro and the hot reload watcher to guarantee
 /// that scope IDs match at compile time and runtime.

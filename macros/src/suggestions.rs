@@ -61,13 +61,13 @@ pub fn closest_match<'a>(target: &str, candidates: &'a HashSet<String>) -> Optio
 }
 
 /// Format an error message with a "did you mean?" suggestion if available.
-#[allow(dead_code)]
 pub fn suggest_fix(target: &str, candidates: &HashSet<String>) -> String {
     if let Some(suggestion) = closest_match(target, candidates) {
         format!("'{}' not found. Did you mean '{}'?", target, suggestion)
     } else {
         format!("'{}' not found.", target)
     }
+}
 }
 
 #[cfg(test)]
