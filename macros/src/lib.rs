@@ -62,15 +62,6 @@ pub fn predict(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
-#[allow(dead_code)]
-struct NodesWrapper(Vec<token_parser::Node>);
-
-impl Parse for NodesWrapper {
-    fn parse(input: ParseStream) -> syn::Result<Self> {
-        token_parser::parse_nodes(input).map(NodesWrapper)
-    }
-}
-
 // Helpers for parsing Component arguments
 struct KeyValueArg {
     key: syn::Ident,
