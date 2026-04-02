@@ -44,10 +44,15 @@ fn test_style_scoping_isolation() {
     );
 
     // Verify we have at least two DIFFERENT scope IDs
+    // Scope attributes are in format data-{scope_id} (e.g., data-s1a2b3c)
     let mut scopes = std::collections::HashSet::new();
-    for part in output.split("data-azumi-scope=\"") {
-        if let Some(end) = part.find('"') {
-            scopes.insert(&part[..end]);
+    // Extract from style tags which contain [data-{hash}] in selectors
+    for part in output.split("[data-") {
+        if let Some(end) = part.find(']') {
+            let scope_id = &part[..end];
+            if !scope_id.is_empty() {
+                scopes.insert(scope_id.to_string());
+            }
         }
     }
     assert!(
