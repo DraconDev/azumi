@@ -54,7 +54,7 @@ fn test_void_element_nested_in_p_error() {
     // but in macro tree it should just be a child.
     let component = html! { <div>"Text"<hr />"More"</div> };
     let html = test::render(&component);
-    assert!(html.contains("<p>"));
+    assert!(html.contains("<div>"));
     assert!(html.contains("<hr"));
 }
 
