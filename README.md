@@ -281,7 +281,7 @@ pub fn RootLayout(children: impl Component) -> impl Component {
 
 Production builds without devtools:
 ```toml
-azumi = { version = "3.0", default-features = false }
+azumi = { version = "4", default-features = false }
 ```
 
 ---

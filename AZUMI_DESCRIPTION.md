@@ -227,4 +227,4 @@ These aren't limitations waiting to be fixed. They're the design.
 
 ---
 
-_© 2025 Azumi Project_
+_© 2026 Azumi Project_
