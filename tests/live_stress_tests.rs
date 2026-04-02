@@ -35,9 +35,9 @@ mod counter {
         html! {
             <div>
                 <span data-bind="count">{state.count}</span>
-                <button on:click={state.increment}>"+1"</button>
-                <button on:click={state.toggle}>"Toggle"</button>
-                <button on:click={state.reset}>"Reset"</button>
+                <button on:click={state.increment} data-predict="count = count + 1">"+1"</button>
+                <button on:click={state.toggle} data-predict="active = !active">"Toggle"</button>
+                <button on:click={state.reset} data-predict="count = 0">"Reset"</button>
             </div>
         }
     }
