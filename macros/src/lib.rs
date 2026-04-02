@@ -87,8 +87,9 @@ fn transform_path_for_component(path: &syn::Path) -> syn::Path {
     if let Some(last) = new_path.segments.last_mut() {
         let s = last.ident.to_string();
         // If starts with lowercase, it's snake_case -> append _component
+        // DISABLED: component.rs creates modules with exact names (8e08e02)
         if s.chars().next().map(|c| c.is_lowercase()).unwrap_or(false) {
-            last.ident = syn::Ident::new(&format!("{}_component", s), last.ident.span());
+            // last.ident = syn::Ident::new(&format!("{}_component", s), last.ident.span());
         }
     }
     new_path
