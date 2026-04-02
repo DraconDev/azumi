@@ -417,10 +417,11 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 
 ### 4. How It Works
 
-1.  **Compiler Analysis**: `#[azumi::live_impl]` analyzes method bodies to generate **predictions**.
-2.  **Optimistic Update**: When you click, the client updates the UI _immediately_ based on the prediction.
-3.  **Server Reconciliation**: The server runs the actual method and sends back the real HTML.
-4.  **Morphing**: The client morphs the DOM to match the server response (usually identical).
+1. **Compiler Analysis**: `#[azumi::live_impl]` analyzes method bodies and stores **predictions** in `LiveStateMetadata`.
+2. **Manual Prediction**: Add `data-predict` attributes to buttons for optimistic UI updates.
+3. **Optimistic Update**: When you click, the client updates the UI _immediately_ based on the prediction.
+4. **Server Reconciliation**: The server runs the actual method and sends back the real HTML.
+5. **Morphing**: The client morphs the DOM to match the server response (usually identical).
 
 ### 5. `data-bind` for Optimistic Updates
 
