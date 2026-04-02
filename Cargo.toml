@@ -1,6 +1,6 @@
 [package]
 name = "azumi"
-version = "4.26.0"
+version = "5.0.0"
 edition = "2021"
 authors = [" DraconDev <dracsharp@gmail.com>"]
 license-file = "LICENSE"
@@ -34,7 +34,3 @@ notify = { version = "6.1", optional = true }
 
 [dev-dependencies]
 azumi = { path = ".", features = ["test-utils"] }
-
-# test Wed  1 Apr 19:00:28 BST 2026
-
-# test Wed  1 Apr 19:00:28 BST 2026
