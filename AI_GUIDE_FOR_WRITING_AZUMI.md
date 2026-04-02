@@ -1749,6 +1749,62 @@ Azumi validates HTML structure at compile time:
 
 ```
 User clicks on:click={state.increment}
+↓
+1. READ: Client reads data-predict attribute
+↓
+2. INSTANT: Execute prediction locally (0ms latency!)
+↓
+3. ASYNC: Send request to server
+↓
+4. RECONCILE: Server returns HTML, morph into DOM
+↓
+5. VERIFY: If prediction was wrong, server wins
+```
+
+**Note**: Predictions are NOT auto-generated. You must add `data-predict` attributes to buttons manually.
+
+### Supported Prediction Patterns
+
+| data-predict value | Effect |
+| ------------------ | ------------------------ |
+| `"x = !x"` | Toggle boolean |
+| `"x = true"` | Set to literal |
+| `"x = false"` | Set to literal |
+| `"x = x + 1"` | Increment |
+| `"x = x - 1"` | Decrement |
+| `"x = value"` | Assignment |
+| `"items.push({text: input})"` | Add to vector |
+| `"items = []"` | Clear vector |
+
+### Adding Predictions to Buttons
+
+```rust
+// In your component, add data-predict to buttons:
+html! {
+    <button on:click={state.increment} data-predict="count = count + 1">"+1"</button>
+    <button on:click={state.toggle} data-predict="active = !active">"Toggle"</button>
+}
+```
+
+### Complex Logic (No Prediction)
+
+For complex mutations that can't be predicted, the server handles everything:
+
+```rust
+// This runs server-only, no client prediction
+pub async fn complex_action(&mut self) {
+    // Database operations
+    // External API calls
+    // Complex calculations
+    // These cannot be predicted
+}
+
+// In your component, just don't add data-predict:
+html! {
+    <button on:click={state.complex_action}>"Submit"</button>
+}
+```
+User clicks on:click={state.increment}
     ↓
 1. INSTANT: Execute prediction locally (0ms latency!)
     ↓
