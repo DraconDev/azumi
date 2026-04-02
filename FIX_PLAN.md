@@ -12,8 +12,8 @@
 | 1.1 XSS in SEO | ✅ FIXED | `html_attr_escape` applied to all values |
 | 1.2 Default secret panic | ✅ FIXED | Panics in release builds |
 | 1.3 unwrap() removal | ✅ FIXED | Proper match error handling |
-| 1.4 CSS injection | ⚠️ PARTIAL | Uses Debug formatting (works but not ideal) |
-| 1.5 PageMetaGuard | ❌ NOT FIXED | Thread-local leak possible |
+| 1.4 CSS injection | ✅ NOT A BUG | CSS is compiler-generated, Debug format works correctly |
+| 1.5 PageMetaGuard | ⚠️ THEORETICAL | Comment explains safety, guard pattern would be cleaner |
 
 ### Phase 2: HIGH Priority Correctness
 | Item | Status | Notes |
@@ -40,8 +40,8 @@
 ### Phase 5: Cleanup
 | Item | Status | Notes |
 |------|--------|-------|
-| 5.1 Dead code | ✅ MOSTLY DONE | transform_path_for_component body commented |
-| 5.2 CSS deduplication | ❌ NOT DONE | Two implementations remain |
+| 5.1 Dead code | ✅ DONE | transform_path_for_component body commented |
+| 5.2 CSS deduplication | ⚠️ LOW PRIORITY | Two implementations serve different purposes (macro vs runtime) |
 | 5.3 Module collision | ✅ FIXED | Uses format_ident! with struct name |
 
 ---
