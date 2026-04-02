@@ -181,17 +181,13 @@ Every component's state is HMAC-signed. Open DevTools, edit `isAdmin: false` to 
 
 ### 4. Optimistic Async
 
-For async operations, declare what to show immediately:
+For async operations, add `data-predict` to show state changes instantly:
 
 ```rust
-#[predict(loading = true)]
-pub async fn load_users(&mut self) {
-    self.users = db::fetch_all().await;
-    self.loading = false;
-}
+<button on:click={state.load_users} data-predict="loading = true">"Load"</button>
 ```
 
-UI shows loading state _instantly_. Data arrives later.
+UI shows loading state _instantly_. Data arrives later from the server.
 
 ---
 
