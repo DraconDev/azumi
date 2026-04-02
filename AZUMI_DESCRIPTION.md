@@ -16,7 +16,13 @@ pub fn increment(&mut self) {
 }
 ```
 
-The compiler analyzes this and emits JavaScript that can apply the same mutation _instantly_ on the client — before the server responds. The server confirms (or corrects) the prediction later.
+Then add `data-predict` attributes to buttons for instant UI updates:
+
+```rust
+<button on:click={state.increment} data-predict="count = count + 1">"+1"</button>
+```
+
+The `#[azumi::live_impl]` macro analyzes the mutations and stores predictions in `LiveStateMetadata`. The server confirms (or corrects) the prediction when the request arrives.
 
 This is "optimistic UI" done at the language level, not as a library pattern.
 
