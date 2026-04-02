@@ -54,7 +54,7 @@ The server remains the source of truth. The client just guesses what the truth w
 | ----------------------- | --------------------------------------------------------- |
 | **HTML Macro**          | `html!` outputs server-rendered HTML (like Maud)          |
 | **CSS Validator**       | Catches undefined classes at compile time                 |
-| **Optimistic Compiler** | Analyzes `&mut self` methods, emits client-side JS        |
+| **Live Analysis**       | Analyzes `&mut self` methods, stores predictions in metadata |
 | **Signed State**        | HMAC-signs component state to prevent tampering           |
 | **Asset Pipeline**      | Content-hashes static files, rewrites paths automatically |
 
