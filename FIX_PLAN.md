@@ -4,6 +4,48 @@
 
 ---
 
+## Status (Updated April 2, 2026)
+
+### Phase 1: CRITICAL Security Fixes
+| Item | Status | Notes |
+|------|--------|-------|
+| 1.1 XSS in SEO | ✅ FIXED | `html_attr_escape` applied to all values |
+| 1.2 Default secret panic | ✅ FIXED | Panics in release builds |
+| 1.3 unwrap() removal | ✅ FIXED | Proper match error handling |
+| 1.4 CSS injection | ⚠️ PARTIAL | Uses Debug formatting (works but not ideal) |
+| 1.5 PageMetaGuard | ❌ NOT FIXED | Thread-local leak possible |
+
+### Phase 2: HIGH Priority Correctness
+| Item | Status | Notes |
+|------|--------|-------|
+| 2.1 Pending timeout | ✅ FIXED | 30s timeout implemented |
+| 2.2 Form signing | ✅ FIXED | _azumi_scope sent with forms |
+| 2.3 Nested prediction | ✅ FIXED | Uses `[\w.]+` pattern |
+| 2.4 CSS validator | ✅ FIXED | Approach changed |
+| 2.5 Scope ID consistency | ✅ FIXED | Shared `compute_scope_id` |
+| 2.6 Dead code removal | ✅ FIXED | generate_scope_id removed |
+| 2.7 is_self_field_mutation | ✅ DOCUMENTED | Returns false, noted |
+
+### Phase 3: AI-First Hardening
+| Item | Status | Notes |
+|------|--------|-------|
+| 3.1-3.7 | ❌ NOT IMPLEMENTED | AI guide exists but no compiler lints |
+
+### Phase 4: Test Infrastructure
+| Item | Status | Notes |
+|------|--------|-------|
+| 4.1 CI expansion | ⚠️ UNKNOWN | No .github checked |
+| 4.2-4.3 Test files | ✅ 30+ files, 1128 tests pass | |
+
+### Phase 5: Cleanup
+| Item | Status | Notes |
+|------|--------|-------|
+| 5.1 Dead code | ✅ MOSTLY DONE | transform_path_for_component body commented |
+| 5.2 CSS deduplication | ❌ NOT DONE | Two implementations remain |
+| 5.3 Module collision | ✅ FIXED | Uses format_ident! with struct name |
+
+---
+
 ## Phase 1: CRITICAL Security Fixes
 
 These are exploitable in production RIGHT NOW. Fix first.
