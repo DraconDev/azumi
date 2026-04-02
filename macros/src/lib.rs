@@ -81,18 +81,9 @@ fn parse_args(tokens: proc_macro2::TokenStream) -> syn::Result<Vec<KeyValueArg>>
     parser.parse2(tokens).map(|p| p.into_iter().collect())
 }
 
-// Helper to transform snake_case component paths to their module name (append _component)
-fn transform_path_for_component(path: &syn::Path) -> syn::Path {
-    let mut new_path = path.clone();
-    if let Some(last) = new_path.segments.last_mut() {
-        let s = last.ident.to_string();
-        // If starts with lowercase, it's snake_case -> append _component
-        // DISABLED: component.rs creates modules with exact names (8e08e02)
-        if s.chars().next().map(|c| c.is_lowercase()).unwrap_or(false) {
-            // last.ident = syn::Ident::new(&format!("{}_component", s), last.ident.span());
-        }
-    }
-    new_path
+// Resolve component path - components use exact module names (no suffix)
+fn resolve_component_path(path: &syn::Path) -> syn::Path {
+    path.clone()
 }
 
 // Helper for parsing space-separated expressions (e.g. class={expr1 expr2})
@@ -1159,8 +1150,8 @@ fn generate_body_with_context(
                     }
                     token_parser::Block::Call(call_block) => {
                         let func_path = &call_block.name;
-                        // Resolve snake_case to _component module
-                        let func_mod_path = transform_path_for_component(func_path);
+                        // Resolve component module path (exact names, no suffix)
+                        let func_mod_path = resolve_component_path(func_path);
 
                         // Parse key=value arguments
                         let args_list = match parse_args(call_block.args.clone()) {
