@@ -404,7 +404,7 @@ pub struct TodoItem {
 }
 ```
 
-### Methods with Auto-Predictions
+### Methods with Predictions
 
 ```rust
 #[azumi::live_impl(component = "todo_view")]

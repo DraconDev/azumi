@@ -4,11 +4,11 @@
 
 ## 🎯 Philosophy & Core Concepts
 
-Azumi is a **compiler-driven optimistic UI framework** that generates client-side predictions from Rust code. Write logic once, get instant UI updates everywhere.
+Azumi is a **compiler-validated web framework** with optional optimistic UI support. Write Rust with compile-time HTML/CSS validation, and add interactivity when needed.
 
 - **Single Source of Truth**: Rust code is the only source of truth
 - **Compile-Time Safety**: Macros catch errors before runtime
-- **Zero JavaScript**: Compiler generates all client logic
+- **Minimal JavaScript**: ~3KB runtime, only when interactivity is needed
 - **Server-Side Truth**: Server always wins, client predictions are optimistic
 
 ---
