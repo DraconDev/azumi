@@ -1343,17 +1343,19 @@ Azumi uses a **Hybrid Optimistic Model** for state management. This is the "Gold
 Pure client state (like the now-removed `set` command) is "Zombie State". It looks alive but lacks the cryptographic signature from the server. The moment you interact with the server again, your unsigned local changes are rejected and overwritten.
 
 **Best Practice:**
-Always implement interactivity via `#[azumi::live_impl]` methods. The compiler automatically generates the optimistic prediction for you!
+Implement interactivity via `#[azumi::live_impl]` methods and add `data-predict` attributes to buttons for optimistic UI:
 
 ```rust
 #[azumi::live_impl(component = "like_button")]
 impl LikeState {
     pub fn toggle(&mut self) {
-        // Compiler sees this and generates: "liked = !liked" for the client!
         self.liked = !self.liked;
     }
 }
-````
+
+// In your component template:
+<button on:click={state.toggle} data-predict="liked = !liked">"Like"</button>
+```
 
 #### 2. Manual (Complex Logic)
 
