@@ -215,4 +215,4 @@ In a world where AI writes most of the code, ecosystem size matters less:
 
 ---
 
-_© 2025 Azumi Project._
+_© 2026 Azumi Project._
