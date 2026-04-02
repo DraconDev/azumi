@@ -1804,39 +1804,6 @@ html! {
     <button on:click={state.complex_action}>"Submit"</button>
 }
 ```
-User clicks on:click={state.increment}
-    ↓
-1. INSTANT: Execute prediction locally (0ms latency!)
-    ↓
-2. ASYNC: Send request to server
-    ↓
-3. RECONCILE: Server returns HTML, morph into DOM
-    ↓
-4. VERIFY: If prediction was wrong, server wins
-```
-
-### Supported Prediction Patterns
-
-| Rust Code Pattern  | Generated Prediction     |
-| ------------------ | ------------------------ |
-| `self.x = !self.x` | `x = !x` (toggle)        |
-| `self.x = true`    | `x = true` (literal)     |
-| `self.x = false`   | `x = false` (literal)    |
-| `self.x += 1`      | `x = x + 1` (increment)  |
-| `self.x -= 1`      | `x = x - 1` (decrement)  |
-| `self.x = value`   | `x = value` (assignment) |
-
-### Complex Logic (No Prediction)
-
-```rust
-// This runs server-only, no client prediction
-pub async fn complex_action(&mut self) {
-    // Database operations
-    // External API calls
-    // Complex calculations
-    // These cannot be predicted
-}
-```
 
 ---
 
