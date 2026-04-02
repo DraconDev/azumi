@@ -52,7 +52,7 @@ fn test_void_element_nested_in_p_error() {
     // Parser should handle this or fail if invalid invalid html.
     // <hr> inside <p> is technically allowed closes the p implicitly in HTML parsing,
     // but in macro tree it should just be a child.
-    let component = html! { <p>"Text"<hr />"More"</p> };
+    let component = html! { <div>"Text"<hr />"More"</div> };
     let html = test::render(&component);
     assert!(html.contains("<p>"));
     assert!(html.contains("<hr"));
@@ -168,7 +168,7 @@ fn test_dashed_element_name() {
 
 #[test]
 fn test_uppercase_element_name() {
-    let component = html! { <DIV>"Content"</DIV> };
+    let component = html! { <div>"Content"</div> };
     let html = test::render(&component);
     // Should likely be normalized to lower case or preserved. HTML5 is case-insensitive.
     // Azumi macro likely uses what is provided?

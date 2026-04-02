@@ -195,7 +195,7 @@ fn test_href_attribute() {
 
 #[test]
 fn test_target_attribute() {
-    let component = html! { <a href="#" target="_blank">"External"</a> };
+    let component = html! { <a href="#" target="_blank" rel="noopener">"External"</a> };
     let html = test::render(&component);
     assert!(html.contains("target=\"_blank\""));
 }
