@@ -68,7 +68,6 @@ pub fn suggest_fix(target: &str, candidates: &HashSet<String>) -> String {
         format!("'{}' not found.", target)
     }
 }
-}
 
 #[cfg(test)]
 mod tests {
