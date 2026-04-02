@@ -384,7 +384,8 @@ fn test_href_dynamic() {
 
 #[test]
 fn test_target_blank() {
-    let component = html! { <a href="https://example.com" target="_blank">"External"</a> };
+    let component =
+        html! { <a href="https://example.com" target="_blank" rel="noopener">"External"</a> };
     let html = test::render(&component);
     assert!(html.contains("target=\"_blank\""));
 }
