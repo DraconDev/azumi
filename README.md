@@ -17,6 +17,25 @@ html! {
 
 No runtime errors. No "works on my machine". No surprises.
 
+---
+
+## 🚀 v5.0.0 Release Notes
+
+**Azumi v5.0.0** — Production-ready release with critical security fixes and comprehensive test coverage.
+
+### What's Fixed
+- **Security**: XSS prevention in SEO, HMAC panic in release builds, proper error handling in live actions
+- **Tests**: 1128 tests passing, all HTML validation errors fixed, data-predict documentation corrected
+- **Documentation**: Accurate API docs, fixed version references, removed auto-generation claims
+- **Code Quality**: Removed dead code, fixed component resolution, cleaned up duplicate constants
+
+### Migration from v4
+- No breaking API changes
+- `data-predict` attributes must be manually added to buttons (unchanged behavior, now correctly documented)
+- Set `AZUMI_SECRET` environment variable in production (required in release builds)
+
+---
+
 ## 🛠️ Development Experience
 
 Azumi includes a built-in hot reload system. Just add one line:
