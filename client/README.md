@@ -68,6 +68,8 @@ Azumi uses a declarative syntax for event handling.
 
 ### 3. Optimistic UI (`data-predict`)
 
+**Note**: Predictions must be added manually to HTML elements. The framework does not auto-generate them.
+
 Predict the outcome of a server action to update the UI immediately (0ms latency). Azumi captures the state, applies the prediction, and rolls it back if the server request fails.
 
 **Syntax**: `data-predict="{field} {operation} {value?}"`
