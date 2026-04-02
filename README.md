@@ -86,37 +86,35 @@ Built-in a11y checks at compile time:
 - `<a target="_blank">` must have `rel="noopener noreferrer"`
 - `<iframe>` must have `title`
 
-### 4. Optimistic UI (Hybrid: Auto + Manual)
+### 4. Optimistic UI (Manual Prediction)
 
 Write Rust. Get instant UI. No JavaScript required.
 
-**Automatic:** Simple mutations are predicted by the compiler.
+**Manual prediction:** Add `data-predict` attributes to buttons for optimistic UI.
 
 ```rust
 #[azumi::live_impl(component = "counter_view")]
 impl Counter {
-    pub fn increment(&mut self) {
-        self.count += 1;  // ✅ Auto: data-predict="count = count + 1"
-    }
-    pub fn toggle(&mut self) {
-        self.active = !self.active;  // ✅ Auto: data-predict="active = !active"
+    pub fn increment(&mut self) { self.count += 1; }
+    pub fn toggle(&mut self) { self.active = !self.active; }
+}
+
+#[azumi::component]
+pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
+    html! {
+        <button on:click={state.increment} data-predict="count = count + 1">"+1"</button>
+        <button on:click={state.toggle} data-predict="active = !active">"Toggle"</button>
     }
 }
 ```
 
-**Expanded patterns** — the compiler now detects:
-- `self.items.push(value)` → `items.push(value)`
-- `self.items.pop()` → `items.pop()`
-- `self.items.clear()` → `items = []`
-- `self.map.insert(key, value)` → `map.insert(key, value)`
-- `self.map.remove(key)` → `map.remove(key)`
-
-**Manual:** Complex mutations use explicit hints.
-
-```rust
-#[azumi::predict("todos.push({ text: input, id: -1 })")]
-pub fn add_todo(&mut self) { ... }
-```
+**Prediction patterns** you can use in `data-predict`:
+- `"field = value"` — Set a field
+- `"field = !field"` — Toggle a boolean
+- `"field = field + value"` — Increment
+- `"field = field - value"` — Decrement
+- `"field.push(value)"` — Add to vector
+- `"field = []"` — Clear vector
 
 ### 5. Signed State (Anti-Tampering)
 
