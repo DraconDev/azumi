@@ -1,1 +1,1 @@
-// Components module
+// Demo components module
