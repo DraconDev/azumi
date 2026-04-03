@@ -19,9 +19,9 @@ No runtime errors. No "works on my machine". No surprises.
 
 ---
 
-## 🚀 v5.1.0 Release Notes
+## 🚀 v5.2.0 Release Notes
 
-**Azumi v5.1.0** — Production-ready release with critical security fixes and comprehensive test coverage.
+**Azumi v5.2.0** — Production-ready release with critical security fixes and comprehensive test coverage.
 
 ### What's Fixed
 - **Security**: XSS prevention in SEO, HMAC panic in release builds, proper error handling in live actions
@@ -300,7 +300,7 @@ pub fn RootLayout(children: impl Component) -> impl Component {
 
 Production builds without devtools:
 ```toml
-azumi = { version = "4", default-features = false }
+azumi = { version = "5", default-features = false }
 ```
 
 ---
@@ -468,7 +468,7 @@ impl TodoList {
 
 ```bash
 cd demo && cargo run
-# Visit http://localhost:3000
+# Visit http://localhost:8080
 ```
 
 ### Debug Macro Expansion
