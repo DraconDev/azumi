@@ -62,7 +62,8 @@ pub fn complex_conditions() -> impl azumi::Component {
         <div class={conditions_container}>
             <h3 class={title}>"Complex Conditions"</h3>
 
-            @if "admin" == "admin" {
+            @let user_role = "admin";
+            @if user_role == "admin" {
                 <p class={permission_granted}>"Full access granted"</p>
                 <ul class={list}>
                     <li>"Item 1"</li>
