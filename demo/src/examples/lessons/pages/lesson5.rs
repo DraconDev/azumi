@@ -15,7 +15,7 @@ pub fn let_pattern_example() -> impl azumi::Component {
             <p>"Hello, " <span class={highlight}>{name}</span> "!"</p>
 
             // Calculated values
-            @let items = vec!["Item 1", "Item 2", "Item 3"];
+            @let items = ["Item 1", "Item 2", "Item 3"];
             @let item_count = items.len();
             <p>"items.len() = " <span class={highlight}>{item_count}</span></p>
 
@@ -32,7 +32,7 @@ pub fn let_pattern_example() -> impl azumi::Component {
             </div>
 
             // Complex data transformations
-            @let users = vec![
+            @let users = [
                 ("Alice", 25),
                 ("Bob", 30),
                 ("Charlie", 35)
