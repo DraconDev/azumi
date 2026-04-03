@@ -1903,7 +1903,7 @@ fn main() {
         .route("/", axum::routing::get(homepage_handler))
         .route("/lesson-0", axum::routing::get(lesson0_handler));
 
-    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
+    axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
