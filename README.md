@@ -602,7 +602,7 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 git clone https://github.com/DraconDev/azumi
 cd azumi
 cargo run -p azumi-demo
-# Visit: http://localhost:3000
+# Visit: http://localhost:8080
 ```
 
 20 interactive lessons covering components through async database integration.
