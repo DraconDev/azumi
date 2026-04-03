@@ -498,10 +498,10 @@ pub async fn login_user(data: LoginPayload) -> impl Component {
     // 1. Validate DB (unpredictable)
     if let Ok(user) = db::auth(&data.email, &data.pass).await {
         // 2. Return redirect or success UI
-        return html! { <div id="login-box">"Welcome back, " {user.name} "!"</div> };
+        return html! { <div id={login_box}>"Welcome back, " {user.name} "!"</div> };
     }
     // 3. Return error UI
-    html! { <div id="login-error" class="error">"Invalid credentials"</div> }
+    html! { <div id={login_error} class={error}>"Invalid credentials"</div> }
 }
 
 // In your view (Standard HTML Form):
