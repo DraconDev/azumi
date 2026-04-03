@@ -27,12 +27,16 @@ pub fn unified_counter_view<'a>(state: &'a UnifiedCounter) -> impl Component + '
             <p>"Active: " <span data-bind="active">{state.active}</span></p>
 
             // New syntax: on:click={state.method}
-            // Auto-generates az-on and data-predict!
-            <button on:click={state.increment}>
+            // Generates az-on attribute. Add data-predict for optimistic UI.
+            <button on:click={state.increment} data-predict="count = count + 1">
                 "Increment (+1)"
             </button>
 
-            <button on:click={state.toggle}>
+            <button on:click={state.toggle} data-predict="active = !active">
+                "Toggle Active"
+            </button>
+
+            <button on:click={state.toggle} data-predict="active = !active">
                 "Toggle Active"
             </button>
             <style>
