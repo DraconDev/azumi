@@ -19,15 +19,16 @@ No runtime errors. No "works on my machine". No surprises.
 
 ---
 
-## 🚀 v5.2.0 Release Notes
+## 🚀 v6.0.0 Release Notes
 
-**Azumi v5.2.0** — Production-ready release with critical security fixes and comprehensive test coverage.
+**Azumi v6.0.0** — Production-ready release with full review complete.
 
 ### What's Fixed
 - **Security**: XSS prevention in SEO, HMAC panic in release builds, proper error handling in live actions
 - **Tests**: 1128 tests passing, all HTML validation errors fixed, data-predict documentation corrected
 - **Documentation**: Accurate API docs, fixed version references, removed auto-generation claims
 - **Code Quality**: Removed dead code, fixed component resolution, cleaned up duplicate constants
+- **Release**: Proper crate metadata, versioned dependencies, publish-ready packaging
 
 ### Migration from v4
 - No breaking API changes
