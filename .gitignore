@@ -52,4 +52,6 @@ target/
 !flake.nix
 !rust-toolchain.toml
 !rustfmt.toml
+# Large files (auto-added by dracon-sync)
+bin/
 # --- END DRACON MANAGED BLOCK ---
