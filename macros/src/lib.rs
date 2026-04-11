@@ -517,8 +517,8 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
             }
         } else {
             format!(
-                "<style data-azumi-internal=\"true\">{}</style>",
-                scoped_output
+                "<style data-azumi-scope=\"{}\">{}</style>",
+                scope_id, scoped_output
             )
         };
 
