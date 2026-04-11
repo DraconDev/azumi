@@ -88,7 +88,8 @@ pub trait LiveState:
     LiveStateMetadata + serde::Serialize + for<'de> serde::de::Deserialize<'de> + Send + Sync + 'static
 {
     fn to_scope(&self) -> String {
-        let json = serde_json::to_string(self).unwrap_or_default();
+        let json = serde_json::to_string(self)
+            .expect("Failed to serialize LiveState to JSON. Ensure all fields implement Serialize.");
         crate::security::sign_state(&json)
     }
 }
