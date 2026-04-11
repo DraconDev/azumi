@@ -96,11 +96,9 @@ impl SeoConfig {
 /// Initialize the global SEO configuration.
 /// This should be called once at application startup.
 pub fn init_seo(config: SeoConfig) {
-    if SITE_CONFIG.get().is_some() {
+    if SITE_CONFIG.set(config).is_err() {
         eprintln!("WARNING: init_seo() called multiple times - first initialization preserved");
-        return;
     }
-    SITE_CONFIG.set(config).expect("init_seo() failed");
 }
 
 /// Generates the full HTML string for <head> meta tags.
