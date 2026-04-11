@@ -1030,8 +1030,6 @@ fn first_node_span(nodes: &[token_parser::Node]) -> proc_macro2::Span {
     proc_macro2::Span::call_site()
 }
 
-/// Compute a scope ID from a source span using the same hashing logic as the runtime.
-/// This function is mirrored from src/lib.rs to ensure both use DefaultHasher on (line, col).
 pub fn azumi_scope_id_from_span(span: proc_macro2::Span) -> String {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
@@ -1045,28 +1043,12 @@ pub fn azumi_scope_id_from_span(span: proc_macro2::Span) -> String {
     col.hash(&mut hasher);
     format!("s{:x}", hasher.finish())
 }
-                            _ => {}
-                        }
-                        continue;
-                    }
 
-                    if attr_name == "style" {
-                        match &attr.value {
-                            token_parser::AttributeValue::StyleDsl(props) => {
-                                instructions.push(quote! { write!(f, " style=\"")?; });
-                                for (i, (key, val)) in props.iter().enumerate() {
-                                    if i > 0 {
-                                        instructions.push(quote! { write!(f, "; ")?; });
-                                    }
-                                    instructions.push(quote! {
-                                        write!(f, "{}: {}", #key, azumi::Escaped(&#val))?;
-                                    });
-                                }
-                                instructions.push(quote! { write!(f, "\"")?; });
-                            }
-                            _ => match &attr.value {
-                                token_parser::AttributeValue::Static(val) => {
-                                    let clean = strip_outer_quotes(val);
+fn generate_body_with_context(
+    nodes: &[token_parser::Node],
+    ctx: &GenerationContext,
+) -> proc_macro2::TokenStream {
+    let mut instructions = Vec::new();
                                     instructions.push(quote! {
                                         write!(f, " {}=\"{}\"", #attr_name, #clean)?;
                                     });
