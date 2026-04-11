@@ -227,6 +227,13 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     if selector.starts_with('@') || selector.starts_with("/*") {
         return selector.to_string();
     }
+    // Web Components shadow DOM selectors - do NOT scope these
+    if selector.starts_with(":host")
+        || selector.starts_with("::slotted")
+        || selector.starts_with("::part")
+    {
+        return selector.to_string();
+    }
     if let Some(pseudo_pos) = selector.find("::") {
         let base = &selector[..pseudo_pos];
         let pseudo = &selector[pseudo_pos..];
