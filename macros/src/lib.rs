@@ -498,18 +498,10 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
     let has_scoped = !scoped_css.is_empty();
 
     if has_global || has_scoped {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-
         let (scoped_output, scope_id) = if has_scoped {
-            let mut hasher = DefaultHasher::new();
-            scoped_css.hash(&mut hasher);
-            let hash = hasher.finish();
-            let scope_id = format!("s{:x}", hash);
-            (
-                crate::css::scope_css(&scoped_css, &scope_id),
-                Some(scope_id),
-            )
+            let span = first_node_span(&nodes);
+            let sid = azumi_scope_id_from_span(span);
+            (crate::css::scope_css(&scoped_css, &sid), Some(sid))
         } else {
             (String::new(), None)
         };
