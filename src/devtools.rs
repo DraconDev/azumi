@@ -82,6 +82,7 @@ fn run_master_loop() {
         }
     }
 
+    let mut last_run = Instant::now();
     let port = std::env::var("PORT")
         .map(|p| p.parse::<u16>().map(|n| n.to_string()))
         .unwrap_or(Ok("8080".to_string()))
