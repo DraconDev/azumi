@@ -96,9 +96,16 @@ impl SeoConfig {
 /// Initialize the global SEO configuration.
 /// This should be called once at application startup.
 pub fn init_seo(config: SeoConfig) {
-    SITE_CONFIG
-        .set(config)
-        .expect("init_seo() called twice - SEO config must be initialized exactly once");
+    if SITE_CONFIG.get().is_some() {
+        panic!("init_seo() called twice - SEO config must be initialized exactly once");
+    }
+    SITE_CONFIG.set(config).expect("init_seo() called twice");
+}
+
+/// Reset SEO config (for testing only - not thread-safe)
+#[cfg(test)]
+pub fn reset_seo() {
+    let _ = SITE_CONFIG.take();
 }
 
 /// Generates the full HTML string for <head> meta tags.
