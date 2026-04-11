@@ -130,11 +130,14 @@ fn is_toggle_expr(expr: &Expr, expected_field: &str) -> bool {
     false
 }
 
-/// Analyze a single statement for predictable mutations
+/// Analyze a single statement for predictable mutations.
+/// Note: This only analyzes top-level statements. Mutations inside control flow
+/// (if/else branches, match arms, loops) are NOT automatically analyzed.
+/// For mutations inside control flow, use #[azumi::predict("...")] manually.
 fn analyze_statement(stmt: &Stmt) -> Option<Prediction> {
     match stmt {
         Stmt::Expr(expr, _semicolon) => analyze_expr(expr),
-        _ => None,
+        _ => None, // Stmt::Local, Stmt::Item, etc. are not analyzed
     }
 }
 
