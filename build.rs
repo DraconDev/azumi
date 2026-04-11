@@ -96,10 +96,9 @@ fn compute_ai_hash() -> String {
         "secret_env_var=AZUMI_SECRET",
     ];
 
-    let mut hasher = DefaultHasher::new();
-    version.hash(&mut hasher);
+    let mut combined = version.to_string();
     for rule in rules {
-        rule.hash(&mut hasher);
+        combined.push_str(rule);
     }
-    format!("{:x}", hasher.finish())
+    format!("{:x}", fnv_hash(&combined))
 }
