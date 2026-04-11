@@ -483,17 +483,26 @@ pub fn validate_attribute_name(attr: &crate::token_parser::Attribute) -> Option<
         return None;
     }
 
-    // 2. Allow event handlers (on*)
-    // Note: Azumi uses on:click syntax, native HTML uses onclick
+    // 2. Check for Azumi event DSL (on:event) vs native HTML events (onevent)
     if name.starts_with("on:") {
-        // This is Azumi's event DSL - allowed
+        // This is Azumi's event DSL like on:click, on:mouseover - allowed
         return None;
     }
     if name.starts_with("on") {
         // Native HTML event handler like onclick, onmouseover
-        // Check if it's a valid event name (on + capital letter or lowercase)
-        // e.g., onclick, onload, onerror are valid native events
-        return None;
+        // Suggest using Azumi's on:event syntax instead
+        let suggestion = format!("on:{}", &name[2..].to_lowercase());
+        let msg = format!(
+            "Native event handler '{}' found. Did you mean to use Azumi's event DSL '{}'?\n\n\
+             Azumi uses a different syntax for events:\n\
+             ❌ onclick={{handle_click()}}\n\
+             ✅ on:click={{handle_click}}\n\n\
+             Note: In Azumi, 'on:click' means 'call handle_click when clicked'.",
+            name, suggestion
+        );
+        return Some(quote! {
+            compile_error!(#msg);
+        });
     }
 
     // 3. Allow XML namespaces (xmlns) - though usually contains colon or is just xmlns
