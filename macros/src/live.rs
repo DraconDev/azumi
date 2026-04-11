@@ -411,10 +411,9 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
 
                     #[allow(non_snake_case)]
                     pub fn #router_name() -> axum::routing::MethodRouter<()> {
+                        use axum::body::DefaultBodyLimit;
                         axum::routing::post(#handler_name)
-                            .layer(axum::middleware::from_fn(
-                                axum::middleware::map_response_body,
-                            ))
+                            .layer(DefaultBodyLimit::max(1024 * 64))
                     }
                 }
             } else {
@@ -440,7 +439,9 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
 
                     #[allow(non_snake_case)]
                     pub fn #router_name() -> axum::routing::MethodRouter<()> {
+                        use axum::body::DefaultBodyLimit;
                         axum::routing::post(#handler_name)
+                            .layer(DefaultBodyLimit::max(1024 * 64))
                     }
                 }
             };
