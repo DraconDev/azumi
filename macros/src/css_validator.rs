@@ -36,7 +36,7 @@ fn check_inline_styles_recursive(nodes: &[Node], errors: &mut Vec<proc_macro2::T
             Node::Element(elem) => {
                 if elem.name == "style" {
                     let has_src = elem.attrs.iter().any(|a| a.name == "src");
-                    let is_internal = elem.attrs.iter().any(|a| a.name == "data-azumi-internal");
+                    let is_internal = elem.attrs.iter().any(|a| a.name == "data-azumi-scope");
 
                     if !has_src && !is_internal {
                         errors.push(quote! {
