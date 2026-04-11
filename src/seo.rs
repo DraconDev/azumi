@@ -18,6 +18,23 @@ fn html_attr_escape(s: &str) -> String {
     out
 }
 
+/// Escape a string for safe inclusion in XML text content or attribute values.
+/// Prevents malformed XML from special characters.
+fn xml_escape(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '&' => out.push_str("&amp;"),
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
+            '"' => out.push_str("&quot;"),
+            '\'' => out.push_str("&apos;"),
+            _ => out.push(c),
+        }
+    }
+    out
+}
+
 /// Escape a string for safe inclusion as HTML text content.
 /// Escapes `<`, `>`, and `&`.
 fn html_text_escape(s: &str) -> String {
