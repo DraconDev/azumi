@@ -509,8 +509,8 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         let css_to_inject = if has_global {
             if has_scoped {
                 format!(
-                    "<style>{}</style><style data-azumi-internal=\"true\">{}</style>",
-                    global_css, scoped_output
+                    "<style>{}</style><style data-azumi-scope=\"{}\">{}</style>",
+                    global_css, scope_id, scoped_output
                 )
             } else {
                 format!("<style>{}</style>", global_css)
