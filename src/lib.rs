@@ -123,12 +123,42 @@ impl<T: LiveStateMetadata> LiveStateMetadata for &mut T {
 #[derive(Clone)]
 pub struct FnComponent<F>(F);
 
+/// A component backed by a function.
+///
+/// # Thread Safety
+///
+/// `FnComponent<F>` does **not** automatically implement `Send` or `Sync`
+/// because the inner function `F` may capture non-`Send` state (e.g., `Rc`,
+/// `RefCell`, or closures capturing thread-local data).
+///
+/// If you need `FnComponent` to be `Send + Sync`, ensure your function `F`
+/// captures only `Send + Sync` types, or use `Arc<Mutex<...>>` for shared state.
+///
+/// # Example
+///
+/// ```ignore
+/// // This FnComponent IS Send + Sync because the closure captures nothing
+/// let comp = FnComponent::new(|f| write!(f, "Hello"));
+///
+/// // This FnComponent is NOT Send + Sync because it captures Rc
+/// let data = std::rc::Rc::new("Hello".to_string());
+/// let comp = FnComponent::new(move |f| write!(f, "{}", data)); // Not Send!
+/// ```
 impl<F> Component for FnComponent<F>
 where
     F: Fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result,
 {
     fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         (self.0)(f)
+    }
+}
+
+impl<F: Send + Sync> FnComponent<F> {
+    /// Create a new `FnComponent` with a `Send + Sync` function.
+    ///
+    /// Use this when you need `FnComponent` to be thread-safe.
+    pub fn new(f: F) -> Self {
+        FnComponent(f)
     }
 }
 
