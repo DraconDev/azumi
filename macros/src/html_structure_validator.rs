@@ -455,9 +455,6 @@ pub fn validate_tag_name(elem: &Element) -> Option<TokenStream> {
         "frac",
         "sqrt",
         "root",
-        "table",
-        "tr",
-        "td",
     ];
 
     if !valid_tags.contains(&name.as_str()) {
