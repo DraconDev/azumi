@@ -757,6 +757,20 @@ fn validate_nodes(
                                             errors.push(quote_spanned! { ident.span() =>
                                                 compile_error!(#msg);
                                             });
+                                        } else if !valid_classes.contains(&var_name)
+                                            && !valid_ids.contains(&var_name)
+                                        {
+                                            // Check if a dashed version might exist (e.g., my_class -> my-class)
+                                            let dashed = var_name.replace('_', "-");
+                                            if valid_classes.contains(&dashed) {
+                                                let msg = format!(
+                                                    "Variable '{}' is not a valid class binding. Did you mean '{}'? Note: CSS class names with dashes must be written with underscores in Rust (e.g., 'my_class' for '.my-class').",
+                                                    var_name, dashed
+                                                );
+                                                errors.push(quote_spanned! { ident.span() =>
+                                                    compile_error!(#msg);
+                                                });
+                                            }
                                         }
                                     }
                                 }
