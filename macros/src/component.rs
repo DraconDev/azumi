@@ -40,11 +40,19 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
                             if meta.path.is_ident("default") {
                                 let value = meta.value()?;
                                 let lit_str: syn::LitStr = value.parse()?;
-                                default_value =
-                                    Some(lit_str.parse::<syn::Expr>().map_err(|_| {
-                                        meta.error("Invalid default value expression")
-                                    })?);
+                                default_value = Some(
+                                    lit_str
+                                        .parse::<syn::Expr>()
+                                        .map_err(|_| meta.error("Invalid default value expression"))?,
+                                );
                             }
+                            Ok(())
+                        }) {
+                            let err = syn::Error::new_spanned(attr, format!("{}", e));
+                            return proc_macro::TokenStream::from(err.to_compile_error());
+                        }
+                    }
+                }
                             Ok(())
                         }) {
                             return proc_macro::TokenStream::from(
