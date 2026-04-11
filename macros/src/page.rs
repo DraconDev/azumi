@@ -64,6 +64,7 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         // Public Wrapper
+        #[azumi::component]
         #fn_vis fn #fn_name() -> impl azumi::Component {
             // Set context for Layouts to find.
             // PageMetaGuard ensures metadata is reset after render completes.
