@@ -1030,6 +1030,8 @@ fn first_node_span(nodes: &[token_parser::Node]) -> proc_macro2::Span {
     proc_macro2::Span::call_site()
 }
 
+/// Compute a scope ID from a source span using the same hashing logic as the runtime.
+/// This function is mirrored from src/lib.rs to ensure both use DefaultHasher on (line, col).
 pub fn azumi_scope_id_from_span(span: proc_macro2::Span) -> String {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
@@ -1043,12 +1045,28 @@ pub fn azumi_scope_id_from_span(span: proc_macro2::Span) -> String {
     col.hash(&mut hasher);
     format!("s{:x}", hasher.finish())
 }
+                            _ => {}
+                        }
+                        continue;
+                    }
 
-fn generate_body_with_context(
-    nodes: &[token_parser::Node],
-    ctx: &GenerationContext,
-) -> proc_macro2::TokenStream {
-    let mut instructions = Vec::new();
+                    if attr_name == "style" {
+                        match &attr.value {
+                            token_parser::AttributeValue::StyleDsl(props) => {
+                                instructions.push(quote! { write!(f, " style=\"")?; });
+                                for (i, (key, val)) in props.iter().enumerate() {
+                                    if i > 0 {
+                                        instructions.push(quote! { write!(f, "; ")?; });
+                                    }
+                                    instructions.push(quote! {
+                                        write!(f, "{}: {}", #key, azumi::Escaped(&#val))?;
+                                    });
+                                }
+                                instructions.push(quote! { write!(f, "\"")?; });
+                            }
+                            _ => match &attr.value {
+                                token_parser::AttributeValue::Static(val) => {
+                                    let clean = strip_outer_quotes(val);
                                     instructions.push(quote! {
                                         write!(f, " {}=\"{}\"", #attr_name, #clean)?;
                                     });
@@ -1236,46 +1254,4 @@ fn generate_body_with_context(
     quote! {
         #(#instructions)*
     }
-}
-
-fn first_node_span(nodes: &[token_parser::Node]) -> proc_macro2::Span {
-    for node in nodes {
-        match node {
-            token_parser::Node::Element(elem) => return elem.span,
-            token_parser::Node::Text(text) => return text.span,
-            token_parser::Node::Expression(expr) => return expr.span,
-            token_parser::Node::Fragment(frag) => {
-                if let Some(span) = first_node_span(&frag.children).ok() {
-                    return span;
-                }
-            }
-            token_parser::Node::Block(block) => {
-                let span = match block {
-                    token_parser::Block::If(b) => b.span,
-                    token_parser::Block::For(b) => b.span,
-                    token_parser::Block::Match(b) => b.span,
-                    token_parser::Block::Call(b) => b.span,
-                    token_parser::Block::Let(b) => b.span,
-                    _ => continue,
-                };
-                return span;
-            }
-            _ => {}
-        }
-    }
-    proc_macro2::Span::call_site()
-}
-
-pub fn azumi_scope_id_from_span(span: proc_macro2::Span) -> String {
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
-
-    let span = span.source_locations();
-    let line = span.line();
-    let col = span.column();
-
-    let mut hasher = DefaultHasher::new();
-    line.hash(&mut hasher);
-    col.hash(&mut hasher);
-    format!("s{:x}", hasher.finish())
 }
