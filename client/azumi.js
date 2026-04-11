@@ -252,6 +252,13 @@ class Azumi {
         const trimmedExpr = expr.trim();
         const pathParts = fieldPath.split(".");
 
+        // Guard against prototype pollution: reject dangerous path segments
+        const dangerous = ["__proto__", "constructor", "prototype", "prototype__", "__defineGetter__", "__defineSetter__", "hasOwnProperty", "isPrototypeOf", "propertyIsEnumerable", "toLocaleString", "toString", "valueOf", "__lookupGetter__", "__lookupSetter__"];
+        if (pathParts.some(p => dangerous.includes(p))) {
+            console.warn("Azumi:Blocked prototype-polluting path:", fieldPath);
+            return;
+        }
+
         // Helper: get nested property
         const getNested = (obj, path) =>
             path.reduce((o, k) => (o != null ? o[k] : undefined), obj);
