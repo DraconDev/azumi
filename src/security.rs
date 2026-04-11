@@ -2,6 +2,7 @@ use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use hmac::{Hmac, Mac};
 use sha2::Sha256;
 use std::env;
+use std::sync::OnceLock;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 type HmacSha256 = Hmac<Sha256>;
@@ -9,24 +10,30 @@ type HmacSha256 = Hmac<Sha256>;
 const DEFAULT_SECRET: &str = "azumi-dev-secret-do-not-use-in-prod";
 const MAX_STATE_AGE_SECS: u64 = 3600; // 1 hour max age for signed state
 
-fn get_secret() -> String {
-    env::var("AZUMI_SECRET").unwrap_or_else(|_| {
-        #[cfg(debug_assertions)]
-        {
-            eprintln!(
-                "⚠️  WARNING: Using default dev HMAC secret. Set AZUMI_SECRET for production!"
-            );
-            DEFAULT_SECRET.to_string()
-        }
-        #[cfg(not(debug_assertions))]
-        {
-            panic!(
-                "FATAL: AZUMI_SECRET environment variable is REQUIRED in release builds.\n\
-                 The default dev secret is publicly known and insecure.\n\
-                 Set AZUMI_SECRET to a random 64+ character string before deploying."
-            );
-        }
-    })
+static SECRET: OnceLock<String> = OnceLock::new();
+
+fn get_secret() -> &'static str {
+    SECRET
+        .get_or_init(|| {
+            env::var("AZUMI_SECRET").unwrap_or_else(|_| {
+                #[cfg(debug_assertions)]
+                {
+                    eprintln!(
+                    "⚠️  WARNING: Using default dev HMAC secret. Set AZUMI_SECRET for production!"
+                );
+                    DEFAULT_SECRET.to_string()
+                }
+                #[cfg(not(debug_assertions))]
+                {
+                    panic!(
+                        "FATAL: AZUMI_SECRET environment variable is REQUIRED in release builds.\n\
+                     The default dev secret is publicly known and insecure.\n\
+                     Set AZUMI_SECRET to a random 64+ character string before deploying."
+                    );
+                }
+            })
+        })
+        .as_str()
 }
 
 fn get_current_timestamp() -> u64 {
