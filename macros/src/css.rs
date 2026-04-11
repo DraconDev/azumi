@@ -119,7 +119,7 @@ fn scope_css_level(iter: &mut Peekable<Chars>, scope_attr: &str, finding_close: 
                     let scoped_selector_str = if selector_raw.starts_with('@') {
                         selector_raw.to_string()
                     } else {
-                        let selectors: Vec<&str> = selector_raw.split(',').collect();
+                        let selectors: Vec<&str> = split_selector_list(&selector_raw);
                         selectors
                             .iter()
                             .filter(|s| !s.trim().is_empty())
@@ -196,6 +196,31 @@ fn extract_balanced_block(iter: &mut Peekable<Chars>) -> String {
         }
     }
     content
+}
+
+fn split_selector_list(selector_raw: &str) -> Vec<&str> {
+    let mut result = Vec::new();
+    let mut depth = 0;
+    let mut last_start = 0;
+    for (i, ch) in selector_raw.chars().enumerate() {
+        match ch {
+            '(' => depth += 1,
+            ')' => depth = depth.saturating_sub(1),
+            ',' if depth == 0 => {
+                let sel = selector_raw[last_start..i].trim();
+                if !sel.is_empty() {
+                    result.push(sel);
+                }
+                last_start = i + 1;
+            }
+            _ => {}
+        }
+    }
+    let last = selector_raw[last_start..].trim();
+    if !last.is_empty() {
+        result.push(last);
+    }
+    result
 }
 
 fn scope_selector(selector: &str, scope_attr: &str) -> String {
