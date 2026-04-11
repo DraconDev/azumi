@@ -400,15 +400,6 @@ impl GenerationContext {
             valid_ids: self.valid_ids.clone(),
         }
     }
-
-    fn into_child_context(&self) -> Self {
-        Self {
-            mode: self.mode.clone(),
-            scope_id: self.scope_id.clone(),
-            valid_classes: self.valid_classes.clone(),
-            valid_ids: self.valid_ids.clone(),
-        }
-    }
 }
 
 fn collect_all_styles(nodes: &[token_parser::Node]) -> (String, String) {
