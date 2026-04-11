@@ -91,7 +91,16 @@ pub fn verify_state(signed_state: &str) -> Result<String, String> {
     };
 
     let current_time = get_current_timestamp();
+
+    // Check if timestamp is too old (expired)
     if current_time.saturating_sub(timestamp) > MAX_STATE_AGE_SECS {
+        return Err("Invalid state".to_string());
+    }
+
+    // Check if timestamp is too far in the future (clock skew protection)
+    // Allow up to 60 seconds of clock drift between signing and verification
+    const ALLOWED_CLOCK_SKEW: u64 = 60;
+    if timestamp > current_time && timestamp - current_time > ALLOWED_CLOCK_SKEW {
         return Err("Invalid state".to_string());
     }
 
