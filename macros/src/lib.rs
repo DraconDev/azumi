@@ -116,17 +116,6 @@ pub fn html(input: TokenStream) -> TokenStream {
     let mut validation_checks = Vec::new();
     collect_bind_checks(&nodes, &mut validation_checks);
 
-    // 5. Compute scope ID from source position (line:col) for hot reload compatibility
-    let (scope_id_tokens, scope_id_expr) = if let Some((line, col)) = first_node_span(&nodes) {
-        let scope_id = azumi_scope_id_from_span(line, col);
-        (
-            quote! { Some(#scope_id.to_string()) },
-            quote! { #scope_id.to_string() },
-        )
-    } else {
-        (quote! { None }, quote! { String::new() })
-    };
-
     let expanded = quote! {
         {
             // Import FallbackRender to ensure render_azumi works even if trait not imported by user
