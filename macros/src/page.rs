@@ -65,6 +65,7 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
         // Public Wrapper
         #fn_vis fn #fn_name() -> impl azumi::Component {
+            use azumi::Component;
             // Set context for Layouts to find.
             azumi::context::set_page_meta(
                 Some(#title.to_string()),
