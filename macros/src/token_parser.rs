@@ -1135,7 +1135,7 @@ impl Parse for IfBlock {
             input.parse::<Token![else]>()?;
             // Support @else if chains by recursively parsing IfBlock
             if input.peek(Token![if]) {
-                Some(vec![Node::Block(Block::If(parse_nodes(&input)?))])
+                Some(vec![Node::Block(Block::If(input.parse::<IfBlock>()?)])
             } else {
                 let content;
                 syn::braced!(content in input);
