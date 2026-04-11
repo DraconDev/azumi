@@ -412,6 +412,9 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                     #[allow(non_snake_case)]
                     pub fn #router_name() -> axum::routing::MethodRouter<()> {
                         axum::routing::post(#handler_name)
+                            .layer(axum::middleware::from_fn(
+                                axum::middleware::map_response_body,
+                            ))
                     }
                 }
             } else {
