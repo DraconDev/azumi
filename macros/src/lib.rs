@@ -903,7 +903,7 @@ fn generate_body_with_context(
                                     instructions.push(quote! {
                                         let __scope_val: String = #tokens;
                                         let __escaped = __scope_val.replace("\"", "&quot;");
-                                        write!(f, " {}=\"{}\"", #attr_name, format!("{}|DEBUG", __escaped))?;
+                                        write!(f, " {}=\"{}\"", #attr_name, __escaped)?;
                                     });
                                 }
                                 token_parser::AttributeValue::Static(val) => {
