@@ -67,6 +67,7 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
         #fn_vis fn #fn_name() -> impl azumi::Component {
             let title = #title.to_string();
             let description = #desc_tokens;
+            let inner = #inner_name {};
             azumi::from_fn(move |f| {
                 // Set context INSIDE render - guard lives through rendering
                 let _guard = azumi::context::set_page_meta(
@@ -75,9 +76,7 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     None
                 );
                 // Render inner (which calls Layout, which calls seo::render_automatic_seo)
-                _inner_ #fn_name ::render(
-                    _inner_ #fn_name ::Props::builder().build().expect("Failed to build props")
-                ).render(f)
+                inner.render(f)
             })
         }
     };
