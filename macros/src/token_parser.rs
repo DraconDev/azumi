@@ -505,7 +505,7 @@ impl Parse for Element {
             let has_src = attrs.iter().any(|attr: &Attribute| attr.name == "src");
             let is_internal = attrs
                 .iter()
-                .any(|attr: &Attribute| attr.name == "data-azumi-internal");
+                .any(|attr: &Attribute| attr.name == "data-azumi-scope");
             let is_json_script = name == "script"
                 && attrs.iter().any(|attr: &Attribute| {
                     attr.name == "type"
