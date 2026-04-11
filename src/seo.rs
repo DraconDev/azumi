@@ -301,6 +301,19 @@ pub fn render_automatic_seo() -> crate::Raw<String> {
 }
 
 /// Simple Sitemap Builder
+///
+/// # Design Note
+///
+/// This uses the builder pattern (owning `self`) for ergonomic chaining:
+/// ```ignore
+/// let sitemap = SitemapBuilder::new("https://example.com")
+///     .add_url("/page1")
+///     .add_url("/page2")
+///     .build();
+/// ```
+///
+/// An alternative `&mut self` design would be less ergonomic but avoid
+/// the occasional clone. This is a deliberate tradeoff for API usability.
 pub struct SitemapBuilder {
     base_url: String,
     urls: Vec<String>,
