@@ -30,18 +30,23 @@ std::thread_local! {
     static PAGE_META: RefCell<PageMeta> = RefCell::new(PageMeta::default());
 }
 
-/// Set the metadata for the current page render.
-/// This should be called by the #[azumi::page] wrapper.
-///
-/// Page metadata persists in thread-local storage until the next call
-/// to `set_page_meta`. This is safe for request-scoped rendering where
-/// each request sets metadata once, renders, then the thread handles
-/// the next request (which sets metadata again).
+/// RAII guard that resets PAGE_META to default on drop.
+/// Ensures metadata from one request cannot leak into another.
+pub struct PageMetaGuard;
+
+impl Drop for PageMetaGuard {
+    fn drop(&mut self) {
+        PAGE_META.with(|params| *params.borrow_mut() = PageMeta::default());
+    }
+}
+
+/// Set the metadata for the current page render and return a guard.
+/// The guard ensures metadata is reset when the current scope ends.
 pub fn set_page_meta(
     title: Option<String>,
     description: Option<String>,
     image: Option<String>,
-) {
+) -> PageMetaGuard {
     PAGE_META.with(|params| {
         *params.borrow_mut() = PageMeta {
             title,
@@ -49,6 +54,7 @@ pub fn set_page_meta(
             image,
         };
     });
+    PageMetaGuard
 }
 
 /// Get the current page metadata.
