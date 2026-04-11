@@ -484,7 +484,15 @@ pub fn validate_attribute_name(attr: &crate::token_parser::Attribute) -> Option<
     }
 
     // 2. Allow event handlers (on*)
+    // Note: Azumi uses on:click syntax, native HTML uses onclick
+    if name.starts_with("on:") {
+        // This is Azumi's event DSL - allowed
+        return None;
+    }
     if name.starts_with("on") {
+        // Native HTML event handler like onclick, onmouseover
+        // Check if it's a valid event name (on + capital letter or lowercase)
+        // e.g., onclick, onload, onerror are valid native events
         return None;
     }
 
