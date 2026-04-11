@@ -1042,7 +1042,7 @@ fn parse_script_content(input: ParseStream, tag_name: &str) -> Result<Vec<Node>>
                 eprintln!("Parsing text...");
             }
             while !input.is_empty() {
-                if input.peek(Token![@]) && !is_css_at_rule(input) {
+                if input.peek(Token![@]) {
                     if debug {
                         eprintln!("Stopped text at @");
                     }
