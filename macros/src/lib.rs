@@ -348,7 +348,7 @@ fn is_valid_identifier(s: &str) -> bool {
 }
 
 fn generate_nodes(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
-    let body = generate_body(nodes, &first_node_span(nodes));
+    let body = generate_body(nodes, first_node_span(nodes));
     quote! {
         #body
         Ok(())
