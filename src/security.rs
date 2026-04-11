@@ -62,14 +62,17 @@ pub fn verify_state(signed_state: &str) -> Result<String, String> {
     }
 
     // Expected format: "json|timestamp|signature"
-    let parts: Vec<&str> = signed_state.split('|').collect();
-    if parts.len() != 3 {
-        return Err("Invalid state format: expected 'json|timestamp|signature'".to_string());
-    }
+    // Find last two pipe positions since JSON could contain |
+    let last_pipe = signed_state
+        .rfind('|')
+        .ok_or("Invalid state format: missing signature separator")?;
+    let second_last_pipe = signed_state[..last_pipe]
+        .rfind('|')
+        .ok_or("Invalid state format: missing timestamp separator")?;
 
-    let state_json = parts[0];
-    let timestamp_str = parts[1];
-    let signature_b64 = parts[2];
+    let state_json = &signed_state[..second_last_pipe];
+    let timestamp_str = &signed_state[second_last_pipe + 1..last_pipe];
+    let signature_b64 = &signed_state[last_pipe + 1..];
 
     // Parse and validate timestamp
     let timestamp: u64 = timestamp_str
