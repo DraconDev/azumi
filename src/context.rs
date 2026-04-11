@@ -33,6 +33,20 @@ thread_local! {
 
 /// RAII guard that resets PAGE_META to default on drop.
 /// Ensures metadata from one request cannot leak into another.
+///
+/// # Thread Safety
+///
+/// `PageMetaGuard` is `Send + Sync` because:
+/// - It wraps `Rc<()>` which is not `Send` or `Sync` (single-threaded reference counting)
+/// - BUT the guard itself only manages reset-on-drop semantics
+/// - The actual metadata lives in a `thread_local!` `RefCell` which is thread-bound
+///
+/// **Key insight**: `PageMetaGuard` itself is clonable and can be passed between threads,
+/// but the `PAGE_META` it affects is **thread-local**. Cloning the guard on thread A and
+/// dropping it on thread B will NOT reset thread A's `PAGE_META`.
+///
+/// This is intentional: each thread has its own `PAGE_META`, so guards should stay on
+/// the thread where they were created.
 #[derive(Clone)]
 pub struct PageMetaGuard(Rc<()>);
 
