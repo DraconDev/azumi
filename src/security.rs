@@ -106,7 +106,7 @@ mod tests {
     fn test_sign_verify() {
         let json = r#"{"count": 10}"#;
         let signed = sign_state(json);
-        assert!(signed.contains('|'));
+        assert_eq!(signed.matches('|').count(), 2); // json|timestamp|signature
 
         let verified = verify_state(&signed).unwrap();
         assert_eq!(verified, json);
@@ -150,7 +150,7 @@ mod tests {
 
     #[test]
     fn test_sign_verify_with_pipes_in_json() {
-        // JSON containing '|' should not break the separator logic
+        // JSON containing '|' should work since we split and take first element
         let json = r#"{"msg": "a|b|c"}"#;
         let signed = sign_state(json);
         let verified = verify_state(&signed).unwrap();
@@ -159,13 +159,33 @@ mod tests {
 
     #[test]
     fn test_invalid_base64_signature() {
-        let result = verify_state(r#"{"count": 10}|not-valid-base64!!!"#);
+        // New format needs 3 parts
+        let result = verify_state(r#"{"count": 10}|1234567890|not-valid-base64!!!"#);
         assert!(result.is_err());
     }
 
     #[test]
     fn test_missing_separator() {
+        // Old format (no timestamp) should fail
         let result = verify_state(r#"{"count": 10}"#);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_expired_state_fails() {
+        // Create state with timestamp of 0 (epoch)
+        let json = r#"{"count": 10}"#;
+        let expired = format!("{}|0|invalid", json);
+        let result = verify_state(&expired);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("expired"));
+    }
+
+    #[test]
+    fn test_state_too_large_fails() {
+        let json = "x".repeat(100_001);
+        let result = verify_state(&json);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("too large"));
     }
 }
