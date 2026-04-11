@@ -302,7 +302,7 @@ fn scope_css_level(
                     let scoped_selector_str = if selector_raw.starts_with('@') {
                         selector_raw.to_string()
                     } else {
-                        let selectors: Vec<&str> = selector_raw.split(',').collect();
+                        let selectors: Vec<&str> = split_selector_list(&selector_raw);
                         selectors
                             .iter()
                             .filter(|s| !s.trim().is_empty())
