@@ -221,4 +221,30 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), "Invalid state");
     }
+
+    #[test]
+    fn test_future_timestamp_rejected() {
+        use std::time::{SystemTime, UNIX_EPOCH};
+        // Create a state with a timestamp 120 seconds in the future
+        let current = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        let future_timestamp = current + 120; // 120 seconds in future
+
+        let json = r#"{"count": 10}"#;
+        // Manually construct a state with a future timestamp
+        let mut mac = HmacSha256::new_from_slice(b"azumi-dev-secret-do-not-use-in-prod").unwrap();
+        mac.update(json.as_bytes());
+        mac.update(&future_timestamp.to_be_bytes());
+        let sig = base64::engine::general_purpose::STANDARD.encode(mac.finalize().into_bytes());
+        let future_state = format!("{}|{}|{}", json, future_timestamp, sig);
+
+        let result = verify_state(&future_state);
+        assert!(
+            result.is_err(),
+            "Future timestamp beyond clock skew should be rejected"
+        );
+        assert_eq!(result.unwrap_err(), "Invalid state");
+    }
 }
