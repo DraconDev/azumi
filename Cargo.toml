@@ -15,7 +15,7 @@ members = ["macros", "demo"]
 resolver = "2"
 
 [features]
-default = ["devtools"]
+default = []
 schema = ["azumi-macros/schema"]
 test-utils = ["dep:scraper"]
 devtools = ["dep:notify", "tokio/sync"]
