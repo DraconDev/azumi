@@ -50,7 +50,7 @@ fn scope_css_recursive(iter: &mut Peekable<Chars>, scope_attr: &str) -> String {
                     // scope_selector handles @ check.
 
                     // Split by comma for multiple selectors
-                    let selectors: Vec<&str> = selector_raw.split(',').collect();
+                    let selectors: Vec<&str> = split_selector_list(&selector_raw);
                     let scoped: Vec<String> = selectors
                         .iter()
                         .filter(|s| !s.trim().is_empty())
