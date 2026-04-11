@@ -1128,7 +1128,7 @@ fn generate_body_with_context(
                                         instructions.push(quote! { write!(f, "; ")?; });
                                     }
                                     instructions.push(quote! {
-                                        write!(f, "{}: {}", #key, azumi::Escaped(&#val))?;
+                                        write!(f, "{}: {}", azumi::Escaped(&#key), azumi::Escaped(&#val))?;
                                     });
                                 }
                                 instructions.push(quote! { write!(f, "\"")?; });
