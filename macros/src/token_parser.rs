@@ -1212,6 +1212,9 @@ impl Parse for LetBlock {
         // Parse value until semicolon
         let mut value = TokenStream::new();
         while !input.peek(Token![;]) {
+            if input.is_empty() {
+                return Err(Error::new(span, "Expected ';' after @let value"));
+            }
             let tt: TokenTree = input.parse()?;
             value.extend(Some(tt));
         }
