@@ -340,10 +340,11 @@ impl SitemapBuilder {
                 )
             };
 
+            let escaped_url = xml_escape(&url);
             let _ = write!(
                 xml,
                 "  <url>\n    <loc>{}</loc>\n    <changefreq>weekly</changefreq>\n  </url>\n",
-                url
+                escaped_url
             );
         }
 
