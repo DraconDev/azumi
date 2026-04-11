@@ -581,7 +581,10 @@ fn collect_styles_recursive(
     }
 }
 
-fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
+fn generate_body(
+    nodes: &[token_parser::Node],
+    span: Option<(usize, usize)>,
+) -> proc_macro2::TokenStream {
     let css_validation_errors = css_validator::validate_component_css(nodes);
     if !css_validation_errors.is_empty() {
         return css_validation_errors;
@@ -609,14 +612,16 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
     let has_scoped = !scoped_css.is_empty();
 
     if has_global || has_scoped {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-
         let (scoped_output, scope_id) = if has_scoped {
-            let mut hasher = DefaultHasher::new();
-            scoped_css.hash(&mut hasher);
-            let hash = hasher.finish();
-            let scope_id = format!("s{:x}", hash);
+            let scope_id = span
+                .map(|(line, col)| azumi_scope_id_from_span(line, col))
+                .unwrap_or_else(|| {
+                    use std::collections::hash_map::DefaultHasher;
+                    use std::hash::{Hash, Hasher};
+                    let mut hasher = DefaultHasher::new();
+                    scoped_css.hash(&mut hasher);
+                    format!("s{:x}", hasher.finish())
+                });
             (
                 crate::css::scope_css(&scoped_css, &scope_id),
                 Some(scope_id),
@@ -628,15 +633,18 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         let css_to_inject = if has_global {
             if has_scoped {
                 format!(
-                    "<style>{}</style><style data-azumi-internal=\"true\">{}</style>",
-                    global_css, scoped_output
+                    "<style>{}</style><style data-azumi-scope=\"{}\">{}</style>",
+                    global_css,
+                    scope_id.as_ref().unwrap(),
+                    scoped_output
                 )
             } else {
                 format!("<style>{}</style>", global_css)
             }
         } else {
             format!(
-                "<style data-azumi-internal=\"true\">{}</style>",
+                "<style data-azumi-scope=\"{}\">{}</style>",
+                scope_id.as_ref().unwrap(),
                 scoped_output
             )
         };
@@ -644,8 +652,8 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         let mut working_nodes = nodes.to_vec();
         let injected = inject_css_into_head(&mut working_nodes, &css_to_inject);
 
-        let ctx = if let Some(sid) = scope_id {
-            GenerationContext::with_scope(sid, valid_classes.clone(), valid_ids.clone())
+        let ctx = if let Some(sid) = &scope_id {
+            GenerationContext::with_scope(sid.clone(), valid_classes.clone(), valid_ids.clone())
         } else {
             GenerationContext::normal()
         };
