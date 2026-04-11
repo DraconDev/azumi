@@ -662,11 +662,10 @@ impl Parse for Attribute {
                      }
                 }
                 proc_macro2::TokenTree::Literal(lit) => {
-                    // It's a literal. Convert to syn::Lit to check if string.
-                    let s = lit.to_string();
-                    if s.starts_with('"') && s.ends_with('"') {
-                         let content = s[1..s.len()-1].to_string();
-                         (AttributeValue::Static(content), Some(lit.span()))
+                    // It's a literal. Convert to syn::Lit to check if string and properly unescape.
+                    if let Ok(syn::Lit::Str(s)) = syn::parse_str(&lit.to_string()) {
+                        // syn::LitStr properly handles escape sequences like \" and \\
+                        (AttributeValue::Static(s.value()), Some(lit.span()))
                     } else {
                         return Err(Error::new(
                             name_span,
