@@ -1,5 +1,5 @@
 use proc_macro2::{Span, TokenStream, TokenTree};
-use quote::{quote, ToTokens};
+use quote::ToTokens;
 use syn::{
     ext::IdentExt,
     parse::{Parse, ParseStream},
