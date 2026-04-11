@@ -373,6 +373,31 @@ fn extract_balanced_block(iter: &mut std::iter::Peekable<std::str::Chars>) -> St
     content
 }
 
+fn split_selector_list(selector_raw: &str) -> Vec<&str> {
+    let mut result = Vec::new();
+    let mut depth = 0;
+    let mut last_start = 0;
+    for (i, ch) in selector_raw.chars().enumerate() {
+        match ch {
+            '(' => depth += 1,
+            ')' => depth = depth.saturating_sub(1),
+            ',' if depth == 0 => {
+                let sel = selector_raw[last_start..i].trim();
+                if !sel.is_empty() {
+                    result.push(sel);
+                }
+                last_start = i + 1;
+            }
+            _ => {}
+        }
+    }
+    let last = selector_raw[last_start..].trim();
+    if !last.is_empty() {
+        result.push(last);
+    }
+    result
+}
+
 fn scope_selector(selector: &str, scope_attr: &str) -> String {
     if selector.starts_with('@') || selector.starts_with("/*") {
         return selector.to_string();
