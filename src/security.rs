@@ -55,33 +55,44 @@ pub fn sign_state(state_json: &str) -> String {
 
 /// Verifies a signed state string and checks timestamp for replay protection.
 /// Returns the original JSON if valid, or an Err if invalid or expired.
+///
+/// # Security Note
+///
+/// This function uses constant-time HMAC comparison via `verify_slice`,
+/// but different validation failures may return at slightly different times.
+/// This is considered acceptable as all failures result in rejection,
+/// and distinguishing between specific error types provides minimal
+/// additional information to an attacker.
 pub fn verify_state(signed_state: &str) -> Result<String, String> {
     // Limit input length to prevent DoS attacks
     if signed_state.len() > 100_000 {
-        return Err("State too large: maximum size is 100KB".to_string());
+        return Err("Invalid state".to_string());
     }
 
     // Expected format: "json|timestamp|signature"
     // Find last two pipe positions since JSON could contain |
-    let last_pipe = signed_state
-        .rfind('|')
-        .ok_or("Invalid state format: missing signature separator")?;
-    let second_last_pipe = signed_state[..last_pipe]
-        .rfind('|')
-        .ok_or("Invalid state format: missing timestamp separator")?;
+    let last_pipe = match signed_state.rfind('|') {
+        Some(idx) => idx,
+        None => return Err("Invalid state".to_string()),
+    };
+    let second_last_pipe = match signed_state[..last_pipe].rfind('|') {
+        Some(idx) => idx,
+        None => return Err("Invalid state".to_string()),
+    };
 
     let state_json = &signed_state[..second_last_pipe];
     let timestamp_str = &signed_state[second_last_pipe + 1..last_pipe];
     let signature_b64 = &signed_state[last_pipe + 1..];
 
     // Parse and validate timestamp
-    let timestamp: u64 = timestamp_str
-        .parse()
-        .map_err(|_| "Invalid timestamp format")?;
+    let timestamp: u64 = match timestamp_str.parse() {
+        Ok(t) => t,
+        Err(_) => return Err("Invalid state".to_string()),
+    };
 
     let current_time = get_current_timestamp();
     if current_time.saturating_sub(timestamp) > MAX_STATE_AGE_SECS {
-        return Err("State has expired: replay detected or state too old".to_string());
+        return Err("Invalid state".to_string());
     }
 
     let secret = get_secret();
@@ -91,14 +102,15 @@ pub fn verify_state(signed_state: &str) -> Result<String, String> {
     mac.update(state_json.as_bytes());
     mac.update(&timestamp.to_be_bytes());
 
-    let signature_bytes = BASE64
-        .decode(signature_b64)
-        .map_err(|_| "Invalid base64 signature")?;
+    let signature_bytes = match BASE64.decode(signature_b64) {
+        Ok(s) => s,
+        Err(_) => return Err("Invalid state".to_string()),
+    };
 
-    mac.verify_slice(&signature_bytes)
-        .map_err(|_| "Invalid signature: State tampering detected")?;
-
-    Ok(state_json.to_string())
+    match mac.verify_slice(&signature_bytes) {
+        Ok(()) => Ok(state_json.to_string()),
+        Err(_) => Err("Invalid state".to_string()),
+    }
 }
 
 #[cfg(test)]
