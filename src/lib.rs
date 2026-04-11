@@ -190,17 +190,18 @@ pub struct Escaped<T: std::fmt::Display>(pub T);
 impl<T: std::fmt::Display> std::fmt::Display for Escaped<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = self.0.to_string();
+        let mut result = String::with_capacity(s.len() * 4);
         for c in s.chars() {
             match c {
-                '<' => write!(f, "&lt;")?,
-                '>' => write!(f, "&gt;")?,
-                '&' => write!(f, "&amp;")?,
-                '"' => write!(f, "&quot;")?,
-                '\'' => write!(f, "&#x27;")?,
-                _ => write!(f, "{}", c)?,
+                '<' => result.push_str("&lt;"),
+                '>' => result.push_str("&gt;"),
+                '&' => result.push_str("&amp;"),
+                '"' => result.push_str("&quot;"),
+                '\'' => result.push_str("&#x27;"),
+                _ => result.push(c),
             }
         }
-        Ok(())
+        write!(f, "{}", result)
     }
 }
 
