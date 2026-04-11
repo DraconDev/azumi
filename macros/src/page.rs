@@ -67,7 +67,9 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
         #fn_vis fn #fn_name() -> impl azumi::Component {
             use azumi::Component;
             // Set context for Layouts to find.
-            azumi::context::set_page_meta(
+            // PageMetaGuard MUST be stored - it resets metadata on drop.
+            // Guard lives until end of scope (after render completes).
+            let _guard = azumi::context::set_page_meta(
                 Some(#title.to_string()),
                 #desc_tokens,
                 None
