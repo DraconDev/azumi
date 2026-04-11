@@ -40,7 +40,7 @@ async fn azumi_js_handler() -> impl IntoResponse {
     )
 }
 
-/// Helper to wrap an action result into an Axum response
+/// Helper to wrap an action result into an Axum response with correct Content-Type
 pub async fn handle_action_result<C: Component + ?Sized>(component: &C) -> impl IntoResponse {
-    crate::render_to_string(component)
+    axum::response::Html(crate::render_to_string(component))
 }
