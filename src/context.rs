@@ -44,7 +44,6 @@ impl PageMetaGuard {
 
 impl Drop for PageMetaGuard {
     fn drop(&mut self) {
-        // Only reset when the last guard is dropped
         if Rc::strong_count(&self.0) == 1 {
             PAGE_META.with(|params| *params.borrow_mut() = PageMeta::default());
         }
@@ -53,6 +52,36 @@ impl Drop for PageMetaGuard {
 
 /// Set the metadata for the current page render and return a guard.
 /// The guard ensures metadata is reset when all copies of the guard are dropped.
+///
+/// # Safety / TOCTOU Warning
+///
+/// This function uses a `thread_local!` `RefCell` which is **not async-safe** when
+/// the guarded value is accessed across `.await` points. Specifically:
+///
+/// - `set_page_meta()` writes to `PAGE_META`
+/// - If the async code that reads `PAGE_META` (via `get_page_meta()`) yields at an `.await`,
+///   another task on the same thread can overwrite `PAGE_META`
+/// - When the guard drops, it resets `PAGE_META` — but by this point the original
+///   async task may have resumed with the wrong metadata
+///
+/// **Rule**: Do not pass `PageMetaGuard` across `.await` points. The guard should
+/// be dropped before any async operation that might yield.
+///
+/// Example of UNSAFE usage:
+/// ```ignore
+/// let guard = set_page_meta(...);
+/// some_async_operation().await; // BAD: another task could overwrite PAGE_META here
+/// let meta = get_page_meta();   // May read corrupted/wrong metadata
+/// drop(guard);                  // Resets at wrong time
+/// ```
+///
+/// Example of SAFE usage:
+/// ```ignore
+/// let guard = set_page_meta(...);
+/// let meta = get_page_meta();   // Read immediately before any await
+/// drop(guard);                  // Reset immediately
+/// some_async_operation().await; // Now safe to await
+/// ```
 pub fn set_page_meta(
     title: Option<String>,
     description: Option<String>,
