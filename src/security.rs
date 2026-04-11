@@ -2,10 +2,12 @@ use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use hmac::{Hmac, Mac};
 use sha2::Sha256;
 use std::env;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 type HmacSha256 = Hmac<Sha256>;
 
 const DEFAULT_SECRET: &str = "azumi-dev-secret-do-not-use-in-prod";
+const MAX_STATE_AGE_SECS: u64 = 3600; // 1 hour max age for signed state
 
 fn get_secret() -> String {
     env::var("AZUMI_SECRET").unwrap_or_else(|_| {
@@ -27,37 +29,59 @@ fn get_secret() -> String {
     })
 }
 
-/// Signs a state string with HMAC-SHA256.
-/// Returns format: "{json}|{signature_base64}"
+fn get_current_timestamp() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0)
+}
+
+/// Signs a state string with HMAC-SHA256 and includes a timestamp for replay protection.
+/// Returns format: "{json}|{timestamp}|{signature_base64}"
 pub fn sign_state(state_json: &str) -> String {
     let secret = get_secret();
+    let timestamp = get_current_timestamp();
+
     let mut mac =
         HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC can take any size key");
 
     mac.update(state_json.as_bytes());
+    mac.update(&timestamp.to_be_bytes());
     let result = mac.finalize();
     let signature = BASE64.encode(result.into_bytes());
 
-    format!("{}|{}", state_json, signature)
+    format!("{}|{}|{}", state_json, timestamp, signature)
 }
 
-/// Verifies a signed state string.
-/// Returns the original JSON if valid, or an Err if invalid.
+/// Verifies a signed state string and checks timestamp for replay protection.
+/// Returns the original JSON if valid, or an Err if invalid or expired.
 pub fn verify_state(signed_state: &str) -> Result<String, String> {
-    // Expected format: "json|signature"
-    // We split from the right to handle potential pipes in json (though pipes in JSON are rare, last pipe is safer)
-    let idx = signed_state
-        .rfind('|')
-        .ok_or("Invalid state format: missing signature separator")?;
+    // Expected format: "json|timestamp|signature"
+    let parts: Vec<&str> = signed_state.split('|').collect();
+    if parts.len() != 3 {
+        return Err("Invalid state format: expected 'json|timestamp|signature'".to_string());
+    }
 
-    let state_json = &signed_state[..idx];
-    let signature_b64 = &signed_state[idx + 1..];
+    let state_json = parts[0];
+    let timestamp_str = parts[1];
+    let signature_b64 = parts[2];
+
+    // Parse and validate timestamp
+    let timestamp: u64 = timestamp_str
+        .parse()
+        .map_err(|_| "Invalid timestamp format")?;
+
+    let current_time = get_current_timestamp();
+    if current_time.saturating_sub(timestamp) > MAX_STATE_AGE_SECS {
+        return Err("State has expired: replay detected or state too old".to_string());
+    }
 
     let secret = get_secret();
     let mut mac =
         HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC can take any size key");
 
     mac.update(state_json.as_bytes());
+    mac.update(&timestamp.to_be_bytes());
 
     let signature_bytes = BASE64
         .decode(signature_b64)
