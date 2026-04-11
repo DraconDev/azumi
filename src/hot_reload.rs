@@ -98,6 +98,10 @@ pub fn get_template(id: &str) -> Option<RuntimeTemplate> {
     registry.get(id).cloned()
 }
 
+const MAX_TEMPLATE_PARTS: usize = 100;
+const MAX_PART_SIZE: usize = 100_000; // 100KB per part
+const MAX_TEMPLATE_ID_LEN: usize = 256;
+
 #[derive(serde::Deserialize)]
 struct TemplateUpdatePayload {
     id: String,
@@ -105,6 +109,22 @@ struct TemplateUpdatePayload {
 }
 
 async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
+    // Validate input
+    if payload.id.len() > MAX_TEMPLATE_ID_LEN {
+        eprintln!("Hot Reload: Template ID too long");
+        return;
+    }
+    if payload.parts.len() > MAX_TEMPLATE_PARTS {
+        eprintln!("Hot Reload: Too many parts (max {})", MAX_TEMPLATE_PARTS);
+        return;
+    }
+    for part in &payload.parts {
+        if part.len() > MAX_PART_SIZE {
+            eprintln!("Hot Reload: Part too large (max {} bytes)", MAX_PART_SIZE);
+            return;
+        }
+    }
+
     let Ok(mut registry) = TEMPLATE_REGISTRY.get_or_init(Default::default).write() else {
         return;
     };
