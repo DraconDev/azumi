@@ -1,4 +1,6 @@
 /// CSS Validator - Enforces Azumi's CSS rules at compile time
+/// Note: Inline <style> tag blocking is handled in token_parser.rs during parsing.
+/// This module focuses on external CSS file validation.
 use crate::token_parser::{AttributeValue, Block, Node};
 
 /// Parse all CSS files referenced in the component and validate classes
@@ -6,19 +8,8 @@ use crate::token_parser::{AttributeValue, Block, Node};
 pub fn validate_component_css(nodes: &[Node]) -> proc_macro2::TokenStream {
     use quote::quote;
 
-    // First, collect all CSS files referenced in the component
     let mut css_files = Vec::new();
     collect_css_files(nodes, &mut css_files);
-
-    // Check for inline styles (banned unless internal)
-    let mut inline_errors = Vec::new();
-    check_inline_styles_recursive(nodes, &mut inline_errors);
-
-    if !inline_errors.is_empty() {
-        return quote! {
-            #(#inline_errors)*
-        };
-    }
 
     if !css_files.is_empty() {
         return quote! {
@@ -27,59 +18,6 @@ pub fn validate_component_css(nodes: &[Node]) -> proc_macro2::TokenStream {
     }
 
     quote! {}
-}
-
-fn check_inline_styles_recursive(nodes: &[Node], errors: &mut Vec<proc_macro2::TokenStream>) {
-    use quote::quote;
-    for node in nodes {
-        match node {
-            Node::Element(elem) => {
-                if elem.name == "style" {
-                    let has_src = elem.attrs.iter().any(|a| a.name == "src");
-                    let is_internal = elem.attrs.iter().any(|a| a.name == "data-azumi-scope");
-
-                    if !has_src && !is_internal {
-                        errors.push(quote! {
-                            compile_error!(r#"Inline <style> tags not allowed in Azumi
-
-CSS must be external:
-  ✅ <style src="components/card.css" />  (auto-scoped)
-  ❌ <style>.card { padding: 2em; }</style>
-
-For dynamic styles: use style attribute with expressions
-
-Why? External files get full IDE support (linting, autocomplete, error checking)."#);
-                        });
-                    }
-                }
-                check_inline_styles_recursive(&elem.children, errors);
-            }
-            Node::Fragment(frag) => {
-                check_inline_styles_recursive(&frag.children, errors);
-            }
-            Node::Block(block) => match block {
-                Block::If(if_block) => {
-                    check_inline_styles_recursive(&if_block.then_branch, errors);
-                    if let Some(else_branch) = &if_block.else_branch {
-                        check_inline_styles_recursive(else_branch, errors);
-                    }
-                }
-                Block::For(for_block) => {
-                    check_inline_styles_recursive(&for_block.body, errors);
-                }
-                Block::Match(match_block) => {
-                    for arm in &match_block.arms {
-                        check_inline_styles_recursive(&arm.body, errors);
-                    }
-                }
-                Block::Call(call_block) => {
-                    check_inline_styles_recursive(&call_block.children, errors);
-                }
-                _ => {}
-            },
-            _ => {}
-        }
-    }
 }
 
 /// Collect all CSS file paths from <style src="..."> tags
