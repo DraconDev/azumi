@@ -421,14 +421,14 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                     ) -> axum::response::Response {
                         let json = match azumi::security::verify_state(&body) {
                             Ok(j) => j,
-                            Err(e) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))
+                            Err(_) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
                             ),
                         };
                         let mut state: #struct_name = match serde_json::from_str(&json) {
                             Ok(s) => s,
-                            Err(e) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::BAD_REQUEST, format!("State deserialization error: {}", e))
+                            Err(_) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
                             ),
                         };
                         #method_call
