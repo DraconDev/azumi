@@ -498,10 +498,18 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
     let has_scoped = !scoped_css.is_empty();
 
     if has_global || has_scoped {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+
         let (scoped_output, scope_id) = if has_scoped {
-            let span = first_node_span(&nodes);
-            let sid = azumi_scope_id_from_span(span);
-            (crate::css::scope_css(&scoped_css, &sid), Some(sid))
+            let mut hasher = DefaultHasher::new();
+            scoped_css.hash(&mut hasher);
+            let hash = hasher.finish();
+            let scope_id = format!("s{:x}", hash);
+            (
+                crate::css::scope_css(&scoped_css, &scope_id),
+                Some(scope_id),
+            )
         } else {
             (String::new(), None)
         };
@@ -509,16 +517,16 @@ fn generate_body(nodes: &[token_parser::Node]) -> proc_macro2::TokenStream {
         let css_to_inject = if has_global {
             if has_scoped {
                 format!(
-                    "<style>{}</style><style data-azumi-scope=\"{}\">{}</style>",
-                    global_css, scope_id, scoped_output
+                    "<style>{}</style><style data-azumi-internal=\"true\">{}</style>",
+                    global_css, scoped_output
                 )
             } else {
                 format!("<style>{}</style>", global_css)
             }
         } else {
             format!(
-                "<style data-azumi-scope=\"{}\">{}</style>",
-                scope_id, scoped_output
+                "<style data-azumi-internal=\"true\">{}</style>",
+                scoped_output
             )
         };
 
@@ -997,54 +1005,8 @@ fn generate_body_with_context(
                                             write!(f, " class=\"{}\"", azumi::Escaped(&#tokens))?;
                                         });
                                     }
-    }
-}
-
-/// Extract the first significant node's span from a parse tree.
-/// This is used to compute a stable scope ID based on source position.
-fn first_node_span(nodes: &[token_parser::Node]) -> proc_macro2::Span {
-    for node in nodes {
-        match node {
-            token_parser::Node::Element(elem) => return elem.span,
-            token_parser::Node::Text(text) => return text.span,
-            token_parser::Node::Expression(expr) => return expr.span,
-            token_parser::Node::Fragment(frag) => {
-                if let Some(span) = first_node_span(&frag.children).ok() {
-                    return span;
-                }
-            }
-            token_parser::Node::Block(block) => {
-                let span = match block {
-                    token_parser::Block::If(b) => b.span,
-                    token_parser::Block::For(b) => b.span,
-                    token_parser::Block::Match(b) => b.span,
-                    token_parser::Block::Call(b) => b.span,
-                    token_parser::Block::Let(b) => b.span,
-                    _ => continue,
-                };
-                return span;
-            }
-            _ => {}
-        }
-    }
-    proc_macro2::Span::call_site()
-}
-
-/// Compute a scope ID from a source span using the same hashing logic as the runtime.
-/// This function is mirrored from src/lib.rs to ensure both use DefaultHasher on (line, col).
-pub fn azumi_scope_id_from_span(span: proc_macro2::Span) -> String {
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
-
-    let span = span.source_locations();
-    let line = span.line();
-    let col = span.column();
-
-    let mut hasher = DefaultHasher::new();
-    line.hash(&mut hasher);
-    col.hash(&mut hasher);
-    format!("s{:x}", hasher.finish())
-}
+                                }
+                            }
                             _ => {}
                         }
                         continue;
