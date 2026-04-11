@@ -56,6 +56,11 @@ pub fn sign_state(state_json: &str) -> String {
 /// Verifies a signed state string and checks timestamp for replay protection.
 /// Returns the original JSON if valid, or an Err if invalid or expired.
 pub fn verify_state(signed_state: &str) -> Result<String, String> {
+    // Limit input length to prevent DoS attacks
+    if signed_state.len() > 100_000 {
+        return Err("State too large: maximum size is 100KB".to_string());
+    }
+
     // Expected format: "json|timestamp|signature"
     let parts: Vec<&str> = signed_state.split('|').collect();
     if parts.len() != 3 {
