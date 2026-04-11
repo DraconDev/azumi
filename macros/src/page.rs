@@ -64,11 +64,10 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         // Public Wrapper
-        #[azumi::component]
         #fn_vis fn #fn_name() -> impl azumi::Component {
             // Set context for Layouts to find.
-            // PageMetaGuard ensures metadata is reset after render completes.
-            let _meta_guard = azumi::context::set_page_meta(
+            // PageMetaGuard must live through render, so we attach it to the component.
+            let meta_guard = azumi::context::set_page_meta(
                 Some(#title.to_string()),
                 #desc_tokens,
                 None
@@ -76,7 +75,9 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
             // Render inner (which calls Layout, which calls seo::render_automatic_seo)
             azumi::html! {
-                @#inner_name()
+                <div az-meta-guard={meta_guard}>
+                    @#inner_name()
+                </div>
             }
         }
     };
