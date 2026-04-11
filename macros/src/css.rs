@@ -200,7 +200,7 @@ fn extract_balanced_block(iter: &mut Peekable<Chars>) -> String {
 
 fn split_selector_list(selector_raw: &str) -> Vec<&str> {
     let mut result = Vec::new();
-    let mut depth = 0;
+    let mut depth: usize = 0;
     let mut last_start = 0;
     for (i, ch) in selector_raw.chars().enumerate() {
         match ch {
