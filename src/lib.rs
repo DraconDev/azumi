@@ -385,7 +385,7 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     if let Some(pseudo_pos) = selector.find(':') {
         let base = &selector[..pseudo_pos];
         let pseudo = &selector[pseudo_pos..];
-        return format!("{}{}{}", base, scope_attr, pseudo);
+        return format!("{}{}{}", base, pseudo, scope_attr);
     }
     format!("{}{}", selector, scope_attr)
 }
