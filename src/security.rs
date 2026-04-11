@@ -174,16 +174,18 @@ mod tests {
 
     #[test]
     fn test_invalid_base64_signature() {
-        // New format needs 3 parts
+        // Now all errors return "Invalid state"
         let result = verify_state(r#"{"count": 10}|1234567890|not-valid-base64!!!"#);
         assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Invalid state");
     }
 
     #[test]
     fn test_missing_separator() {
-        // Old format (no timestamp) should fail
+        // Now all errors return "Invalid state"
         let result = verify_state(r#"{"count": 10}"#);
         assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Invalid state");
     }
 
     #[test]
@@ -193,7 +195,7 @@ mod tests {
         let expired = format!("{}|0|invalid", json);
         let result = verify_state(&expired);
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("expired"));
+        assert_eq!(result.unwrap_err(), "Invalid state");
     }
 
     #[test]
@@ -201,6 +203,6 @@ mod tests {
         let json = "x".repeat(100_001);
         let result = verify_state(&json);
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("too large"));
+        assert_eq!(result.unwrap_err(), "Invalid state");
     }
 }
