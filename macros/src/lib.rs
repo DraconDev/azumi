@@ -135,9 +135,6 @@ pub fn html(input: TokenStream) -> TokenStream {
 
             // Runtime HTML generation
             azumi::from_fn(move |f| {
-                if false {
-                   // Legacy code removed
-                }
                 #html_construction
             })
         }
