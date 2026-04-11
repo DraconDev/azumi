@@ -1,7 +1,7 @@
 use crate::token_parser::Element;
 use crate::token_parser::Node;
 use proc_macro2::TokenStream;
-use quote::quote_spanned;
+use quote::{quote, quote_spanned};
 
 /// Rule 10: Component Structure Enforcement
 /// Enforces Script -> Content -> Style order
