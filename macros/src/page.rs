@@ -63,22 +63,22 @@ pub fn expand_page(_attr: TokenStream, item: TokenStream) -> TokenStream {
             #fn_block
         }
 
-        // Public Wrapper
+        // Public Wrapper - uses from_fn to set metadata INSIDE render
         #fn_vis fn #fn_name() -> impl azumi::Component {
-            use azumi::Component;
-            // Set context for Layouts to find.
-            // PageMetaGuard MUST be stored - it resets metadata on drop.
-            // Guard lives until end of scope (after render completes).
-            let _guard = azumi::context::set_page_meta(
-                Some(#title.to_string()),
-                #desc_tokens,
-                None
-            );
-
-            // Render inner (which calls Layout, which calls seo::render_automatic_seo)
-            azumi::html! {
-                @#inner_name()
-            }
+            let title = #title.to_string();
+            let description = #desc_tokens;
+            azumi::from_fn(move |f| {
+                // Set context INSIDE render - guard lives through rendering
+                let _guard = azumi::context::set_page_meta(
+                    Some(title.clone()),
+                    description.clone(),
+                    None
+                );
+                // Render inner (which calls Layout, which calls seo::render_automatic_seo)
+                _inner_ #fn_name ::render(
+                    _inner_ #fn_name ::Props::builder().build().expect("Failed to build props")
+                ).render(f)
+            })
         }
     };
 
