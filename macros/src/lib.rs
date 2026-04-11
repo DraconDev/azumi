@@ -572,7 +572,7 @@ fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool 
         match node {
             token_parser::Node::Element(elem) => {
                 if elem.name == "head" {
-                    let content = format!("{:?}", css);
+                    let content = css.to_string();
                     let text_node = token_parser::Node::Text(token_parser::Text {
                         content,
                         span: elem.span,
