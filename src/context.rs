@@ -1,5 +1,7 @@
 use std::cell::RefCell;
 use std::future::Future;
+use std::rc::Rc;
+use std::thread;
 
 tokio::task_local! {
     static CURRENT_PATH: String;
@@ -26,22 +28,32 @@ pub struct PageMeta {
     pub image: Option<String>,
 }
 
-std::thread_local! {
+thread_local! {
     static PAGE_META: RefCell<PageMeta> = RefCell::new(PageMeta::default());
 }
 
 /// RAII guard that resets PAGE_META to default on drop.
 /// Ensures metadata from one request cannot leak into another.
-pub struct PageMetaGuard;
+#[derive(Clone)]
+pub struct PageMetaGuard(Rc<()>);
+
+impl PageMetaGuard {
+    fn new() -> Self {
+        PageMetaGuard(Rc::new(()))
+    }
+}
 
 impl Drop for PageMetaGuard {
     fn drop(&mut self) {
-        PAGE_META.with(|params| *params.borrow_mut() = PageMeta::default());
+        // Only reset when the last guard is dropped
+        if Rc::strong_count(&self.0) == 1 {
+            PAGE_META.with(|params| *params.borrow_mut() = PageMeta::default());
+        }
     }
 }
 
 /// Set the metadata for the current page render and return a guard.
-/// The guard ensures metadata is reset when the current scope ends.
+/// The guard ensures metadata is reset when all copies of the guard are dropped.
 pub fn set_page_meta(
     title: Option<String>,
     description: Option<String>,
@@ -54,7 +66,7 @@ pub fn set_page_meta(
             image,
         };
     });
-    PageMetaGuard
+    PageMetaGuard::new()
 }
 
 /// Get the current page metadata.
