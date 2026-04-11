@@ -1,7 +1,6 @@
 use std::cell::RefCell;
 use std::future::Future;
 use std::rc::Rc;
-use std::thread;
 
 tokio::task_local! {
     static CURRENT_PATH: String;
