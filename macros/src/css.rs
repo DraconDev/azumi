@@ -185,7 +185,6 @@ fn is_grouping_rule(s: &str) -> bool {
         || s.starts_with("@font-face")
         || s.starts_with("@counter-style")
         || s.starts_with("@font-feature-values")
-        || s.starts_with("@font-face")
 }
 
 fn is_keyframes(s: &str) -> bool {

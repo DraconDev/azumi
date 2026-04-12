@@ -6,7 +6,7 @@ use axum::{
 };
 use std::sync::OnceLock;
 use tokio::sync::broadcast;
-use crate::FallbackRender;
+use crate::{Escaped, FallbackRender};
 
 static BROADCAST_CHANNEL: OnceLock<broadcast::Sender<String>> = OnceLock::new();
 
@@ -100,7 +100,7 @@ impl RuntimeTemplate {
         dynamics: &[&dyn FallbackRender],
     ) -> std::fmt::Result {
         for (i, part) in self.static_parts.iter().enumerate() {
-            write!(f, "{}", part)?;
+            write!(f, "{}", Escaped(part))?;
             if i < dynamics.len() {
                 dynamics[i].render_azumi(f)?;
             }
