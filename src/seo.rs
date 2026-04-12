@@ -345,12 +345,26 @@ impl SitemapBuilder {
             let url = if path.starts_with("http") {
                 path
             } else {
-                format!(
+                let mut candidate = format!(
                     "{}{}{}",
                     base,
                     if path.starts_with('/') { "" } else { "/" },
                     path
-                )
+                );
+                // Validate URL stays within base domain (prevent path traversal)
+                // Remove any /../ sequences by normalizing
+                while let Some(pos) = candidate.find("/../") {
+                    candidate = format!("{}{}", &candidate[..pos], &candidate[pos + 3..]);
+                }
+                // Reject if final URL doesn't start with base
+                if !candidate.starts_with(base) {
+                    eprintln!(
+                        "SEO Warning: Path '{}' resolves outside base URL, skipping",
+                        path
+                    );
+                    continue;
+                }
+                candidate
             };
 
             let escaped_url = xml_escape(&url);
