@@ -133,7 +133,7 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
                 azumi::from_fn(move |f| {
                     let scope_json = <_ as azumi::LiveState>::to_scope(#state_ident);
                     let struct_name = <#live_state_type as azumi::LiveStateMetadata>::struct_name();
-                    write!(f, "<div az-scope=\"{}\" az-struct=\"{}\" style=\"display: contents\">", azumi::Escaped(&scope_json), struct_name)?;
+                    write!(f, "<div az-scope=\"{}\" az-struct=\"{}\" style=\"display: contents\">", azumi::Escaped(&scope_json), azumi::Escaped(struct_name))?;
                     let inner = #fn_block;
                     inner.render(f)?;
                     write!(f, "</div>")?;
