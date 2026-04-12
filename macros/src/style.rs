@@ -526,9 +526,8 @@ pub fn process_global_style_macro(input: TokenStream) -> StyleOutput {
 }
 
 pub fn process_style_macro(input: TokenStream) -> StyleOutput {
-    // 1. Parse the input (clone first to use later for reconstruction)
-    let input_clone = input.clone();
-    let _style_input: StyleInput = match parse2(input) {
+    // 1. Parse the input (only once)
+    let style_input: StyleInput = match parse2(input) {
         Ok(input) => input,
         Err(err) => {
             return StyleOutput {
@@ -538,8 +537,8 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
         }
     };
 
-    // 2. Reconstruct CSS string (with quotes removed from values)
-    let raw_css = reconstruct_css_from_tokens(input_clone);
+    // 2. Reconstruct CSS string from already-parsed AST (no re-parsing)
+    let raw_css = reconstruct_css_from_parsed(&style_input);
 
     // 3. Extract classes and IDs for bindings
     let (classes, ids) = extract_selectors(&raw_css);
@@ -596,6 +595,38 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
         bindings,
         css: minify_css(&raw_css),
     }
+}
+
+/// Reconstruct CSS string from already-parsed AST (no re-parsing)
+pub fn reconstruct_css_from_parsed(style_input: &StyleInput) -> String {
+    let mut raw_css = String::new();
+
+    for item in &style_input.items {
+        match item {
+            StyleItem::AtRule(at_rule) => {
+                raw_css.push('@');
+                raw_css.push_str(&at_rule.name);
+                raw_css.push(' ');
+                raw_css.push_str(&at_rule.content);
+                if !at_rule.content.trim().ends_with('}') {
+                    raw_css.push(';');
+                }
+                raw_css.push(' ');
+            }
+            StyleItem::Rule(rule) => {
+                let selector_str = tokens_to_css_string(&rule.selectors);
+
+                raw_css.push_str(&selector_str);
+                raw_css.push_str(" { ");
+                for prop in &rule.block.properties {
+                    raw_css.push_str(&format!("{}: {}; ", prop.name, prop.value));
+                }
+                raw_css.push_str("} ");
+            }
+        }
+    }
+
+    raw_css
 }
 
 /// Reconstruct CSS string from TokenStream (parsing and formatting)
