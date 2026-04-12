@@ -641,13 +641,16 @@ fn generate_body(
         let mut working_nodes = nodes.to_vec();
         let injected = inject_css_into_head(&mut working_nodes, &css_to_inject);
 
-        let ctx = if let Some(sid) = &scope_id {
-            GenerationContext::with_scope(sid.clone(), valid_classes.clone(), valid_ids.clone())
+        let body_content = if let Some(sid) = &scope_id {
+            let ctx = GenerationContext::with_scope(
+                sid.clone(),
+                valid_classes.clone(),
+                valid_ids.clone(),
+            );
+            generate_body_with_context(&working_nodes, &ctx)
         } else {
-            GenerationContext::normal()
+            generate_body_with_context(&working_nodes, &GenerationContext::normal())
         };
-
-        let body_content = generate_body_with_context(&working_nodes, &ctx);
 
         if injected {
             body_content
