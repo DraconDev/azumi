@@ -638,10 +638,9 @@ fn generate_body(
             )
         };
 
-        let mut working_nodes = nodes.to_vec();
-        let injected = inject_css_into_head(&mut working_nodes, &css_to_inject);
-
         let body_content = if let Some(sid) = &scope_id {
+            let mut working_nodes = nodes.to_vec();
+            inject_css_into_head(&mut working_nodes, &css_to_inject);
             let ctx = GenerationContext::with_scope(
                 sid.clone(),
                 valid_classes.clone(),
@@ -649,17 +648,9 @@ fn generate_body(
             );
             generate_body_with_context(&working_nodes, &ctx)
         } else {
-            generate_body_with_context(&working_nodes, &GenerationContext::normal())
+            inject_css_into_head(&mut nodes.to_vec(), &css_to_inject);
+            generate_body_with_context(nodes, &GenerationContext::normal())
         };
-
-        if injected {
-            body_content
-        } else {
-            quote! {
-                write!(f, "{}", #css_to_inject)?;
-                #body_content
-            }
-        }
     } else {
         generate_body_with_context(nodes, &GenerationContext::normal())
     }
