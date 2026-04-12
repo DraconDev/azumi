@@ -328,8 +328,8 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut component_name = None;
 
     for arg in args {
-        if let syn::Meta::NameValue(nv) = arg {
-            if nv.path.is_ident("component") {
+        match arg {
+            syn::Meta::NameValue(nv) if nv.path.is_ident("component") => {
                 if let syn::Expr::Lit(syn::ExprLit {
                     lit: syn::Lit::Str(lit),
                     ..
@@ -338,6 +338,16 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                     component_name = Some(lit.value());
                 }
             }
+            syn::Meta::List(list) if list.path.is_ident("component") => {
+                if let Some(first) = list.tokens.first() {
+                    if let proc_macro2::TokenTree::Literal(lit) = first {
+                        if let Ok(s) = lit.parse::<syn::LitStr>() {
+                            component_name = Some(s.value());
+                        }
+                    }
+                }
+            }
+            _ => {}
         }
     }
 
