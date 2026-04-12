@@ -431,19 +431,26 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     if selector.starts_with('@') || selector.starts_with("/*") {
         return selector.to_string();
     }
-    // Web Components shadow DOM selectors - do NOT scope these
     if selector.starts_with(":host") || selector.starts_with("::slotted") || selector.starts_with("::part") {
         return selector.to_string();
     }
+    // Handle pseudo-elements (::before, ::after, etc.)
     if let Some(pseudo_pos) = selector.find("::") {
+        let base_and_pseudos = &selector[..pseudo_pos];
+        let pseudo_element = &selector[pseudo_pos..];
+        // Check if base has pseudo-classes (e.g., div:hover::before)
+        if let Some(class_pos) = base_and_pseudos.rfind(':') {
+            let base = &base_and_pseudos[..class_pos];
+            let pseudo_classes = &base_and_pseudos[class_pos..];
+            return format!("{}{}{}{}", base, pseudo_classes, scope_attr, pseudo_element);
+        }
+        return format!("{}{}{}", base_and_pseudos, scope_attr, pseudo_element);
+    }
+    // Handle pseudo-classes only (no :: pseudo-element) - use rfind for last colon
+    if let Some(pseudo_pos) = selector.rfind(':') {
         let base = &selector[..pseudo_pos];
         let pseudo = &selector[pseudo_pos..];
         return format!("{}{}{}", base, scope_attr, pseudo);
-    }
-    if let Some(pseudo_pos) = selector.find(':') {
-        let base = &selector[..pseudo_pos];
-        let pseudo = &selector[pseudo_pos..];
-        return format!("{}{}{}", base, pseudo, scope_attr);
     }
     format!("{}{}", selector, scope_attr)
 }
