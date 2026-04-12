@@ -60,9 +60,13 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
                 let json_value = self.to_schema_json_value();
                 let json_string = serde_json::to_string_pretty(&json_value)
                     .expect("Failed to serialize schema to JSON");
+                let escaped_json = json_string
+                    .replace('&', "&amp;")
+                    .replace('<', "&lt;")
+                    .replace('>', "&gt;");
                 format!(
                     "<script type=\"application/ld+json\">\n{}\n</script>",
-                    json_string
+                    escaped_json
                 )
             }
 
