@@ -486,6 +486,8 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
+        impl azumi::LiveState for #struct_name {}
+
         // Generated handlers module (unique name per struct to avoid collisions)
         #[allow(non_snake_case)]
         mod #handler_mod {
