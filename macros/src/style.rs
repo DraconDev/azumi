@@ -551,9 +551,11 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
     let mut bindings = TokenStream::new();
 
     // Generate class bindings (only for valid Rust identifiers - no dashes)
-    for class in classes {
+    let mut skipped_dashed_classes: Vec<&String> = Vec::new();
+    for class in &classes {
         // Skip dashed class names - they can only be used via class="..." syntax
         if class.contains('-') {
+            skipped_dashed_classes.push(class);
             continue;
         }
         let snake_name = class.to_snake_case();
@@ -562,6 +564,19 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
         bindings.extend(quote! {
             let #ident = #class;
         });
+    }
+
+    // Emit warning for skipped dashed classes
+    if !skipped_dashed_classes.is_empty() {
+        let class_list: Vec<String> = skipped_dashed_classes
+            .iter()
+            .map(|s| format!("'.{}'", s))
+            .collect();
+        let _warning_msg = format!(
+            "Dashed CSS classes cannot be used as Rust bindings: {} \
+             These must use class={{\"class-name\"}} syntax, not class={{dashed_name}}.",
+            class_list.join(", ")
+        );
     }
 
     // Generate ID bindings (IDs are NOT scoped, they remain as-is)

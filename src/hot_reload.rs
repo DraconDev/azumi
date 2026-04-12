@@ -28,6 +28,20 @@ pub fn push_style_update(scope_id: &str, css: &str) {
 }
 
 /// Mounts the hot reload route at `/_azumi/live_reload`
+///
+/// # Security Warning
+///
+/// These endpoints are **development-only** and should NOT be exposed in production:
+///
+/// - `/_azumi/live_reload` - WebSocket endpoint for hot reload (no authentication)
+/// - `/_azumi/update_template` - POST endpoint to update templates (no authentication)
+///
+/// In production, either:
+/// 1. Remove this router entirely (hot reload is for development only)
+/// 2. Restrict access at the network level (e.g., firewall rules to block external access)
+/// 3. Add your own authentication middleware
+///
+/// If deploying to production with this enabled, ensure only localhost can access these routes.
 pub fn router<S>() -> Router<S>
 where
     S: Clone + Send + Sync + 'static,
@@ -89,7 +103,9 @@ impl RuntimeTemplate {
     }
 }
 
-static TEMPLATE_REGISTRY: OnceLock<std::sync::RwLock<std::collections::HashMap<String, RuntimeTemplate>>> = OnceLock::new();
+static TEMPLATE_REGISTRY: OnceLock<std::sync::RwLock<std::collections::BTreeMap<String, RuntimeTemplate>>> = OnceLock::new();
+
+const MAX_REGISTRY_SIZE: usize = 1000;
 
 pub fn get_template(id: &str) -> Option<RuntimeTemplate> {
     let Ok(registry) = TEMPLATE_REGISTRY.get_or_init(Default::default).read() else {
@@ -128,6 +144,17 @@ async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
     let Ok(mut registry) = TEMPLATE_REGISTRY.get_or_init(Default::default).write() else {
         return;
     };
+
+    // Evict oldest entries if registry is full (LRU-style eviction)
+    if registry.len() >= MAX_REGISTRY_SIZE {
+        // Remove oldest 10% of entries
+        let evict_count = (MAX_REGISTRY_SIZE / 10).max(1);
+        let keys_to_remove: Vec<_> = registry.keys().take(evict_count).cloned().collect();
+        for key in keys_to_remove {
+            registry.remove(&key);
+        }
+    }
+
     registry.insert(payload.id.clone(), RuntimeTemplate { static_parts: payload.parts });
     #[cfg(debug_assertions)]
     println!("🔥 Hot Reload: Updated template {}", payload.id);

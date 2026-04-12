@@ -203,7 +203,7 @@ fn extract_templates_internal(content: &str, file_path: &str) -> HashMap<String,
         };
 
         let last_line = pre.lines().last().unwrap_or("");
-        let col = last_line.len() + 1;
+        let col = last_line.chars().count() + 1; // Use char count, not byte count for UTF-8
 
         let mut depth = 1;
         let mut inner_end = 0;
@@ -271,7 +271,7 @@ fn watch_loop() -> Result<(), Box<dyn std::error::Error>> {
     use std::sync::mpsc::channel;
 
     let (tx, rx) = channel();
-    let mut watcher = notify::recommended_watcher(tx)?;
+    let mut watcher = notify::recommended_watcher(tx).expect("Failed to initialize file watcher. This may happen if there are too many open file descriptors or insufficient permissions.");
 
     // Watch src directory
     if Path::new("src").exists() {

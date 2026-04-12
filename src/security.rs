@@ -76,6 +76,14 @@ pub fn verify_state(signed_state: &str) -> Result<String, String> {
         return Err("Invalid state".to_string());
     }
 
+    // Limit pipe count to prevent algorithmic complexity attack
+    // The parsing uses rfind twice, so O(n) per pipe. With many pipes, this becomes O(n²).
+    // A signed state should only have 2 pipes (json|timestamp|signature), so allow 10 as buffer.
+    let pipe_count = signed_state.matches('|').count();
+    if pipe_count > 10 {
+        return Err("Invalid state".to_string());
+    }
+
     // Expected format: "json|timestamp|signature"
     // Find last two pipe positions since JSON could contain |
     let last_pipe = match signed_state.rfind('|') {
@@ -98,6 +106,11 @@ pub fn verify_state(signed_state: &str) -> Result<String, String> {
     };
 
     let current_time = get_current_timestamp();
+
+    // Reject u64::MAX timestamp - this would bypass expiration via saturating_sub
+    if timestamp == u64::MAX {
+        return Err("Invalid state".to_string());
+    }
 
     // Check if timestamp is too old (expired)
     if current_time.saturating_sub(timestamp) > MAX_STATE_AGE_SECS {

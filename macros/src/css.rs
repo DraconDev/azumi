@@ -95,6 +95,18 @@ fn scope_css_level(iter: &mut Peekable<Chars>, scope_attr: &str, finding_close: 
     let mut buffer = String::new();
 
     while let Some(ch) = iter.next() {
+        // Skip strings (single and double quoted)
+        if ch == '"' || ch == '\'' {
+            buffer.push(ch);
+            let quote = ch;
+            while let Some(c) = iter.next() {
+                buffer.push(c);
+                if c == quote {
+                    break;
+                }
+            }
+            continue;
+        }
         match ch {
             '{' => {
                 let selector_raw = buffer.trim().to_string();
@@ -169,6 +181,11 @@ fn is_grouping_rule(s: &str) -> bool {
         || s.starts_with("@supports")
         || s.starts_with("@layer")
         || s.starts_with("@container")
+        || s.starts_with("@property")
+        || s.starts_with("@font-face")
+        || s.starts_with("@counter-style")
+        || s.starts_with("@font-feature-values")
+        || s.starts_with("@font-face")
 }
 
 fn is_keyframes(s: &str) -> bool {

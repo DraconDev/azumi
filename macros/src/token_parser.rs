@@ -491,7 +491,10 @@ impl Parse for Element {
             }) {
                 attrs.remove(pos);
                 // Using syn::parse_str to create the expression
-                let expr: syn::Expr = syn::parse_str("azumi::Raw(azumi::AZUMI_JS)").unwrap();
+                // This is a hardcoded string, so unwrap is safe here - it will only panic
+                // if the azumi crate doesn't export Raw and AZUMI_JS (which would be a build error anyway)
+                let expr: syn::Expr = syn::parse_str("azumi::Raw(azumi::AZUMI_JS)")
+                    .expect("azumi::Raw and azumi::AZUMI_JS must be available - ensure azumi crate is properly imported");
                 children.push(Node::Expression(Expression {
                     content: expr.to_token_stream(),
                     span: Span::call_site(),

@@ -989,7 +989,7 @@ fn generate_body_with_context(
                 let clean_content = strip_outer_quotes(content);
                 if !clean_content.is_empty() {
                     instructions.push(quote! {
-                        write!(f, "{}", #clean_content)?;
+                        write!(f, "{}", azumi::Escaped(&#clean_content))?;
                     });
                 }
             }
@@ -1031,13 +1031,13 @@ fn generate_body_with_context(
                             token_parser::AttributeValue::Dynamic(tokens) => {
                                 let s = tokens.to_string(); // Stringify tokens
                                 instructions.push(quote! {
-                                    write!(f, " {}=\"{}\"", #attr_name, #s)?;
+                                    write!(f, " {}=\"{}\"", #attr_name, azumi::Escaped(&#s))?;
                                 });
                             }
                             token_parser::AttributeValue::Static(val) => {
                                 let clean = strip_outer_quotes(val);
                                 instructions.push(quote! {
-                                    write!(f, " {}=\"{}\"", #attr_name, #clean)?;
+                                    write!(f, " {}=\"{}\"", #attr_name, azumi::Escaped(&#clean))?;
                                 });
                             }
                             _ => {}

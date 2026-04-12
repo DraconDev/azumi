@@ -293,8 +293,9 @@ pub fn expand_live(_attr: TokenStream, item: TokenStream) -> TokenStream {
         impl #struct_generics #struct_name #struct_generics {
             /// Serialize state for az-scope attribute
             pub fn to_scope(&self) -> String {
-                let json = serde_json::to_string(self)
-                    .expect("LiveState serialization failed: ensure all fields implement Serialize");
+                let json = serde_json::to_string(self).unwrap_or_else(|e| {
+                    panic!("LiveState serialization failed: {}. Ensure all fields implement Serialize and types are JSON-serializable.", e)
+                });
                 azumi::security::sign_state(&json)
             }
         }
@@ -314,7 +315,13 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     let struct_name_str = struct_name_str.replace(" ", "");
 
     // Unique module name per struct to avoid collisions when multiple live_impls exist
-    let handler_mod = format_ident!("__azumi_live_{}", struct_name_str.to_lowercase());
+    // Use base64 encoding of struct name to avoid Foo/FOO collision issue
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+    let mut hasher = DefaultHasher::new();
+    struct_name_str.hash(&mut hasher);
+    let hash_suffix = format!("{:x}", hasher.finish());
+    let handler_mod = format_ident!("__azumi_live_{}", hash_suffix);
 
     // Parse attributes to find component="name"
     let args = parse_macro_input!(attr with syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated);
