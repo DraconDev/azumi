@@ -571,8 +571,8 @@ pub fn process_style_macro(input: TokenStream) -> StyleOutput {
             .iter()
             .map(|s| format!("'.{}'", s))
             .collect();
-        let _warning_msg = format!(
-            "Dashed CSS classes cannot be used as Rust bindings: {} \
+        eprintln!(
+            "WARNING: Dashed CSS classes cannot be used as Rust bindings: {} \
              These must use class={{\"class-name\"}} syntax, not class={{dashed_name}}.",
             class_list.join(", ")
         );
