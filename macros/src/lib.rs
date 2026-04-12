@@ -303,7 +303,7 @@ fn collect_input_names(
                                     .collect();
 
                                 errors.push(quote! {
-                                    let _ = &data.#(#field_idents).*;
+                                    let _ = &data.#(#field_idents)*;
                                 });
                             }
                         }
