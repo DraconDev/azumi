@@ -450,7 +450,7 @@ fn strip_outer_quotes(s: &str) -> String {
         && ((trimmed.starts_with('"') && trimmed.ends_with('"'))
             || (trimmed.starts_with('\'') && trimmed.ends_with('\'')))
     {
-        return trimmed[1..trimmed.len() - 1].to_string();
+        return trimmed[1..trimmed.len()].to_string();
     }
     s.to_string()
 }
