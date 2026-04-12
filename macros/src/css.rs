@@ -265,7 +265,8 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
         return format!("{}{}{}", base_and_pseudos, scope_attr, pseudo_element);
     }
     // Handle pseudo-classes only (no :: pseudo-element)
-    if let Some(pseudo_pos) = selector.find(':') {
+    // Use rfind to find the LAST colon (the pseudo-class colon)
+    if let Some(pseudo_pos) = selector.rfind(':') {
         let base = &selector[..pseudo_pos];
         let pseudo = &selector[pseudo_pos..];
         return format!("{}{}{}", base, scope_attr, pseudo);
