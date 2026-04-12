@@ -1024,7 +1024,7 @@ fn generate_body_with_context(
                                 token_parser::AttributeValue::Static(val) => {
                                     let clean = strip_outer_quotes(val);
                                     instructions.push(quote! {
-                                        write!(f, " {}=\"{}\"", #attr_name, #clean)?;
+                                        write!(f, " {}=\"{}\"", #attr_name, azumi::Escaped(&#clean))?;
                                     });
                                 }
                                 _ => {}
