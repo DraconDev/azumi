@@ -302,8 +302,14 @@ fn collect_input_names(
                                     .map(|s| proc_macro2::Ident::new(s, span))
                                     .collect();
 
+                                // Generate validation code to check field path exists at compile time
+                                // For "parent.child", generates: let _ = &data.parent.child;
+                                let mut field_path = quote! { data };
+                                for ident in &field_idents {
+                                    field_path = quote! { #field_path.#ident };
+                                }
                                 errors.push(quote! {
-                                    let _ = &data.#(#field_idents)*;
+                                    let _ = &#field_path;
                                 });
                             }
                         }
@@ -1167,7 +1173,7 @@ fn generate_body_with_context(
                             token_parser::AttributeValue::Static(val) => {
                                 let clean = strip_outer_quotes(val);
                                 instructions.push(quote! {
-                                    write!(f, " {}=\"{}\"", #attr_name, #clean)?;
+                                    write!(f, " {}=\"{}\"", #attr_name, azumi::Escaped(&#clean))?;
                                 });
                             }
                             token_parser::AttributeValue::Dynamic(expr) => {

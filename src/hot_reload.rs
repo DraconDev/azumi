@@ -68,9 +68,15 @@ async fn handle_socket(mut socket: WebSocket) {
                     }
                 }
             }
-            // Handle incoming websocket messages (to detect closure)
+            // Handle incoming websocket messages (to detect closure and keep alive)
             res = socket.recv() => {
                 match res {
+                    Some(Ok(Message::Ping(data))) => {
+                        // Respond to ping to keep connection alive through proxies
+                        if socket.send(Message::Pong(data)).await.is_err() {
+                            break;
+                        }
+                    }
                     Some(Ok(Message::Close(_))) => break,
                     Some(Err(_)) => break,
                     None => break,
@@ -109,6 +115,9 @@ const MAX_REGISTRY_SIZE: usize = 1000;
 
 pub fn get_template(id: &str) -> Option<RuntimeTemplate> {
     let Ok(registry) = TEMPLATE_REGISTRY.get_or_init(Default::default).read() else {
+        // RwLock poisoning indicates a prior panic in a writer - this is a serious issue
+        // Return None rather than panicking again, but this may indicate underlying problems
+        eprintln!("Hot Reload: Registry lock poisoned - template lookup failed");
         return None;
     };
     registry.get(id).cloned()
@@ -142,10 +151,13 @@ async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
     }
 
     let Ok(mut registry) = TEMPLATE_REGISTRY.get_or_init(Default::default).write() else {
+        eprintln!("Hot Reload: Registry lock poisoned - template update failed");
         return;
     };
 
-    // Evict oldest entries if registry is full (LRU-style eviction)
+    // Evict entries when registry is full
+    // Note: This evicts alphabetically (BTreeMap key order), NOT by insertion time.
+    // This is NOT true LRU - it's just preventing unbounded growth.
     if registry.len() >= MAX_REGISTRY_SIZE {
         // Remove oldest 10% of entries
         let evict_count = (MAX_REGISTRY_SIZE / 10).max(1);

@@ -15,7 +15,7 @@ static SECRET: OnceLock<String> = OnceLock::new();
 fn get_secret() -> &'static str {
     SECRET
         .get_or_init(|| {
-            env::var("AZUMI_SECRET").unwrap_or_else(|_| {
+            let env_secret = env::var("AZUMI_SECRET").unwrap_or_else(|_| {
                 #[cfg(debug_assertions)]
                 {
                     eprintln!(
@@ -27,11 +27,26 @@ fn get_secret() -> &'static str {
                 {
                     panic!(
                         "FATAL: AZUMI_SECRET environment variable is REQUIRED in release builds.\n\
-                     The default dev secret is publicly known and insecure.\n\
-                     Set AZUMI_SECRET to a random 64+ character string before deploying."
+                      The default dev secret is publicly known and insecure.\n\
+                      Set AZUMI_SECRET to a random 64+ character string before deploying."
                     );
                 }
-            })
+            });
+
+            // Reject empty secrets as insecure
+            if env_secret.is_empty() {
+                #[cfg(debug_assertions)]
+                {
+                    eprintln!("⚠️  WARNING: AZUMI_SECRET is empty. Using default dev secret.");
+                    DEFAULT_SECRET.to_string()
+                }
+                #[cfg(not(debug_assertions))]
+                {
+                    panic!("FATAL: AZUMI_SECRET cannot be empty. Set a non-empty random string.");
+                }
+            } else {
+                env_secret
+            }
         })
         .as_str()
 }
