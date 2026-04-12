@@ -630,12 +630,14 @@ fn generate_body(
             } else {
                 format!("<style>{}</style>", global_css)
             }
-        } else {
+        } else if has_scoped {
             format!(
                 "<style data-azumi-scope=\"{}\">{}</style>",
                 scope_id.as_ref().unwrap(),
                 scoped_output
             )
+        } else {
+            String::new()
         };
 
         let (body_content, css_injected) = if let Some(sid) = &scope_id {
