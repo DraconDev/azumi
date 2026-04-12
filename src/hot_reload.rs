@@ -1,4 +1,4 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
 use std::sync::OnceLock;
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
@@ -25,7 +25,6 @@ struct LRUEntry<V> {
 
 struct LRUCache<K, V> {
     map: HashMap<K, LRUEntry<V>>,
-    order: VecDeque<K>,
     next_access_id: u64,
 }
 
@@ -33,30 +32,31 @@ impl<K: std::hash::Hash + Eq, V> LRUCache<K, V> {
     fn new() -> Self {
         Self {
             map: HashMap::new(),
-            order: VecDeque::new(),
             next_access_id: 0,
         }
     }
 
     fn insert(&mut self, key: K, value: V) {
+        let access_id = self.next_access_id;
+        self.next_access_id = self.next_access_id.wrapping_add(1);
+
         if let Some(entry) = self.map.get_mut(&key) {
             entry.value = value;
-            entry.last_access = self.next_access_id;
-            self.next_access_id += 1;
+            entry.last_access = access_id;
             return;
         }
-        self.map.insert(key.clone(), LRUEntry {
+        self.map.insert(key, LRUEntry {
             value,
-            last_access: self.next_access_id,
+            last_access: access_id,
         });
-        self.order.push_back(key);
-        self.next_access_id += 1;
     }
 
     fn get(&mut self, key: &K) -> Option<&V> {
+        let access_id = self.next_access_id;
+        self.next_access_id = self.next_access_id.wrapping_add(1);
+
         if let Some(entry) = self.map.get_mut(key) {
-            entry.last_access = self.next_access_id;
-            self.next_access_id += 1;
+            entry.last_access = access_id;
             Some(&entry.value)
         } else {
             None
@@ -65,8 +65,13 @@ impl<K: std::hash::Hash + Eq, V> LRUCache<K, V> {
 
     fn evict_lru(&mut self, count: usize) {
         for _ in 0..count {
-            if let Some(oldest) = self.order.pop_front() {
-                self.map.remove(&oldest);
+            if let Some(oldest_key) = self
+                .map
+                .iter()
+                .min_by_key(|(_, entry)| entry.last_access)
+                .map(|(k, _)| k.clone())
+            {
+                self.map.remove(&oldest_key);
             }
         }
     }
