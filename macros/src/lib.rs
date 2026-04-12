@@ -638,19 +638,32 @@ fn generate_body(
             )
         };
 
-        let body_content = if let Some(sid) = &scope_id {
+        let (body_content, css_injected) = if let Some(sid) = &scope_id {
             let mut working_nodes = nodes.to_vec();
-            inject_css_into_head(&mut working_nodes, &css_to_inject);
+            let injected = inject_css_into_head(&mut working_nodes, &css_to_inject);
             let ctx = GenerationContext::with_scope(
                 sid.clone(),
                 valid_classes.clone(),
                 valid_ids.clone(),
             );
-            generate_body_with_context(&working_nodes, &ctx)
+            (generate_body_with_context(&working_nodes, &ctx), injected)
         } else {
-            inject_css_into_head(&mut nodes.to_vec(), &css_to_inject);
-            generate_body_with_context(nodes, &GenerationContext::normal())
+            let mut temp_nodes = nodes.to_vec();
+            let injected = inject_css_into_head(&mut temp_nodes, &css_to_inject);
+            (
+                generate_body_with_context(&temp_nodes, &GenerationContext::normal()),
+                injected,
+            )
         };
+
+        if css_injected {
+            body_content
+        } else {
+            quote! {
+                write!(f, "{}", #css_to_inject)?;
+                #body_content
+            }
+        }
     } else {
         generate_body_with_context(nodes, &GenerationContext::normal())
     }
