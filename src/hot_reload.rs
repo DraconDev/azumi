@@ -1,10 +1,11 @@
+use std::collections::{HashMap, VecDeque};
+use std::sync::OnceLock;
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
     response::IntoResponse,
     routing::{get, post},
     Json, Router,
 };
-use std::sync::OnceLock;
 use tokio::sync::broadcast;
 use crate::{Escaped, FallbackRender};
 
@@ -16,6 +17,72 @@ fn get_broadcast_channel() -> &'static broadcast::Sender<String> {
         tx
     })
 }
+
+struct LRUEntry<V> {
+    value: V,
+    last_access: u64,
+}
+
+struct LRUCache<K, V> {
+    map: HashMap<K, LRUEntry<V>>,
+    order: VecDeque<K>,
+    next_access_id: u64,
+}
+
+impl<K: std::hash::Hash + Eq, V> LRUCache<K, V> {
+    fn new() -> Self {
+        Self {
+            map: HashMap::new(),
+            order: VecDeque::new(),
+            next_access_id: 0,
+        }
+    }
+
+    fn insert(&mut self, key: K, value: V) {
+        if let Some(entry) = self.map.get_mut(&key) {
+            entry.value = value;
+            entry.last_access = self.next_access_id;
+            self.next_access_id += 1;
+            return;
+        }
+        self.map.insert(key.clone(), LRUEntry {
+            value,
+            last_access: self.next_access_id,
+        });
+        self.order.push_back(key);
+        self.next_access_id += 1;
+    }
+
+    fn get(&mut self, key: &K) -> Option<&V> {
+        if let Some(entry) = self.map.get_mut(key) {
+            entry.last_access = self.next_access_id;
+            self.next_access_id += 1;
+            Some(&entry.value)
+        } else {
+            None
+        }
+    }
+
+    fn evict_lru(&mut self, count: usize) {
+        for _ in 0..count {
+            if let Some(oldest) = self.order.pop_front() {
+                self.map.remove(&oldest);
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.map.len()
+    }
+}
+
+impl<K, V> Default for LRUCache<K, V> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+static TEMPLATE_REGISTRY: OnceLock<std::sync::RwLock<LRUCache<String, RuntimeTemplate>>> = OnceLock::new();
 
 /// Pushes a style update to all connected clients
 pub fn push_style_update(scope_id: &str, css: &str) {
@@ -60,7 +127,6 @@ async fn handle_socket(mut socket: WebSocket) {
 
     loop {
         tokio::select! {
-            // Forward broadcasted messages to the websocket
             msg = rx.recv() => {
                 if let Ok(msg) = msg {
                     if socket.send(Message::Text(msg)).await.is_err() {
@@ -68,11 +134,9 @@ async fn handle_socket(mut socket: WebSocket) {
                     }
                 }
             }
-            // Handle incoming websocket messages (to detect closure and keep alive)
             res = socket.recv() => {
                 match res {
                     Some(Ok(Message::Ping(data))) => {
-                        // Respond to ping to keep connection alive through proxies
                         if socket.send(Message::Pong(data)).await.is_err() {
                             break;
                         }
@@ -87,7 +151,6 @@ async fn handle_socket(mut socket: WebSocket) {
     }
 }
 
-// Runtime Template Support
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub struct RuntimeTemplate {
     pub static_parts: Vec<String>,
@@ -109,14 +172,10 @@ impl RuntimeTemplate {
     }
 }
 
-static TEMPLATE_REGISTRY: OnceLock<std::sync::RwLock<std::collections::BTreeMap<String, RuntimeTemplate>>> = OnceLock::new();
-
 const MAX_REGISTRY_SIZE: usize = 1000;
 
 pub fn get_template(id: &str) -> Option<RuntimeTemplate> {
-    let Ok(registry) = TEMPLATE_REGISTRY.get_or_init(Default::default).read() else {
-        // RwLock poisoning indicates a prior panic in a writer - this is a serious issue
-        // Return None rather than panicking again, but this may indicate underlying problems
+    let Ok(mut registry) = TEMPLATE_REGISTRY.get_or_init(Default::default).write() else {
         eprintln!("Hot Reload: Registry lock poisoned - template lookup failed");
         return None;
     };
@@ -124,7 +183,7 @@ pub fn get_template(id: &str) -> Option<RuntimeTemplate> {
 }
 
 const MAX_TEMPLATE_PARTS: usize = 100;
-const MAX_PART_SIZE: usize = 100_000; // 100KB per part
+const MAX_PART_SIZE: usize = 100_000;
 const MAX_TEMPLATE_ID_LEN: usize = 256;
 
 #[derive(serde::Deserialize)]
@@ -134,7 +193,6 @@ struct TemplateUpdatePayload {
 }
 
 async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
-    // Validate input
     if payload.id.len() > MAX_TEMPLATE_ID_LEN {
         eprintln!("Hot Reload: Template ID too long");
         return;
@@ -155,20 +213,13 @@ async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
         return;
     };
 
-    // Evict entries when registry is full
-    // Note: This evicts alphabetically (BTreeMap key order), NOT by insertion time.
-    // This is NOT true LRU - it's just preventing unbounded growth.
     if registry.len() >= MAX_REGISTRY_SIZE {
-        // Remove oldest 10% of entries
         let evict_count = (MAX_REGISTRY_SIZE / 10).max(1);
-        let keys_to_remove: Vec<_> = registry.keys().take(evict_count).cloned().collect();
-        for key in keys_to_remove {
-            registry.remove(&key);
-        }
+        registry.evict_lru(evict_count);
     }
 
     registry.insert(payload.id.clone(), RuntimeTemplate { static_parts: payload.parts });
     #[cfg(debug_assertions)]
-    println!("🔥 Hot Reload: Updated template {}", payload.id);
+    println!("Hot Reload: Updated template {}", payload.id);
     let _ = get_broadcast_channel().send(serde_json::json!({"type": "reload"}).to_string());
 }

@@ -106,13 +106,10 @@ pub fn html(input: TokenStream) -> TokenStream {
     // 1. Process styles (hoist <style> tags)
     let (style_bindings, _scoped_css, _global_css) = process_styles(&nodes);
 
-    // 2. CSS dependencies are no longer collected for external files
-    let css_deps: Vec<proc_macro2::TokenStream> = Vec::new();
-
-    // 3. Generate HTML string construction code
+    // 2. Generate HTML string construction code
     let html_construction = generate_nodes(&nodes);
 
-    // 4. Generate bind validation checks
+    // 3. Generate bind validation checks
     let mut validation_checks = Vec::new();
     collect_bind_checks(&nodes, &mut validation_checks);
 
@@ -124,9 +121,6 @@ pub fn html(input: TokenStream) -> TokenStream {
 
             // Inject style bindings (hoisted)
             #style_bindings
-
-            // CSS dependency tracking (forces recompile when CSS changes)
-            #(#css_deps)*
 
             // Validation block (compile-time only)
             const _: () = {

@@ -250,11 +250,21 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     {
         return selector.to_string();
     }
+    // Handle pseudo-elements (::before, ::after, etc.)
+    // They must come AFTER pseudo-classes in the selector
     if let Some(pseudo_pos) = selector.find("::") {
-        let base = &selector[..pseudo_pos];
-        let pseudo = &selector[pseudo_pos..];
-        return format!("{}{}{}", base, scope_attr, pseudo);
+        let base_and_pseudos = &selector[..pseudo_pos];
+        let pseudo_element = &selector[pseudo_pos..];
+        // Check if base has pseudo-classes (e.g., div:hover::before)
+        if let Some(class_pos) = base_and_pseudos.rfind(':') {
+            let base = &base_and_pseudos[..class_pos];
+            let pseudo_classes = &base_and_pseudos[class_pos..];
+            return format!("{}{}{}{}", base, pseudo_classes, scope_attr, pseudo_element);
+        }
+        // No pseudo-classes, just base + pseudo-element
+        return format!("{}{}{}", base_and_pseudos, scope_attr, pseudo_element);
     }
+    // Handle pseudo-classes only (no :: pseudo-element)
     if let Some(pseudo_pos) = selector.find(':') {
         let base = &selector[..pseudo_pos];
         let pseudo = &selector[pseudo_pos..];
