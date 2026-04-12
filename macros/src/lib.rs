@@ -1190,7 +1190,7 @@ fn generate_body_with_context(
 
                 if let Some(sid) = &ctx.scope_id {
                     instructions.push(quote! {
-                        write!(f, " data-{}", #sid)?;
+                        write!(f, " data-{}=\"{}\"", #sid, #sid)?;
                     });
                 }
 
