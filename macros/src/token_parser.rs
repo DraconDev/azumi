@@ -1337,6 +1337,16 @@ impl Parse for Fragment {
 
         input.parse::<Token![<]>()?;
         input.parse::<Token![/]>()?;
+        let (closing_name, _) = parse_html_name(input, false)?;
+        if closing_name != "fragment" {
+            return Err(Error::new(
+                input.span(),
+                format!(
+                    "Invalid closing tag for fragment: expected </fragment>, found </{}>",
+                    closing_name
+                ),
+            ));
+        }
         input.parse::<Token![>]>()?;
 
         Ok(Fragment { children, span })
