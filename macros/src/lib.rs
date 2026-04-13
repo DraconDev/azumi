@@ -447,7 +447,23 @@ fn strip_outer_quotes(s: &str) -> String {
         && ((trimmed.starts_with('"') && trimmed.ends_with('"'))
             || (trimmed.starts_with('\'') && trimmed.ends_with('\'')))
     {
-        trimmed[1..trimmed.len() - 1].to_string()
+        let quote_char = trimmed.chars().next().unwrap();
+        let mut result = String::with_capacity(trimmed.len() - 2);
+        let mut chars = trimmed[1..trimmed.len() - 1].chars().peekable();
+
+        while let Some(c) = chars.next() {
+            if c == '\\' {
+                if let Some(&next) = chars.peek() {
+                    if next == quote_char || next == '\\' {
+                        result.push(next);
+                        chars.next();
+                        continue;
+                    }
+                }
+            }
+            result.push(c);
+        }
+        result
     } else {
         s.to_string()
     }
