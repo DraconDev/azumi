@@ -163,6 +163,7 @@ pub fn verify_state(signed_state: &str) -> Result<String, String> {
     }
 
     let secret = get_secret();
+    assert!(!secret.is_empty(), "AZUMI_SECRET must not be empty");
     let mut mac =
         HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC can take any size key");
 
