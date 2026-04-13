@@ -297,9 +297,21 @@ async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
         }
     }
 
-    if registry.len() >= MAX_REGISTRY_SIZE {
+    // Atomic check-and-evict: loop until we have room or hit max capacity
+    while registry.len() >= MAX_REGISTRY_SIZE {
         let evict_count = (MAX_REGISTRY_SIZE / 10).max(1);
+        let old_len = registry.len();
         registry.evict_lru(evict_count);
+        // If eviction didn't help (e.g., registry is exactly full and can't evict more), break
+        if registry.len() >= old_len {
+            break;
+        }
+    }
+
+    // Final check: if we're still over capacity after eviction, reject
+    if registry.len() >= MAX_REGISTRY_SIZE {
+        eprintln!("Hot Reload: Registry at capacity, could not evict");
+        return;
     }
 
     registry.insert(payload.id.clone(), RuntimeTemplate { static_parts: payload.parts });
