@@ -84,6 +84,7 @@ fn get_current_timestamp() -> u64 {
 /// Returns format: "{json}|{timestamp}|{signature_base64}"
 pub fn sign_state(state_json: &str) -> String {
     let secret = get_secret();
+    assert!(!secret.is_empty(), "AZUMI_SECRET must not be empty");
     let timestamp = get_current_timestamp();
 
     let mut mac =
