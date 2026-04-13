@@ -157,7 +157,7 @@ dependencies = [
 
 [[package]]
 name = "azumi"
-version = "7.32.47"
+version = "7.32.49"
 dependencies = [
  "axum",
  "azumi",
@@ -202,6 +202,7 @@ dependencies = [
 name = "azumi-macros"
 version = "6.0.0"
 dependencies = [
+ "fnv",
  "heck 0.5.0",
  "lightningcss",
  "proc-macro2",
