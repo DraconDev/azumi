@@ -487,15 +487,14 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     }
     
     fn find_last_real_colon(s: &str) -> Option<usize> {
-        let mut depth = 0;
-        let mut in_attr = false;
+        let mut bracket_depth = 0usize;
         let mut last_colon = None;
         
         for (i, ch) in s.char_indices() {
             match ch {
-                '[' => { depth += 1; in_attr = true; }
-                ']' => { depth = depth.saturating_sub(1); in_attr = depth > 0; }
-                ':' if depth == 0 => { last_colon = Some(i); }
+                '[' => bracket_depth = bracket_depth.saturating_add(1),
+                ']' => bracket_depth = bracket_depth.saturating_sub(1),
+                ':' if bracket_depth == 0 => { last_colon = Some(i); }
                 _ => {}
             }
         }
