@@ -809,7 +809,7 @@ fn is_valid_css_property(name: &str) -> bool {
         return true;
     }
     static VALID_PROPERTIES: std::collections::HashSet<&'static str> =
-        std::collections::hash_map::HashSet::from_iter([
+        std::collections::HashSet::from_iter([
             "align-content",
             "align-items",
             "align-self",
