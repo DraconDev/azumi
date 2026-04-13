@@ -157,12 +157,13 @@ dependencies = [
 
 [[package]]
 name = "azumi"
-version = "7.28.18"
+version = "7.29.4"
 dependencies = [
  "axum",
  "azumi",
  "azumi-macros",
  "base64 0.21.7",
+ "fnv",
  "hmac",
  "inventory",
  "notify",
