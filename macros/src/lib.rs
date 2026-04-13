@@ -1302,7 +1302,8 @@ fn generate_body_with_context(
                             #func_mod_path::Props::builder()
                             #(#setters)*
                             .build()
-                            .expect("Failed to build props")
+                            .map_err(|e| concat!("Failed to build props: ", e))
+                            .unwrap()
                         };
 
                         if call_block.children.is_empty() {
