@@ -138,11 +138,14 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 
 ### 5. Signed State (Anti-Tampering)
 
-Every component's state is HMAC-signed. Users can't forge counts, bypass auth, or inject data.
+Every component's state is HMAC-signed. Users can't forge state, but **authorization is your responsibility**.
 
 ```rust
 // User tries to edit az-scope JSON in DevTools...
 // → 400 Bad Request. Automatically. No code needed.
+
+// But any user with a valid signed state CAN trigger any action.
+// YOU must add authorization checks in your action methods.
 ```
 
 ### 6. Automatic SEO
