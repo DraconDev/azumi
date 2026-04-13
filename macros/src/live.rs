@@ -356,7 +356,10 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                     ..
                 }) = nv.value
                 {
-                    component_name = Some(lit.value());
+                    let name = lit.value();
+                    if !name.is_empty() && name.chars().all(|c| c.is_alphanumeric() || c == '_') {
+                        component_name = Some(name);
+                    }
                 }
             }
         }
