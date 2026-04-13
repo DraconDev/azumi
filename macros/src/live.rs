@@ -402,9 +402,19 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             };
 
             // Generate Axum handler
-            // SECURITY NOTE: Actions verify state HMAC but do NOT implement authorization.
-            // Developers must add their own authorization checks within action methods.
-            // For example, verify the user is allowed to modify this specific state.
+            //
+            // SECURITY: HMAC verification proves state integrity, NOT authorization.
+            // Any user with a valid signed state can trigger any action.
+            // Developers MUST add their own authorization within action methods.
+            // Example: verify user owns this state, has permission for this action.
+            //
+            // To prevent the handler from running if the user isn't authorized,
+            // add a check at the start of your action method:
+            //   fn increment(&mut self, user_id: &str) {
+            //       if !self.is_owner(user_id) { return; } // Auth check
+            //       self.count += 1;
+            //   }
+            //
             let handler = if let Some(comp_name) = &component_name {
                 let comp_mod = format_ident!("{}", comp_name);
                 quote! {
