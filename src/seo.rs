@@ -362,23 +362,26 @@ impl SitemapBuilder {
 
         for path in self.urls {
             let url = if path.starts_with("http") {
-                // Validate absolute URLs don't escape base origin
+                // Validate absolute URLs match the base origin exactly
                 let scheme_pos = path.find("://").map(|p| p + 3).unwrap_or(0);
-                if let Some(path_origin_end) = path[scheme_pos..].find('/') {
-                    let absolute_path_origin_end = scheme_pos + path_origin_end;
-                    let url_origin = &path[..absolute_path_origin_end];
-                    let base_host = if let Some(pos) = base_origin.find("://") {
-                        &base_origin[pos + 3..]
-                    } else {
-                        &base_origin[..]
-                    };
-                    if !url_origin.ends_with(base_host) && !url_origin.starts_with(base_host) {
-                        eprintln!(
-                            "SEO Warning: Absolute URL '{}' doesn't match base origin, skipping",
-                            path
-                        );
-                        continue;
-                    }
+                let after_scheme = &path[scheme_pos..];
+                let path_slash = after_scheme.find('/').unwrap_or(after_scheme.len());
+                let url_origin = &path[..scheme_pos + path_slash];
+
+                // Extract base scheme+host exactly
+                let base_scheme_pos = base_origin.find("://").map(|p| p + 3).unwrap_or(0);
+                let base_after_scheme = &base_origin[base_scheme_pos..];
+                let base_path_slash = base_after_scheme
+                    .find('/')
+                    .unwrap_or(base_after_scheme.len());
+                let base_origin_exact = &base_origin[..base_scheme_pos + base_path_slash];
+
+                if url_origin != base_origin_exact {
+                    eprintln!(
+                        "SEO Warning: Absolute URL '{}' doesn't match base origin '{}', skipping",
+                        path, base_origin_exact
+                    );
+                    continue;
                 }
                 path.to_string()
             } else {
