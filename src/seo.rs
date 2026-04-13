@@ -389,15 +389,20 @@ impl SitemapBuilder {
                     path
                 );
                 // Normalize path by removing /../ segments (go up one directory)
-                // When we see /../, we need to remove the PRECEDING path segment
+                // When we see /../, we need to remove the PRECEDING path segment including its /
                 // e.g. /foo/../bar becomes /bar (remove foo/)
                 while let Some(pos) = candidate.find("/../") {
-                    // Find the / before the /../ to know what segment to remove
-                    // e.g. /foo/../bar - the / before foo is at pos-3
-                    // We need to cut at that /, removing foo/../ entirely
-                    if pos >= 3 {
-                        let cut_pos = pos - 3; // The / before the segment to remove
-                        candidate = format!("{}{}", &candidate[..cut_pos], &candidate[pos + 3..]);
+                    // Find the / that starts the segment to remove
+                    // We search backwards from pos for the / that precedes /../
+                    let mut seg_start = pos;
+                    while seg_start > 0 && candidate.as_bytes()[seg_start - 1] != b'/' {
+                        seg_start -= 1;
+                    }
+                    // seg_start now points to the / before the segment name
+                    // e.g. for /foo/../bar, seg_start is at / (before foo)
+                    if seg_start > 0 {
+                        // Remove from seg_start to pos+3 (end of /../)
+                        candidate = format!("{}{}", &candidate[..seg_start], &candidate[pos + 3..]);
                     } else {
                         // /../ at the start - just remove it
                         candidate = candidate[pos + 3..].to_string();
