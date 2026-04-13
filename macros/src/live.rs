@@ -295,7 +295,7 @@ pub fn expand_live(_attr: TokenStream, item: TokenStream) -> TokenStream {
             /// Returns Err with message if serialization fails
             pub fn to_scope(&self) -> Result<String, String> {
                 let json = serde_json::to_string(self).map_err(|e| {
-                    format!("LiveState serialization failed: {}. Ensure all fields implement Serialize and types are JSON-serializable.", e)
+                    format!("LiveState serialization failed: {}. Ensure all fields implement Serialize.", e)
                 })?;
                 Ok(azumi::security::sign_state(&json))
             }
