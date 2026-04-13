@@ -33,10 +33,14 @@ fn is_dev_token_valid(token: Option<&str>) -> bool {
     let t_bytes = t.as_bytes();
     let expected_bytes = expected.as_bytes();
     
-    let len = t_bytes.len().min(expected_bytes.len());
-    let mut result = (t_bytes.len() ^ expected_bytes.len()) as u8;
+    // SECURITY: Length check must come BEFORE byte comparison
+    // Otherwise a partial token (e.g., "sec" vs "secret") would match
+    if t_bytes.len() != expected_bytes.len() {
+        return false;
+    }
     
-    for i in 0..len {
+    let mut result = 0u8;
+    for i in 0..t_bytes.len() {
         result |= t_bytes[i] ^ expected_bytes[i];
     }
     
