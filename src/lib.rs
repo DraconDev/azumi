@@ -2,7 +2,7 @@ pub mod prelude {
     pub use crate::action::Action;
     pub use crate::{
         action, azumi_script, component, head, html, live, live_impl, predict, AzumiScript,
-        Component,
+        Component, escape_css_string,
     };
 }
 
