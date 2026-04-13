@@ -351,10 +351,20 @@ impl SitemapBuilder {
                     if path.starts_with('/') { "" } else { "/" },
                     path
                 );
-                // Validate URL stays within base domain (prevent path traversal)
-                // Remove any /../ sequences by normalizing
+                // Normalize path by removing /../ segments (go up one directory)
+                // When we see /../, we need to remove the PRECEDING path segment
+                // e.g. /foo/../bar becomes /bar (remove foo/)
                 while let Some(pos) = candidate.find("/../") {
-                    candidate = format!("{}{}", &candidate[..pos], &candidate[pos + 3..]);
+                    // Find the / before the /../ to know what segment to remove
+                    // e.g. /foo/../bar - the / before foo is at pos-3
+                    // We need to cut at that /, removing foo/../ entirely
+                    if pos >= 3 {
+                        let cut_pos = pos - 3; // The / before the segment to remove
+                        candidate = format!("{}{}", &candidate[..cut_pos], &candidate[pos + 3..]);
+                    } else {
+                        // /../ at the start - just remove it
+                        candidate = candidate[pos + 3..].to_string();
+                    }
                 }
                 // Reject if final URL doesn't start with base
                 if !candidate.starts_with(base) {
