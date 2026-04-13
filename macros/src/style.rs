@@ -398,19 +398,34 @@ fn validate_units(value: &str) -> Option<String> {
     // Extract potential unit from value like "10px", "2em", etc.
     let value_lower = value.to_lowercase();
 
-    // Common typos in units
+    // Common typos in units - use word boundary matching to avoid false positives
+    // e.g., "pz" should not match "spaz" or "pizza"
     let typo_map = [
-        ("pz", "px"),
-        ("pxs", "px"),
-        ("p x", "px"),
-        ("e m", "em"),
-        ("r em", "rem"),
-        ("p t", "pt"),
-        ("p c", "pc"),
+        ("pz", "px", "p z"),    // Also check for "p z" (space)
+        ("pxs", "px", "p x s"), // Also check for spaced version
+        ("e m", "em", "e  m"),  // space between e and m
+        ("r em", "rem", "r  em"),
+        ("p t", "pt", "p  t"),
+        ("p c", "pc", "p  c"),
     ];
 
-    for (typo, correct) in &typo_map {
-        if value_lower.contains(typo) {
+    for (typo, correct, spaced_typo) in &typo_map {
+        // Check for word boundary before and after the typo
+        if value_lower == *typo
+            || value_lower.ends_with(typo)
+                && value_lower.len() > typo.len()
+                && !value_lower
+                    .chars()
+                    .nth(value_lower.len() - typo.len() - 1)
+                    .map_or(false, |c| c.is_alphanumeric())
+            || value_lower.starts_with(typo)
+                && value_lower.len() > typo.len()
+                && !value_lower
+                    .chars()
+                    .nth(typo.len())
+                    .map_or(false, |c| c.is_alphanumeric())
+            || value_lower.contains(spaced_typo)
+        {
             return Some(format!(
                 "Invalid unit '{}'. Did you mean '{}'?",
                 typo, correct
