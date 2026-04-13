@@ -486,6 +486,19 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                                     (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
                                 ),
                             };
+
+                            // SECURITY: Check for deeply nested structures (DoS prevention)
+                            let mut depth: u32 = 0;
+                            let mut in_string = false;
+                            for ch in json.chars() {
+                                match ch {
+                                    '"' => in_string = !in_string,
+                                    '{' | '[' if !in_string => { depth += 1; if depth > 100 { return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, "Request too complex")); } },
+                                    '}' | ']' if !in_string => { depth = depth.saturating_sub(1); }
+                                    _ => {}
+                                }
+                            }
+
                             let mut state: #struct_name = match serde_json::from_str(&json) {
                                 Ok(s) => s,
                                 Err(_) => return axum::response::IntoResponse::into_response(
