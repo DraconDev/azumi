@@ -766,7 +766,7 @@ fn tokens_to_css_string(tokens: &TokenStream) -> String {
                 if is_quoted {
                     css.push_str(&trimmed[1..trimmed.len() - 1]);
                 } else {
-                    css.push_str(&s);
+                    css.push_str(trimmed);
                 }
 
                 last_char_was_hyphen = false;
