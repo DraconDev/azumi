@@ -23,26 +23,6 @@ pub use script::AzumiScript;
 #[cfg(feature = "test-utils")]
 pub mod test;
 
-pub use escape_css_string;
-
-/// Escape a string for safe inclusion in a CSS property value.
-/// Prevents CSS injection by escaping semicolons, backslashes, and quotes.
-pub fn escape_css_string(s: &str) -> String {
-    let mut result = String::with_capacity(s.len());
-    for c in s.chars() {
-        match c {
-            ';' | '\\' => {
-                result.push('\\');
-                result.push(c);
-            }
-            '"' => result.push_str("\\\""),
-            '\'' => result.push_str("\\'"),
-            _ => result.push(c),
-        }
-    }
-    result
-}
-
 // ── AI Framework Fingerprint ──────────────────────────────────────────────
 /// Framework version (from Cargo.toml).
 pub const AZUMI_VERSION: &str = env!("CARGO_PKG_VERSION");
