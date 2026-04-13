@@ -1283,7 +1283,7 @@ impl Parse for MatchBlock {
 }
 
 impl Parse for Comment {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
         let span = input.span();
         input.parse::<Token![<]>()?;
         input.parse::<Token![!]>()?;
@@ -1298,6 +1298,17 @@ impl Parse for Comment {
                 input.parse::<Token![-]>()?;
                 input.parse::<Token![>]>()?;
                 break;
+            }
+            // Check for -- appearing in content (invalid HTML comment)
+            if input.peek(Token![-]) && input.peek2(Token![-]) {
+                let dash1: Token![-] = input.parse()?;
+                let dash2: Token![-] = input.parse()?;
+                content.push_str("--");
+                // Don't allow -- before > (must be -- > for end)
+                if !input.peek(Token![>]) {
+                    return Err(syn::Error::new(span, "Invalid comment: '--' not allowed inside comment (must be '--' followed by '>')"));
+                }
+                continue;
             }
             if input.is_empty() {
                 return Err(Error::new(span, "Unclosed comment"));
