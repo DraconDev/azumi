@@ -46,17 +46,27 @@ thread_local! {
 /// This is intentional: each thread has its own `PAGE_META`, so developers must ensure
 /// guards do not cross thread boundaries.
 #[derive(Clone)]
-pub struct PageMetaGuard(Rc<()>);
+pub struct PageMetaGuard {
+    counter: Rc<std::sync::atomic::AtomicU32>,
+    generation: u32,
+}
+
+thread_local! {
+    static PAGE_META_GENERATION: Rc<std::sync::atomic::AtomicU32> = Rc::new(std::sync::atomic::AtomicU32::new(0));
+}
 
 impl PageMetaGuard {
     fn new() -> Self {
-        PageMetaGuard(Rc::new(()))
+        let counter = PAGE_META_GENERATION.with(|rc| Rc::clone(rc));
+        let generation = counter.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        PageMetaGuard { counter, generation }
     }
 }
 
 impl Drop for PageMetaGuard {
     fn drop(&mut self) {
-        if Rc::strong_count(&self.0) == 1 {
+        let current = self.counter.load(std::sync::atomic::Ordering::SeqCst);
+        if current == self.generation + 1 {
             PAGE_META.with(|params| *params.borrow_mut() = PageMeta::default());
         }
     }
