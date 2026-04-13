@@ -64,7 +64,8 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
                     .replace('&', "&amp;")
                     .replace('<', "&lt;")
                     .replace('>', "&gt;")
-                    .replace('"', "&quot;");
+                    .replace('"', "&quot;")
+                    .replace('\'', "&#39;");
                 format!(
                     "<script type=\"application/ld+json\">\n{}\n</script>",
                     escaped_json
