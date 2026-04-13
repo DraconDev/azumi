@@ -1970,6 +1970,40 @@ Azumi protects all Live Component state with **HMAC-SHA256 signatures**.
 
 You do not need to "enable" this; it is on by default for all `#[azumi::live]` components.
 
+### ⚠️ IMPORTANT: Live Action Handlers Require Authorization
+
+**Critical Security Note:** Live action handlers verify HMAC signatures (proving state integrity) but do **NOT** implement authorization. Any user with a valid signed state can trigger any action.
+
+**Why HMAC ≠ Authorization:**
+- HMAC proves the state came from your server and wasn't tampered with
+- HMAC does NOT prove the user is authorized to perform that action on that state
+
+**Developer Responsibility:** You MUST add your own authorization checks within action methods:
+
+```rust
+#[azumi::live_impl(component = "admin_panel")]
+impl AdminState {
+    // ❌ WRONG - No authorization check
+    pub fn delete_user(&mut self, user_id: i64) {
+        self.users.retain(|u| u.id != user_id);
+    }
+
+    // ✅ CORRECT - Authorization check added
+    pub fn delete_user(&mut self, requesting_user_id: i64, target_user_id: i64) {
+        // Verify the requesting user has permission
+        if !self.can_delete_user(requesting_user_id) {
+            return; // Silently fail - user not authorized
+        }
+        self.users.retain(|u| u.id != target_user_id);
+    }
+}
+```
+
+**Pattern for Authorization:**
+1. Pass user identifier to the action method
+2. Check permissions at the start of the method
+3. Return early if not authorized
+
 ### Authentication Middleware
 
 ### The Data Bridge Pattern
