@@ -265,8 +265,9 @@ pub fn get_template(id: &str) -> Option<RuntimeTemplate> {
 }
 
 const MAX_TEMPLATE_PARTS: usize = 100;
-const MAX_PART_SIZE: usize = 100_000;
+const MAX_PART_SIZE: usize = 100_000; // 100KB per part
 const MAX_TEMPLATE_ID_LEN: usize = 256;
+const MAX_TOTAL_CSS_SIZE: usize = 500_000; // 500KB total CSS limit per template
 
 #[derive(serde::Deserialize)]
 struct TemplateUpdatePayload {
@@ -283,9 +284,15 @@ async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
         eprintln!("Hot Reload: Too many parts (max {})", MAX_TEMPLATE_PARTS);
         return;
     }
+    let mut total_size = payload.id.len();
     for part in &payload.parts {
         if part.len() > MAX_PART_SIZE {
             eprintln!("Hot Reload: Part too large (max {} bytes)", MAX_PART_SIZE);
+            return;
+        }
+        total_size = total_size.saturating_add(part.len());
+        if total_size > MAX_TOTAL_CSS_SIZE {
+            eprintln!("Hot Reload: Total CSS size too large (max {} bytes)", MAX_TOTAL_CSS_SIZE);
             return;
         }
     }
