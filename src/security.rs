@@ -15,6 +15,9 @@ static SECRET: OnceLock<String> = OnceLock::new();
 fn get_secret() -> &'static str {
     SECRET
         .get_or_init(|| {
+            // Check if AZUMI_SECRET is explicitly set (even if empty)
+            let explicit_empty = matches!(env::var("AZUMI_SECRET"), Ok(s) if s.is_empty());
+            
             let env_secret = env::var("AZUMI_SECRET").unwrap_or_else(|_| {
                 #[cfg(debug_assertions)]
                 {
@@ -33,23 +36,26 @@ fn get_secret() -> &'static str {
                 }
             });
 
-            // Reject empty secrets as insecure - require explicit AZUMI_DEV_MODE for dev
-            if env_secret.is_empty() {
+            // If env var was explicitly set to empty, require explicit opt-in for dev mode
+            if explicit_empty {
                 #[cfg(debug_assertions)]
                 {
-                    // Only use default secret if AZUMI_DEV_MODE is explicitly set
                     let dev_mode = env::var("AZUMI_DEV_MODE").unwrap_or_default();
                     if dev_mode == "1" || dev_mode.to_lowercase() == "true" {
                         eprintln!("⚠️  WARNING: Using default dev HMAC secret (AZUMI_DEV_MODE enabled). Do NOT use in production!");
-                        DEFAULT_SECRET.to_string()
-                    } else {
-                        DEFAULT_SECRET.to_string()
+                        return DEFAULT_SECRET.to_string();
                     }
+                    // In debug mode without dev mode, still allow but warn
+                    eprintln!("⚠️  WARNING: AZUMI_SECRET is empty. Set a proper secret for production!");
+                    DEFAULT_SECRET.to_string()
                 }
                 #[cfg(not(debug_assertions))]
                 {
                     panic!("FATAL: AZUMI_SECRET cannot be empty. Set a non-empty random string.");
                 }
+            } else if env_secret.is_empty() {
+                // Env var not set -> use default with warning
+                DEFAULT_SECRET.to_string()
             } else {
                 env_secret
             }
