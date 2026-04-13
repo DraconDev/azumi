@@ -453,6 +453,22 @@ fn strip_outer_quotes(s: &str) -> String {
     }
 }
 
+fn escape_css_string(s: &str) -> String {
+    let mut result = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            ';' | '\\' => {
+                result.push('\\');
+                result.push(c);
+            }
+            '"' => result.push_str("\\\""),
+            '\'' => result.push_str("\\'"),
+            _ => result.push(c),
+        }
+    }
+    result
+}
+
 #[derive(Clone, PartialEq, Debug)]
 enum Context {
     Normal,
