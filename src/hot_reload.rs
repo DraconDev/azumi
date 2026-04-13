@@ -302,6 +302,6 @@ async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
 
     registry.insert(payload.id.clone(), RuntimeTemplate { static_parts: payload.parts });
     #[cfg(debug_assertions)]
-    println!("Hot Reload: Updated template {}", payload.id);
+    println!("Hot Reload: Updated template \"{}\"", payload.id.replace('"', "\\\""));
     let _ = get_broadcast_channel().send(serde_json::json!({"type": "reload"}).to_string());
 }
