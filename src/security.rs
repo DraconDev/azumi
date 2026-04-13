@@ -19,7 +19,7 @@ fn get_secret() -> &'static str {
                 #[cfg(debug_assertions)]
                 {
                     eprintln!(
-                    "⚠️  WARNING: Using default dev HMAC secret. Set AZUMI_SECRET for production!"
+                    "⚠️  WARNING: AZUMI_SECRET is not set. Set it for production!"
                 );
                     DEFAULT_SECRET.to_string()
                 }
@@ -33,12 +33,18 @@ fn get_secret() -> &'static str {
                 }
             });
 
-            // Reject empty secrets as insecure
+            // Reject empty secrets as insecure - require explicit AZUMI_DEV_MODE for dev
             if env_secret.is_empty() {
                 #[cfg(debug_assertions)]
                 {
-                    eprintln!("⚠️  WARNING: AZUMI_SECRET is empty. Using default dev secret.");
-                    DEFAULT_SECRET.to_string()
+                    // Only use default secret if AZUMI_DEV_MODE is explicitly set
+                    let dev_mode = env::var("AZUMI_DEV_MODE").unwrap_or_default();
+                    if dev_mode == "1" || dev_mode.to_lowercase() == "true" {
+                        eprintln!("⚠️  WARNING: Using default dev HMAC secret (AZUMI_DEV_MODE enabled). Do NOT use in production!");
+                        DEFAULT_SECRET.to_string()
+                    } else {
+                        DEFAULT_SECRET.to_string()
+                    }
                 }
                 #[cfg(not(debug_assertions))]
                 {
