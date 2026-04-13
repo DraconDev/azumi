@@ -299,47 +299,53 @@ fn process_file_change(path: &Path) {
         Err(_) => return,
     };
 
-    let mut current_pos = 0;
-    while let Some(start_idx) = content[current_pos..].find("html!") {
-        let absolute_start = current_pos + start_idx;
-        if let Some(brace_idx) = content[absolute_start..].find('{') {
-            let macro_content_start = absolute_start + brace_idx + 1;
+    // Pre-scan all "html!" positions
+    let mut html_positions: Vec<usize> = Vec::new();
+    let mut search_from = 0;
+    while let Some(pos) = content[search_from..].find("html!") {
+        html_positions.push(search_from + pos);
+        search_from += pos + 5;
+    }
 
-            // The macro uses nodes[0].span().start()
-            // Find the first non-whitespace character after the opening brace
-            let first_node_rel = content[macro_content_start..]
-                .find(|c: char| !c.is_whitespace())
-                .unwrap_or(0);
-            let first_node_abs = macro_content_start + first_node_rel;
+    for start in html_positions {
+        let brace_idx = match content[start..].find('{') {
+            Some(i) => start + i,
+            None => continue,
+        };
+        let macro_content_start = brace_idx + 1;
 
-            // Find <style> and </style>
-            if let Some(style_start) = content[macro_content_start..].find("<style") {
-                let style_tag_rel_end = content[macro_content_start + style_start..]
-                    .find(">")
-                    .unwrap_or(0);
-                let css_start = macro_content_start + style_start + style_tag_rel_end + 1;
+        // Find <style>...</style> using pre-scanned positions
+        let style_start = match content[macro_content_start..].find("<style") {
+            Some(i) => macro_content_start + i,
+            None => continue,
+        };
+        let style_tag_end = match content[style_start..].find('>') {
+            Some(i) => style_start + i,
+            None => continue,
+        };
+        let css_start = style_tag_end + 1;
 
-                if let Some(style_end) = content[css_start..].find("</style>") {
-                    let css_content = &content[css_start..css_start + style_end];
+        let style_end = match content[css_start..].find("</style>") {
+            Some(i) => css_start + i,
+            None => continue,
+        };
 
-                    // Line (1-indexed)
-                    let line = content[..first_node_abs].lines().count();
-                    // Column (0-indexed in proc-macro2)
-                    let line_start = content[..first_node_abs]
-                        .rfind('\n')
-                        .map(|i| i + 1)
-                        .unwrap_or(0);
-                    let col = first_node_abs - line_start;
+        let css_content = &content[css_start..style_end];
 
-                    // Use shared scope ID function — must match the proc-macro
-                    let scope_id = crate::compute_scope_id(line, col);
+        // Find first non-whitespace character for line/col
+        let first_node_rel = match content[macro_content_start..].find(|c: char| !c.is_whitespace()) {
+            Some(i) => i,
+            None => continue,
+        };
+        let first_node_abs = macro_content_start + first_node_rel;
 
-                    let scoped_css = crate::scope_css(css_content, &scope_id);
-                    crate::hot_reload::push_style_update(&scope_id, &scoped_css);
-                }
-            }
-        }
-        current_pos = absolute_start + 5;
+        let line = content[..first_node_abs].lines().count();
+        let line_start = content[..first_node_abs].rfind('\n').map(|i| i + 1).unwrap_or(0);
+        let col = first_node_abs - line_start;
+
+        let scope_id = crate::compute_scope_id(line, col);
+        let scoped_css = crate::scope_css(css_content, &scope_id);
+        crate::hot_reload::push_style_update(&scope_id, &scoped_css);
     }
 }
 
