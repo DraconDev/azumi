@@ -259,6 +259,11 @@ impl<T: std::fmt::Display> FallbackRender for RenderWrapper<T> {
 
 /// A wrapper to inject raw HTML/JS content without escaping.
 ///
+/// **WARNING: XSS Vulnerability Risk**
+///
+/// This wrapper bypasses ALL Azumi escaping protections. User-controlled input
+/// passed through `Raw` can lead to Cross-Site Scripting (XSS) vulnerabilities.
+///
 /// Usage:
 /// ```rust,ignore
 /// use azumi::html;
@@ -268,6 +273,32 @@ impl<T: std::fmt::Display> FallbackRender for RenderWrapper<T> {
 ///     </script>
 /// }
 /// ```
+///
+/// **When to use Raw:**
+/// - Injecting static scripts (like Azumi's built-in JS)
+/// - Third-party widgets with known-safe HTML
+/// - Server-rendered template content from a trusted source
+///
+/// **Never use Raw with:**
+/// - User input (form data, URL parameters, cookies)
+/// - Dynamic content from databases
+/// - Content from external APIs
+///
+/// If you need to include dynamic data in a script, pass it via data attributes
+/// or form elements, not through Raw.
+///
+/// # Example of SAFE usage:
+/// ```rust,ignore
+/// // Safe: static script content
+/// html! { <script>{Raw("console.log('safe');")}</script> }
+/// ```
+///
+/// # Example of DANGEROUS usage:
+/// ```rust,ignore
+/// // DANGEROUS: user input passed through Raw - XSS vulnerability!
+/// html! { <div>{Raw(user_name)}</div> }
+/// ```
+///
 pub struct Raw<T: std::fmt::Display>(pub T);
 
 impl<T: std::fmt::Display> std::fmt::Display for Raw<T> {
