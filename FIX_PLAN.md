@@ -4,7 +4,7 @@
 
 ---
 
-## Status (Updated April 2, 2026)
+## Status (Updated April 13, 2026)
 
 ### Phase 1: CRITICAL Security Fixes
 | Item | Status | Notes |
@@ -14,6 +14,8 @@
 | 1.3 unwrap() removal | ✅ FIXED | Proper match error handling |
 | 1.4 CSS injection | ✅ NOT A BUG | CSS is compiler-generated, Debug format works correctly |
 | 1.5 PageMetaGuard | ⚠️ THEORETICAL | Comment explains safety, guard pattern would be cleaner |
+| 1.6 Authorization gap in live actions | ✅ DOCUMENTED | Comments added, AI guide updated - developer responsibility |
+| 1.7 Component name validation | ✅ FIXED | Added alphanumeric validation before format_ident! |
 
 ### Phase 2: HIGH Priority Correctness
 | Item | Status | Notes |
@@ -25,17 +27,21 @@
 | 2.5 Scope ID consistency | ✅ FIXED | Shared `compute_scope_id` |
 | 2.6 Dead code removal | ✅ FIXED | generate_scope_id removed |
 | 2.7 is_self_field_mutation | ✅ DOCUMENTED | Returns false, noted |
+| 2.8 Raw<T> XSS risk | ✅ DOCUMENTED | Added comprehensive warning in src/lib.rs and AI guide |
+| 2.9 scope_id expect safety | ✅ VERIFIED | Logic correct - has_scoped implies Some |
+| 2.10 children_type unwrap | ✅ VERIFIED | Logic correct - has_children implies Some |
 
 ### Phase 3: AI-First Hardening
 | Item | Status | Notes |
 |------|--------|-------|
 | 3.1-3.7 | ❌ NOT IMPLEMENTED | AI guide exists but no compiler lints |
+| 3.8 Live action auth docs | ✅ DONE | AI guide updated with authorization requirements |
 
 ### Phase 4: Test Infrastructure
 | Item | Status | Notes |
 |------|--------|-------|
 | 4.1 CI expansion | ⚠️ UNKNOWN | No .github checked |
-| 4.2-4.3 Test files | ✅ 30+ files, 1128 tests pass | |
+| 4.2-4.3 Test files | ✅ 48+ tests pass | 2 pre-existing failures unrelated to fixes |
 
 ### Phase 5: Cleanup
 | Item | Status | Notes |
