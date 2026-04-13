@@ -341,6 +341,19 @@ impl SitemapBuilder {
 
         let base = self.base_url.trim_end_matches('/');
 
+        // Extract origin from base for validation (scheme + host)
+        let base_origin = if let Some(origin_end) = base.find(
+            '/',
+            base.find("://")
+                .map(|p| p + 3)
+                .unwrap_or(0)
+                .max(base.find("://").map(|p| p + 3).unwrap_or(0)),
+        ) {
+            &base[..origin_end]
+        } else {
+            base
+        };
+
         for path in self.urls {
             let url = if path.starts_with("http") {
                 path
@@ -366,8 +379,8 @@ impl SitemapBuilder {
                         candidate = candidate[pos + 3..].to_string();
                     }
                 }
-                // Reject if final URL doesn't start with base
-                if !candidate.starts_with(base) {
+                // Reject if final URL doesn't stay within base origin
+                if !candidate.starts_with(base_origin) {
                     eprintln!(
                         "SEO Warning: Path '{}' resolves outside base URL, skipping",
                         path
