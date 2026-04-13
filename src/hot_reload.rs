@@ -67,11 +67,19 @@ impl<K: std::hash::Hash + Eq, V> LRUCache<K, V> {
         if count == 0 {
             return;
         }
+        // Collect entries sorted by last_access, take the oldest 'count' keys
         let mut entries: Vec<_> = self.map.iter()
             .map(|(k, v)| (v.last_access, k))
             .collect();
         entries.sort_by_key(|(access, _)| *access);
-        let keys_to_remove: Vec<_> = entries.into_iter().take(count).map(|(_, k)| k.clone()).collect();
+        
+        // Collect keys to remove first (to avoid borrow conflict)
+        let keys_to_remove: Vec<_> = entries.into_iter()
+            .take(count)
+            .map(|(_, k)| k.clone())
+            .collect();
+        
+        // Now remove them
         for key in keys_to_remove {
             self.map.remove(&key);
         }
