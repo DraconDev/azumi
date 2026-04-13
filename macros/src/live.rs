@@ -455,25 +455,27 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                     }
                 }
             } else {
+                // No component - direct state handler
+                // SECURITY: Same authorization requirements apply (see above)
                 quote! {
-                    pub async fn #handler_name(
-                        body: String
-                    ) -> axum::response::Response {
-                        let json = match azumi::security::verify_state(&body) {
-                            Ok(j) => j,
-                            Err(_) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
-                            ),
-                        };
-                        let mut state: #struct_name = match serde_json::from_str(&json) {
-                            Ok(s) => s,
-                            Err(_) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
-                            ),
-                        };
-                        #method_call
-                        axum::response::IntoResponse::into_response(axum::response::Json(state))
-                    }
+                        pub async fn #handler_name(
+                            body: String
+                        ) -> axum::response::Response {
+                            let json = match azumi::security::verify_state(&body) {
+                                Ok(j) => j,
+                                Err(_) => return axum::response::IntoResponse::into_response(
+                                    (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
+                                ),
+                            };
+                            let mut state: #struct_name = match serde_json::from_str(&json) {
+                                Ok(s) => s,
+                                Err(_) => return axum::response::IntoResponse::into_response(
+                                    (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
+                                ),
+                            };
+                            #method_call
+                            axum::response::IntoResponse::into_response(axum::response::Json(state))
+                        }
 
                     #[allow(non_snake_case)]
                     pub fn #router_name() -> axum::routing::MethodRouter<()> {
