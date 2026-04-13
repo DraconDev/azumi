@@ -619,7 +619,10 @@ fn generate_body(
 
         // INVARIANT: scope_id is always Some when has_scoped is true
         // This is guaranteed by the code logic above
-        debug_assert!(has_scoped implies scope_id.is_some(), "scope_id must be Some when has_scoped is true");
+        debug_assert!(
+            !has_scoped || scope_id.is_some(),
+            "scope_id must be Some when has_scoped is true"
+        );
         let scope_id_str = scope_id.as_ref().map(|s| s.as_str()).unwrap_or("");
 
         let css_to_inject = if has_global {
