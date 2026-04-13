@@ -23,29 +23,22 @@ fn get_broadcast_channel() -> &'static broadcast::Sender<String> {
 const DEV_TOKEN_HEADER: &str = "X-Azumi-Dev-Token";
 
 fn is_dev_token_valid(token: Option<&str>) -> bool {
-    if let Some(t) = token {
-        if let Ok(expected) = std::env::var("AZUMI_DEV_TOKEN") {
-            use std::time::Instant;
-            use std::hint::black_box;
-            
-            let start = Instant::now();
-            let result = black_box(t.as_bytes()).eq(black_box(expected.as_bytes()));
-            let _ = start.elapsed();
-            
-            if !result {
-                return false;
-            }
-            
-            if t.len() != expected.len() {
-                return false;
-            }
-            
-            return true;
-        }
-        true
-    } else {
-        false
+    let Some(t) = token else {
+        return false;
+    };
+    let Ok(expected) = std::env::var("AZUMI_DEV_TOKEN") else {
+        return false;
+    };
+    
+    if t.len() != expected.len() {
+        return false;
     }
+    
+    let mut result = 0u8;
+    for (a, b) in t.as_bytes().iter().zip(expected.as_bytes()) {
+        result |= a ^ b;
+    }
+    result == 0
 }
 
 struct LRUEntry<V> {
