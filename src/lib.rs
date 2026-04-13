@@ -485,20 +485,34 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     if selector.starts_with(":host") || selector.starts_with("::slotted") || selector.starts_with("::part") {
         return selector.to_string();
     }
-    // Handle pseudo-elements (::before, ::after, etc.)
+    
+    fn find_last_real_colon(s: &str) -> Option<usize> {
+        let mut depth = 0;
+        let mut in_attr = false;
+        let mut last_colon = None;
+        
+        for (i, ch) in s.char_indices() {
+            match ch {
+                '[' => { depth += 1; in_attr = true; }
+                ']' => { depth = depth.saturating_sub(1); in_attr = depth > 0; }
+                ':' if depth == 0 => { last_colon = Some(i); }
+                _ => {}
+            }
+        }
+        last_colon
+    }
+    
     if let Some(pseudo_pos) = selector.find("::") {
         let base_and_pseudos = &selector[..pseudo_pos];
         let pseudo_element = &selector[pseudo_pos..];
-        // Check if base has pseudo-classes (e.g., div:hover::before)
-        if let Some(class_pos) = base_and_pseudos.rfind(':') {
+        if let Some(class_pos) = find_last_real_colon(base_and_pseudos) {
             let base = &base_and_pseudos[..class_pos];
             let pseudo_classes = &base_and_pseudos[class_pos..];
             return format!("{}{}{}{}", base, pseudo_classes, scope_attr, pseudo_element);
         }
         return format!("{}{}{}", base_and_pseudos, scope_attr, pseudo_element);
     }
-    // Handle pseudo-classes only (no :: pseudo-element) - use rfind for last colon
-    if let Some(pseudo_pos) = selector.rfind(':') {
+    if let Some(pseudo_pos) = find_last_real_colon(selector) {
         let base = &selector[..pseudo_pos];
         let pseudo = &selector[pseudo_pos..];
         return format!("{}{}{}", base, scope_attr, pseudo);
