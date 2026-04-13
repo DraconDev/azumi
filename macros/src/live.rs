@@ -443,10 +443,11 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                         let mut in_string = false;
                         for ch in json.chars() {
                             match ch {
-                                '"' => in_string = !in_string,
+                                '\\' => { escaped = true; }
+                                '"' if !escaped => { in_string = !in_string; }
                                 '{' | '[' if !in_string => { depth += 1; if depth > 100 { return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, "Request too complex")); } },
                                 '}' | ']' if !in_string => { depth = depth.saturating_sub(1); }
-                                _ => {}
+                                _ => { escaped = false; }
                             }
                         }
 
