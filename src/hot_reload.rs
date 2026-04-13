@@ -287,6 +287,14 @@ async fn update_template_handler(Json(payload): Json<TemplateUpdatePayload>) {
         return;
     };
 
+    {
+        let total_size = payload.id.len() + payload.parts.iter().map(|p| p.len()).sum::<usize>();
+        if total_size > MAX_REGISTRY_SIZE * 10 {
+            eprintln!("Hot Reload: Total payload size too large");
+            return;
+        }
+    }
+
     if registry.len() >= MAX_REGISTRY_SIZE {
         let evict_count = (MAX_REGISTRY_SIZE / 10).max(1);
         registry.evict_lru(evict_count);
