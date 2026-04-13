@@ -455,13 +455,16 @@ fn extract_balanced_block(iter: &mut std::iter::Peekable<std::str::Chars>) -> St
 
 fn split_selector_list(selector_raw: &str) -> Vec<&str> {
     let mut result = Vec::new();
-    let mut depth: usize = 0;
+    let mut paren_depth: usize = 0;
+    let mut bracket_depth: usize = 0;
     let mut last_start = 0;
     for (byte_idx, ch) in selector_raw.char_indices() {
         match ch {
-            '(' => depth += 1,
-            ')' => depth = depth.saturating_sub(1),
-            ',' if depth == 0 => {
+            '(' => paren_depth += 1,
+            ')' => paren_depth = paren_depth.saturating_sub(1),
+            '[' => bracket_depth += 1,
+            ']' => bracket_depth = bracket_depth.saturating_sub(1),
+            ',' if paren_depth == 0 && bracket_depth == 0 => {
                 let sel = selector_raw[last_start..byte_idx].trim();
                 if !sel.is_empty() {
                     result.push(sel);
