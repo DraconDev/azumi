@@ -79,25 +79,43 @@ impl<K: std::hash::Hash + Eq, V> LRUCache<K, V> {
     }
 
     fn evict_lru(&mut self, count: usize) {
-        if count == 0 {
+        if count == 0 || self.map.is_empty() {
             return;
         }
-        // Collect entries sorted by last_access, take the oldest 'count' keys
+        
+        let map_len = self.map.len();
+        let remove_count = count.min(map_len);
+        
+        if remove_count >= map_len {
+            self.map.clear();
+            return;
+        }
+        
+        // Use select_nth_unstable for O(n) average partition instead of O(n log n) sort
+        // This finds the kth smallest element and partitions around it
         let mut entries: Vec<_> = self.map.iter()
             .map(|(k, v)| (v.last_access, k))
             .collect();
-        entries.sort_by_key(|(access, _)| *access);
         
-        // Collect keys to remove first (to avoid borrow conflict)
+        // Partition to find the boundary - entries[0..keep] are the ones to keep (newer)
+        // We want to remove the oldest 'count' entries, so we keep the (len - count) newest
+        let keep_count = map_len - remove_count;
+        
+        if keep_count > 0 {
+            // Partition so entries[keep_count..] contains the oldest items to evict
+            entries.select_nth_unstable(keep_count);
+        }
+        
+        // Collect keys to remove (everything from keep_count onward)
         let keys_to_remove: Vec<_> = entries.into_iter()
-            .take(count)
+            .skip(keep_count)
             .map(|(_, k)| k.clone())
             .collect();
         
-        // Now remove them
         for key in keys_to_remove {
             self.map.remove(&key);
         }
+    }
     }
 
     fn len(&self) -> usize {
