@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::OnceLock;
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
+    extract::connect_info::ConnectInfo,
     response::IntoResponse,
     routing::{get, post},
     Json, Router,
@@ -16,6 +17,19 @@ fn get_broadcast_channel() -> &'static broadcast::Sender<String> {
         let (tx, _) = broadcast::channel(100);
         tx
     })
+}
+
+const DEV_TOKEN_HEADER: &str = "X-Azumi-Dev-Token";
+
+fn is_dev_token_valid(token: Option<&str>) -> bool {
+    if let Some(t) = token {
+        if let Ok(expected) = std::env::var("AZUMI_DEV_TOKEN") {
+            return t == expected;
+        }
+        true
+    } else {
+        false
+    }
 }
 
 struct LRUEntry<V> {
