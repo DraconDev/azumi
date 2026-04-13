@@ -64,14 +64,23 @@ impl<K: std::hash::Hash + Eq, V> LRUCache<K, V> {
     }
 
     fn evict_lru(&mut self, count: usize) {
-        let keys: Vec<K> = self
-            .map
-            .iter()
-            .map(|(k, v)| (k.clone(), v.last_access))
+        if count >= self.map.len() {
+            self.map.clear();
+            return;
+        }
+        let indices: Vec<_> = (0..self.map.len()).collect();
+        let mut indexed: Vec<_> = self.map.iter()
+            .zip(indices)
+            .map(|((k, v), i)| (v.last_access, i))
             .collect();
-        let mut sorted: Vec<_> = keys;
-        sorted.sort_by_key(|(_, access)| *access);
-        for (key, _) in sorted.into_iter().take(count) {
+        indexed.select_nth_unstable(count);
+        let cutoff = indexed[count].0;
+        let keys_to_evict: Vec<_> = self.map.iter()
+            .enumerate()
+            .filter(|(_, (_, v))| v.last_access < cutoff)
+            .map(|(idx, (k, _))| k.clone())
+            .collect();
+        for key in keys_to_evict {
             self.map.remove(&key);
         }
     }
