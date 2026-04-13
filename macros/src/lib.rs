@@ -433,9 +433,9 @@ fn first_node_span(nodes: &[token_parser::Node]) -> Option<(usize, usize)> {
 }
 
 fn azumi_scope_id_from_span(line: usize, col: usize) -> String {
-    use std::collections::hash_map::DefaultHasher;
+    use fnv::FnvHasher;
     use std::hash::{Hash, Hasher};
-    let mut hasher = DefaultHasher::new();
+    let mut hasher = FnvHasher::default();
     line.hash(&mut hasher);
     col.hash(&mut hasher);
     format!("s{:x}", hasher.finish())
