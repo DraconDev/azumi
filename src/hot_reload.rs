@@ -190,6 +190,8 @@ async fn check_dev_token(
     if is_dev_token_valid(token) {
         Ok(next.run(req).await)
     } else {
+        // 401 UNAUTHORIZED is correct here - missing/invalid token means unauthenticated
+        // 403 FORBIDDEN would mean authenticated but not allowed (not our case)
         Err(StatusCode::UNAUTHORIZED)
     }
 }
