@@ -337,9 +337,9 @@ impl<T: std::fmt::Display> Component for Raw<T> {
 /// Used by both the proc-macro and the hot reload watcher to guarantee
 /// that scope IDs match at compile time and runtime.
 pub fn compute_scope_id(line: usize, col: usize) -> String {
-    use std::collections::hash_map::DefaultHasher;
+    use fnv::FnvHasher;
     use std::hash::{Hash, Hasher};
-    let mut hasher = DefaultHasher::new();
+    let mut hasher = FnvHasher::default();
     line.hash(&mut hasher);
     col.hash(&mut hasher);
     format!("s{:x}", hasher.finish())
