@@ -57,7 +57,17 @@ fn get_secret() -> &'static str {
                 // Env var not set -> use default with warning
                 DEFAULT_SECRET.to_string()
             } else {
-                env_secret
+                let secret = env_secret;
+                // Warn if secret is too short (HMAC-SHA256 needs at least 32 bytes for security)
+                #[cfg(not(debug_assertions))]
+                if secret.len() < 32 {
+                    eprintln!(
+                        "⚠️  WARNING: AZUMI_SECRET is too short ({} bytes). \
+                        For HMAC-SHA256 security, use at least 32 random characters (64+ hex chars).",
+                        secret.len()
+                    );
+                }
+                secret
             }
         })
         .as_str()
@@ -67,7 +77,7 @@ fn get_current_timestamp() -> u64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_secs())
-        .unwrap_or(0)
+        .unwrap_or(0) // REVISIT: This silently returns 0 on clock errors, causing DoS
 }
 
 /// Signs a state string with HMAC-SHA256 and includes a timestamp for replay protection.
