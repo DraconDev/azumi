@@ -305,7 +305,28 @@ pub fn expand_live(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 /// Attribute macro for impl blocks: #[azumi::live_impl]
-/// This analyzes methods and generates action handlers with predictions
+///
+/// Analyzes methods in the impl block and generates:
+/// - Action handlers at `/_azumi/action/{StructName}/{MethodName}`
+/// - Prediction DSL for state change analysis
+/// - HMAC verification on all state updates
+///
+/// # Arguments
+/// * `attr` - Comma-separated key=value pairs, e.g., `component = "MyComponent"`
+/// * `item` - The `impl` block to process
+///
+/// # Example
+/// ```ignore
+/// #[azumi::live_impl(component = "Counter")]
+/// impl CounterState {
+///     #[azumi::action]
+///     fn increment(&mut self) {
+///         self.count += 1;
+///     }
+/// }
+/// ```
+///
+/// The generated handlers verify state HMAC signatures before executing actions.
 pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemImpl);
     let struct_name = &input.self_ty;
