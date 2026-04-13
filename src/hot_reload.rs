@@ -30,14 +30,16 @@ fn is_dev_token_valid(token: Option<&str>) -> bool {
         return false;
     };
     
-    if t.len() != expected.len() {
-        return false;
+    let t_bytes = t.as_bytes();
+    let expected_bytes = expected.as_bytes();
+    
+    let len = t_bytes.len().min(expected_bytes.len());
+    let mut result = (t_bytes.len() ^ expected_bytes.len()) as u8;
+    
+    for i in 0..len {
+        result |= t_bytes[i] ^ expected_bytes[i];
     }
     
-    let mut result = 0u8;
-    for (a, b) in t.as_bytes().iter().zip(expected.as_bytes()) {
-        result |= a ^ b;
-    }
     result == 0
 }
 
