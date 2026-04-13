@@ -457,16 +457,16 @@ fn split_selector_list(selector_raw: &str) -> Vec<&str> {
     let mut result = Vec::new();
     let mut depth: usize = 0;
     let mut last_start = 0;
-    for (i, ch) in selector_raw.chars().enumerate() {
+    for (byte_idx, ch) in selector_raw.char_indices() {
         match ch {
             '(' => depth += 1,
             ')' => depth = depth.saturating_sub(1),
             ',' if depth == 0 => {
-                let sel = selector_raw[last_start..i].trim();
+                let sel = selector_raw[last_start..byte_idx].trim();
                 if !sel.is_empty() {
                     result.push(sel);
                 }
-                last_start = i + 1;
+                last_start = byte_idx + ch.len_utf8();
             }
             _ => {}
         }
