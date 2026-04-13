@@ -617,15 +617,16 @@ fn generate_body(
             (String::new(), None)
         };
 
+        // INVARIANT: scope_id is always Some when has_scoped is true
+        // This is guaranteed by the code logic above
+        debug_assert!(has_scoped implies scope_id.is_some(), "scope_id must be Some when has_scoped is true");
+        let scope_id_str = scope_id.as_ref().map(|s| s.as_str()).unwrap_or("");
+
         let css_to_inject = if has_global {
             if has_scoped {
                 format!(
                     "<style>{}</style><style data-azumi-scope=\"{}\">{}</style>",
-                    global_css,
-                    scope_id
-                        .as_ref()
-                        .expect("scope_id must be Some when has_scoped is true"),
-                    scoped_output
+                    global_css, scope_id_str, scoped_output
                 )
             } else {
                 format!("<style>{}</style>", global_css)
@@ -633,10 +634,7 @@ fn generate_body(
         } else if has_scoped {
             format!(
                 "<style data-azumi-scope=\"{}\">{}</style>",
-                scope_id
-                    .as_ref()
-                    .expect("scope_id must be Some when has_scoped is true"),
-                scoped_output
+                scope_id_str, scoped_output
             )
         } else {
             String::new()
