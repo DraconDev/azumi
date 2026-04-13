@@ -336,7 +336,9 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     let struct_name_str = struct_name_str.replace(" ", "");
 
     // Unique module name per struct to avoid collisions when multiple live_impls exist
-    // Use base64 encoding of struct name to avoid Foo/FOO collision issue
+    // Use a hash of the struct name.
+    // NOTE: DefaultHasher (SipHash) is used here, not for security, just for stable module naming.
+    // The hash output is only used for local module names, not any security-critical purpose.
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
     let mut hasher = DefaultHasher::new();
