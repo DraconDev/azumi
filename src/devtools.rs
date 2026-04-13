@@ -105,7 +105,7 @@ fn run_master_loop() {
     let mut last_run = Instant::now();
     let port = std::env::var("PORT")
         .map(|p| p.parse::<u16>().map(|n| n.to_string()))
-        .unwrap_or(Ok("8080".to_string()))
+        .unwrap_or_else(|_| Ok("8080".to_string()))
         .unwrap_or_else(|e| {
             eprintln!("WARNING: Invalid PORT '{}' - using default 8080. Error: {}", e, e);
             "8080".to_string()
