@@ -160,10 +160,11 @@ fn send_raw_post(port: &str, path: &str, body: &str) -> bool {
     use std::net::TcpStream;
 
     let addr = format!("127.0.0.1:{}", port);
-    if let Ok(mut stream) = TcpStream::connect_timeout(
-        &addr.parse().unwrap(),
-        Duration::from_millis(100),
-    ) {
+    if let Ok(socket_addr) = addr.parse() {
+        if let Ok(mut stream) = TcpStream::connect_timeout(
+            &socket_addr,
+            Duration::from_millis(100),
+        ) {
         let request = format!(
             "POST {} HTTP/1.1\r\n\
              Host: localhost:{}\r\n\
