@@ -363,13 +363,16 @@ impl SitemapBuilder {
         for path in self.urls {
             let url = if path.starts_with("http") {
                 // Validate absolute URLs don't escape base origin
-                if let Some(path_origin_end) =
-                    path.find('/', path.find("://").map(|p| p + 3).unwrap_or(0))
-                {
-                    let url_origin = &path[..path_origin_end];
-                    if !url_origin.starts_with(
-                        &base_origin[..base_origin.find('/').unwrap_or(base_origin.len())],
-                    ) {
+                let scheme_pos = path.find("://").map(|p| p + 3).unwrap_or(0);
+                if let Some(path_origin_end) = path[scheme_pos..].find('/') {
+                    let absolute_path_origin_end = scheme_pos + path_origin_end;
+                    let url_origin = &path[..absolute_path_origin_end];
+                    let base_host = if let Some(pos) = base_origin.find("://") {
+                        &base_origin[pos + 3..]
+                    } else {
+                        &base_origin[..]
+                    };
+                    if !url_origin.ends_with(base_host) && !url_origin.starts_with(base_host) {
                         eprintln!(
                             "SEO Warning: Absolute URL '{}' doesn't match base origin, skipping",
                             path
