@@ -68,10 +68,11 @@ impl<K: std::hash::Hash + Eq, V> LRUCache<K, V> {
             return;
         }
         let mut entries: Vec<_> = self.map.iter()
-            .map(|(k, v)| (v.last_access, k.clone()))
+            .map(|(k, v)| (v.last_access, k))
             .collect();
         entries.sort_by_key(|(access, _)| *access);
-        for (_, key) in entries.into_iter().take(count) {
+        let keys_to_remove: Vec<_> = entries.into_iter().take(count).map(|(_, k)| k.clone()).collect();
+        for key in keys_to_remove {
             self.map.remove(&key);
         }
     }
