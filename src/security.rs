@@ -77,7 +77,7 @@ fn get_current_timestamp() -> u64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_secs())
-        .unwrap_or(0) // REVISIT: This silently returns 0 on clock errors, causing DoS
+        .expect("System clock is before UNIX_EPOCH or unavailable - this is a fatal error for state signing")
 }
 
 /// Signs a state string with HMAC-SHA256 and includes a timestamp for replay protection.
