@@ -14,6 +14,18 @@ fn scope_css_recursive(iter: &mut Peekable<Chars>, scope_attr: &str) -> String {
     let mut buffer = String::new();
 
     while let Some(ch) = iter.next() {
+        // Skip strings (single and double quoted) - needed to handle CSS like content: "}"
+        if ch == '"' || ch == '\'' {
+            buffer.push(ch);
+            let quote = ch;
+            while let Some(c) = iter.next() {
+                buffer.push(c);
+                if c == quote {
+                    break;
+                }
+            }
+            continue;
+        }
         match ch {
             '{' => {
                 let selector_raw = buffer.trim().to_string();
