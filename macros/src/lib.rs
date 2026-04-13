@@ -625,7 +625,9 @@ fn generate_body(
                 format!(
                     "<style>{}</style><style data-azumi-scope=\"{}\">{}</style>",
                     global_css,
-                    scope_id.as_ref().unwrap(),
+                    scope_id
+                        .as_ref()
+                        .expect("scope_id must be Some when has_scoped is true"),
                     scoped_output
                 )
             } else {
@@ -634,7 +636,9 @@ fn generate_body(
         } else if has_scoped {
             format!(
                 "<style data-azumi-scope=\"{}\">{}</style>",
-                scope_id.as_ref().unwrap(),
+                scope_id
+                    .as_ref()
+                    .expect("scope_id must be Some when has_scoped is true"),
                 scoped_output
             )
         } else {
