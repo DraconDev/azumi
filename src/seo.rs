@@ -341,15 +341,15 @@ impl SitemapBuilder {
 
         let base = self.base_url.trim_end_matches('/');
 
-        // Extract origin from base for validation (scheme + host)
-        let base_origin = if let Some(origin_end) = base.find(
-            '/',
-            base.find("://")
-                .map(|p| p + 3)
-                .unwrap_or(0)
-                .max(base.find("://").map(|p| p + 3).unwrap_or(0)),
-        ) {
-            &base[..origin_end]
+        // Extract origin from base for validation (scheme + host + optional port)
+        // Origin ends at first / after the scheme (://)
+        let base_origin = if let Some(scheme_pos) = base.find("://") {
+            let after_scheme = &base[scheme_pos + 3..];
+            if let Some(path_pos) = after_scheme.find('/') {
+                &base[..scheme_pos + 3 + path_pos]
+            } else {
+                base // No path, entire URL is origin
+            }
         } else {
             base
         };
