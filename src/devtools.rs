@@ -68,17 +68,37 @@ fn run_master_loop() {
     use std::sync::mpsc::channel;
 
     // Detect the binary name to ensure we restart the correct target
-    let exe = std::env::current_exe().expect("Failed to get current exe path");
+    let exe = match std::env::current_exe() {
+        Ok(e) => e,
+        Err(e) => {
+            eprintln!("Devtools: Failed to get current exe: {}", e);
+            return;
+        }
+    };
     let bin_name = exe.file_name().and_then(|s| s.to_str()).unwrap_or("app");
+
+    // Validate bin_name to prevent command injection
+    if bin_name.is_empty() || bin_name.contains(|c: char| c.is_whitespace() || c == ';' || c == '|' || c == '&' || c == '>' || c == '<' || c == '`' || c == '$') {
+        eprintln!("Devtools: Invalid binary name '{}', using 'app'", bin_name);
+        bin_name = "app";
+    }
 
     let mut server = start_worker(bin_name);
     let (tx, rx) = channel();
-    let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();
+    let watcher = match RecommendedWatcher::new(tx, Config::default()) {
+        Ok(w) => w,
+        Err(e) => {
+            eprintln!("Devtools: Failed to create watcher: {}", e);
+            return;
+        }
+    };
 
     // Watch src directory (the standard Rust project layout)
     for dir in ["src"] {
         if Path::new(dir).exists() {
-            watcher.watch(Path::new(dir), RecursiveMode::Recursive).unwrap();
+            if let Err(e) = watcher.watch(Path::new(dir), RecursiveMode::Recursive) {
+                eprintln!("Devtools: Failed to watch directory {}: {}", dir, e);
+            }
         }
     }
 
