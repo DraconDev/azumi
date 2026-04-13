@@ -238,7 +238,7 @@ pub fn escape_css_string(s: &str) -> String {
     let mut result = String::with_capacity(s.len());
     for c in s.chars() {
         match c {
-            ';' | '\\' => {
+            ';' | '\\' | '{' | '}' => {
                 result.push('\\');
                 result.push(c);
             }
