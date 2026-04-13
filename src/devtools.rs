@@ -183,27 +183,26 @@ fn send_raw_post(port: &str, path: &str, body: &str) -> bool {
 
 fn extract_templates_internal(content: &str, file_path: &str) -> HashMap<String, Vec<String>> {
     let mut templates = HashMap::new();
-    let mut current_idx = 0;
-    while let Some(idx) = content[current_idx..].find("html!") {
-        let start = current_idx + idx;
+    // Pre-scan all "html!" positions for efficiency
+    let mut html_positions: Vec<usize> = Vec::new();
+    let mut search_from = 0;
+    while let Some(pos) = content[search_from..].find("html!") {
+        html_positions.push(search_from + pos);
+        search_from += pos + 5; // Move past this occurrence
+    }
+
+    for start in html_positions {
         let open_brace = match content[start..].find('{') {
             Some(i) => start + i,
-            None => {
-                current_idx = start + 5;
-                continue;
-            }
+            None => continue,
         };
 
         let pre = &content[..start];
         let line = pre.lines().count();
-        let line = if pre.ends_with('\n') {
-            line + 1
-        } else {
-            std::cmp::max(1, line)
-        };
+        let line = if pre.ends_with('\n') { line + 1 } else { std::cmp::max(1, line) };
 
         let last_line = pre.lines().last().unwrap_or("");
-        let col = last_line.chars().count() + 1; // Use char count, not byte count for UTF-8
+        let col = last_line.chars().count() + 1;
 
         let mut depth = 1;
         let mut inner_end = 0;
@@ -215,7 +214,6 @@ fn extract_templates_internal(content: &str, file_path: &str) -> HashMap<String,
             } else if c == '}' {
                 depth -= 1;
             }
-
             if depth == 0 {
                 inner_end = open_brace + 1 + i;
                 break;
@@ -245,9 +243,6 @@ fn extract_templates_internal(content: &str, file_path: &str) -> HashMap<String,
 
             let id = format!("{}:{}:{}", file_path, line, col);
             templates.insert(id, parts);
-            current_idx = inner_end;
-        } else {
-            break;
         }
     }
     templates
