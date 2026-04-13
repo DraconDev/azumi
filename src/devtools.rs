@@ -147,7 +147,10 @@ fn start_worker(bin_name: &str) -> Child {
     cmd.args(["run", "--bin", bin_name, "--"]);
     
     // Forward original CLI arguments to the worker
-    let args: Vec<String> = std::env::args().skip(1).collect();
+    // Filter args to remove potentially dangerous values
+    let args: Vec<String> = std::env::args().skip(1).filter(|arg| {
+        !arg.contains(|c: char| c == '\r' || c == '\n' || c == ';')
+    }).collect();
     cmd.args(&args);
 
     cmd.env("AZUMI_IS_WORKER", "1")
