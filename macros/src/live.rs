@@ -292,12 +292,15 @@ pub fn expand_live(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
         impl #struct_generics #struct_name #struct_generics {
             /// Serialize state for az-scope attribute
-            /// Returns Err with message if serialization fails
-            pub fn to_scope(&self) -> Result<String, String> {
-                let json = serde_json::to_string(self).map_err(|e| {
-                    format!("LiveState serialization failed: {}. Ensure all fields implement Serialize.", e)
-                })?;
-                Ok(azumi::security::sign_state(&json))
+            /// Logs error and returns empty string if serialization fails
+            pub fn to_scope(&self) -> String {
+                match serde_json::to_string(self) {
+                    Ok(json) => azumi::security::sign_state(&json),
+                    Err(e) => {
+                        eprintln!("LiveState serialization error: {}", e);
+                        String::new()
+                    }
+                }
             }
         }
     };
