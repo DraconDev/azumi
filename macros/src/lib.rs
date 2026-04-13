@@ -1172,6 +1172,7 @@ fn generate_body_with_context(
                                 _ => {}
                             },
                         }
+                        continue;
                     } else {
                         match &attr.value {
                             token_parser::AttributeValue::Static(val) => {
