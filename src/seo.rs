@@ -344,11 +344,17 @@ impl SitemapBuilder {
         // Extract origin from base for validation (scheme + host + optional port)
         // Origin ends at first / after the scheme (://)
         let base_origin = if let Some(scheme_pos) = base.find("://") {
-            let after_scheme = &base[scheme_pos + 3..];
-            if let Some(path_pos) = after_scheme.find('/') {
-                &base[..scheme_pos + 3 + path_pos]
+            // Safely extract origin - check bounds before slicing
+            let scheme_end = scheme_pos + 3; // Position after "://"
+            if scheme_end < base.len() {
+                let after_scheme = &base[scheme_end..];
+                if let Some(path_pos) = after_scheme.find('/') {
+                    &base[..scheme_end + path_pos]
+                } else {
+                    base // No path, entire URL is origin
+                }
             } else {
-                base // No path, entire URL is origin
+                base // Malformed URL, use entire string
             }
         } else {
             base
@@ -356,7 +362,22 @@ impl SitemapBuilder {
 
         for path in self.urls {
             let url = if path.starts_with("http") {
-                path
+                // Validate absolute URLs don't escape base origin
+                if let Some(path_origin_end) =
+                    path.find('/', path.find("://").map(|p| p + 3).unwrap_or(0))
+                {
+                    let url_origin = &path[..path_origin_end];
+                    if !url_origin.starts_with(
+                        &base_origin[..base_origin.find('/').unwrap_or(base_origin.len())],
+                    ) {
+                        eprintln!(
+                            "SEO Warning: Absolute URL '{}' doesn't match base origin, skipping",
+                            path
+                        );
+                        continue;
+                    }
+                }
+                path.to_string()
             } else {
                 let mut candidate = format!(
                     "{}{}{}",
