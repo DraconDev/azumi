@@ -741,7 +741,7 @@ fn validate_nodes(
                             if let token_parser::AttributeValue::Static(_) = &attr.value {
                                 let error_span = attr.value_span.unwrap_or(attr.span);
                                 errors.push(quote_spanned! { error_span =>
-                                    compile_error!("Static style attributes are banned (e.g. style=\"...\"). Use style={ --prop: value } instead.");
+                                    compile_error!("Static style attributes are banned (e.g. style=\"...\"). Use style={--prop: value} instead (no space after --).");
                                 });
                             }
                         }
