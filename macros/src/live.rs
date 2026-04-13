@@ -441,6 +441,7 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                         // A valid JSON object/array with depth > 100 can cause stack overflow
                         let mut depth: u32 = 0;
                         let mut in_string = false;
+                        let mut escaped = false;
                         for ch in json.chars() {
                             match ch {
                                 '\\' => { escaped = true; }
