@@ -233,6 +233,24 @@ impl<T: std::fmt::Display> std::fmt::Display for Escaped<T> {
     }
 }
 
+/// Escape a string for safe inclusion in a CSS property value.
+/// Prevents CSS injection by escaping semicolons, backslashes, and quotes.
+pub fn escape_css_string(s: &str) -> String {
+    let mut result = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            ';' | '\\' => {
+                result.push('\\');
+                result.push(c);
+            }
+            '"' => result.push_str("\\\""),
+            '\'' => result.push_str("\\'"),
+            _ => result.push(c),
+        }
+    }
+    result
+}
+
 // Smart Interpolation Machinery
 // Allows {} to handle both Components (render) and Display types (escape)
 
