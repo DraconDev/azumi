@@ -219,40 +219,7 @@ pub struct Escaped<T: std::fmt::Display>(pub T);
 
 impl<T: std::fmt::Display> std::fmt::Display for Escaped<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = self.0.to_string();
-        for c in s.chars() {
-            match c {
-                '<' => write!(f, "&lt;")?,
-                '>' => write!(f, "&gt;")?,
-                '&' => write!(f, "&amp;")?,
-                '"' => write!(f, "&quot;")?,
-                '\'' => write!(f, "&#x27;")?,
-                _ => write!(f, "{}", c)?,
-            }
-        }
-        Ok(())
-    }
-}
-
-impl Escaped<&str> {
-    fn fmt_str(s: &str, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for c in s.chars() {
-            match c {
-                '<' => write!(f, "&lt;")?,
-                '>' => write!(f, "&gt;")?,
-                '&' => write!(f, "&amp;")?,
-                '"' => write!(f, "&quot;")?,
-                '\'' => write!(f, "&#x27;")?,
-                _ => write!(f, "{}", c)?,
-            }
-        }
-        Ok(())
-    }
-}
-
-impl Escaped<String> {
-    fn fmt_string(s: &String, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for c in s.chars() {
+        for c in self.0.to_string().chars() {
             match c {
                 '<' => write!(f, "&lt;")?,
                 '>' => write!(f, "&gt;")?,
