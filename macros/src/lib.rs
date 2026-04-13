@@ -447,6 +447,7 @@ fn strip_outer_quotes(s: &str) -> String {
         && ((trimmed.starts_with('"') && trimmed.ends_with('"'))
             || (trimmed.starts_with('\'') && trimmed.ends_with('\'')))
     {
+        // SAFETY: trimmed.len() >= 2 and starts with quote char, so first char exists
         let quote_char = trimmed.chars().next().unwrap();
         let mut result = String::with_capacity(trimmed.len() - 2);
         let mut chars = trimmed[1..trimmed.len() - 1].chars().peekable();
