@@ -159,6 +159,12 @@ fn send_raw_post(port: &str, path: &str, body: &str) -> bool {
     use std::io::Write;
     use std::net::TcpStream;
 
+    // Validate path to prevent HTTP header injection
+    if path.contains('\r') || path.contains('\n') {
+        eprintln!("Devtools: Invalid path contains newlines");
+        return false;
+    }
+
     let addr = format!("127.0.0.1:{}", port);
     if let Ok(socket_addr) = addr.parse() {
         if let Ok(mut stream) = TcpStream::connect_timeout(
