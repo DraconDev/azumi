@@ -18,8 +18,11 @@ pub use inventory;
 pub mod devtools;
 
 pub mod seo;
-
 pub use script::AzumiScript;
+
+pub mod css_utils {
+    pub use super::escape_css_string;
+}
 
 #[cfg(feature = "test-utils")]
 pub mod test;
