@@ -147,9 +147,14 @@ fn start_worker(bin_name: &str) -> Child {
     cmd.args(["run", "--bin", bin_name, "--"]);
     
     // Forward original CLI arguments to the worker
-    // Filter args to remove potentially dangerous values
+    // SECURITY: Filter args to remove shell metacharacters that could enable injection
     let args: Vec<String> = std::env::args().skip(1).filter(|arg| {
-        !arg.contains(|c: char| c == '\r' || c == '\n' || c == ';')
+        !arg.contains(|c: char| 
+            c == '\r' || c == '\n' || c == ';' || c == '|' || c == '&' ||
+            c == '>' || c == '<' || c == '$' || c == '`' || c == '(' ||
+            c == ')' || c == '!' || c == '*' || c == '?' || c == '#' ||
+            c == '\'' || c == '"' || c == '\\'
+        )
     }).collect();
     cmd.args(&args);
 
