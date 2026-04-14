@@ -161,7 +161,7 @@ fn test_verify_accepts_valid_timestamp() {
 #[test]
 fn test_dev_token_valid_when_matching() {
     std::env::set_var("AZUMI_DEV_TOKEN", "test-secret-token");
-    let result = azumi::devtools::is_dev_token_valid(Some("test-secret-token"));
+    let result = azumi::hot_reload::is_dev_token_valid(Some("test-secret-token"));
     std::env::remove_var("AZUMI_DEV_TOKEN");
     assert!(result);
 }
@@ -169,7 +169,7 @@ fn test_dev_token_valid_when_matching() {
 #[test]
 fn test_dev_token_invalid_when_mismatched() {
     std::env::set_var("AZUMI_DEV_TOKEN", "test-secret-token");
-    let result = azumi::devtools::is_dev_token_valid(Some("wrong-token"));
+    let result = azumi::hot_reload::is_dev_token_valid(Some("wrong-token"));
     std::env::remove_var("AZUMI_DEV_TOKEN");
     assert!(!result);
 }
@@ -177,21 +177,21 @@ fn test_dev_token_invalid_when_mismatched() {
 #[test]
 fn test_dev_token_invalid_when_none() {
     std::env::remove_var("AZUMI_DEV_TOKEN");
-    let result = azumi::devtools::is_dev_token_valid(None);
+    let result = azumi::hot_reload::is_dev_token_valid(None);
     assert!(!result);
 }
 
 #[test]
 fn test_dev_token_invalid_when_env_not_set() {
     std::env::remove_var("AZUMI_DEV_TOKEN");
-    let result = azumi::devtools::is_dev_token_valid(Some("any-token"));
+    let result = azumi::hot_reload::is_dev_token_valid(Some("any-token"));
     assert!(!result);
 }
 
 #[test]
 fn test_dev_token_invalid_length_mismatch() {
     std::env::set_var("AZUMI_DEV_TOKEN", "short");
-    let result = azumi::devtools::is_dev_token_valid(Some("much-longer-token"));
+    let result = azumi::hot_reload::is_dev_token_valid(Some("much-longer-token"));
     std::env::remove_var("AZUMI_DEV_TOKEN");
     assert!(!result);
 }
