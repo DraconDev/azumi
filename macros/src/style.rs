@@ -12,7 +12,7 @@ pub struct StyleOutput {
 }
 
 // AST for our style! macro
-struct StyleInput {
+pub(crate) struct StyleInput {
     items: Vec<StyleItem>,
 }
 
