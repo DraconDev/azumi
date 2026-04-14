@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock to reflect dependency resolution changes
+Refactored dev token validation to expose it as a public function for broader use
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes after recent refactoring work
+- [x] Made `is_dev_token_valid` function public to allow external access
 ```

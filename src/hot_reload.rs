@@ -22,7 +22,7 @@ fn get_broadcast_channel() -> &'static broadcast::Sender<String> {
 
 const DEV_TOKEN_HEADER: &str = "X-Azumi-Dev-Token";
 
-fn is_dev_token_valid(token: Option<&str>) -> bool {
+pub fn is_dev_token_valid(token: Option<&str>) -> bool {
     let Some(t) = token else {
         return false;
     };
