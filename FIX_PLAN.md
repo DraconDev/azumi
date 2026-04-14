@@ -4,7 +4,7 @@
 
 ---
 
-## Status (Updated April 13, 2026)
+## Status (Updated April 14, 2026)
 
 ### Phase 1: CRITICAL Security Fixes
 | Item | Status | Notes |
@@ -13,7 +13,7 @@
 | 1.2 Default secret panic | ✅ FIXED | Panics in release builds |
 | 1.3 unwrap() removal | ✅ FIXED | Proper match error handling |
 | 1.4 CSS injection | ✅ NOT A BUG | CSS is compiler-generated, Debug format works correctly |
-| 1.5 PageMetaGuard | ⚠️ THEORETICAL | Comment explains safety, guard pattern would be cleaner |
+| 1.5 PageMetaGuard | ✅ FIXED | Generation-based atomic counter implemented |
 | 1.6 Authorization gap in live actions | ✅ DOCUMENTED | Comments added, AI guide updated - developer responsibility |
 | 1.7 Component name validation | ✅ FIXED | Added alphanumeric validation before format_ident! |
 
@@ -24,7 +24,7 @@
 | 2.2 Form signing | ✅ FIXED | _azumi_scope sent with forms |
 | 2.3 Nested prediction | ✅ FIXED | Uses `[\w.]+` pattern |
 | 2.4 CSS validator | ✅ FIXED | Approach changed |
-| 2.5 Scope ID consistency | ✅ FIXED | Shared `compute_scope_id` |
+| 2.5 Scope ID consistency | ✅ FIXED | FNV-1a hash for deterministic output |
 | 2.6 Dead code removal | ✅ FIXED | generate_scope_id removed |
 | 2.7 is_self_field_mutation | ✅ DOCUMENTED | Returns false, noted |
 | 2.8 Raw<T> XSS risk | ✅ DOCUMENTED | Added comprehensive warning in src/lib.rs and AI guide |
@@ -34,21 +34,28 @@
 ### Phase 3: AI-First Hardening
 | Item | Status | Notes |
 |------|--------|-------|
-| 3.1-3.7 | ❌ NOT IMPLEMENTED | AI guide exists but no compiler lints |
+| 3.1-3.7 | ⚠️ PARTIAL | AI guide exists, some compiler lints implemented |
 | 3.8 Live action auth docs | ✅ DONE | AI guide updated with authorization requirements |
 
 ### Phase 4: Test Infrastructure
 | Item | Status | Notes |
 |------|--------|-------|
 | 4.1 CI expansion | ⚠️ UNKNOWN | No .github checked |
-| 4.2-4.3 Test files | ✅ 48+ tests pass | 2 pre-existing failures unrelated to fixes |
+| 4.2-4.3 Test files | ✅ 1232 tests | All passing, 0 failures |
 
 ### Phase 5: Cleanup
 | Item | Status | Notes |
 |------|--------|-------|
-| 5.1 Dead code | ✅ DONE | transform_path_for_component body commented |
-| 5.2 CSS deduplication | ⚠️ LOW PRIORITY | Two implementations serve different purposes (macro vs runtime) |
+| 5.1 Dead code | ✅ DONE | suggestions.rs removed, predict macro kept for future |
+| 5.2 CSS deduplication | ⚠️ LOW PRIORITY | Two implementations serve different purposes |
 | 5.3 Module collision | ✅ FIXED | Uses format_ident! with struct name |
+
+### Phase 6: Shell Metachar Security (Round 2 Review)
+| Item | Status | Notes |
+|------|--------|-------|
+| 6.1 Extended metachar filter | ✅ FIXED | Added [ ] { } % ~ space (21 chars total) |
+| 6.2 is_dev_token_valid tests | ✅ DONE | 5 security tests added |
+| 6.3 is_arg_safe tests | ✅ DONE | 2 tests for blocked/safe chars |
 
 ---
 
