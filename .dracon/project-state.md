@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Added a debug test for sitemap URL normalization to verify path resolution behavior
+Removed a debug test for sitemap URL normalization
 
 ## Completed
-- [x] Added test case to verify sitemap URL normalization with path resolution ("/a/b/c/../../d")
+- [x] Deleted `tests/debug_sitemap2.rs` which was a temporary debug test for verifying path resolution in sitemap URLs
