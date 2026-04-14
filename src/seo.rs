@@ -404,6 +404,8 @@ impl SitemapBuilder {
                     // seg_start now points to the / before the segment name
                     // e.g. for /foo/../bar, seg_start is at / (before foo)
                     if seg_start > 0 {
+                        // Point to the / before the directory to remove
+                        seg_start -= 1;
                         // Remove from seg_start to pos+3 (end of /../)
                         candidate = format!("{}{}", &candidate[..seg_start], &candidate[pos + 3..]);
                     } else {
