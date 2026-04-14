@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency resolution changes
+Refactored template lookup in hot_reload.rs to return key-value pairs for better ownership handling
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes
+- [x] Changed `registry.get(id).cloned()` to `registry.get_key_value(id).map(|(_, v)| v.clone())` to maintain proper ownership semantics
 ```
