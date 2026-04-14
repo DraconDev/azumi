@@ -228,19 +228,20 @@ fn send_raw_post(port: &str, path: &str, body: &str) -> bool {
             &socket_addr,
             Duration::from_millis(100),
         ) {
-        let request = format!(
-            "POST {} HTTP/1.1\r\n\
-             Host: localhost:{}\r\n\
-             Content-Type: application/json\r\n\
-             Content-Length: {}\r\n\
-             Connection: close\r\n\r\n\
-             {}",
-            path,
-            port,
-            body.len(),
-            body
-        );
-        return stream.write_all(request.as_bytes()).is_ok();
+            let request = format!(
+                "POST {} HTTP/1.1\r\n\
+                 Host: localhost:{}\r\n\
+                 Content-Type: application/json\r\n\
+                 Content-Length: {}\r\n\
+                 Connection: close\r\n\r\n\
+                 {}",
+                path,
+                port,
+                body.len(),
+                body
+            );
+            return stream.write_all(request.as_bytes()).is_ok();
+        }
     }
     false
 }
