@@ -206,3 +206,79 @@ fn test_compute_scope_id_format() {
         id
     );
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// CSS String Escaping
+// ════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_escape_css_string_basic() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("hello");
+    assert_eq!(result, "hello");
+}
+
+#[test]
+fn test_escape_css_string_semicolon() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("color: red;");
+    assert!(result.contains("\\;"));
+}
+
+#[test]
+fn test_escape_css_string_backslash() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("path\\to\\file");
+    assert!(result.contains("\\\\"));
+}
+
+#[test]
+fn test_escape_css_string_quotes() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("font-family: \"Arial\"");
+    assert!(result.contains("\\\""));
+}
+
+#[test]
+fn test_escape_css_string_newline() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("line1\nline2");
+    assert!(result.contains("\\a"));
+}
+
+#[test]
+fn test_escape_css_string_braces() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("{valid}");
+    assert!(result.contains("\\{") && result.contains("\\}"));
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Sitemap Path Normalization
+// ════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_sitemap_basic_url() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
+        .add_url("/page1")
+        .add_url("/page2")
+        .build();
+    assert!(sitemap.contains("https://example.com/page1"));
+    assert!(sitemap.contains("https://example.com/page2"));
+}
+
+#[test]
+fn test_sitemap_trailing_slash_normalized() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com/")
+        .add_url("/page")
+        .build();
+    assert!(sitemap.contains("https://example.com/page"));
+}
+
+#[test]
+fn test_sitemap_path_traversal_removed() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
+        .add_url("/foo/bar/../baz")
+        .build();
+    assert!(sitemap.contains("https://example.com/foo/baz"));
+}
