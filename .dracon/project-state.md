@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency resolution changes
+Added comprehensive security tests for state verification to prevent DoS and invalid signature handling
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes
+- [x] Added test for rejecting single-pipe input (missing timestamp)
+- [x] Added test for rejecting invalid base64 signatures
 ```

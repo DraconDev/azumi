@@ -120,6 +120,22 @@ fn test_verify_rejects_invalid_json_pipe_structure() {
     assert!(security::verify_state(invalid).is_err());
 }
 
+#[test]
+fn test_verify_rejects_single_pipe() {
+    // Only one pipe - missing timestamp
+    let invalid = "json|signature";
+    assert!(security::verify_state(invalid).is_err());
+}
+
+#[test]
+fn test_verify_rejects_invalid_base64_signature() {
+    // Valid structure but invalid base64
+    let signed = security::sign_state("test");
+    let parts: Vec<&str> = signed.splitn(2, '|').collect();
+    let invalid = format!("{}|{}|INVALID!!!base64", parts[0], parts[1]);
+    assert!(security::verify_state(&invalid).is_err());
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // Default Secret Detection
 // ════════════════════════════════════════════════════════════════════════════
