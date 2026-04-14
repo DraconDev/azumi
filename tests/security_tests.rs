@@ -296,3 +296,40 @@ fn test_sitemap_path_traversal_removed() {
         .build();
     assert!(sitemap.contains("https://example.com/foo/baz"));
 }
+
+#[test]
+fn test_sitemap_absolute_url_rejected_when_mismatched() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
+        .add_url("https://other.com/page")
+        .build();
+    assert!(!sitemap.contains("other.com"));
+}
+
+#[test]
+fn test_sitemap_multiple_urls() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
+        .add_url("/page1")
+        .add_url("/page2")
+        .add_url("/page3")
+        .build();
+    assert!(sitemap.contains("/page1"));
+    assert!(sitemap.contains("/page2"));
+    assert!(sitemap.contains("/page3"));
+}
+
+#[test]
+fn test_sitemap_has_xml_header() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
+        .add_url("/page")
+        .build();
+    assert!(sitemap.starts_with(r#"<?xml version="1.0""#));
+    assert!(sitemap.contains(r#"xmlns="http://www.sitemaps.org/schemas/sitemap/0.9""#));
+}
+
+#[test]
+fn test_sitemap_escapes_special_chars_in_url() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
+        .add_url("/page?id=1&lang=en")
+        .build();
+    assert!(sitemap.contains("&amp;"));
+}
