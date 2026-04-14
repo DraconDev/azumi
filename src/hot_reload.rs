@@ -261,7 +261,7 @@ pub fn get_template(id: &str) -> Option<RuntimeTemplate> {
         eprintln!("Hot Reload: Registry lock poisoned - template lookup failed");
         return None;
     };
-    registry.get_key_value(id).map(|(_, v)| v.clone())
+    registry.get(&id.to_string()).cloned()
 }
 
 const MAX_TEMPLATE_PARTS: usize = 100;
