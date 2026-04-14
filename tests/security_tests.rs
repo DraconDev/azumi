@@ -550,3 +550,20 @@ fn test_sitemap_empty_path() {
         .build();
     assert!(sitemap.contains("https://example.com/"));
 }
+
+#[test]
+fn test_sitemap_complex_path() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
+        .add_url("/blog/2024/03/15/my-first-post")
+        .build();
+    assert!(sitemap.contains("blog/2024/03/15/my-first-post"));
+}
+
+#[test]
+fn test_sitemap_query_params_escaped() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
+        .add_url("/search?q=test&category=tech")
+        .build();
+    assert!(sitemap.contains("&amp;"));
+    assert!(sitemap.contains("q=test"));
+}

@@ -1,12 +1,9 @@
 # Project State
 
 ## Current Focus
-Added comprehensive security test cases for state signing and verification
+Added comprehensive sitemap generation tests for complex paths and query parameter escaping
 
 ## Completed
-- [x] Added test for signing and verifying empty JSON
-- [x] Added test for signing and verifying nested JSON structures
-- [x] Added test for handling special characters in JSON
-- [x] Added test for detecting tampered JSON content
-- [x] Added test for rejecting empty signatures
-- [x] Added test for rejecting invalid Unicode in signatures
+- [x] Added test for sitemap generation with complex paths (e.g., "/blog/2024/03/15/my-first-post")
+- [x] Added test for proper XML escaping of query parameters in sitemap URLs
+```
