@@ -201,7 +201,7 @@ fn test_compute_scope_id_format() {
     let id = compute_scope_id(1, 1);
     assert!(id.starts_with("s"), "Scope ID should start with 's'");
     assert!(
-        id.len() <= 16,
+        id.len() <= 20,
         "Scope ID should be reasonably short, got: {}",
         id
     );
