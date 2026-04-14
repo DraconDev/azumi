@@ -485,10 +485,10 @@ pub fn validate_attribute_name(attr: &crate::token_parser::Attribute) -> Option<
         // This is Azumi's event DSL like on:click, on:mouseover - allowed
         return None;
     }
-    if name.starts_with("on") {
+    if let Some(stripped) = name.strip_prefix("on") {
         // Native HTML event handler like onclick, onmouseover
         // Suggest using Azumi's on:event syntax instead
-        let suggestion = format!("on:{}", &name[2..].to_lowercase());
+        let suggestion = format!("on:{}", stripped.to_lowercase());
         let msg = format!(
             "Native event handler '{}' found. Did you mean to use Azumi's event DSL '{}'?\n\n\
              Azumi uses a different syntax for events:\n\

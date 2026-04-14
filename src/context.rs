@@ -57,7 +57,7 @@ thread_local! {
 
 impl PageMetaGuard {
     fn new() -> Self {
-        let counter = PAGE_META_GENERATION.with(|rc| Rc::clone(rc));
+        let counter = PAGE_META_GENERATION.with(Rc::clone);
         let generation = counter.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
         PageMetaGuard { counter, generation }
     }
