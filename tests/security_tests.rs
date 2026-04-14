@@ -106,6 +106,20 @@ fn test_verify_rejects_multiple_separators() {
     assert_eq!(verified, json);
 }
 
+#[test]
+fn test_verify_rejects_too_many_pipes() {
+    // More than 10 pipes should be rejected (DoS protection)
+    let malicious = "a|".repeat(20);
+    assert!(security::verify_state(&malicious).is_err());
+}
+
+#[test]
+fn test_verify_rejects_invalid_json_pipe_structure() {
+    // Has pipes but not in correct structure (json|timestamp|signature)
+    let invalid = "just-json-without-timestamp";
+    assert!(security::verify_state(invalid).is_err());
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // Default Secret Detection
 // ════════════════════════════════════════════════════════════════════════════
