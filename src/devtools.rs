@@ -57,6 +57,32 @@ pub fn auto_reload_if(enabled: bool) {
     std::process::exit(0);
 }
 
+/// Check if an argument is safe from shell injection.
+///
+/// Returns true if the argument does not contain any shell metacharacters
+/// that could enable command injection when passed to a shell.
+///
+/// # Security
+///
+/// This function is used to validate CLI arguments before passing them
+/// to a subprocess. Blocked characters include:
+/// - Shell operators: `;`, `|`, `&`, `>`, `<`
+/// - Variable expansion: `$`, `` ` ``, `%`
+/// - Quote removal: `'`, `"`, `\`
+/// - Grouping: `(`, `)`, `{`, `}`, `[`, `]`
+/// - Glob/brace expansion: `*`, `?`, `#`, `~`, space
+/// - Newlines which can inject HTTP headers
+pub fn is_arg_safe(arg: &str) -> bool {
+    !arg.contains(|c: char| 
+        c == '\r' || c == '\n' || c == ';' || c == '|' || c == '&' ||
+        c == '>' || c == '<' || c == '$' || c == '`' || c == '(' ||
+        c == ')' || c == '!' || c == '*' || c == '?' || c == '#' ||
+        c == '\'' || c == '"' || c == '\\' ||
+        c == '[' || c == ']' || c == '{' || c == '}' ||
+        c == '%' || c == '~' || c == ' '
+    )
+}
+
 use std::io::IsTerminal;
 
 // The master loop runs forever, reaping child processes on each restart.
