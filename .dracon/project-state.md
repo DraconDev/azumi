@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency resolution changes
+Refactored LRUCache key removal to ensure proper ownership handling
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes
+- [x] Modified key cloning in LRUCache to properly dereference and clone keys
 ```
