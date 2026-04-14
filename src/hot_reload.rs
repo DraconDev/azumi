@@ -137,7 +137,7 @@ impl<K: std::hash::Hash + Eq + std::cmp::Ord + Clone, V> LRUCache<K, V> {
     }
 }
 
-impl<K, V> Default for LRUCache<K, V> {
+impl<K: std::hash::Hash + Eq + std::cmp::Ord + Clone, V> Default for LRUCache<K, V> {
     fn default() -> Self {
         Self::new()
     }
