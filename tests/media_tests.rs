@@ -343,11 +343,11 @@ fn test_video_controlslist() {
 fn test_video_fallback() {
     let component = html! {
         <video src="/video.mp4">
-            <p>"Your browser doesn&quot;t support video."</p>
+            <p>"Video not supported"</p>
         </video>
     };
     let html = test::render(&component);
-    assert!(html.contains("doesn&quot;t support video"));
+    assert!(html.contains("Video not supported"));
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -413,11 +413,11 @@ fn test_audio_multiple_sources() {
 fn test_audio_fallback() {
     let component = html! {
         <audio src="/audio.mp3">
-            <p>"Your browser doesn&quot;t support audio."</p>
+            <p>"Audio not supported"</p>
         </audio>
     };
     let html = test::render(&component);
-    assert!(html.contains("doesn&quot;t support audio"));
+    assert!(html.contains("Audio not supported"));
 }
 
 #[test]
