@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency resolution changes
+Removed typo suggestion functionality from the macros crate
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes
+- [x] Deleted the `suggestions.rs` module which provided Levenshtein distance calculations and typo suggestions for error messages
+- [x] Removed all related test cases for the suggestion functionality
