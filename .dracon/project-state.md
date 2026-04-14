@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed unused `ConnectInfo` import from hot_reload.rs
+Update Cargo.lock to reflect dependency resolution changes after recent refactoring
 
 ## Completed
-- [x] Removed unused `ConnectInfo` import to reduce module dependencies
+- [x] Updated Cargo.lock to reflect dependency changes from recent refactoring work
 ```
