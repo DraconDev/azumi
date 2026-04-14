@@ -640,7 +640,7 @@ fn generate_body(
             !has_scoped || scope_id.is_some(),
             "scope_id must be Some when has_scoped is true"
         );
-        let scope_id_str = scope_id.as_ref().map(|s| s.as_str()).unwrap_or("");
+        let scope_id_str = scope_id.as_deref().unwrap_or("");
 
         let css_to_inject = if has_global {
             if has_scoped {

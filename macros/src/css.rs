@@ -18,7 +18,7 @@ fn scope_css_recursive(iter: &mut Peekable<Chars>, scope_attr: &str) -> String {
         if ch == '"' || ch == '\'' {
             buffer.push(ch);
             let quote = ch;
-            while let Some(c) = iter.next() {
+            for c in iter.by_ref() {
                 buffer.push(c);
                 if c == quote {
                     break;
@@ -111,7 +111,7 @@ fn scope_css_level(iter: &mut Peekable<Chars>, scope_attr: &str, finding_close: 
         if ch == '"' || ch == '\'' {
             buffer.push(ch);
             let quote = ch;
-            while let Some(c) = iter.next() {
+            for c in iter.by_ref() {
                 buffer.push(c);
                 if c == quote {
                     break;

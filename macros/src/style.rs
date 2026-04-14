@@ -417,13 +417,13 @@ fn validate_units(value: &str) -> Option<String> {
                 && !value_lower
                     .chars()
                     .nth(value_lower.len() - typo.len() - 1)
-                    .map_or(false, |c| c.is_alphanumeric())
+                    .is_some_and(|c| c.is_alphanumeric())
             || value_lower.starts_with(typo)
                 && value_lower.len() > typo.len()
                 && !value_lower
                     .chars()
                     .nth(typo.len())
-                    .map_or(false, |c| c.is_alphanumeric())
+                    .is_some_and(|c| c.is_alphanumeric())
             || value_lower.contains(spaced_typo)
         {
             return Some(format!(
