@@ -1,8 +1,12 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock to reflect dependency resolution changes after recent refactoring
+Added comprehensive security test cases for state signing and verification
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency changes from recent refactoring work
-```
+- [x] Added test for signing and verifying empty JSON
+- [x] Added test for signing and verifying nested JSON structures
+- [x] Added test for handling special characters in JSON
+- [x] Added test for detecting tampered JSON content
+- [x] Added test for rejecting empty signatures
+- [x] Added test for rejecting invalid Unicode in signatures

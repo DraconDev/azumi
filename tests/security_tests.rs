@@ -154,6 +154,52 @@ fn test_verify_accepts_valid_timestamp() {
     assert_eq!(verified, r#"{"count":5}"#);
 }
 
+#[test]
+fn test_sign_state_empty_json() {
+    let signed = security::sign_state("{}");
+    let verified = security::verify_state(&signed).unwrap();
+    assert_eq!(verified, "{}");
+}
+
+#[test]
+fn test_sign_state_nested_json() {
+    let json = r#"{"user":{"name":"Alice","items":[1,2,3]}}"#;
+    let signed = security::sign_state(json);
+    let verified = security::verify_state(&signed).unwrap();
+    assert_eq!(verified, json);
+}
+
+#[test]
+fn test_sign_state_special_chars_in_json() {
+    let json = r#"{"message":"Hello\nWorld!","path":"C:\\Users\\Test"}"#;
+    let signed = security::sign_state(json);
+    let verified = security::verify_state(&signed).unwrap();
+    assert_eq!(verified, json);
+}
+
+#[test]
+fn test_verify_rejects_tampered_json() {
+    let signed = security::sign_state(r#"{"admin":false}"#);
+    let tampered = signed.replace("false", "true");
+    assert!(security::verify_state(&tampered).is_err());
+}
+
+#[test]
+fn test_verify_rejects_empty_signature() {
+    let signed = security::sign_state("test");
+    let parts: Vec<&str> = signed.splitn(2, '|').collect();
+    let tampered = format!("{}||", parts[0]);
+    assert!(security::verify_state(&tampered).is_err());
+}
+
+#[test]
+fn test_verify_rejects_unicode_in_signature() {
+    let signed = security::sign_state("test");
+    let parts: Vec<&str> = signed.splitn(2, '|').collect();
+    let tampered = format!("{}|{}¥¥¥¥", parts[0], parts[1]);
+    assert!(security::verify_state(&tampered).is_err());
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // Dev Token Validation (hot_reload)
 // ════════════════════════════════════════════════════════════════════════════
