@@ -57,7 +57,7 @@ struct LRUCache<K, V> {
     next_access_id: u64,
 }
 
-impl<K: std::hash::Hash + Eq + std::cmp::Ord, V> LRUCache<K, V> {
+impl<K: std::hash::Hash + Eq + std::cmp::Ord + Clone, V> LRUCache<K, V> {
     fn new() -> Self {
         Self {
             map: HashMap::new(),
