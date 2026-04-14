@@ -499,7 +499,8 @@ fn test_render_nested_components() {
 
 #[test]
 fn test_render_with_attributes() {
-    let component = azumi::html! { <a href="https://example.com" class="link">"Link"</a> };
+    let class = "link";
+    let component = azumi::html! { <a href="https://example.com" class={class}>"Link"</a> };
     let html = azumi::test::render(&component);
     assert!(html.contains("href=\"https://example.com\""));
     assert!(html.contains("class=\"link\""));
