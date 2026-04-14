@@ -6,5 +6,6 @@ mod tests {
             .add_url("/foo/bar/../baz")
             .build();
         println!("SITEMAP: {}", sitemap);
+        assert!(false, "SITEMAP: {}", sitemap);
     }
 }
