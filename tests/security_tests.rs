@@ -280,5 +280,5 @@ fn test_sitemap_path_traversal_removed() {
     let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
         .add_url("/foo/bar/../baz")
         .build();
-    assert!(sitemap.contains("https://example.com/foo//baz"));
+    assert!(sitemap.contains("https://example.com/foo/baz"));
 }
