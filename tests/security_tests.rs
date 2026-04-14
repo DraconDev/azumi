@@ -426,6 +426,50 @@ fn test_render_automatic_seo_empty_context() {
 }
 
 #[test]
+fn test_escape_css_string_carriage_return() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("line1\rline2");
+    assert!(result.contains("\\d"));
+}
+
+#[test]
+fn test_escape_css_string_tab() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("prop:\tvalue");
+    assert!(result.contains("\\9"));
+}
+
+#[test]
+fn test_escape_css_string_single_quote() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("font-family: 'Arial'");
+    assert!(result.contains("\\'"));
+}
+
+#[test]
+fn test_escape_css_string_multiple_special_chars() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("color: blue; }");
+    assert!(result.contains("\\}"));
+    assert!(result.contains("\\;"));
+}
+
+#[test]
+fn test_escaped_wrapper_double_quote() {
+    use azumi::Escaped;
+    let escaped = format!("{}", Escaped("say \"hello\""));
+    assert!(escaped.contains("&quot;"));
+}
+
+#[test]
+fn test_escaped_wrapper_newline_becomes_space() {
+    use azumi::Escaped;
+    let escaped = format!("{}", Escaped("line1\nline2"));
+    assert!(escaped.contains("line1"));
+    assert!(escaped.contains("line2"));
+}
+
+#[test]
 fn test_escape_css_string_basic() {
     use azumi::escape_css_string;
     let result = escape_css_string("hello");
