@@ -111,7 +111,7 @@ fn run_master_loop() {
 
     let mut server = start_worker(bin_name);
     let (tx, rx) = channel();
-    let watcher = match RecommendedWatcher::new(tx, Config::default()) {
+    let mut watcher = match RecommendedWatcher::new(tx, Config::default()) {
         Ok(w) => w,
         Err(e) => {
             eprintln!("Devtools: Failed to create watcher: {}", e);
