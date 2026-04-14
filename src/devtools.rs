@@ -101,7 +101,7 @@ fn run_master_loop() {
             return;
         }
     };
-    let bin_name = exe.file_name().and_then(|s| s.to_str()).unwrap_or("app");
+    let mut bin_name = exe.file_name().and_then(|s| s.to_str()).unwrap_or("app");
 
     // Validate bin_name to prevent command injection
     if bin_name.is_empty() || bin_name.contains(|c: char| c.is_whitespace() || c == ';' || c == '|' || c == '&' || c == '>' || c == '<' || c == '`' || c == '$') {
