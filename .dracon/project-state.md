@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency resolution changes
+Added a debug test for sitemap URL normalization to verify path resolution behavior
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes
-```
+- [x] Added test case to verify sitemap URL normalization with path resolution ("/a/b/c/../../d")
