@@ -235,8 +235,40 @@ fn test_compute_scope_id_format() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// CSS String Escaping
+// HTML Escaping
 // ════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_escaped_wrapper_all_chars() {
+    use azumi::Escaped;
+    let escaped = format!("{}", Escaped("<script>alert('xss')&\"test\""));
+    assert!(escaped.contains("&lt;script&gt;"));
+    assert!(escaped.contains("&#x27;")); // single quote
+    assert!(escaped.contains("&amp;")); // ampersand
+    assert!(escaped.contains("&quot;")); // double quote
+}
+
+#[test]
+fn test_escaped_wrapper_preserves_normal_text() {
+    use azumi::Escaped;
+    let escaped = format!("{}", Escaped("Hello World"));
+    assert_eq!(escaped, "Hello World");
+}
+
+#[test]
+fn test_escaped_wrapper_angle_brackets() {
+    use azumi::Escaped;
+    let escaped = format!("{}", Escaped("a < b > c"));
+    assert!(escaped.contains("&lt;"));
+    assert!(escaped.contains("&gt;"));
+}
+
+#[test]
+fn test_render_automatic_seo_empty_context() {
+    // Without init_seo or page context, render_automatic_seo should still work
+    let html = azumi::seo::generate_head("", None, None, None, None);
+    assert!(html.0.contains("<title>"));
+}
 
 #[test]
 fn test_escape_css_string_basic() {
