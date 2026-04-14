@@ -515,6 +515,21 @@ fn test_render_self_closing_tags() {
 }
 
 #[test]
+fn test_render_multiple_elements() {
+    let component = azumi::html! {
+        <div>
+            <p>"First"</p>
+            <p>"Second"</p>
+            <p>"Third"</p>
+        </div>
+    };
+    let html = azumi::test::render(&component);
+    assert!(html.contains("<p>First</p>"));
+    assert!(html.contains("<p>Second</p>"));
+    assert!(html.contains("<p>Third</p>"));
+}
+
+#[test]
 fn test_escape_css_string_basic() {
     use azumi::escape_css_string;
     let result = escape_css_string("hello");
