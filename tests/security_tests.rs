@@ -469,6 +469,51 @@ fn test_escaped_wrapper_newline_becomes_space() {
     assert!(escaped.contains("line2"));
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// Component Rendering Tests
+// ════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_render_simple_component() {
+    let component = azumi::html! { <div>"Hello"</div> };
+    let html = azumi::test::render(&component);
+    assert!(html.contains("<div>"));
+    assert!(html.contains("Hello"));
+    assert!(html.contains("</div>"));
+}
+
+#[test]
+fn test_render_nested_components() {
+    let component = azumi::html! {
+        <div>
+            <span>"Nested"</span>
+        </div>
+    };
+    let html = azumi::test::render(&component);
+    assert!(html.contains("<div>"));
+    assert!(html.contains("<span>"));
+    assert!(html.contains("Nested"));
+    assert!(html.contains("</span>"));
+    assert!(html.contains("</div>"));
+}
+
+#[test]
+fn test_render_with_attributes() {
+    let component = azumi::html! { <a href="https://example.com" class="link">"Link"</a> };
+    let html = azumi::test::render(&component);
+    assert!(html.contains("href=\"https://example.com\""));
+    assert!(html.contains("class=\"link\""));
+}
+
+#[test]
+fn test_render_self_closing_tags() {
+    let component = azumi::html! { <input type="text" name="field" /> };
+    let html = azumi::test::render(&component);
+    assert!(html.contains("<input"));
+    assert!(html.contains("type=\"text\""));
+    assert!(html.contains("name=\"field\""));
+}
+
 #[test]
 fn test_escape_css_string_basic() {
     use azumi::escape_css_string;
