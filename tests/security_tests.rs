@@ -177,3 +177,32 @@ fn test_seo_url_special_chars() {
         html.0
     );
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// Depth Check (DoS Prevention)
+// ════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_compute_scope_id_deterministic() {
+    use azumi::compute_scope_id;
+    let id1 = compute_scope_id(10, 5);
+    let id2 = compute_scope_id(10, 5);
+    let id3 = compute_scope_id(10, 6);
+    assert_eq!(id1, id2, "Same line/col should produce same scope ID");
+    assert_ne!(
+        id1, id3,
+        "Different line/col should produce different scope ID"
+    );
+}
+
+#[test]
+fn test_compute_scope_id_format() {
+    use azumi::compute_scope_id;
+    let id = compute_scope_id(1, 1);
+    assert!(id.starts_with("s"), "Scope ID should start with 's'");
+    assert!(
+        id.len() <= 16,
+        "Scope ID should be reasonably short, got: {}",
+        id
+    );
+}
