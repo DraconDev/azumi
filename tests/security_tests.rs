@@ -139,6 +139,19 @@ fn test_default_secret_is_obviously_dev() {
 // ════════════════════════════════════════════════════════════════════════════
 
 #[test]
+fn test_seo_title_only() {
+    let html = azumi::seo::generate_head("Page Title", None, None, None, None);
+    assert!(html.0.contains("Page Title"));
+}
+
+#[test]
+fn test_seo_description_only() {
+    let html = azumi::seo::generate_head("", Some("Page description"), None, None, None);
+    assert!(html.0.contains("Page description"));
+    assert!(html.0.contains(r#"name="description""#));
+}
+
+#[test]
 fn test_seo_title_no_raw_script_tags() {
     let html = azumi::seo::generate_head("<script>alert('xss')</script>", None, None, None, None);
     assert!(
