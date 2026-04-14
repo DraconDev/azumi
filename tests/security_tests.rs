@@ -155,6 +155,81 @@ fn test_verify_accepts_valid_timestamp() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// Dev Token Validation (hot_reload)
+// ════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_dev_token_valid_when_matching() {
+    std::env::set_var("AZUMI_DEV_TOKEN", "test-secret-token");
+    let result = azumi::devtools::is_dev_token_valid(Some("test-secret-token"));
+    std::env::remove_var("AZUMI_DEV_TOKEN");
+    assert!(result);
+}
+
+#[test]
+fn test_dev_token_invalid_when_mismatched() {
+    std::env::set_var("AZUMI_DEV_TOKEN", "test-secret-token");
+    let result = azumi::devtools::is_dev_token_valid(Some("wrong-token"));
+    std::env::remove_var("AZUMI_DEV_TOKEN");
+    assert!(!result);
+}
+
+#[test]
+fn test_dev_token_invalid_when_none() {
+    std::env::remove_var("AZUMI_DEV_TOKEN");
+    let result = azumi::devtools::is_dev_token_valid(None);
+    assert!(!result);
+}
+
+#[test]
+fn test_dev_token_invalid_when_env_not_set() {
+    std::env::remove_var("AZUMI_DEV_TOKEN");
+    let result = azumi::devtools::is_dev_token_valid(Some("any-token"));
+    assert!(!result);
+}
+
+#[test]
+fn test_dev_token_invalid_length_mismatch() {
+    std::env::set_var("AZUMI_DEV_TOKEN", "short");
+    let result = azumi::devtools::is_dev_token_valid(Some("much-longer-token"));
+    std::env::remove_var("AZUMI_DEV_TOKEN");
+    assert!(!result);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Shell Metachar Filtering (devtools)
+// ════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_devtools_blocked_chars_filtered() {
+    let blocked = [
+        "\r", "\n", ";", "|", "&", ">", "<", "$", "`", "(", ")", "!", "*", "?", "#", "'", "\"",
+        "\\", "[", "]", "{", "}", "%", "~", " ",
+    ];
+
+    for ch in blocked {
+        let arg = format!("arg{}value", ch);
+        assert!(
+            !azumi::devtools::is_arg_safe(&arg),
+            "Character {:?} should be blocked but wasn't",
+            ch
+        );
+    }
+}
+
+#[test]
+fn test_devtools_safe_chars_allowed() {
+    let safe = ["arg", "value", "123", "abc-def", "file.txt", "path/to/dir"];
+    for arg in safe {
+        assert!(
+            azumi::devtools::is_arg_safe(arg),
+            "Safe argument {:?} should be allowed but wasn't",
+            arg
+        );
+    }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // Default Secret Detection
 // ════════════════════════════════════════════════════════════════════════════
 
