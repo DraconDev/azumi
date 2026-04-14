@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored devtools watcher to use mutable binding for potential future modifications
+Refactored LRUCache key removal to ensure proper ownership handling during cache pruning
 
 ## Completed
-- [x] Changed watcher variable from immutable to mutable in devtools.rs to allow potential future modifications
+- [x] Modified key collection in LRUCache to clone keys before mutable borrow of self.map
 ```

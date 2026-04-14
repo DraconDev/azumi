@@ -121,7 +121,8 @@ impl<K: std::hash::Hash + Eq + std::cmp::Ord, V> LRUCache<K, V> {
         }
         
         // Collect keys to remove (everything from keep_count onward)
-        let keys_to_remove: Vec<_> = entries.into_iter()
+        // Clone keys to owned values so we can mutably borrow self.map afterwards
+        let keys_to_remove: Vec<K> = entries.into_iter()
             .skip(keep_count)
             .map(|(_, k)| k.clone())
             .collect();
