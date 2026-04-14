@@ -418,8 +418,8 @@ fn test_sitemap_double_dot_normalization() {
     let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
         .add_url("/a/b/c/../../d")
         .build();
-    // /a/b/c/../../d should normalize to /a/b/d
-    assert!(sitemap.contains("https://example.com/a/b/d"));
+    // /a/b/c/../../d should normalize to /a/d
+    assert!(sitemap.contains("https://example.com/a/d"));
 }
 
 #[test]

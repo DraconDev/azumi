@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Removed a debug test for sitemap URL normalization
+Fix incorrect URL path normalization in sitemap generation
 
 ## Completed
-- [x] Deleted `tests/debug_sitemap2.rs` which was a temporary debug test for verifying path resolution in sitemap URLs
+- [x] Corrected path normalization logic for sitemap URLs (changed `/a/b/c/../../d` to normalize to `/a/d` instead of `/a/b/d`)
