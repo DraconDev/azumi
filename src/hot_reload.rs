@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::sync::OnceLock;
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
-    extract::connect_info::ConnectInfo,
     response::IntoResponse,
     routing::{get, post},
     Json, Router,
