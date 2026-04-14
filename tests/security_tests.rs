@@ -412,3 +412,20 @@ fn test_sitemap_escapes_special_chars_in_url() {
         .build();
     assert!(sitemap.contains("&amp;"));
 }
+
+#[test]
+fn test_sitemap_double_dot_normalization() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
+        .add_url("/a/b/c/../../d")
+        .build();
+    // /a/b/c/../../d should normalize to /a/b/d
+    assert!(sitemap.contains("https://example.com/a/b/d"));
+}
+
+#[test]
+fn test_sitemap_empty_path() {
+    let sitemap = azumi::seo::SitemapBuilder::new("https://example.com")
+        .add_url("/")
+        .build();
+    assert!(sitemap.contains("https://example.com/"));
+}
