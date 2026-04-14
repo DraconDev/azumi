@@ -130,7 +130,6 @@ impl<K: std::hash::Hash + Eq, V> LRUCache<K, V> {
             self.map.remove(&key);
         }
     }
-    }
 
     fn len(&self) -> usize {
         self.map.len()
