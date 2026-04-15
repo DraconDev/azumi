@@ -61,6 +61,58 @@ pub fn predict(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+/// Marks an action method as requiring authentication.
+///
+/// When applied to a method in a `#[azumi::live_impl]` block, the generated
+/// handler will verify the user is authenticated before executing the action.
+///
+/// # Usage
+///
+/// ```ignore
+/// #[azumi::live_impl(component = "my_view")]
+/// impl MyState {
+///     #[azumi::require_auth]
+///     pub fn delete_item(&mut self) {
+///         // Only executes if user is authenticated
+///     }
+///
+///     pub fn view_item(&mut self) {
+///         // No auth required - public access
+///     }
+/// }
+/// ```
+///
+/// # Setup
+///
+/// You must register an auth provider that implements `azumi::auth::HasCurrentUser`:
+///
+/// ```ignore
+/// struct MyAuth;
+///
+/// impl azumi::auth::HasCurrentUser for MyAuth {
+///     fn get_user_id(req: &Request<Body>) -> AuthResult<String> {
+///         // Extract user from your auth middleware (cookies, JWT, etc.)
+///     }
+/// }
+///
+/// fn main() {
+///     azumi::auth::register_auth_provider::<MyAuth>();
+/// }
+/// ```
+///
+/// # Security Note
+///
+/// `#[require_auth]` verifies the user IS AUTHENTICATED. You must still add
+/// authorization checks within your action methods to verify the user is allowed
+/// to perform that specific action on that specific state (e.g., "is this user
+/// the owner of this resource?").
+#[proc_macro_attribute]
+pub fn require_auth(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    // This attribute is recognized by the live_impl macro
+    // It doesn't transform the item - it just marks it
+    item
+}
+
 // Helpers for parsing Component arguments
 struct KeyValueArg {
     key: syn::Ident,
