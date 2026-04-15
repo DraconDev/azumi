@@ -204,7 +204,7 @@ fn test_fn_once_with_various_types() {
     // Test with different std::fmt::Display types
     let string = String::from("text");
     let num = 42;
-    let float = 3.14159;
+    let float = std::f64::consts::PI;
     let char = 'X';
 
     let component = from_fn_once(move |f| write!(f, "<div>{string} {num} {float} {char}</div>"));

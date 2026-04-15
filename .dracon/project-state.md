@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency resolution changes after recent dependency updates
+Improved test coverage for `FnOnceComponent` by using more precise mathematical constants
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes after recent dependency updates
+- [x] Replaced hardcoded float value with `std::f64::consts::PI` for more accurate testing of floating-point rendering
 ```
