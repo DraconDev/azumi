@@ -1,28 +1,19 @@
 //! Authentication and Authorization Framework
 //!
-//! Azumi provides a trait-based authorization system that integrates with your
-//! existing authentication middleware (Axum extensions, cookies, JWT, etc.).
-//!
-//! # Overview
-//!
-//! - **Authentication**: Your app handles this via Axum middleware that extracts
-//!   user identity from requests (cookies, JWT, sessions, etc.)
-//!
-//! - **Authorization**: Azumi's `#[require_auth]` attribute marks actions that
-//!   need authentication. The `HasCurrentUser` trait bridges your auth system
-//!   to Azumi's action handlers.
+//! Azumi provides a closure-based authorization system that integrates with your
+//! existing authentication middleware (cookies, JWT, sessions, etc.).
 //!
 //! # Setup
 //!
-//! 1. Implement `HasCurrentUser` for your app's auth type
-//! 2. Use `#[require_auth]` on actions that need authentication
-//! 3. Register your app type with `azumi::auth::register_auth_provider()`
+//! 1. Create a closure that extracts user ID from a request
+//! 2. Register it with `azumi::auth::register_auth_provider()`
+//! 3. Use `#[require_auth]` on actions that need authentication
 //!
 //! # Example
 //!
 //! ```ignore
-//! use axum::{extract::Extension, http::Request};
-//! use azumi::auth::{HasCurrentUser, AuthResult};
+//! use axum::{extract::Extension, http::Request, body::Body};
+//! use azumi::auth::{AuthError, AuthResult};
 //!
 //! // Your User type
 //! #[derive(Clone)]
@@ -31,23 +22,23 @@
 //!     pub role: String,
 //! }
 //!
-//! // Implement HasCurrentUser - extract user from Axum extensions
-//! impl HasCurrentUser for MyAppAuth {
-//!     fn get_user_id(req: &Request<Body>) -> AuthResult<String> {
-//!         // Extract from your auth middleware's Extension
-//!         let user = req.extensions()
-//!             .get::<Extension<User>>()
-//!             .ok_or(AuthError::NotAuthenticated)?;
-//!!         Ok(user.id.clone())
-//!     }
-//! }
+//! // Create an auth extractor closure
+//! let auth_extractor = |req: &Request<Body>| -> AuthResult<String> {
+//!     // Extract from your auth middleware's Extension
+//!     let user = req.extensions()
+//!         .get::<Extension<User>>()
+//!         .ok_or(AuthError::NotAuthenticated)?;
+//!     Ok(user.id.clone())
+//! };
 //!
 //! // Register at startup
-//! azumi::auth::register_auth_provider::<MyAppAuth>();
+//! azumi::auth::register_auth_provider(auth_extractor);
 //! ```
 
-use axum::{async_trait, extract::Request, http::StatusCode, response::IntoResponse, Extension};
-use std::sync::Arc;
+use axum::http::StatusCode;
+use axum::response::IntoResponse;
+use std::future::Future;
+use std::pin::Pin;
 
 /// Authorization error types
 #[derive(Debug, Clone)]
@@ -55,6 +46,83 @@ pub enum AuthError {
     NotAuthenticated,
     Forbidden,
     Internal(&'static str),
+}
+
+impl IntoResponse for AuthError {
+    fn into_response(self) -> axum::response::Response {
+        match self {
+            AuthError::NotAuthenticated => {
+                (StatusCode::UNAUTHORIZED, "Unauthorized").into_response()
+            }
+            AuthError::Forbidden => (StatusCode::FORBIDDEN, "Forbidden").into_response(),
+            AuthError::Internal(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg).into_response(),
+        }
+    }
+}
+
+/// Result type for auth operations
+pub type AuthResult<T> = Result<T, AuthError>;
+
+/// Type alias for the auth extractor function
+pub type AuthExtractor =
+    for<'a> fn(req: &'a axum::http::Request<axum::body::Body>) -> AuthResult<String>;
+
+/// Marker function for when no auth provider is registered
+fn no_auth_provider(_req: &axum::http::Request<axum::body::Body>) -> AuthResult<String> {
+    Err(AuthError::Internal(
+        "No auth provider registered. Call azumi::auth::register_auth_provider() at startup.",
+    ))
+}
+
+// Global auth provider storage
+static AUTH_PROVIDER: std::sync::OnceLock<AuthExtractor> = std::sync::OnceLock::new();
+
+/// Register your auth extractor at startup.
+///
+/// Call this once in your `main()` function before handling requests:
+///
+/// ```ignore
+/// use axum::{extract::Extension, http::Request, body::Body};
+/// use azumi::auth::{AuthError, AuthResult};
+///
+/// // Your User type
+/// #[derive(Clone)]
+/// pub struct User { pub id: String }
+///
+/// // Create an auth extractor closure
+/// let auth_extractor = |req: &Request<Body>| -> AuthResult<String> {
+///     let user = req.extensions()
+///         .get::<Extension<User>>()
+///         .ok_or(AuthError::NotAuthenticated)?;
+///     Ok(user.id.clone())
+/// };
+///
+/// fn main() {
+///     azumi::auth::register_auth_provider(auth_extractor);
+///     // ... rest of app setup
+/// }
+/// ```
+pub fn register_auth_provider(extractor: AuthExtractor) {
+    AUTH_PROVIDER
+        .set(extractor)
+        .map_err(|_| ())
+        .expect("auth::register_auth_provider() called multiple times");
+}
+
+/// Get the registered auth provider.
+///
+/// Used internally by generated handlers.
+pub fn get_auth_provider() -> AuthExtractor {
+    AUTH_PROVIDER.get().copied().unwrap_or(no_auth_provider)
+}
+
+/// Internal helper to extract user from a request.
+///
+/// This is called by generated handlers when `#[require_auth]` is present.
+pub fn extract_user_from_request(
+    req: &axum::http::Request<axum::body::Body>,
+) -> AuthResult<String> {
+    get_auth_provider()(req)
 }
 
 impl IntoResponse for AuthError {
