@@ -41,8 +41,8 @@ test_val!(test_isize, 100isize, "100");
 test_val!(test_usize, 200usize, "200");
 
 // Floats
-test_val!(test_f32, 3.14f32, "3.14");
-test_val!(test_f64, 2.71828f64, "2.71828");
+test_val!(test_f32, std::f32::consts::PI, "3.14");
+test_val!(test_f64, std::f64::consts::E, "2.71828");
 
 // Strings and Characters
 test_val!(test_str, "hello", "hello");
