@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed the `require_auth` attribute macro from public exports
+Removed auth-related exports from the public prelude to simplify the API surface
 
 ## Completed
-- [x] Removed `require_auth` from `azumi_macros` re-exports in `lib.rs`
-- [x] Cleaned up authentication system exports after macro removal
+- [x] Removed auth-related exports (`AuthError`, `AuthResult`, `AuthExtractor`, `register_auth_provider`, `extract_user_from_request`) from the public prelude
+- [x] Removed the `auth` module from the public exports
