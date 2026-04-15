@@ -190,8 +190,17 @@ fn verify_state_internal(
     let (actual_user_id, state_json) = match payload.find(':') {
         Some(idx) => {
             let uid = &payload[..idx];
-            let json = &payload[idx + 1..];
-            (Some(uid), json)
+            let rest = &payload[idx + 1..];
+            if uid
+                .chars()
+                .all(|c| c.is_alphanumeric() || c == '_' || c == '-')
+                && !rest.is_empty()
+                && rest.chars().next() == Some('{')
+            {
+                (Some(uid), rest)
+            } else {
+                (None, payload)
+            }
         }
         None => (None, payload),
     };
