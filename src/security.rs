@@ -351,4 +351,50 @@ mod tests {
         );
         assert_eq!(result.unwrap_err(), "Invalid state");
     }
+
+    #[test]
+    fn test_user_scoped_sign_and_verify() {
+        let json = r#"{"count": 10}"#;
+        let signed = sign_state_for_user("user123", json);
+        assert!(signed.starts_with("user123:"));
+
+        let verified = verify_state_for_user("user123", &signed).unwrap();
+        assert_eq!(verified, json);
+    }
+
+    #[test]
+    fn test_user_scoped_replay_attack_prevented() {
+        let json = r#"{"role": "user"}"#;
+        let signed = sign_state_for_user("attacker", json);
+
+        // Victim tries to use attacker's signed state - should fail
+        let result = verify_state_for_user("victim", &signed);
+        assert!(result.is_err(), "Replay attack should be prevented");
+    }
+
+    #[test]
+    fn test_user_scoped_without_user_fails() {
+        let json = r#"{"count": 10}"#;
+        let signed = sign_state_for_user("user123", json);
+
+        // Using verify_state (no user) on user-scoped state should fail
+        let result = verify_state(&signed);
+        assert!(
+            result.is_err(),
+            "User-scoped state should not verify without user context"
+        );
+    }
+
+    #[test]
+    fn test_non_user_scoped_state_has_no_prefix() {
+        let json = r#"{"count": 10}"#;
+        let signed = sign_state(json);
+
+        // Should not start with user_id pattern
+        assert!(!signed.starts_with("user") || signed.chars().nth(4) != Some(':'));
+
+        // verify_state should work fine
+        let verified = verify_state(&signed).unwrap();
+        assert_eq!(verified, json);
+    }
 }

@@ -1,10 +1,11 @@
 # Project State
 
 ## Current Focus
-Enhanced state verification with stricter payload validation rules
+Added comprehensive user-scoped state signing and verification tests with replay protection
 
 ## Completed
-- [x] Added stricter validation for user IDs in state payloads (alphanumeric + '_' or '-')
-- [x] Added validation that state JSON must start with '{' after user ID
-- [x] Improved error handling for malformed state payloads
-```
+- [x] Added test for successful user-scoped state signing and verification
+- [x] Added test to prevent replay attacks between different users
+- [x] Added test to ensure user-scoped states fail verification without user context
+- [x] Added test to verify non-user-scoped states maintain original behavior
+- [x] Enhanced test coverage for security module's state handling functionality
