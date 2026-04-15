@@ -641,7 +641,6 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                                 .layer(DefaultBodyLimit::max(1024 * 64))
                         }
                     }
-                }
             };
 
             method_handlers.push(handler);
