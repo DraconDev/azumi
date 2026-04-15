@@ -84,19 +84,30 @@ pub fn predict(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Setup
 ///
-/// You must register an auth provider that implements `azumi::auth::HasCurrentUser`:
+/// You must register an auth extractor closure at startup:
 ///
 /// ```ignore
-/// struct MyAuth;
+/// use axum::{extract::Extension, http::Request, body::Body};
+/// use azumi::auth::{AuthError, AuthResult};
 ///
-/// impl azumi::auth::HasCurrentUser for MyAuth {
-///     fn get_user_id(req: &Request<Body>) -> AuthResult<String> {
-///         // Extract user from your auth middleware (cookies, JWT, etc.)
-///     }
-/// }
+/// // Your User type
+/// #[derive(Clone)]
+/// pub struct User { pub id: String }
 ///
 /// fn main() {
-///     azumi::auth::register_auth_provider::<MyAuth>();
+///     let auth_extractor = |req: &Request<Body>| -> AuthResult<String> {
+///         let Extension(user) = req.extensions()
+///             .get::<Extension<Option<User>>>()
+///             .cloned()
+///             .unwrap_or(Extension(None));
+///
+///         match user {
+///             Some(u) => Ok(u.id.clone()),
+///             None => Err(AuthError::NotAuthenticated),
+///         }
+///     };
+///
+///     azumi::auth::register_auth_provider(auth_extractor);
 /// }
 /// ```
 ///

@@ -1,9 +1,10 @@
 # Project State
 
 ## Current Focus
-Refactored auth system exports to include new provider registration and extraction utilities
+Refactored auth system documentation to use closure-based provider registration
 
 ## Completed
-- [x] Added `AuthExtractor` and `register_auth_provider` to auth exports
-- [x] Removed `HasCurrentUser` from auth exports
-- [x] Added `extract_user_from_request` to auth exports
+- [x] Updated auth documentation to show closure-based provider registration
+- [x] Added example implementation for auth extractor closure
+- [x] Removed outdated trait-based auth provider example
+- [x] Updated Cargo.lock to reflect dependency resolution changes
