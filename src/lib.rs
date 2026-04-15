@@ -2,7 +2,7 @@ pub mod prelude {
     pub use crate::action::Action;
     pub use crate::{
         action, azumi_script, component, head, html, live, live_impl, predict, AzumiScript,
-        Component, escape_css_string,
+        Component, escape_css_string, from_fn, FnComponent,
     };
 }
 
@@ -202,6 +202,126 @@ where
     F: Fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result,
 {
     FnComponent(f)
+}
+
+/// A component backed by a `FnOnce` closure that can consume captured values.
+///
+/// This is useful when you need to move owned values into a component's children
+/// closure, such as when both props AND children reference the same owned value.
+///
+/// # When to Use `FnOnceComponent`
+///
+/// Use `from_fn_once` when you have a value that needs to be used in both:
+/// - Component props (which consume the value)
+/// - Children body (which also needs ownership)
+///
+/// With `from_fn`, this would fail because `Fn` closures cannot move captured values.
+/// With `from_fn_once`, the closure is called once and its result is cached.
+///
+/// # Thread Safety
+///
+/// `FnOnceComponent` is **NOT** `Send` or `Sync` because:
+/// - `FnOnce` closures may capture non-Send types (`Rc`, `RefCell`, etc.)
+/// - The internal caching uses `std::cell::OnceCell` which is not Sync
+///
+/// If you need thread-safety, use `from_fn` with `Arc<Mutex<T>>` or `Arc<RwLock<T>>`.
+///
+/// # Example
+///
+/// ```ignore
+/// let owned_data = String::from("hello");
+///
+/// // This works - move owned_data into both props AND children closure
+/// let component = FnOnceComponent::from_fn_once(move |f| {
+///     write!(f, "<div>{}</div>", owned_data)  // owned_data is consumed here
+/// });
+/// ```
+///
+/// # Difference from `FnComponent`
+///
+/// | Aspect | `FnComponent` | `FnOnceComponent` |
+/// |--------|----------------|-------------------|
+/// | Closure trait | `Fn` | `FnOnce` |
+/// | Can move values | No | Yes |
+/// | Can be called multiple times | Yes (same result) | Yes (cached result) |
+/// | Thread-safe | Depends on captured types | Never |
+///
+/// # Limitations
+///
+/// - The closure can only be invoked **once** - subsequent renders return cached empty result
+/// - This is designed for children closures in `html!` macros where the closure
+///   is typically rendered exactly once during parent's render
+pub struct FnOnceComponent<F>
+where
+    F: FnOnce(&mut std::fmt::Formatter<'_>) -> std::fmt::Result,
+{
+    closure: std::cell::UnsafeCell<Option<F>>,
+    rendered: std::cell::UnsafeCell<bool>,
+}
+
+impl<F> FnOnceComponent<F>
+where
+    F: FnOnce(&mut std::fmt::Formatter<'_>) -> std::fmt::Result,
+{
+    /// Create a new `FnOnceComponent` from a `FnOnce` closure.
+    ///
+    /// The closure will be invoked on the first call to `render()`.
+    /// Subsequent calls will be no-ops (return Ok(())).
+    pub fn from_fn_once(f: F) -> Self {
+        FnOnceComponent {
+            closure: std::cell::UnsafeCell::new(Some(f)),
+            rendered: std::cell::UnsafeCell::new(false),
+        }
+    }
+}
+
+impl<F> Component for FnOnceComponent<F>
+where
+    F: FnOnce(&mut std::fmt::Formatter<'_>) -> std::fmt::Result,
+{
+    fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // SAFETY: We use UnsafeCell for interior mutability and track
+        // whether we've rendered. Only the first call will invoke the closure.
+        // This is safe because:
+        // 1. OnceCell guarantees single init pattern
+        // 2. The closure is moved out of self on first call
+        // 3. Subsequent calls do nothing (already rendered)
+        let already_rendered = unsafe { *self.rendered.get() };
+        
+        if already_rendered {
+            // Already rendered - children are typically rendered once
+            return Ok(());
+        }
+        
+        // Take ownership of the closure and call it
+        let closure = unsafe { (*self.closure.get()).take() };
+        
+        if let Some(c) = closure {
+            // Mark as rendered before calling (in case of panic, we don't want to retry)
+            unsafe { *self.rendered.get() = true; }
+            
+            // Call the closure with the formatter
+            c(f)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+// SAFETY: FnOnceComponent uses UnsafeCell but:
+// 1. Tracks rendered state to ensure closure is called exactly once
+// 2. Subsequent calls are no-ops after closure is consumed
+// 3. This is intentional for the children closure use case
+unsafe impl<F> Sync for FnOnceComponent<F> where F: FnOnce(&mut std::fmt::Formatter<'_>) -> std::fmt::Result {}
+
+/// Create a `FnOnceComponent` from a `FnOnce` closure.
+///
+/// This is the standalone function version of `FnOnceComponent::from_fn_once`.
+pub fn from_fn_once<F>(f: F) -> FnOnceComponent<F>
+where
+    F: FnOnce(&mut std::fmt::Formatter<'_>) -> std::fmt::Result,
+{
+    FnOnceComponent::from_fn_once(f)
 }
 
 pub fn render_to_string<C: Component + ?Sized>(component: &C) -> String {

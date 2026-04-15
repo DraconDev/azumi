@@ -1331,9 +1331,19 @@ fn generate_body_with_context(
                             let children_body =
                                 generate_body_with_context(&call_block.children, ctx);
                             // Wrap children in a component-compatible closure
-                            // IMPORTANT: Do NOT use `move` here. Inner closure should borrow from outer closure.
+                            // IMPORTANT: Use `from_fn_once` here instead of `from_fn` because
+                            // children closures may capture owned values (via `move`) that were
+                            // also moved into the component's props. `FnOnce` closures can consume
+                            // captured values, while `Fn` closures can only borrow them.
+                            //
+                            // The `FnOnceComponent` caches its rendered result, so the closure
+                            // is only invoked once (which is the typical case for children).
+                            //
+                            // If you need the children to be rendered multiple times (e.g., in
+                            // a loop), ensure they don't capture owned values, or use `from_fn`
+                            // with `Arc<Clone>` for shared owned data.
                             let children_arg = quote! {
-                                azumi::from_fn(|f| {
+                                azumi::from_fn_once(move |f| {
                                     #children_body
                                     Ok(())
                                 })

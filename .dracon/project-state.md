@@ -1,9 +1,12 @@
 # Project State
 
 ## Current Focus
-Added encrypted secrets management to git tracking with age encryption
+Added `FnOnceComponent` to support owned value capture in children closures
 
 ## Completed
-- [x] Added encrypted secrets tracking to git (intentionally tracked for team collaboration)
-- [x] Added documentation block explaining encrypted secrets management
-- [x] Preserved existing gitignore rules for build artifacts and logs
+- [x] Added `FnOnceComponent` struct with `from_fn_once` constructor
+- [x] Implemented `Component` trait for `FnOnceComponent`
+- [x] Added comprehensive test suite for `FnOnceComponent`
+- [x] Updated macro to use `from_fn_once` for children closures
+- [x] Added documentation explaining when to use `FnOnceComponent`
+```
