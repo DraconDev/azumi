@@ -587,14 +587,14 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                         let html = azumi::render_to_string(&#comp_mod::render(props));
 
                         axum::response::IntoResponse::into_response(axum::response::Html(html))
-                    }
+                    };
 
                     #[allow(non_snake_case)]
                     pub fn #router_name() -> axum::routing::MethodRouter<()> {
                         use axum::extract::DefaultBodyLimit;
                         axum::routing::post(#handler_name)
                             .layer(DefaultBodyLimit::max(1024 * 64))
-                    }
+                    };
                 }
             } else {
                 // No component - direct state handler
@@ -609,6 +609,40 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                                     (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
                                 ),
                             };
+
+                            // SECURITY: Check for deeply nested structures (DoS prevention)
+                            let mut depth: u32 = 0;
+                            let mut in_string = false;
+                            let mut escaped = false;
+                            for ch in json.chars() {
+                                match ch {
+                                    '\\' => { escaped = true; }
+                                    '"' if !escaped => { in_string = !in_string; }
+                                    '{' | '[' if !in_string => { depth += 1; if depth > 100 { return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, "Request too complex")); } },
+                                    '}' | ']' if !in_string => { depth = depth.saturating_sub(1); }
+                                    _ => { escaped = false; }
+                                }
+                            }
+
+                            let mut state: #struct_name = match serde_json::from_str(&json) {
+                                Ok(s) => s,
+                                Err(_) => return axum::response::IntoResponse::into_response(
+                                    (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
+                                ),
+                            };
+                            #method_call
+                            axum::response::IntoResponse::into_response(axum::response::Json(state))
+                        };
+
+                        #[allow(non_snake_case)]
+                        pub fn #router_name() -> axum::routing::MethodRouter<()> {
+                            use axum::extract::DefaultBodyLimit;
+                            axum::routing::post(#handler_name)
+                                .layer(DefaultBodyLimit::max(1024 * 64))
+                        };
+                    }
+                }
+            };
 
                             // SECURITY: Check for deeply nested structures (DoS prevention)
                             let mut depth: u32 = 0;
