@@ -572,6 +572,14 @@ fn test_escape_css_string_braces() {
     assert!(result.contains("\\{") && result.contains("\\}"));
 }
 
+#[test]
+fn test_escape_css_string_forward_slash() {
+    use azumi::escape_css_string;
+    let result = escape_css_string("click here</style><script>alert(1)</script>");
+    assert!(result.contains("\\/"));
+    assert!(!result.contains("</style>"));
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // Sitemap Path Normalization
 // ════════════════════════════════════════════════════════════════════════════
