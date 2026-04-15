@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Binary update to Cargo.toml (likely dependency version changes)
+Binary update to `macros/Cargo.toml` (likely dependency version changes)
 
 ## Completed
-- [x] Updated Cargo.toml with binary changes (dependency version updates or metadata adjustments)
+- [x] Updated dependency versions in `macros/Cargo.toml`
 ```
