@@ -212,7 +212,7 @@ fn test_fn_once_with_various_types() {
     let html = test::render(&component);
     assert!(html.contains("text"));
     assert!(html.contains("42"));
-    assert!(html.contains("3.14159"));
+    assert!(html.contains("3.141592653589793"));
     assert!(html.contains("X"));
 }
 

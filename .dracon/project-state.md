@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved test precision by using standard math constants for floating-point comparisons
+Improved test precision for floating-point values in `FnOnceComponent` rendering
 
 ## Completed
-- [x] Updated test_expr_float_f64 to use std::f64::consts::PI instead of hardcoded value
-- [x] Updated test_attr_expr_string to use consistent formatting for HTML attributes
+- [x] Updated test assertion to use more precise π value (3.141592653589793) instead of truncated version (3.14159)
 ```
