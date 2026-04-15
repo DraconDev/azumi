@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Binary update to `macros/Cargo.toml` (likely dependency version changes)
+Update Cargo.lock to reflect dependency resolution changes after recent dependency updates
 
 ## Completed
-- [x] Updated dependency versions in `macros/Cargo.toml`
+- [x] Updated Cargo.lock to resolve new dependency versions from recent updates
 ```
