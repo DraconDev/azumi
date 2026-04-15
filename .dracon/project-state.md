@@ -1,12 +1,13 @@
 # Project State
 
 ## Current Focus
-Implement replay protection in state signing by adding user context to HMAC verification
+Enhanced state signing and verification with user-scoped replay protection
 
-## Completed - Auth Revert
-- [x] Removed `#[require_auth]` attribute macro from macros/src/lib.rs
-- [x] Removed auth module (src/auth.rs deleted)
-- [x] Removed auth exports from src/lib.rs prelude
-- [x] Reverted live.rs to original handler code (without auth integration)
-- [x] Build passes, all 18 tests pass
+## Completed
+- [x] Added user-scoped state signing with `sign_state_for_user` function
+- [x] Implemented user-scoped state verification with `verify_state_for_user` function
+- [x] Added comprehensive input validation for signed states
+- [x] Implemented timestamp verification with expiration and clock skew protection
+- [x] Added constant-time HMAC verification for security
+- [x] Updated Cargo.lock to reflect dependency resolution changes
 ```
