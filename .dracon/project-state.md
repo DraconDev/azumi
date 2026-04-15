@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed the `#[require_auth]` attribute macro and its documentation
+Removed the `require_auth` attribute macro from public exports
 
 ## Completed
-- [x] Removed the `require_auth` attribute macro implementation
-- [x] Removed all associated documentation and usage examples
-```
+- [x] Removed `require_auth` from `azumi_macros` re-exports in `lib.rs`
+- [x] Cleaned up authentication system exports after macro removal
