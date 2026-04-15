@@ -1,14 +1,9 @@
 # Project State
 
 ## Current Focus
-Added authentication and authorization framework for Azumi
+Added authentication-related types and macros to the prelude and exposed the auth module
 
 ## Completed
-- [x] Implemented trait-based authorization system with `HasCurrentUser` interface
-- [x] Added `#[require_auth]` attribute support for action handlers
-- [x] Created auth provider registration system with `register_auth_provider()`
-- [x] Added comprehensive error handling with `AuthError` enum
-- [x] Included example implementation for Axum extension-based auth
-- [x] Added documentation for setup and usage patterns
-- [x] Created internal helper functions for request processing
-- [x] Added test cases for auth provider registration
+- [x] Added `AuthError`, `AuthResult`, and `HasCurrentUser` to the prelude for easier access
+- [x] Added `require_auth` macro to the public re-exports
+- [x] Exposed the `auth` module in the library's public interface

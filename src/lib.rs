@@ -1,13 +1,15 @@
 pub mod prelude {
     pub use crate::action::Action;
     pub use crate::{
-        action, azumi_script, component, head, html, live, live_impl, predict, AzumiScript,
+        action, azumi_script, component, head, html, live, live_impl, page, predict, AzumiScript,
         Component, escape_css_string, from_fn, FnComponent,
     };
+    pub use crate::auth::{AuthError, AuthResult, HasCurrentUser};
 }
 
-pub use azumi_macros::{action, component, head, html, live, live_impl, page, predict};
+pub use azumi_macros::{action, component, head, html, live, live_impl, page, predict, require_auth};
 pub mod action;
+pub mod auth;
 pub mod context;
 #[cfg(feature = "devtools")]
 pub mod hot_reload;
