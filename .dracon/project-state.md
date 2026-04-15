@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency resolution changes after recent dependency updates
+Improved test precision by using standard math constants for floating-point comparisons
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes after recent dependency updates
-```
+- [x] Replaced hardcoded `3.14159` with `std::f32::consts::PI` in `test_f32_decimal`
+- [x] Replaced hardcoded `3.141592653589793` with `std::f64::consts::PI` in `test_f64_precision`

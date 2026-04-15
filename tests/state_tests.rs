@@ -75,7 +75,7 @@ fn test_u64() {
 
 #[test]
 fn test_f32_decimal() {
-    let n: f32 = 3.14159;
+    let n: f32 = std::f32::consts::PI;
     let component = html! { <span>{n}</span> };
     let html = test::render(&component);
     assert!(html.contains("3.14"));
@@ -83,7 +83,7 @@ fn test_f32_decimal() {
 
 #[test]
 fn test_f64_precision() {
-    let n: f64 = 3.141592653589793;
+    let n: f64 = std::f64::consts::PI;
     let component = html! { <span>{n}</span> };
     let html = test::render(&component);
     assert!(html.contains("3.14159"));
