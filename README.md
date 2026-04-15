@@ -495,18 +495,29 @@ Set `AZUMI_DEBUG=1` to see detailed parsing output during compilation.
 
 ## 🏢 When to Use Azumi
 
+> **Confused about whether Azumi is right for your project?** See [WHEN_TO_USE_AZUMI.md](./WHEN_TO_USE_AZUMI.md) for a detailed comparison with simpler approaches.
+
 ### ✅ Excels At
 
 - **Correctness** — CSS-HTML co-validation, accessibility checks, end-to-end type safety
 - **Performance** — Zero hydration, ~3KB runtime, instant TTI
 - **Developer Experience** — No API layer, browserless testing, built-in asset pipeline
 - **Production** — Low memory footprint, signed state, edge-cacheable
+- **Reusable components** — Build once, use everywhere with compile-time validation
 
 ### 🎯 Outside Core Scope
 
 - **Offline-first apps** — Requires separate sync layer
 - **Real-time collaboration** — Pair with dedicated real-time layer
 - **Mobile native** — Wrap in Tauri/Capacitor for native distribution
+- **One-off static pages** — Consider `format!()` strings or Maud for simple pages
+
+### The Honest Take
+
+Azumi trades verbosity for safety. If you need:
+- A **component library** (ProductCard, NavBar, etc.) → Azumi wins
+- **HMAC state signing** and XSS protection → Azumi wins
+- **Quick one-off pages** with no reuse → simpler approaches may win
 
 Azumi is opinionated: logic runs on the server, UI updates are predicted, the server is truth.
 
