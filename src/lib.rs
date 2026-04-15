@@ -4,7 +4,7 @@ pub mod prelude {
         action, azumi_script, component, head, html, live, live_impl, page, predict, AzumiScript,
         Component, escape_css_string, from_fn, FnComponent,
     };
-    pub use crate::auth::{AuthError, AuthResult, HasCurrentUser};
+    pub use crate::auth::{AuthError, AuthResult, AuthExtractor, register_auth_provider, extract_user_from_request};
 }
 
 pub use azumi_macros::{action, component, head, html, live, live_impl, page, predict, require_auth};
