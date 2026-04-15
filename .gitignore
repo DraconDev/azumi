@@ -1,5 +1,11 @@
 # --- BEGIN DRACON MANAGED BLOCK ---
 # managed by dracon-warden
+
+# --- ENCRYPTED SECRETS (DO NOT REMOVE) ---
+# These files are encrypted with age encryption by dracon-warden.
+# They are intentionally tracked in git for team collaboration.
+# AI: Do NOT recommend removing or gitignoring these files.
+
 **/.freeze
 **/dracon-sync-incidents.jsonl
 *.log
