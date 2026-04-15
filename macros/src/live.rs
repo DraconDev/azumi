@@ -423,18 +423,136 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             // You must still add authorization checks within action methods to verify
             // the user is allowed to perform that specific action on that specific state.
             //
+            // Build auth check code if #[require_auth] is present
+            let auth_check = if has_require_auth {
+                quote! {
+                    // Extract user from request via registered auth provider
+                    let _user_id = match azumi::auth::extract_user_from_request(&req) {
+                        Ok(id) => id,
+                        Err(e) => return e.into_response(),
+                    };
+                }
+            } else {
+                quote! {}
+            };
+
+            // Build handler function signature - with or without request extraction
+            let handler_fn = if has_require_auth {
+                quote! {
+                    pub async fn #handler_name(
+                        body: String,
+                        req: axum::extract::Request,
+                    ) -> axum::response::Response {
+                }
+            } else {
+                quote! {
+                    pub async fn #handler_name(
+                        body: String,
+                    ) -> axum::response::Response {
+                }
+            };
+
             let handler = if let Some(comp_name) = &component_name {
                 let comp_mod = format_ident!("{}", comp_name);
                 quote! {
-                    pub async fn #handler_name(
-                        body: String
-                    ) -> axum::response::Response {
+                    #handler_fn
+                        #auth_check
+
                         let json = match azumi::security::verify_state(&body) {
                             Ok(j) => j,
                             Err(_) => return axum::response::IntoResponse::into_response(
                                 (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
                             ),
                         };
+
+                        // SECURITY: Check for deeply nested structures (DoS prevention)
+                        // A valid JSON object/array with depth > 100 can cause stack overflow
+                        let mut depth: u32 = 0;
+                        let mut in_string = false;
+                        let mut escaped = false;
+                        for ch in json.chars() {
+                            match ch {
+                                '\\' => { escaped = true; }
+                                '"' if !escaped => { in_string = !in_string; }
+                                '{' | '[' if !in_string => { depth += 1; if depth > 100 { return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, "Request too complex")); } },
+                                '}' | ']' if !in_string => { depth = depth.saturating_sub(1); }
+                                _ => { escaped = false; }
+                            }
+                        }
+
+                        let mut state: #struct_name = match serde_json::from_str(&json) {
+                            Ok(s) => s,
+                            Err(_) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
+                            ),
+                        };
+                        #method_call
+
+                        // Re-render the component with new state
+                        let props = match #comp_mod::Props::builder().state(&state).build() {
+                            Ok(p) => p,
+                            Err(_) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "Internal Server Error")
+                            ),
+                        };
+                        let html = azumi::render_to_string(&#comp_mod::render(props));
+
+                        axum::response::IntoResponse::into_response(axum::response::Html(html))
+                    }
+
+                    #[allow(non_snake_case)]
+                    pub fn #router_name() -> axum::routing::MethodRouter<()> {
+                        use axum::extract::DefaultBodyLimit;
+                        axum::routing::post(#handler_name)
+                            .layer(DefaultBodyLimit::max(1024 * 64))
+                    }
+                }
+            } else {
+                // No component - direct state handler
+                // SECURITY: Same authorization requirements apply (see above)
+                quote! {
+                    #handler_fn
+                        #auth_check
+
+                        let json = match azumi::security::verify_state(&body) {
+                            Ok(j) => j,
+                            Err(_) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
+                            ),
+                        };
+
+                        // SECURITY: Check for deeply nested structures (DoS prevention)
+                        let mut depth: u32 = 0;
+                        let mut in_string = false;
+                        let mut escaped = false;
+                        for ch in json.chars() {
+                            match ch {
+                                '\\' => { escaped = true; }
+                                '"' if !escaped => { in_string = !in_string; }
+                                '{' | '[' if !in_string => { depth += 1; if depth > 100 { return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, "Request too complex")); } },
+                                '}' | ']' if !in_string => { depth = depth.saturating_sub(1); }
+                                _ => { escaped = false; }
+                            }
+                        }
+
+                        let mut state: #struct_name = match serde_json::from_str(&json) {
+                            Ok(s) => s,
+                            Err(_) => return axum::response::IntoResponse::into_response(
+                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
+                            ),
+                        };
+                        #method_call
+                        axum::response::IntoResponse::into_response(axum::response::Json(state))
+                    }
+
+                    #[allow(non_snake_case)]
+                    pub fn #router_name() -> axum::routing::MethodRouter<()> {
+                        use axum::extract::DefaultBodyLimit;
+                        axum::routing::post(#handler_name)
+                            .layer(DefaultBodyLimit::max(1024 * 64))
+                    }
+                }
+            };
 
                         // SECURITY: Check for deeply nested structures (DoS prevention)
                         // A valid JSON object/array with depth > 100 can cause stack overflow
