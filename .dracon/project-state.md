@@ -1,10 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved error handling for LiveState serialization with fatal abort on failure
+Improved thread safety guarantees for `FnOnceComponent` by requiring `Send + Sync` on the closure
 
 ## Completed
-- [x] Enhanced error handling for `serde_json::to_string` in `to_scope` method
-- [x] Added detailed error message explaining serialization failure causes
-- [x] Implemented process abort on serialization failure to prevent invalid state propagation
-```
+- [x] Made `FnOnceComponent` `Sync` only when closure is `Send + Sync` to prevent unsoundness with non-Sync captured types
+- [x] Added documentation explaining thread safety requirements and implementation details
+- [x] Updated Cargo.lock to reflect dependency resolution changes

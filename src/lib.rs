@@ -315,11 +315,17 @@ where
     }
 }
 
-// SAFETY: FnOnceComponent uses UnsafeCell but:
-// 1. Tracks rendered state to ensure closure is called exactly once
-// 2. Subsequent calls are no-ops after closure is consumed
-// 3. This is intentional for the children closure use case
-unsafe impl<F> Sync for FnOnceComponent<F> where F: FnOnce(&mut std::fmt::Formatter<'_>) -> std::fmt::Result {}
+// SAFETY: FnOnceComponent uses UnsafeCell but is marked Sync only when the
+// closure is Send + Sync. This is required because FnOnce closures may capture
+// non-Sync types (like Rc), and claiming Sync for such types would be unsound.
+//
+// The `rendered` and `closure` UnsafeCells are only accessed from the `render()`
+// method which takes `&self`. Since we require F: Send + Sync, the closure
+// and any captured state can be safely shared across threads.
+unsafe impl<F> Sync for FnOnceComponent<F>
+where
+    F: FnOnce(&mut std::fmt::Formatter<'_>) -> std::fmt::Result + Send + Sync
+{}
 
 /// Create a `FnOnceComponent` from a `FnOnce` closure.
 ///
