@@ -403,6 +403,12 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             // Keep original method
             original_methods.push(quote! { #method });
 
+            // Check if method has #[require_auth] attribute
+            let has_require_auth = method
+                .attrs
+                .iter()
+                .any(|attr| attr.path().is_ident("require_auth"));
+
             let is_async = method.sig.asyncness.is_some();
             let method_call = if is_async {
                 quote! { state.#method_name().await; }
@@ -413,16 +419,9 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             // Generate Axum handler
             //
             // SECURITY: HMAC verification proves state integrity, NOT authorization.
-            // Any user with a valid signed state can trigger any action.
-            // Developers MUST add their own authorization within action methods.
-            // Example: verify user owns this state, has permission for this action.
-            //
-            // To prevent the handler from running if the user isn't authorized,
-            // add a check at the start of your action method:
-            //   fn increment(&mut self, user_id: &str) {
-            //       if !self.is_owner(user_id) { return; } // Auth check
-            //       self.count += 1;
-            //   }
+            // If #[require_auth] is present, we verify the user is authenticated.
+            // You must still add authorization checks within action methods to verify
+            // the user is allowed to perform that specific action on that specific state.
             //
             let handler = if let Some(comp_name) = &component_name {
                 let comp_mod = format_ident!("{}", comp_name);

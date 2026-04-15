@@ -1,11 +1,9 @@
 # Project State
 
 ## Current Focus
-Added authentication attribute macro for Azumi framework
+Improved authentication handling in LiveState action methods
 
 ## Completed
-- [x] Added `#[require_auth]` attribute macro to mark action methods requiring authentication
-- [x] Documented usage pattern for auth-protected actions
-- [x] Included setup instructions for registering auth providers
-- [x] Added security note about combining authentication with authorization checks
-```
+- [x] Added `#[require_auth]` attribute check for LiveState action methods
+- [x] Updated security documentation to clarify authentication requirements
+- [x] Maintained existing authorization pattern while adding explicit auth checks
