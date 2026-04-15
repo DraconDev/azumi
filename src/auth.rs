@@ -5,7 +5,7 @@
 //!
 //! # Setup
 //!
-//! 1. Implement `HasCurrentUser` trait for your auth type
+//! 1. Create a closure that extracts user ID from a request
 //! 2. Register it with `azumi::auth::register_auth_provider()`
 //! 3. Use `#[require_auth]` on actions that need authentication
 //!
@@ -13,7 +13,7 @@
 //!
 //! ```ignore
 //! use axum::{extract::Extension, http::Request, body::Body};
-//! use azumi::auth::{AuthError, AuthResult, HasCurrentUser};
+//! use azumi::auth::{AuthError, AuthResult};
 //!
 //! // Your User type
 //! #[derive(Clone)]
@@ -22,25 +22,21 @@
 //!     pub role: String,
 //! }
 //!
-//! // Your auth implementation
-//! pub struct MyAuth;
+//! // Create an auth extractor closure
+//! let auth_extractor = |req: &Request<Body>| -> AuthResult<String> {
+//!     let Extension(user) = req.extensions()
+//!         .get::<Extension<Option<User>>>()
+//!         .cloned()
+//!         .unwrap_or(Extension(None));
 //!
-//! impl HasCurrentUser for MyAuth {
-//!     fn get_user_id(req: &Request<Body>) -> AuthResult<String> {
-//!         let Extension(user) = req.extensions()
-//!             .get::<Extension<Option<User>>>()
-//!             .cloned()
-//!             .unwrap_or(Extension(None));
-//!
-//!         match user {
-//!             Some(u) => Ok(u.id.clone()),
-//!             None => Err(AuthError::NotAuthenticated),
-//!         }
+//!     match user {
+//!         Some(u) => Ok(u.id.clone()),
+//!         None => Err(AuthError::NotAuthenticated),
 //!     }
-//! }
+//! };
 //!
 //! // Register at startup
-//! azumi::auth::register_auth_provider(MyAuth);
+//! azumi::auth::register_auth_provider(auth_extractor);
 //! ```
 
 use axum::body::Body;
@@ -69,39 +65,29 @@ impl IntoResponse for AuthError {
 
 pub type AuthResult<T> = Result<T, AuthError>;
 
-pub trait HasCurrentUser: Send + Sync + 'static {
-    fn get_user_id(req: &Request<Body>) -> AuthResult<String>;
+pub type AuthExtractor = for<'a> fn(req: &'a Request<Body>) -> AuthResult<String>;
+
+fn no_auth_provider(_req: &Request<Body>) -> AuthResult<String> {
+    Err(AuthError::Internal(
+        "No auth provider registered. Call azumi::auth::register_auth_provider() at startup.",
+    ))
 }
 
-pub struct NoAuthProvider;
+static AUTH_PROVIDER: std::sync::OnceLock<AuthExtractor> = std::sync::OnceLock::new();
 
-impl HasCurrentUser for NoAuthProvider {
-    fn get_user_id(_req: &Request<Body>) -> AuthResult<String> {
-        Err(AuthError::Internal(
-            "No auth provider registered. Implement HasCurrentUser and call \
-             azumi::auth::register_auth_provider() at startup.",
-        ))
-    }
-}
-
-static AUTH_PROVIDER: std::sync::OnceLock<Box<dyn HasCurrentUser>> = std::sync::OnceLock::new();
-
-pub fn register_auth_provider<T: HasCurrentUser>(provider: T) {
+pub fn register_auth_provider(extractor: AuthExtractor) {
     AUTH_PROVIDER
-        .set(Box::new(provider))
+        .set(extractor)
         .map_err(|_| ())
         .expect("auth::register_auth_provider() called multiple times");
 }
 
-pub fn get_auth_provider() -> &'static dyn HasCurrentUser {
-    AUTH_PROVIDER
-        .get()
-        .map(|p| p.as_ref())
-        .unwrap_or(&NoAuthProvider)
+pub fn get_auth_provider() -> AuthExtractor {
+    AUTH_PROVIDER.get().copied().unwrap_or(no_auth_provider)
 }
 
 pub fn extract_user_from_request(req: &Request<Body>) -> AuthResult<String> {
-    get_auth_provider().get_user_id(req)
+    get_auth_provider()(req)
 }
 
 #[cfg(test)]
@@ -112,7 +98,7 @@ mod tests {
     #[test]
     fn test_no_auth_provider_error() {
         let req = Request::new(Body::empty());
-        let result = NoAuthProvider.get_user_id(&req);
+        let result = no_auth_provider(&req);
         assert!(matches!(result, Err(AuthError::Internal(_))));
     }
 }

@@ -1,11 +1,11 @@
 # Project State
 
 ## Current Focus
-Refactored auth system to use trait-based provider registration instead of closure-based
+Refactored auth system to use closure-based provider registration instead of trait-based approach
 
 ## Completed
-- [x] Replaced closure-based auth provider with `HasCurrentUser` trait implementation
-- [x] Simplified auth provider registration to use direct type instantiation
-- [x] Improved documentation with clear implementation examples
-- [x] Removed redundant auth provider storage and extraction logic
-- [x] Added proper error handling for missing auth providers
+- [x] Removed `HasCurrentUser` trait and associated implementations
+- [x] Replaced with direct function registration using `AuthExtractor` type
+- [x] Simplified provider registration to use closures instead of trait objects
+- [x] Updated documentation to reflect the new closure-based approach
+- [x] Maintained backward compatibility with existing auth provider interface
