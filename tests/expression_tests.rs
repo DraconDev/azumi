@@ -58,7 +58,7 @@ fn test_expr_integer_negative() {
 
 #[test]
 fn test_expr_float_f64() {
-    let val: f64 = 3.14159;
+    let val: f64 = std::f64::consts::PI;
     let component = html! { <span>{val}</span> };
     let html = test::render(&component);
     assert!(html.contains("3.14159"));
@@ -187,7 +187,7 @@ fn test_expr_reference_deref() {
 
 #[test]
 fn test_attr_expr_string() {
-    let component = html! { 
+    let component = html! {
         <button class={btn_primary}>"Click"</button>
         <style>
             .btn_primary { background: "blue"; padding: "0.5rem 1rem"; }
