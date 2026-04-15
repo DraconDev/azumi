@@ -632,14 +632,14 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                             };
                             #method_call
                             axum::response::IntoResponse::into_response(axum::response::Json(state))
-                        };
+                        }
 
                         #[allow(non_snake_case)]
                         pub fn #router_name() -> axum::routing::MethodRouter<()> {
                             use axum::extract::DefaultBodyLimit;
                             axum::routing::post(#handler_name)
                                 .layer(DefaultBodyLimit::max(1024 * 64))
-                        };
+                        }
                     }
                 }
             };
