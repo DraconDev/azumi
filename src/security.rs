@@ -82,20 +82,40 @@ fn get_current_timestamp() -> u64 {
 
 /// Signs a state string with HMAC-SHA256 and includes a timestamp for replay protection.
 /// Returns format: "{json}|{timestamp}|{signature_base64}"
+///
+/// For user-scoped signing (prevents replay across users), use `sign_state_for_user`.
 pub fn sign_state(state_json: &str) -> String {
+    sign_state_internal(None, state_json)
+}
+
+/// Signs a state string scoped to a specific user.
+/// Returns format: "{user_id}:{json}|{timestamp}|{signature}"
+///
+/// This prevents replay attacks where User A's state is replayed by User B.
+/// User B's verification will fail because the user_id won't match.
+pub fn sign_state_for_user(user_id: &str, state_json: &str) -> String {
+    sign_state_internal(Some(user_id), state_json)
+}
+
+fn sign_state_internal(user_id: Option<&str>, state_json: &str) -> String {
     let secret = get_secret();
     assert!(!secret.is_empty(), "AZUMI_SECRET must not be empty");
     let timestamp = get_current_timestamp();
 
+    let payload = match user_id {
+        Some(uid) => format!("{}:{}", uid, state_json),
+        None => state_json.to_string(),
+    };
+
     let mut mac =
         HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC can take any size key");
 
-    mac.update(state_json.as_bytes());
+    mac.update(payload.as_bytes());
     mac.update(&timestamp.to_be_bytes());
     let result = mac.finalize();
     let signature = BASE64.encode(result.into_bytes());
 
-    format!("{}|{}|{}", state_json, timestamp, signature)
+    format!("{}|{}|{}", payload, timestamp, signature)
 }
 
 /// Verifies a signed state string and checks timestamp for replay protection.
@@ -109,21 +129,30 @@ pub fn sign_state(state_json: &str) -> String {
 /// and distinguishing between specific error types provides minimal
 /// additional information to an attacker.
 pub fn verify_state(signed_state: &str) -> Result<String, String> {
-    // Limit input length to prevent DoS attacks
+    verify_state_internal(None, signed_state)
+}
+
+/// Verifies a user-scoped signed state.
+/// Returns the original JSON if valid, or an Err if invalid/expired/user mismatch.
+///
+/// Use this when the state was signed with `sign_state_for_user`.
+pub fn verify_state_for_user(expected_user_id: &str, signed_state: &str) -> Result<String, String> {
+    verify_state_internal(Some(expected_user_id), signed_state)
+}
+
+fn verify_state_internal(
+    expected_user_id: Option<&str>,
+    signed_state: &str,
+) -> Result<String, String> {
     if signed_state.len() > 100_000 {
         return Err("Invalid state".to_string());
     }
 
-    // Limit pipe count to prevent algorithmic complexity attack
-    // The parsing uses rfind twice, so O(n) per pipe. With many pipes, this becomes O(n²).
-    // A signed state should only have 2 pipes (json|timestamp|signature), so allow 10 as buffer.
     let pipe_count = signed_state.matches('|').count();
     if pipe_count > 10 {
         return Err("Invalid state".to_string());
     }
 
-    // Expected format: "json|timestamp|signature"
-    // Find last two pipe positions since JSON could contain |
     let last_pipe = match signed_state.rfind('|') {
         Some(idx) => idx,
         None => return Err("Invalid state".to_string()),
@@ -133,11 +162,10 @@ pub fn verify_state(signed_state: &str) -> Result<String, String> {
         None => return Err("Invalid state".to_string()),
     };
 
-    let state_json = &signed_state[..second_last_pipe];
-    let timestamp_str = &signed_state[second_last_pipe + 1..last_pipe];
+    let payload_with_ts = &signed_state[..last_pipe];
     let signature_b64 = &signed_state[last_pipe + 1..];
 
-    // Parse and validate timestamp
+    let timestamp_str = &payload_with_ts[second_last_pipe + 1..];
     let timestamp: u64 = match timestamp_str.parse() {
         Ok(t) => t,
         Err(_) => return Err("Invalid state".to_string()),
@@ -145,20 +173,35 @@ pub fn verify_state(signed_state: &str) -> Result<String, String> {
 
     let current_time = get_current_timestamp();
 
-    // Reject u64::MAX timestamp - this would bypass expiration via saturating_sub
     if timestamp == u64::MAX {
         return Err("Invalid state".to_string());
     }
 
-    // Check if timestamp is too old (expired)
     if current_time.saturating_sub(timestamp) > MAX_STATE_AGE_SECS {
         return Err("Invalid state".to_string());
     }
 
-    // Check if timestamp is too far in the future (clock skew protection)
-    // Allow up to 60 seconds of clock drift between signing and verification
     const ALLOWED_CLOCK_SKEW: u64 = 60;
     if timestamp > current_time && timestamp - current_time > ALLOWED_CLOCK_SKEW {
+        return Err("Invalid state".to_string());
+    }
+
+    let payload = &payload_with_ts[..second_last_pipe];
+    let (actual_user_id, state_json) = match payload.find(':') {
+        Some(idx) => {
+            let uid = &payload[..idx];
+            let json = &payload[idx + 1..];
+            (Some(uid), json)
+        }
+        None => (None, payload),
+    };
+
+    if let Some(expected) = expected_user_id {
+        match actual_user_id {
+            Some(actual) if actual == expected => {}
+            _ => return Err("Invalid state".to_string()),
+        }
+    } else if actual_user_id.is_some() {
         return Err("Invalid state".to_string());
     }
 
@@ -167,7 +210,7 @@ pub fn verify_state(signed_state: &str) -> Result<String, String> {
     let mut mac =
         HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC can take any size key");
 
-    mac.update(state_json.as_bytes());
+    mac.update(payload.as_bytes());
     mac.update(&timestamp.to_be_bytes());
 
     let signature_bytes = match BASE64.decode(signature_b64) {

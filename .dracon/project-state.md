@@ -1,12 +1,12 @@
 # Project State
 
 ## Current Focus
-Simplified state signing and verification by removing user-scoped functionality
+Enhanced state signing and verification with user-scoped replay protection
 
 ## Completed
-- [x] Removed user-scoped signing and verification functions (`sign_state_for_user` and `verify_state_for_user`)
-- [x] Simplified `sign_state` to only handle basic state signing without user context
-- [x] Removed all user ID handling from the signing and verification logic
-- [x] Removed the `AuthError` implementation for HTTP responses
-- [x] Cleaned up test module to match simplified functionality
-- [x] Updated documentation to reflect simplified state format ("{json}|{timestamp}|{signature_base64}")
+- [x] Added `sign_state_for_user` and `verify_state_for_user` functions to prevent cross-user replay attacks
+- [x] Refactored core signing logic into `sign_state_internal` and `verify_state_internal` to avoid code duplication
+- [x] Improved payload handling to support user-scoped signing format `{user_id}:{json}`
+- [x] Added user ID verification during state validation
+- [x] Updated Cargo.lock to reflect dependency resolution changes
+```
