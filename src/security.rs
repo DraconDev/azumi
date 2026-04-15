@@ -322,6 +322,18 @@ pub fn verify_state(signed_state: &str) -> Result<String, String> {
     }
 }
 
+impl IntoResponse for AuthError {
+    fn into_response(self) -> axum::response::Response {
+        match self {
+            AuthError::NotAuthenticated => {
+                (StatusCode::UNAUTHORIZED, "Unauthorized").into_response()
+            }
+            AuthError::Forbidden => (StatusCode::FORBIDDEN, "Forbidden").into_response(),
+            AuthError::Internal(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg).into_response(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
