@@ -1,12 +1,16 @@
 # Project State
 
 ## Current Focus
-Added comprehensive documentation for when to use Azumi vs simpler approaches
+Updated project documentation with recent fixes, planned improvements, and design decisions
 
 ## Completed
-- [x] Created WHEN_TO_USE_AZUMI.md with decision matrix comparing Azumi to simpler approaches
-- [x] Documented trade-offs between component-based and string-based templating
-- [x] Provided clear guidance for hybrid approaches
-- [x] Included security comparison between approaches
-- [x] Added decision tree for choosing between Azumi and simpler solutions
-```
+- [x] Documented v8.7.0 release with FnOnceComponent Sync bounds fix
+- [x] Added CSS string forward slash escaping implementation
+- [x] Improved LiveState::to_scope error handling
+- [x] Created roadmap for v9.0 security enhancements
+- [x] Documented planned improvements in security, DX, and code quality
+- [x] Added table of known design decisions with rationales
+- [x] Included security test for CSS string escaping
+- [x] Documented thread safety guarantees for FnOnceComponent
+- [x] Added fatal abort behavior for LiveState serialization
+- [x] Documented CSS injection protection enhancements
