@@ -127,7 +127,7 @@ impl HasCurrentUser for NoAuthProvider {
 // Global auth provider storage
 static AUTH_PROVIDER: std::sync::OnceLock<Box<dyn HasCurrentUser>> = std::sync::OnceLock::new();
 
-/// Register your auth provider type at startup.
+/// Register your auth provider at startup.
 ///
 /// Call this once in your `main()` function before handling requests:
 ///
@@ -142,12 +142,11 @@ static AUTH_PROVIDER: std::sync::OnceLock<Box<dyn HasCurrentUser>> = std::sync::
 /// }
 ///
 /// fn main() {
-///     azumi::auth::register_auth_provider::<MyAuth>();
+///     azumi::auth::register_auth_provider(MyAuth);
 ///     // ... rest of app setup
 /// }
 /// ```
-pub fn register_auth_provider<T: HasCurrentUser>() {
-    let provider = T;
+pub fn register_auth_provider<T: HasCurrentUser>(provider: T) {
     AUTH_PROVIDER
         .set(Box::new(provider))
         .map_err(|_| ())

@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock to reflect dependency resolution changes after recent security and framework enhancements
+Refactored auth provider registration to use direct instantiation instead of type-based registration
 
 ## Completed
-- [x] Updated Cargo.lock to resolve new dependency versions after security framework additions
-```
+- [x] Changed `register_auth_provider` to accept a concrete instance rather than a type parameter
+- [x] Updated documentation to reflect the new usage pattern
+- [x] Maintained backward compatibility by keeping the same function name and purpose
