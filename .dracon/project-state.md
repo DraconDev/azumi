@@ -1,10 +1,12 @@
 # Project State
 
 ## Current Focus
-Refactored auth system documentation to use closure-based provider registration
+Enhanced LiveState handlers with authentication support and security improvements
 
 ## Completed
-- [x] Updated auth documentation to show closure-based provider registration
-- [x] Added example implementation for auth extractor closure
-- [x] Removed outdated trait-based auth provider example
-- [x] Updated Cargo.lock to reflect dependency resolution changes
+- [x] Added authentication check for methods with `#[require_auth]` attribute
+- [x] Refactored handler generation to support both authenticated and unauthenticated routes
+- [x] Improved security by adding user extraction from requests when auth is required
+- [x] Maintained backward compatibility for existing unauthenticated handlers
+- [x] Enhanced error handling for security verification failures
+```

@@ -305,6 +305,17 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
         if let ImplItem::Fn(method) = item {
             let analysis = analyze_method(method);
 
+            let method_name = &method.sig.ident;
+            let method_name_str = method_name.to_string();
+
+            // Check if method has #[require_auth] attribute
+            let has_require_auth = method.attrs.iter().any(|attr| {
+                attr.path()
+                    .segments
+                    .iter()
+                    .any(|seg| seg.ident == "require_auth")
+            });
+
             // Generate prediction string
             let prediction_dsl: String = analysis
                 .predictions
@@ -312,9 +323,6 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                 .map(|p| p.to_dsl())
                 .collect::<Vec<_>>()
                 .join("; ");
-
-            let method_name = &method.sig.ident;
-            let method_name_str = method_name.to_string();
 
             if !prediction_dsl.is_empty() {
                 predictions_entries.push(quote! {
@@ -335,53 +343,119 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                 quote! { state.#method_name(); }
             };
 
-            // Generate Axum handler
+            // Generate auth check code if required
+            let auth_check = if has_require_auth {
+                quote! {
+                    let _user_id = azumi::auth::extract_user_from_request(&req)
+                        .map_err(axum::response::IntoResponse::into_response)?;
+                }
+            } else {
+                quote! {}
+            };
+
+            // Generate Axum handler - with or without auth
             let handler = if let Some(comp_name) = &component_name {
                 let comp_mod = format_ident!("{}_component", comp_name);
-                quote! {
-                    pub async fn #handler_name(
-                        body: String
-                    ) -> axum::response::Response {
-                        let json = match azumi::security::verify_state(&body) {
-                            Ok(j) => j,
-                            Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
-                        };
-                        let mut state: #struct_name = serde_json::from_str(&json).unwrap();
-                        #method_call
 
-                        // Re-render the component with new state
-                        let html = azumi::render_to_string(&#comp_mod::render(
-                            #comp_mod::Props::builder()
-                                .state(&state)
-                                .build()
-                                .expect("Live component re-render failed")
-                        ));
+                if has_require_auth {
+                    quote! {
+                        pub async fn #handler_name(
+                            req: axum::extract::Request,
+                            body: String
+                        ) -> axum::response::Response {
+                            #auth_check
 
-                        axum::response::IntoResponse::into_response(axum::response::Html(html))
+                            let json = match azumi::security::verify_state(&body) {
+                                Ok(j) => j,
+                                Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
+                            };
+                            let mut state: #struct_name = serde_json::from_str(&json).unwrap();
+                            #method_call
+
+                            let html = azumi::render_to_string(&#comp_mod::render(
+                                #comp_mod::Props::builder()
+                                    .state(&state)
+                                    .build()
+                                    .expect("Live component re-render failed")
+                            ));
+
+                            axum::response::IntoResponse::into_response(axum::response::Html(html))
+                        }
+
+                        #[allow(non_snake_case)]
+                        pub fn #router_name() -> axum::routing::MethodRouter<()> {
+                            axum::routing::post(#handler_name)
+                        }
                     }
+                } else {
+                    quote! {
+                        pub async fn #handler_name(
+                            body: String
+                        ) -> axum::response::Response {
+                            let json = match azumi::security::verify_state(&body) {
+                                Ok(j) => j,
+                                Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
+                            };
+                            let mut state: #struct_name = serde_json::from_str(&json).unwrap();
+                            #method_call
 
-                    #[allow(non_snake_case)]
-                    pub fn #router_name() -> axum::routing::MethodRouter<()> {
-                        axum::routing::post(#handler_name)
+                            let html = azumi::render_to_string(&#comp_mod::render(
+                                #comp_mod::Props::builder()
+                                    .state(&state)
+                                    .build()
+                                    .expect("Live component re-render failed")
+                            ));
+
+                            axum::response::IntoResponse::into_response(axum::response::Html(html))
+                        }
+
+                        #[allow(non_snake_case)]
+                        pub fn #router_name() -> axum::routing::MethodRouter<()> {
+                            axum::routing::post(#handler_name)
+                        }
                     }
                 }
             } else {
-                quote! {
-                    pub async fn #handler_name(
-                        body: String
-                    ) -> axum::response::Response {
-                        let json = match azumi::security::verify_state(&body) {
-                            Ok(j) => j,
-                            Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
-                        };
-                        let mut state: #struct_name = serde_json::from_str(&json).unwrap();
-                        #method_call
-                        axum::response::IntoResponse::into_response(axum::response::Json(state))
-                    }
+                if has_require_auth {
+                    quote! {
+                        pub async fn #handler_name(
+                            req: axum::extract::Request,
+                            body: String
+                        ) -> axum::response::Response {
+                            #auth_check
 
-                    #[allow(non_snake_case)]
-                    pub fn #router_name() -> axum::routing::MethodRouter<()> {
-                        axum::routing::post(#handler_name)
+                            let json = match azumi::security::verify_state(&body) {
+                                Ok(j) => j,
+                                Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
+                            };
+                            let mut state: #struct_name = serde_json::from_str(&json).unwrap();
+                            #method_call
+                            axum::response::IntoResponse::into_response(axum::response::Json(state))
+                        }
+
+                        #[allow(non_snake_case)]
+                        pub fn #router_name() -> axum::routing::MethodRouter<()> {
+                            axum::routing::post(#handler_name)
+                        }
+                    }
+                } else {
+                    quote! {
+                        pub async fn #handler_name(
+                            body: String
+                        ) -> axum::response::Response {
+                            let json = match azumi::security::verify_state(&body) {
+                                Ok(j) => j,
+                                Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
+                            };
+                            let mut state: #struct_name = serde_json::from_str(&json).unwrap();
+                            #method_call
+                            axum::response::IntoResponse::into_response(axum::response::Json(state))
+                        }
+
+                        #[allow(non_snake_case)]
+                        pub fn #router_name() -> axum::routing::MethodRouter<()> {
+                            axum::routing::post(#handler_name)
+                        }
                     }
                 }
             };
