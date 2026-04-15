@@ -9,8 +9,8 @@
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{
-    parse_macro_input, BinOp, Expr, ExprAssign, ExprBinary, ExprField, ExprPath, ExprUnary, Fields,
-    ImplItem, ImplItemFn, ItemImpl, ItemStruct, Member, Stmt, UnOp,
+    parse_macro_input, BinOp, Expr, ExprAssign, ExprBinary, ExprField, ExprMethodCall, ExprPath,
+    ExprUnary, Fields, ImplItem, ImplItemFn, ItemImpl, ItemStruct, Member, Stmt, UnOp,
 };
 
 /// Represents a predictable mutation that can be executed optimistically
@@ -24,20 +24,6 @@ pub enum Prediction {
     Add { field: String, value: String },
     /// self.field -= value (decrement)
     Sub { field: String, value: String },
-    /// self.field.push(value)
-    Push { field: String, value: String },
-    /// self.field.pop()
-    Pop { field: String },
-    /// self.field.clear()
-    Clear { field: String },
-    /// self.map.insert(key, value)
-    Insert {
-        field: String,
-        key: String,
-        value: String,
-    },
-    /// self.map.remove(key)
-    Remove { field: String, key: String },
     /// Manual prediction string from #[azumi::predict]
     Manual(String),
 }
@@ -58,21 +44,6 @@ impl Prediction {
             Prediction::Sub { field, value } => {
                 format!("{} = {} - {}", field, field, value)
             }
-            Prediction::Push { field, value } => {
-                format!("{}.push({})", field, value)
-            }
-            Prediction::Pop { field } => {
-                format!("{}.pop()", field)
-            }
-            Prediction::Clear { field } => {
-                format!("{} = []", field)
-            }
-            Prediction::Insert { field, key, value } => {
-                format!("{}.insert({}, {})", field, key, value)
-            }
-            Prediction::Remove { field, key } => {
-                format!("{}.remove({})", field, key)
-            }
             Prediction::Manual(s) => s.clone(),
         }
     }
@@ -81,7 +52,11 @@ impl Prediction {
 /// Metadata about an analyzed method
 #[derive(Debug)]
 pub struct MethodAnalysis {
+    #[allow(dead_code)]
+    pub name: String,
     pub predictions: Vec<Prediction>,
+    #[allow(dead_code)]
+    pub has_unpredictable: bool,
 }
 
 /// Extract field name from `self.field` expression
@@ -130,14 +105,11 @@ fn is_toggle_expr(expr: &Expr, expected_field: &str) -> bool {
     false
 }
 
-/// Analyze a single statement for predictable mutations.
-/// Note: This only analyzes top-level statements. Mutations inside control flow
-/// (if/else branches, match arms, loops) are NOT automatically analyzed.
-/// For mutations inside control flow, use #[azumi::predict("...")] manually.
+/// Analyze a single statement for predictable mutations
 fn analyze_statement(stmt: &Stmt) -> Option<Prediction> {
     match stmt {
         Stmt::Expr(expr, _semicolon) => analyze_expr(expr),
-        _ => None, // Stmt::Local, Stmt::Item, etc. are not analyzed
+        _ => None,
     }
 }
 
@@ -175,61 +147,15 @@ fn analyze_expr(expr: &Expr) -> Option<Prediction> {
             }
         }
 
-        // self.field.push(value)
-        Expr::MethodCall(mc) => {
-            let method_name = mc.method.to_string();
-            // Check if receiver is self.field
-            if let Expr::Field(ExprField { base, member, .. }) = &*mc.receiver {
-                if let Expr::Path(ExprPath { path, .. }) = &**base {
-                    if path.is_ident("self") {
-                        if let Member::Named(field) = member {
-                            let field = field.to_string();
-                            match method_name.as_str() {
-                                "clear" => return Some(Prediction::Clear { field }),
-                                "pop" => return Some(Prediction::Pop { field }),
-                                "push" => {
-                                    if let Some(arg) = mc.args.first() {
-                                        if let Some(value) = expr_to_literal_string(arg) {
-                                            return Some(Prediction::Push { field, value });
-                                        }
-                                    }
-                                }
-                                "insert" => {
-                                    if mc.args.len() == 2 {
-                                        let key = expr_to_literal_string(&mc.args[0]);
-                                        let value = expr_to_literal_string(&mc.args[1]);
-                                        if let (Some(k), Some(v)) = (key, value) {
-                                            return Some(Prediction::Insert {
-                                                field,
-                                                key: k,
-                                                value: v,
-                                            });
-                                        }
-                                    }
-                                }
-                                "remove" => {
-                                    if let Some(arg) = mc.args.first() {
-                                        if let Some(key) = expr_to_literal_string(arg) {
-                                            return Some(Prediction::Remove { field, key });
-                                        }
-                                    }
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
-                }
-            }
-            None
-        }
-
         _ => None,
     }
 }
 
 /// Analyze a method body for all predictable mutations
 pub fn analyze_method(method: &ImplItemFn) -> MethodAnalysis {
+    let name = method.sig.ident.to_string();
     let mut predictions = Vec::new();
+    let mut has_unpredictable = false;
 
     // Check for #[azumi::predict("...")] attribute
     for attr in &method.attrs {
@@ -247,10 +173,50 @@ pub fn analyze_method(method: &ImplItemFn) -> MethodAnalysis {
     for stmt in &method.block.stmts {
         if let Some(prediction) = analyze_statement(stmt) {
             predictions.push(prediction);
+        } else {
+            // Check if this is a statement that could have side effects
+            match stmt {
+                Stmt::Expr(expr, _semicolon) => {
+                    if is_side_effect(expr) {
+                        has_unpredictable = true;
+                    }
+                }
+                Stmt::Local(_) => {
+                    // Local variable bindings are fine
+                }
+                _ => {
+                    has_unpredictable = true;
+                }
+            }
         }
     }
 
-    MethodAnalysis { predictions }
+    MethodAnalysis {
+        name,
+        predictions,
+        has_unpredictable,
+    }
+}
+
+/// Check if an expression likely has side effects (async, await, method calls, etc.)
+fn is_side_effect(expr: &Expr) -> bool {
+    match expr {
+        Expr::Await(_) => true,
+        Expr::Call(_) => true, // Function calls might have side effects
+        Expr::MethodCall(mc) => {
+            // self.field mutations are handled separately
+            // External method calls are side effects
+            !is_self_field_mutation(mc)
+        }
+        Expr::Assign(_) => false, // Assignments to self are fine
+        Expr::Macro(_) => true,   // Macros are unpredictable
+        _ => false,
+    }
+}
+
+fn is_self_field_mutation(_mc: &ExprMethodCall) -> bool {
+    // Check if this is something like self.field.push() which we can't predict
+    false
 }
 
 /// Main macro expansion for #[azumi::live]
@@ -292,15 +258,9 @@ pub fn expand_live(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
         impl #struct_generics #struct_name #struct_generics {
             /// Serialize state for az-scope attribute
-            /// Logs error and returns empty string if serialization fails
             pub fn to_scope(&self) -> String {
-                match serde_json::to_string(self) {
-                    Ok(json) => azumi::security::sign_state(&json),
-                    Err(e) => {
-                        eprintln!("LiveState serialization error: {}", e);
-                        String::new()
-                    }
-                }
+                let json = serde_json::to_string(self).unwrap_or_default();
+                azumi::security::sign_state(&json)
             }
         }
     };
@@ -309,28 +269,7 @@ pub fn expand_live(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 /// Attribute macro for impl blocks: #[azumi::live_impl]
-///
-/// Analyzes methods in the impl block and generates:
-/// - Action handlers at `/_azumi/action/{StructName}/{MethodName}`
-/// - Prediction DSL for state change analysis
-/// - HMAC verification on all state updates
-///
-/// # Arguments
-/// * `attr` - Comma-separated key=value pairs, e.g., `component = "MyComponent"`
-/// * `item` - The `impl` block to process
-///
-/// # Example
-/// ```ignore
-/// #[azumi::live_impl(component = "Counter")]
-/// impl CounterState {
-///     #[azumi::action]
-///     fn increment(&mut self) {
-///         self.count += 1;
-///     }
-/// }
-/// ```
-///
-/// The generated handlers verify state HMAC signatures before executing actions.
+/// This analyzes methods and generates action handlers with predictions
 pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemImpl);
     let struct_name = &input.self_ty;
@@ -338,17 +277,6 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     let struct_name_str = quote!(#struct_name).to_string();
     // Clean up struct name (remove spaces)
     let struct_name_str = struct_name_str.replace(" ", "");
-
-    // Unique module name per struct to avoid collisions when multiple live_impls exist
-    // Use a hash of the struct name.
-    // NOTE: DefaultHasher (SipHash) is used here, not for security, just for stable module naming.
-    // The hash output is only used for local module names, not any security-critical purpose.
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
-    let mut hasher = DefaultHasher::new();
-    struct_name_str.hash(&mut hasher);
-    let hash_suffix = format!("{:x}", hasher.finish());
-    let handler_mod = format_ident!("__azumi_live_{}", hash_suffix);
 
     // Parse attributes to find component="name"
     let args = parse_macro_input!(attr with syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated);
@@ -362,10 +290,7 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                     ..
                 }) = nv.value
                 {
-                    let name = lit.value();
-                    if !name.is_empty() && name.chars().all(|c| c.is_alphanumeric() || c == '_') {
-                        component_name = Some(name);
-                    }
+                    component_name = Some(lit.value());
                 }
             }
         }
@@ -403,12 +328,6 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             // Keep original method
             original_methods.push(quote! { #method });
 
-            // Check if method has #[require_auth] attribute
-            let has_require_auth = method
-                .attrs
-                .iter()
-                .any(|attr| attr.path().is_ident("require_auth"));
-
             let is_async = method.sig.asyncness.is_some();
             let method_call = if is_async {
                 quote! { state.#method_name().await; }
@@ -417,262 +336,52 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             };
 
             // Generate Axum handler
-            //
-            // SECURITY: HMAC verification proves state integrity, NOT authorization.
-            // If #[require_auth] is present, we verify the user is authenticated.
-            // You must still add authorization checks within action methods to verify
-            // the user is allowed to perform that specific action on that specific state.
-            //
-            // Build auth check code if #[require_auth] is present
-            let auth_check = if has_require_auth {
-                quote! {
-                    // Extract user from request via registered auth provider
-                    let _user_id = match azumi::auth::extract_user_from_request(&req) {
-                        Ok(id) => id,
-                        Err(e) => return e.into_response(),
-                    };
-                }
-            } else {
-                quote! {}
-            };
-
-            // Build handler function signature - with or without request extraction
-            let handler_fn = if has_require_auth {
-                quote! {
-                    pub async fn #handler_name(
-                        body: String,
-                        req: axum::extract::Request,
-                    ) -> axum::response::Response {
-                }
-            } else {
-                quote! {
-                    pub async fn #handler_name(
-                        body: String,
-                    ) -> axum::response::Response {
-                }
-            };
-
             let handler = if let Some(comp_name) = &component_name {
-                let comp_mod = format_ident!("{}", comp_name);
+                let comp_mod = format_ident!("{}_component", comp_name);
                 quote! {
-                    #handler_fn
-                        #auth_check
-
+                    pub async fn #handler_name(
+                        body: String
+                    ) -> axum::response::Response {
                         let json = match azumi::security::verify_state(&body) {
                             Ok(j) => j,
-                            Err(_) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
-                            ),
+                            Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
                         };
-
-                        // SECURITY: Check for deeply nested structures (DoS prevention)
-                        // A valid JSON object/array with depth > 100 can cause stack overflow
-                        let mut depth: u32 = 0;
-                        let mut in_string = false;
-                        let mut escaped = false;
-                        for ch in json.chars() {
-                            match ch {
-                                '\\' => { escaped = true; }
-                                '"' if !escaped => { in_string = !in_string; }
-                                '{' | '[' if !in_string => { depth += 1; if depth > 100 { return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, "Request too complex")); } },
-                                '}' | ']' if !in_string => { depth = depth.saturating_sub(1); }
-                                _ => { escaped = false; }
-                            }
-                        }
-
-                        let mut state: #struct_name = match serde_json::from_str(&json) {
-                            Ok(s) => s,
-                            Err(_) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
-                            ),
-                        };
+                        let mut state: #struct_name = serde_json::from_str(&json).unwrap();
                         #method_call
 
                         // Re-render the component with new state
-                        let props = match #comp_mod::Props::builder().state(&state).build() {
-                            Ok(p) => p,
-                            Err(_) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "Internal Server Error")
-                            ),
-                        };
-                        let html = azumi::render_to_string(&#comp_mod::render(props));
+                        let html = azumi::render_to_string(&#comp_mod::render(
+                            #comp_mod::Props::builder()
+                                .state(&state)
+                                .build()
+                                .expect("Live component re-render failed")
+                        ));
 
                         axum::response::IntoResponse::into_response(axum::response::Html(html))
                     }
 
                     #[allow(non_snake_case)]
                     pub fn #router_name() -> axum::routing::MethodRouter<()> {
-                        use axum::extract::DefaultBodyLimit;
                         axum::routing::post(#handler_name)
-                            .layer(DefaultBodyLimit::max(1024 * 64))
                     }
                 }
             } else {
-                // No component - direct state handler
-                // SECURITY: Same authorization requirements apply (see above)
                 quote! {
-                    #handler_fn
-                        #auth_check
-
+                    pub async fn #handler_name(
+                        body: String
+                    ) -> axum::response::Response {
                         let json = match azumi::security::verify_state(&body) {
                             Ok(j) => j,
-                            Err(_) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
-                            ),
+                            Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, format!("Security Error: {}", e))),
                         };
-
-                        // SECURITY: Check for deeply nested structures (DoS prevention)
-                        let mut depth: u32 = 0;
-                        let mut in_string = false;
-                        let mut escaped = false;
-                        for ch in json.chars() {
-                            match ch {
-                                '\\' => { escaped = true; }
-                                '"' if !escaped => { in_string = !in_string; }
-                                '{' | '[' if !in_string => { depth += 1; if depth > 100 { return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, "Request too complex")); } },
-                                '}' | ']' if !in_string => { depth = depth.saturating_sub(1); }
-                                _ => { escaped = false; }
-                            }
-                        }
-
-                        let mut state: #struct_name = match serde_json::from_str(&json) {
-                            Ok(s) => s,
-                            Err(_) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
-                            ),
-                        };
+                        let mut state: #struct_name = serde_json::from_str(&json).unwrap();
                         #method_call
                         axum::response::IntoResponse::into_response(axum::response::Json(state))
                     }
 
                     #[allow(non_snake_case)]
                     pub fn #router_name() -> axum::routing::MethodRouter<()> {
-                        use axum::extract::DefaultBodyLimit;
                         axum::routing::post(#handler_name)
-                            .layer(DefaultBodyLimit::max(1024 * 64))
-                    }
-                }
-            };
-
-                        // SECURITY: Check for deeply nested structures (DoS prevention)
-                        // A valid JSON object/array with depth > 100 can cause stack overflow
-                        let mut depth: u32 = 0;
-                        let mut in_string = false;
-                        let mut escaped = false;
-                        for ch in json.chars() {
-                            match ch {
-                                '\\' => { escaped = true; }
-                                '"' if !escaped => { in_string = !in_string; }
-                                '{' | '[' if !in_string => { depth += 1; if depth > 100 { return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, "Request too complex")); } },
-                                '}' | ']' if !in_string => { depth = depth.saturating_sub(1); }
-                                _ => { escaped = false; }
-                            }
-                        }
-
-                        let mut state: #struct_name = match serde_json::from_str(&json) {
-                            Ok(s) => s,
-                            Err(_) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
-                            ),
-                        };
-                        #method_call
-
-                        // Re-render the component with new state
-                        let props = match #comp_mod::Props::builder().state(&state).build() {
-                            Ok(p) => p,
-                            Err(_) => return axum::response::IntoResponse::into_response(
-                                (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "Internal Server Error")
-                            ),
-                        };
-                        let html = azumi::render_to_string(&#comp_mod::render(props));
-
-                        axum::response::IntoResponse::into_response(axum::response::Html(html))
-                    };
-
-                    #[allow(non_snake_case)]
-                    pub fn #router_name() -> axum::routing::MethodRouter<()> {
-                        use axum::extract::DefaultBodyLimit;
-                        axum::routing::post(#handler_name)
-                            .layer(DefaultBodyLimit::max(1024 * 64))
-                    };
-                }
-            } else {
-                // No component - direct state handler
-                // SECURITY: Same authorization requirements apply (see above)
-                quote! {
-                        pub async fn #handler_name(
-                            body: String
-                        ) -> axum::response::Response {
-                            let json = match azumi::security::verify_state(&body) {
-                                Ok(j) => j,
-                                Err(_) => return axum::response::IntoResponse::into_response(
-                                    (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
-                                ),
-                            };
-
-                            // SECURITY: Check for deeply nested structures (DoS prevention)
-                            let mut depth: u32 = 0;
-                            let mut in_string = false;
-                            let mut escaped = false;
-                            for ch in json.chars() {
-                                match ch {
-                                    '\\' => { escaped = true; }
-                                    '"' if !escaped => { in_string = !in_string; }
-                                    '{' | '[' if !in_string => { depth += 1; if depth > 100 { return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, "Request too complex")); } },
-                                    '}' | ']' if !in_string => { depth = depth.saturating_sub(1); }
-                                    _ => { escaped = false; }
-                                }
-                            }
-
-                            let mut state: #struct_name = match serde_json::from_str(&json) {
-                                Ok(s) => s,
-                                Err(_) => return axum::response::IntoResponse::into_response(
-                                    (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
-                                ),
-                            };
-                            #method_call
-                            axum::response::IntoResponse::into_response(axum::response::Json(state))
-                        };
-
-                        #[allow(non_snake_case)]
-                        pub fn #router_name() -> axum::routing::MethodRouter<()> {
-                            use axum::extract::DefaultBodyLimit;
-                            axum::routing::post(#handler_name)
-                                .layer(DefaultBodyLimit::max(1024 * 64))
-                        };
-                    }
-                }
-            };
-
-                            // SECURITY: Check for deeply nested structures (DoS prevention)
-                            let mut depth: u32 = 0;
-                            let mut in_string = false;
-                            let mut escaped = false;
-                            for ch in json.chars() {
-                                match ch {
-                                    '\\' => { escaped = true; }
-                                    '"' if !escaped => { in_string = !in_string; }
-                                    '{' | '[' if !in_string => { depth += 1; if depth > 100 { return axum::response::IntoResponse::into_response((axum::http::StatusCode::BAD_REQUEST, "Request too complex")); } },
-                                    '}' | ']' if !in_string => { depth = depth.saturating_sub(1); }
-                                    _ => { escaped = false; }
-                                }
-                            }
-
-                            let mut state: #struct_name = match serde_json::from_str(&json) {
-                                Ok(s) => s,
-                                Err(_) => return axum::response::IntoResponse::into_response(
-                                    (axum::http::StatusCode::BAD_REQUEST, "Bad Request")
-                                ),
-                            };
-                            #method_call
-                            axum::response::IntoResponse::into_response(axum::response::Json(state))
-                        }
-
-                    #[allow(non_snake_case)]
-                    pub fn #router_name() -> axum::routing::MethodRouter<()> {
-                        use axum::extract::DefaultBodyLimit;
-                        axum::routing::post(#handler_name)
-                            .layer(DefaultBodyLimit::max(1024 * 64))
                     }
                 }
             };
@@ -699,7 +408,10 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             #(#original_methods)*
         }
 
-        impl azumi::LiveStateMetadata for #struct_name {
+        impl azumi::LiveState for #struct_name {
+            fn to_scope(&self) -> String {
+                self.to_scope()
+            }
             fn predictions() -> &'static [(&'static str, &'static str)] {
                 &[
                     #(#predictions_entries),*
@@ -710,11 +422,9 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        impl azumi::LiveState for #struct_name {}
-
-        // Generated handlers module (unique name per struct to avoid collisions)
+        // Generated handlers module
         #[allow(non_snake_case)]
-        mod #handler_mod {
+        mod __azumi_live_handlers {
             use super::*;
             #(#method_handlers)*
         }
