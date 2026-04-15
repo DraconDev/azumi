@@ -353,7 +353,8 @@ impl<T: std::fmt::Display> std::fmt::Display for Escaped<T> {
 }
 
 /// Escape a string for safe inclusion in a CSS property value.
-/// Prevents CSS injection by escaping semicolons, backslashes, and quotes.
+/// Prevents CSS injection by escaping semicolons, backslashes, braces, quotes, and forward slashes.
+/// Forward slashes are escaped to prevent </style> injection attacks.
 pub fn escape_css_string(s: &str) -> String {
     let mut result = String::with_capacity(s.len());
     for c in s.chars() {
@@ -364,6 +365,7 @@ pub fn escape_css_string(s: &str) -> String {
             }
             '"' => result.push_str("\\\""),
             '\'' => result.push_str("\\'"),
+            '/' => result.push_str("\\/"),
             '\n' => result.push_str("\\a "),
             '\r' => result.push_str("\\d "),
             '\t' => result.push_str("\\9 "),
