@@ -72,8 +72,9 @@ pub fn auto_reload_if(enabled: bool) {
 /// - Grouping: `(`, `)`, `{`, `}`, `[`, `]`
 /// - Glob/brace expansion: `*`, `?`, `#`, `~`, space
 /// - Newlines which can inject HTTP headers
+#[allow(clippy::manual_pattern_char_comparison)]
 pub fn is_arg_safe(arg: &str) -> bool {
-    !arg.contains(|c: char| 
+    !arg.contains(|c: char|
         c == '\r' || c == '\n' || c == ';' || c == '|' || c == '&' ||
         c == '>' || c == '<' || c == '$' || c == '`' || c == '(' ||
         c == ')' || c == '!' || c == '*' || c == '?' || c == '#' ||
