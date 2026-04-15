@@ -176,8 +176,9 @@ fn start_worker(bin_name: &str) -> Child {
     // Forward original CLI arguments to the worker
     // SECURITY: Filter args to remove shell metacharacters that could enable injection
     // Blocked characters: shell operators, variable expansion, quote removal, glob/brace expansion
+    #[allow(clippy::manual_pattern_char_comparison)]
     let args: Vec<String> = std::env::args().skip(1).filter(|arg| {
-        !arg.contains(|c: char| 
+        !arg.contains(|c: char|
             c == '\r' || c == '\n' || c == ';' || c == '|' || c == '&' ||
             c == '>' || c == '<' || c == '$' || c == '`' || c == '(' ||
             c == ')' || c == '!' || c == '*' || c == '?' || c == '#' ||
