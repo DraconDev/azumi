@@ -87,8 +87,15 @@ pub trait LiveState:
     LiveStateMetadata + serde::Serialize + for<'de> serde::de::Deserialize<'de> + Send + Sync + 'static
 {
     fn to_scope(&self) -> String {
-        let json = serde_json::to_string(self)
-            .expect("Failed to serialize LiveState to JSON. Ensure all fields implement Serialize.");
+        let json = match serde_json::to_string(self) {
+            Ok(j) => j,
+            Err(e) => {
+                eprintln!("FATAL: Failed to serialize LiveState to JSON: {}. \
+                    This usually means a field doesn't implement Serialize. \
+                    Check that all state fields implement serde::Serialize.", e);
+                std::process::abort();
+            }
+        };
         crate::security::sign_state(&json)
     }
 }
