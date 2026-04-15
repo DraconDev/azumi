@@ -1,7 +1,12 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock to reflect dependency resolution changes after authentication system refactoring
+Implement replay protection in state signing by adding user context to HMAC verification
 
-## Completed
-- [x] Updated Cargo.lock to reflect dependency changes from authentication system refactoring
+## Completed - Auth Revert
+- [x] Removed `#[require_auth]` attribute macro from macros/src/lib.rs
+- [x] Removed auth module (src/auth.rs deleted)
+- [x] Removed auth exports from src/lib.rs prelude
+- [x] Reverted live.rs to original handler code (without auth integration)
+- [x] Build passes, all 18 tests pass
+```
