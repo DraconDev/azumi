@@ -5,7 +5,7 @@ use azumi::prelude::*;
 ///
 /// Demonstrates the `@Image` component for performance.
 #[azumi::component]
-pub fn lesson12_page() -> impl Component {
+pub fn render_page() -> impl Component {
     html! {
         @DarkModernLayout() {
             <div class={container}>

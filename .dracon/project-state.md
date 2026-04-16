@@ -4,5 +4,4 @@
 Refactored `lesson12.rs` to use consistent `render_page()` naming convention
 
 ## Completed
-- [x] Updated `lesson12_handler()` to call `render_page()` instead of `lesson12_page()`
-```
+- [x] Renamed `lesson12_page()` to `render_page()` for naming consistency with other lesson files
