@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Added dead code annotation for PageMetaState struct to prevent compiler warnings
+security: replaced assert with panic for empty AZUMI_SECRET check in state signing
 
 ## Completed
-- [x] Added `#[allow(dead_code)]` to PageMetaState struct to suppress unused code warnings
-```
+- [x] security: replaced assert! with explicit panic! for AZUMI_SECRET validation in state signing to provide more consistent error handling behavior
