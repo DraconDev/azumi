@@ -172,7 +172,7 @@ pub fn let_composition_example() -> impl azumi::Component {
 
 /// Main lesson demonstration component
 #[azumi::component]
-pub fn lesson5() -> impl azumi::Component {
+pub fn page() -> impl azumi::Component {
     html! {
         @DarkModernLayout() {
             <div class={container}>
