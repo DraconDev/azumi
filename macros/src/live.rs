@@ -227,26 +227,15 @@ pub fn expand_live(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let struct_generics = &input.generics;
     let struct_fields = &input.fields;
 
-    // Extract field information
-    let _field_info: Vec<_> = match struct_fields {
-        Fields::Named(fields) => fields
-            .named
-            .iter()
-            .map(|f| {
-                let name = f.ident.as_ref().unwrap();
-                let ty = &f.ty;
-                (name.clone(), ty.clone())
-            })
-            .collect(),
-        _ => {
-            return syn::Error::new_spanned(
-                &input,
-                "#[azumi::live] only supports structs with named fields",
-            )
-            .to_compile_error()
-            .into();
-        }
-    };
+    // Validate that struct has named fields
+    if !matches!(struct_fields, Fields::Named(_)) {
+        return syn::Error::new_spanned(
+            &input,
+            "#[azumi::live] only supports structs with named fields",
+        )
+        .to_compile_error()
+        .into();
+    }
 
     let struct_attrs = &input.attrs;
 
