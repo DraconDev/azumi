@@ -341,18 +341,14 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
                         };
                         #method_call
 
-                        let html = match azumi::render_to_string(&#comp_mod::render(
-                            match #comp_mod::Props::builder()
-                                .state(&state)
-                                .build()
-                            {
-                                Ok(props) => props,
-                                Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::INTERNAL_SERVER_ERROR, format!("Component Build Error: {}", e))),
-                            }
-                        )) {
-                            Ok(html) => html,
-                            Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::INTERNAL_SERVER_ERROR, format!("Render Error: {}", e))),
+                        let props = match #comp_mod::Props::builder()
+                            .state(&state)
+                            .build()
+                        {
+                            Ok(props) => props,
+                            Err(e) => return axum::response::IntoResponse::into_response((axum::http::StatusCode::INTERNAL_SERVER_ERROR, format!("Component Build Error: {}", e))),
                         };
+                        let html = azumi::render_to_string(&#comp_mod::render(props));
 
                         axum::response::IntoResponse::into_response(axum::response::Html(html))
                     }
