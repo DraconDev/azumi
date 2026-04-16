@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency resolution changes after automated updates
+Refactored lesson0.rs to use `page()` instead of `lesson0()` in Axum handler
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes after automated updates
+- [x] Updated Axum handler to render `page()` instead of `lesson0()` for consistency
+```
