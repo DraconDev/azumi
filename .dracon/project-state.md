@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-security: replaced assert with panic for empty AZUMI_SECRET check to improve error handling
+security: replaced error logging with panic for LiveState serialization failures
 
 ## Completed
-- [x] security: replaced assert! with explicit panic! for empty AZUMI_SECRET check to provide more descriptive error messages
+- [x] security: changed error handling from `eprintln` + `abort` to direct `panic` for LiveState serialization failures
 ```

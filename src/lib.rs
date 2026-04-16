@@ -90,10 +90,9 @@ pub trait LiveState:
         let json = match serde_json::to_string(self) {
             Ok(j) => j,
             Err(e) => {
-                eprintln!("FATAL: Failed to serialize LiveState to JSON: {}. \
+                panic!("FATAL: Failed to serialize LiveState to JSON: {}. \
                     This usually means a field doesn't implement Serialize. \
                     Check that all state fields implement serde::Serialize.", e);
-                std::process::abort();
             }
         };
         crate::security::sign_state(&json)
