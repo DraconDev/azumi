@@ -78,6 +78,7 @@ thread_local! {
 /// This is intentional: each thread has its own `PAGE_META`, so developers must ensure
 /// guards do not cross thread boundaries.
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct PageMetaGuard(PageMetaState);
 
 impl PageMetaGuard {
