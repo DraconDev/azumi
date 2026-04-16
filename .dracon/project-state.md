@@ -1,7 +1,10 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency resolution changes after automated updates
+Removed Sync implementation from FnOnceComponent to prevent unsafe thread-sharing
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes after automated updates
+- [x] Removed unsafe Sync implementation for FnOnceComponent
+- [x] Added clear documentation explaining why FnOnceComponent is not thread-safe
+- [x] Updated documentation to recommend thread-safe alternatives
+```

@@ -314,17 +314,13 @@ where
     }
 }
 
-// SAFETY: FnOnceComponent uses UnsafeCell but is marked Sync only when the
-// closure is Send + Sync. This is required because FnOnce closures may capture
-// non-Sync types (like Rc), and claiming Sync for such types would be unsound.
+// NOTE: FnOnceComponent does NOT implement Send or Sync.
+// This is intentional because:
+// 1. FnOnce closures may capture non-Send types (like Rc)
+// 2. The internal UnsafeCell mutation is not protected by atomics
+// 3. Calling render() from multiple threads simultaneously is unsafe
 //
-// The `rendered` and `closure` UnsafeCells are only accessed from the `render()`
-// method which takes `&self`. Since we require F: Send + Sync, the closure
-// and any captured state can be safely shared across threads.
-unsafe impl<F> Sync for FnOnceComponent<F>
-where
-    F: FnOnce(&mut std::fmt::Formatter<'_>) -> std::fmt::Result + Send + Sync
-{}
+// If you need thread-safety, use FnComponent with Arc<Mutex<T>> or Arc<RwLock<T>>.
 
 /// Create a `FnOnceComponent` from a `FnOnce` closure.
 ///
