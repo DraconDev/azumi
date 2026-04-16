@@ -182,5 +182,5 @@ pub fn lesson17() -> impl Component {
 }
 
 pub async fn handler() -> impl IntoResponse {
-    Html(azumi::render_to_string(&lesson17()))
+    Html(azumi::render_to_string(&render_page()))
 }
