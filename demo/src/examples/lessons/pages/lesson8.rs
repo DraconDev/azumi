@@ -184,7 +184,7 @@ pub async fn compose_actions(state: CompositionState) -> impl azumi::Component {
 
 /// Main lesson demonstration component
 #[azumi::component]
-pub fn lesson8() -> impl azumi::Component {
+pub fn page() -> impl azumi::Component {
     let counter_state = CounterState { count: 0 };
     let management_state = ManagementState {
         status: "Active".to_string(),
