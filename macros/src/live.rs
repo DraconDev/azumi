@@ -421,13 +421,36 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        // Generated handlers module
-        #[allow(non_snake_case)]
-        mod __azumi_live_handlers {
-            use super::*;
-            #(#method_handlers)*
-        }
-    };
+        // Generated handlers module - unique name per struct to avoid collisions
+        let handler_mod_name = format_ident!("__azumi_live_handlers_{}", struct_name.to_string().to_lowercase());
+        let expanded = quote! {
+            impl #struct_name {
+                #(#original_methods)*
+            }
+
+            impl azumi::LiveStateMetadata for #struct_name {
+                fn predictions() -> &'static [(&'static str, &'static str)] {
+                    &[
+                        #(#predictions_entries),*
+                    ]
+                }
+                fn struct_name() -> &'static str {
+                    #struct_name_str
+                }
+            }
+
+            impl azumi::LiveState for #struct_name {
+                fn to_scope(&self) -> String {
+                    self.to_scope()
+                }
+            }
+
+            #[allow(non_snake_case)]
+            mod #handler_mod_name {
+                use super::*;
+                #(#method_handlers)*
+            }
+        };
 
     TokenStream::from(expanded)
 }
