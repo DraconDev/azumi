@@ -1,8 +1,11 @@
 # Project State
 
 ## Current Focus
-Removed unused CSRF test module from action.rs
+Added comprehensive CSRF protection documentation for Azumi actions module
 
 ## Completed
-- [x] Removed redundant CSRF documentation test module
-- [x] Cleaned up action.rs by removing unused test code
+- [x] Added detailed documentation explaining CSRF protection requirements for Azumi actions
+- [x] Documented that Azumi doesn't implement CSRF protection as it's application responsibility
+- [x] Explained CSRF protection options for cookie-based authentication
+- [x] Clarified that LiveView state is protected by HMAC-signed state
+- [x] Provided specific implementation recommendations for CSRF protection
