@@ -133,5 +133,5 @@ pub fn lesson12_page() -> impl Component {
 }
 
 pub async fn lesson12_handler() -> impl axum::response::IntoResponse {
-    axum::response::Html(azumi::render_to_string(&lesson12_page()))
+    axum::response::Html(azumi::render_to_string(&render_page()))
 }
