@@ -155,7 +155,7 @@ pub fn scoping_best_practices() -> impl azumi::Component {
 
 /// Main lesson demonstration component
 #[azumi::component]
-pub fn lesson2() -> impl azumi::Component {
+pub fn page() -> impl azumi::Component {
     html! {
         @DarkModernLayout() {
             <div class={container}>

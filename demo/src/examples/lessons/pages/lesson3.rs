@@ -134,7 +134,7 @@ pub fn complex_layout() -> impl azumi::Component {
 
 /// Main lesson demonstration component
 #[azumi::component]
-pub fn lesson3() -> impl azumi::Component {
+pub fn page() -> impl azumi::Component {
     azumi::html! {
         @DarkModernLayout() {
             <div class={container}>
@@ -224,5 +224,5 @@ pub fn lesson3() -> impl azumi::Component {
 
 // Handler for Axum
 pub async fn lesson3_handler() -> impl axum::response::IntoResponse {
-    axum::response::Html(azumi::render_to_string(&lesson3()))
+    axum::response::Html(azumi::render_to_string(&page()))
 }
