@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored lesson1.rs to use `page()` instead of `lesson1()` for consistency with other lesson files
+Refactored lesson2.rs to use `page()` instead of `lesson2()` in Axum handler
 
 ## Completed
-- [x] Renamed `lesson1()` function to `page()` to maintain consistent naming across lesson components
+- [x] Updated Axum handler in lesson2.rs to use `page()` function instead of `lesson2()` for consistency with other lessons
 ```
