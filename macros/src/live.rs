@@ -214,9 +214,40 @@ fn is_side_effect(expr: &Expr) -> bool {
     }
 }
 
-fn is_self_field_mutation(_mc: &ExprMethodCall) -> bool {
-    // Check if this is something like self.field.push() which we can't predict
-    false
+fn is_self_field_mutation(mc: &ExprMethodCall) -> bool {
+    use syn::ExprField;
+    if let Expr::Field(ExprField { base, .. }) = &*mc.receiver {
+        if let Expr::Path(ExprPath { path, .. }) = &**base {
+            if path.is_ident("self") {
+                let method_name = mc.method.to_string();
+                matches!(
+                    method_name.as_str(),
+                    "push"
+                        | "pop"
+                        | "shift"
+                        | "unshift"
+                        | "insert"
+                        | "remove"
+                        | "clear"
+                        | "reverse"
+                        | "sort"
+                        | "splice"
+                        | "swap"
+                        | "lock"
+                        | "put"
+                        | "get_mut"
+                        | "write"
+                        | "clear"
+                )
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    } else {
+        false
+    }
 }
 
 /// Main macro expansion for #[azumi::live]
