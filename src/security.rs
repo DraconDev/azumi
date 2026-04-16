@@ -118,6 +118,49 @@ fn sign_state_internal(user_id: Option<&str>, state_json: &str) -> String {
 /// Verifies a signed state string and checks timestamp for replay protection.
 /// Returns the original JSON if valid, or an Err if invalid or expired.
 ///
+/// # Security Properties
+///
+/// **WHAT HMAC VERIFIES:**
+/// - State integrity: Data was not tampered with after signing
+/// - Timestamp freshness: State is within allowed age (1 hour max)
+/// - (For user-scoped) User identity: State was signed for a specific user
+///
+/// **WHAT HMAC DOES NOT VERIFY:**
+/// - **User authorization**: A valid signed state does NOT prove the user is allowed to submit this action
+/// - **Business logic**: The framework cannot enforce "is this user allowed to modify this data?"
+///
+/// # Authorization Responsibility
+///
+/// Action handlers verify that the state was signed by the server, but Azumi does NOT
+/// enforce authorization. Your application must verify that the authenticated user
+/// is permitted to perform the requested action on the given state.
+///
+/// Example attack scenario WITHOUT proper authorization:
+/// ```ignore
+/// // User A's state contains {role: "user", id: 123}
+/// // User A sends this state to the set_admin action
+/// // HMAC verifies ✓, state is valid
+/// // But User A should NOT be able to make themselves admin!
+/// ```
+///
+/// Your application should validate authorization AFTER verifying state:
+/// ```ignore
+/// async fn set_admin_handler(signed_state: String) -> Response {
+///     let json = verify_state(&signed_state)?; // 1. Verify HMAC
+///     let state: UserState = serde_json::from_str(&json)?;
+///
+///     // 2. Check authorization (YOUR responsibility)
+///     let current_user = get_authenticated_user()?;
+///     if !current_user.is_admin() && state.id != current_user.id {
+///         return Err(Unauthorized); // Can't modify other users!
+///     }
+///
+///     // 3. Perform action
+///     state.role = "admin".into();
+///     Ok(Json(state))
+/// }
+/// ```
+///
 /// # Security Note
 ///
 /// This function uses constant-time HMAC comparison via `verify_slice`,
