@@ -57,7 +57,7 @@ mod tests {
 }
 
 #[azumi::component]
-pub fn lesson18() -> impl Component {
+pub fn render_page() -> impl Component {
     let initial_state = SecureCounter {
         count: 0,
         is_admin: false,
