@@ -32,6 +32,7 @@ thread_local! {
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 struct PageMetaState {
     refcount: Rc<std::sync::atomic::AtomicU32>,
 }
