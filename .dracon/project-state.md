@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored lesson5.rs to use consistent `page()` naming convention across all lesson components
+Refactored lesson6.rs to use consistent `page()` naming convention in Axum handler
 
 ## Completed
-- [x] Renamed `lesson5()` function to `page()` to maintain consistent naming across all lesson components
+- [x] Changed `lesson6_handler()` to call `page()` instead of `lesson6()` for consistency with other lessons
