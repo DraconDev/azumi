@@ -197,13 +197,28 @@ pub fn counter_view<'a>(state: &'a Counter) -> impl Component + 'a {
 
 ### 8. Event Binding Syntax
 
+**Recommended: Use `on:event={state.method}`** - the macro generates the underlying `az-on` attribute automatically.
+
 ```rust
-// ✅ CORRECT - use on:event={state.method}
+// ✅ CORRECT - on:click generates az-on="click call increment"
 <button on:click={state.increment}>"Click"</button>
 
 // ❌ WRONG - don't use closures or function calls
 <button on:click={|| state.increment()}>"Click"</button>
 <button on:click={state.increment()}>"Click"</button>
+```
+
+**Under the hood:** `on:click={state.increment}` generates `az-on="click call increment"` in the HTML.
+The `az-on` attribute follows the format: `{event} {command} {target}` where:
+- `click` — the DOM event
+- `call` — execute a method on the state
+- `increment` — the method name
+
+For advanced use cases, you can write `az-on` directly:
+```rust
+// Direct az-on syntax for complex scenarios
+<button az-on="click call increment -> #counter">"Increment"</button>
+<button az-on="click set is_open = !is_open">"Toggle"</button>
 ```
 
 ### 9. Text Content Must Be Quoted
