@@ -137,7 +137,6 @@ pub fn html(input: TokenStream) -> TokenStream {
             // invoked once - which is the typical case for a complete HTML page.
             azumi::from_fn_once(move |f| {
                 #html_construction
-                Ok(())
             })
         }
     };
