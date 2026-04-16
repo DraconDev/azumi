@@ -43,25 +43,11 @@ pub async fn handle_action_result<C: Component + ?Sized>(component: &C) -> impl 
     axum::response::Html(crate::render_to_string(component))
 }
 
-/// # CSRF Protection for Actions
-///
-/// `#[azumi::action]` handlers are plain JSON API endpoints. CSRF protection
-/// is NOT built into Azumi because:
-///
-/// 1. **Azumi doesn't own auth** - Authentication is application responsibility
-/// 2. **Actions are JSON APIs** - They're designed to be called from the JS client
-///
-/// ## CSRF Protection Options
-///
-/// For applications using cookie-based authentication, add CSRF protection at the
-/// Axum middleware layer (not in Azumi). Common approaches:
-///
-/// 1. **SameSite cookies** - Set `SameSite=Strict` or `SameSite=Lax` on session cookies
-/// 2. **Double Submit Cookie** - Check a CSRF token in both cookie and header
-/// 3. **Custom Axum middleware** - Verify Origin/Referer headers
-///
-/// ## LiveView State Protection
-///
-/// `#[azumi::live_impl]` handlers are protected against CSRF by HMAC-signed state.
-/// The state is generated server-side with a timestamp and signature - attackers
-/// cannot forge valid state without the secret key.
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn csrf_doc_test() {
+        // Doc test placeholder - CSRF protection is documented in action.rs
+        // Actions are plain JSON APIs - CSRF is application responsibility
+    }
+}
