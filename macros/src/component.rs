@@ -175,34 +175,24 @@ pub fn expand_component(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
         }
     };
 
-    // Check if function name is snake_case
-    let name_str = fn_name.to_string();
-    let is_snake_case = name_str.chars().all(|c| c.is_lowercase() || c == '_');
+    // Component module name is always {fn_name}_component
+    let comp_mod_name = syn::Ident::new(&format!("{}_component", fn_name), fn_name.span());
 
-    let (mod_name, wrapper_fn) = if is_snake_case {
-        let mod_ident = syn::Ident::new(&name_str, fn_name.span());
-
-        // Generate wrapper function for direct calls (e.g. @snake_case())
-        // Note: This only works for components with no required props or children
-        let wrapper = if has_children || !props_fields.is_empty() {
-            // Don't generate wrapper if props/children are required
-            quote! {}
-        } else {
-            quote! {
-                #fn_vis fn #fn_name #fn_generics () -> impl azumi::Component #where_clause {
-                    #mod_ident::render(#mod_ident::Props::builder().build().expect("Missing required props in wrapper call"))
-                }
-            }
-        };
-
-        (mod_ident, wrapper)
+    // Generate wrapper function for direct calls (e.g. @snake_case())
+    // Note: This only works for components with no required props or children
+    let wrapper_fn = if has_children || !props_fields.is_empty() {
+        quote! {}
     } else {
-        (fn_name.clone(), quote! {})
+        quote! {
+            #fn_vis fn #fn_name #fn_generics () -> impl azumi::Component #where_clause {
+                #comp_mod_name::render(#comp_mod_name::Props::builder().build().expect("Missing required props in wrapper call"))
+            }
+        }
     };
 
     let expanded = quote! {
         #[allow(non_snake_case)]
-        #fn_vis mod #mod_name {
+        #fn_vis mod #comp_mod_name {
             use super::*;
             use azumi::Component;
 
