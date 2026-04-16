@@ -124,7 +124,7 @@ pub fn valid_css_example() -> impl azumi::Component {
 
 /// Main lesson demonstration component
 #[azumi::component]
-pub fn lesson1() -> impl azumi::Component {
+pub fn page() -> impl azumi::Component {
     html! {
         @DarkModernLayout() {
             <div class={container}>
