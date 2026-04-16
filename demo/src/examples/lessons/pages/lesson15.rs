@@ -259,5 +259,5 @@ pub fn lesson15_page() -> impl Component {
 
 // Handler for Axum
 pub async fn lesson15_handler() -> impl axum::response::IntoResponse {
-    axum::response::Html(azumi::render_to_string(&lesson15_page()))
+    axum::response::Html(azumi::render_to_string(&render_page()))
 }
