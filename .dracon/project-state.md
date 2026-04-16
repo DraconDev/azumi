@@ -1,11 +1,10 @@
 # Project State
 
 ## Current Focus
-Added complete setup example for Azumi with Axum integration
+Added detailed documentation for Azumi's live component state management and security model
 
 ## Completed
-- [x] Added minimal working example showing Azumi component and Axum integration
-- [x] Documented devtools features (hot reload, action registration)
-- [x] Included production deployment instructions
-- [x] Added client-side runtime explanation (~3KB optimistic UI)
-```
+- [x] Added comprehensive flow diagram for live component lifecycle (init → action → server → update)
+- [x] Documented HMAC state signing mechanism with timestamp and signature verification
+- [x] Added security properties table covering state integrity, replay prevention, XSS, and CSS injection
+- [x] Updated documentation to reflect current implementation of Azumi's live component system
