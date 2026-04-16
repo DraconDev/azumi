@@ -5,7 +5,7 @@ use azumi::prelude::*;
 ///
 /// Learn when to use client-side state vs server state.
 #[azumi::component]
-pub fn lesson10_page() -> impl Component {
+pub fn render_page() -> impl Component {
     html! {
         @DarkModernLayout() {
             <div class={container}>
