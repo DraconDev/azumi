@@ -54,12 +54,7 @@ fn get_secret() -> &'static str {
                     panic!("FATAL: AZUMI_SECRET cannot be empty. Set a non-empty random string.");
                 }
             } else {
-                // env_secret comes from unwrap_or_else which defaults to DEFAULT_SECRET
-                // If env var was set to empty string, explicit_empty would be true and we
-                // would have returned above. So here env_secret is always non-empty.
                 let secret = env_secret;
-                // Warn if secret is too short (HMAC-SHA256 needs at least 32 bytes for security)
-                #[cfg(not(debug_assertions))]
                 if secret.len() < 32 {
                     eprintln!(
                         "⚠️  WARNING: AZUMI_SECRET is too short ({} bytes). \
