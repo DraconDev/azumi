@@ -219,5 +219,5 @@ pub fn secure_view<'a>(state: &'a SecureCounter) -> impl Component + 'a {
 }
 
 pub async fn handler() -> impl IntoResponse {
-    Html(azumi::render_to_string(&lesson18()))
+    Html(azumi::render_to_string(&render_page()))
 }
