@@ -1,10 +1,11 @@
 # Project State
 
 ## Current Focus
-Refactored component macro to use consistent module naming pattern
+Refactored component macro to support snake_case function names and improve module naming consistency
 
 ## Completed
-- [x] Changed component module naming from snake_case to `{fn_name}_component` pattern
-- [x] Simplified wrapper function generation logic
-- [x] Removed redundant snake_case validation check
-- [x] Maintained same functionality while improving code organization
+- [x] Modified component macro to check for snake_case function names
+- [x] Updated module naming to use the original function name for snake_case components
+- [x] Added wrapper function generation for snake_case components without required props/children
+- [x] Updated live.rs to use the original component name for Axum handler generation
+- [x] Maintained backward compatibility for non-snake_case component naming

@@ -326,7 +326,7 @@ pub fn expand_live_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
 
             // Generate Axum handler
             let handler = if let Some(comp_name) = &component_name {
-                let comp_mod = format_ident!("{}_component", comp_name);
+                let comp_mod = syn::Ident::new(comp_name, comp_name.span());
                 quote! {
                     pub async fn #handler_name(
                         body: String
