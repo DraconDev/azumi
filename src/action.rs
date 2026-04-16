@@ -6,6 +6,7 @@ use std::future::Future;
 
 /// Trait for Azumi Actions
 /// This is implemented automatically by the `#[azumi::action]` macro
+#[allow(dead_code)]
 pub trait Action<Input, Output> {
     fn call(input: Input) -> impl Future<Output = Output> + Send;
 }
