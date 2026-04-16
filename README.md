@@ -630,6 +630,67 @@ cd my-azumi-app
 cargo add azumi
 ```
 
+### Option 3: Complete Setup (Minimal Example)
+
+Here's a complete `main.rs` showing how to wire Azumi with Axum:
+
+```rust
+use axum::{routing::get, Router};
+use azumi::{html, component};
+
+#[azumi::component]
+pub fn HomePage() -> impl azumi::Component {
+    html! {
+        <html>
+            <head>
+                <title>"My Azumi App"</title>
+            </head>
+            <body>
+                <h1>"Hello, Azumi!"</h1>
+                <p>"Welcome to the framework that catches your CSS typos."</p>
+                <script src="azumi.js" />
+            </body>
+        </html>
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    // Optional: Enable hot reload in development
+    azumi::devtools::auto_reload();
+
+    let app = Router::new()
+        .route("/", get(|| async {
+            axum::response::Html(azumi::render_to_string(&HomePage()))
+        }))
+        // Register Azumi actions (for interactive components)
+        .merge(azumi::action::register_actions(axum::Router::new()))
+        // Optional: Enable hot reload endpoints
+        .merge(azumi::devtools::router());
+
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
+    println!("Server running at http://localhost:8080");
+    axum::serve(listener, app).await.unwrap();
+}
+```
+
+#### What Each Part Does
+
+| Component | Purpose |
+|-----------|---------|
+| `azumi::devtools::auto_reload()` | Sub-second CSS hot reload in development |
+| `azumi::action::register_actions(...)` | Registers interactive endpoints |
+| `azumi::devtools::router()` | WebSocket endpoint for hot reload |
+| `<script src="azumi.js" />` | Client runtime (~3KB) for optimistic UI |
+
+#### Production Deployment
+
+For production, omit devtools and set the secret:
+
+```bash
+AZUMI_SECRET="your-64-char-random-secret" cargo run --release
+```
+
 ---
 
 ## 📚 Lesson Index

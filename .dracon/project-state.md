@@ -1,8 +1,11 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency resolution changes after automated audit
+Added complete setup example for Azumi with Axum integration
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency resolution changes after automated security audit
+- [x] Added minimal working example showing Azumi component and Axum integration
+- [x] Documented devtools features (hot reload, action registration)
+- [x] Included production deployment instructions
+- [x] Added client-side runtime explanation (~3KB optimistic UI)
 ```
