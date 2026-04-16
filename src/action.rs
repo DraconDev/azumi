@@ -42,12 +42,3 @@ async fn azumi_js_handler() -> impl IntoResponse {
 pub async fn handle_action_result<C: Component + ?Sized>(component: &C) -> impl IntoResponse {
     axum::response::Html(crate::render_to_string(component))
 }
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn csrf_doc_test() {
-        // Doc test placeholder - CSRF protection is documented in action.rs
-        // Actions are plain JSON APIs - CSRF is application responsibility
-    }
-}
