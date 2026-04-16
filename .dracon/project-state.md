@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored lesson0.rs to use `page()` instead of `lesson0()` for consistency with Axum routing conventions
+Refactored lesson1.rs to use `page()` instead of `lesson1()` in Axum handler
 
 ## Completed
-- [x] Renamed `lesson0()` to `page()` to align with Axum routing patterns and improve code consistency
+- [x] Updated Axum handler in lesson1.rs to call `page()` instead of `lesson1()` for consistent naming with other lessons
