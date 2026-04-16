@@ -217,7 +217,9 @@ fn verify_state_internal(
     }
 
     let secret = get_secret();
-    assert!(!secret.is_empty(), "AZUMI_SECRET must not be empty");
+    if secret.is_empty() {
+        panic!("AZUMI_SECRET must not be empty");
+    }
     let mut mac =
         HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC can take any size key");
 
