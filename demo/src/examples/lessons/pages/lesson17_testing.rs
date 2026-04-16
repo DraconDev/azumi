@@ -86,7 +86,7 @@ mod tests {
 // -----------------------------------------------------------------------------
 
 #[azumi::component]
-pub fn lesson17() -> impl Component {
+pub fn render_page() -> impl Component {
     html! {
         @crate::examples::lessons::components::layout::DarkModernLayout() {
             <div class={container}>
