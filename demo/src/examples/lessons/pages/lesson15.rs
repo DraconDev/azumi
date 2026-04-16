@@ -200,7 +200,7 @@ pub fn todo_app_view<'a>(state: &'a TodoApp) -> impl Component + 'a {
 
 /// Full page component for Lesson 15
 #[azumi::component]
-pub fn lesson15_page() -> impl Component {
+pub fn render_page() -> impl Component {
     let app_state = TodoApp {
         show_completed: false,
         item_count: 0,
