@@ -71,7 +71,7 @@ pub fn multi_element_component() -> impl azumi::Component {
 
 /// Main lesson demonstration component
 #[azumi::component]
-pub fn lesson0() -> impl azumi::Component {
+pub fn page() -> impl azumi::Component {
     html! {
         @DarkModernLayout() {
             <div class={container}>
