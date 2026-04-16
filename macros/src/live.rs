@@ -237,7 +237,6 @@ fn is_self_field_mutation(mc: &ExprMethodCall) -> bool {
                         | "put"
                         | "get_mut"
                         | "write"
-                        | "clear"
                 )
             } else {
                 false
