@@ -166,7 +166,7 @@ pub fn complex_form_example() -> impl azumi::Component {
 
 /// Main lesson demonstration component
 #[azumi::component]
-pub fn lesson7() -> impl azumi::Component {
+pub fn page() -> impl azumi::Component {
     html! {
         @DarkModernLayout() {
             <div class={container}>
