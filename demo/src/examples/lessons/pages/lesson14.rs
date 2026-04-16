@@ -134,7 +134,7 @@ pub fn tabs_view<'a>(state: &'a TabState) -> impl Component + 'a {
 
 /// Full page component for Lesson 14
 #[azumi::component]
-pub fn lesson14_page() -> impl Component {
+pub fn render_page() -> impl Component {
     let tab_state = TabState { active_index: 0 };
     html! {
         @DarkModernLayout() {
