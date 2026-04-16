@@ -251,7 +251,7 @@ pub fn user_loader_view<'a>(state: &'a UserLoader) -> impl Component + 'a {
 }
 
 #[azumi::component]
-pub fn lesson11() -> impl azumi::Component {
+pub fn page() -> impl azumi::Component {
     let state = UserLoader {
         loading: false,
         error: None,
