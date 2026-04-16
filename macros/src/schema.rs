@@ -63,9 +63,7 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
                 let escaped_json = json_string
                     .replace('&', "&amp;")
                     .replace('<', "&lt;")
-                    .replace('>', "&gt;")
-                    .replace('"', "&quot;")
-                    .replace('\'', "&#39;");
+                    .replace('>', "&gt;");
                 format!(
                     "<script type=\"application/ld+json\">\n{}\n</script>",
                     escaped_json
