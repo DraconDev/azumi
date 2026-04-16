@@ -31,44 +31,57 @@ thread_local! {
     static PAGE_META: RefCell<PageMeta> = RefCell::new(PageMeta::default());
 }
 
-/// RAII guard that resets PAGE_META to default on drop.
+#[derive(Clone)]
+struct PageMetaState {
+    refcount: Rc<std::sync::atomic::AtomicU32>,
+}
+
+impl PageMetaState {
+    fn new() -> Self {
+        Self {
+            refcount: Rc::new(std::sync::atomic::AtomicU32::new(1)),
+        }
+    }
+
+    fn clone(&self) -> Self {
+        self.refcount.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        Self {
+            refcount: Rc::clone(&self.refcount),
+        }
+    }
+}
+
+impl Drop for PageMetaState {
+    fn drop(&mut self) {
+        if self.refcount.fetch_sub(1, std::sync::atomic::Ordering::SeqCst) == 1 {
+            PAGE_META.with(|params| *params.borrow_mut() = PageMeta::default());
+        }
+    }
+}
+
+thread_local! {
+    static PAGE_META_STATE: PageMetaState = PageMetaState::new();
+}
+
+/// RAII guard that resets PAGE_META to default when all guards are dropped.
 /// Ensures metadata from one request cannot leak into another.
 ///
 /// # Thread Safety
 ///
-/// `PageMetaGuard` is **NOT** `Send` or `Sync` because:
-/// - It wraps `Rc<()>` which is not `Send` or `Sync` (single-threaded reference counting)
-/// - The guard itself cannot be safely shared between threads
+/// `PageMetaGuard` uses atomic reference counting and is `Sync`.
+/// However, guards must stay on the thread where they were created because
+/// `PAGE_META` is a `thread_local!` `RefCell` which is not thread-safe.
 ///
-/// **Key limitation**: Cloning the guard on thread A and dropping it on thread B will NOT
-/// reset thread A's `PAGE_META`. Guards must stay on the thread where they were created.
+/// **Key limitation**: Guards must not cross thread boundaries.
 ///
 /// This is intentional: each thread has its own `PAGE_META`, so developers must ensure
 /// guards do not cross thread boundaries.
 #[derive(Clone)]
-pub struct PageMetaGuard {
-    counter: Rc<std::sync::atomic::AtomicU32>,
-    generation: u32,
-}
-
-thread_local! {
-    static PAGE_META_GENERATION: Rc<std::sync::atomic::AtomicU32> = Rc::new(std::sync::atomic::AtomicU32::new(0));
-}
+pub struct PageMetaGuard(PageMetaState);
 
 impl PageMetaGuard {
     fn new() -> Self {
-        let counter = PAGE_META_GENERATION.with(Rc::clone);
-        let generation = counter.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-        PageMetaGuard { counter, generation }
-    }
-}
-
-impl Drop for PageMetaGuard {
-    fn drop(&mut self) {
-        let current = self.counter.load(std::sync::atomic::Ordering::SeqCst);
-        if current == self.generation + 1 {
-            PAGE_META.with(|params| *params.borrow_mut() = PageMeta::default());
-        }
+        Self(PAGE_META_STATE.with(|s| s.clone()))
     }
 }
 
