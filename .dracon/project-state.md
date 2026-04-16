@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Improve HTML generation safety by switching from `Fn` to `FnOnce` closure handling
+Updated Cargo.lock to reflect dependency resolution changes after automated updates
 
 ## Completed
-- [x] Replace `from_fn` with `from_fn_once` in HTML macro to properly handle owned values
-- [x] Add documentation explaining the change and its necessity for component props
+- [x] Updated dependency versions in Cargo.lock (automated resolution)
 ```
