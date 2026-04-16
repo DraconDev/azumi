@@ -128,8 +128,16 @@ pub fn html(input: TokenStream) -> TokenStream {
             };
 
             // Runtime HTML generation
-            azumi::from_fn(move |f| {
+            // IMPORTANT: Use `from_fn_once` instead of `from_fn` because the html!
+            // closure may capture owned values (via `move`) that are also used in
+            // component props. `FnOnce` closures can consume captured values, while
+            // `Fn` closures can only borrow them, causing "cannot move" errors.
+            //
+            // `FnOnceComponent` caches its rendered result, so the closure is only
+            // invoked once - which is the typical case for a complete HTML page.
+            azumi::from_fn_once(move |f| {
                 #html_construction
+                Ok(())
             })
         }
     };
