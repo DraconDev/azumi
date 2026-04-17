@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added a new `Element` struct to the token parser for better template handling
+Added support for getting line/column positions from RawText nodes in the token parser
 
 ## Completed
-- [x] Added `Element` struct with fields for name, attributes, children, bind structure, and spans
-- [x] Enhanced template parsing capabilities with proper element representation
+- [x] Added pattern matching for RawText nodes to extract their starting line/column positions
+- [x] Implemented consistent span extraction logic for RawText nodes alongside other node types

@@ -359,6 +359,10 @@ fn first_node_span(nodes: &[token_parser::Node]) -> Option<(usize, usize)> {
                 let loc = text.span.start();
                 Some((loc.line, loc.column))
             }
+            token_parser::Node::RawText(text) => {
+                let loc = text.span.start();
+                Some((loc.line, loc.column))
+            }
             token_parser::Node::Expression(expr) => {
                 let loc = expr.span.start();
                 Some((loc.line, loc.column))
