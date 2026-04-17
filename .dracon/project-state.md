@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock during documentation improvements
+Refined AzumiScript security test to conditionally verify script tag escaping only when needed
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions
-```
+- [x] Changed test to only check for escaped script tags when the JS content contains `</script>`
+- [x] Improved test logic to be more precise about security validation conditions
