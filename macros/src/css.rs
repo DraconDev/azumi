@@ -286,7 +286,7 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
         if before_paren.starts_with(':') {
             // For :is(), :where(), :not(), :has() - process content but preserve document selectors
             let scoped_content = scope_selector_list_preserve_docs(&paren_content, scope_attr);
-            return format!("{}:({}){}", before_paren, scoped_content, after_paren);
+            return format!("{}({}){}", before_paren, scoped_content, after_paren);
         }
     }
     // Handle pseudo-elements (::before, ::after, etc.)
