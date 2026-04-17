@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored CSS injection logic to use RawText nodes for better text handling
+Added a new `Element` struct to the token parser for better template handling
 
 ## Completed
-- [x] Changed CSS injection to use `RawText` variant instead of `Text` for CSS content in template engine
-- [x] Updated Cargo.lock for minor dependency version changes
+- [x] Added `Element` struct with fields for name, attributes, children, bind structure, and spans
+- [x] Enhanced template parsing capabilities with proper element representation
