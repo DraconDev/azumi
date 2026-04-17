@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock due to minor dependency version changes during documentation work
+Refactored HTML structure validator to simplify Raw() call detection
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions
+- [x] Removed redundant `contains_raw_call` function and its doc comment
 ```

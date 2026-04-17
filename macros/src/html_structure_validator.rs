@@ -3,11 +3,6 @@ use crate::token_parser::Node;
 use proc_macro2::TokenStream;
 use quote::{quote, quote_spanned};
 
-/// Check if a TokenStream contains a call to `Raw(...)`
-fn contains_raw_call(tokens: &TokenStream) -> bool {
-    tokens.to_string().contains("Raw(")
-}
-
 /// Validate Raw usage patterns - ERROR when Raw() is used without explicit opt-out
 ///
 /// By default, Raw() is an error. To use it, you must explicitly mark it as safe
