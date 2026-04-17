@@ -49,18 +49,6 @@ pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
                             || (normalized_str.contains(".")
                                 && normalized_str.contains("{")
                                 && normalized_str.contains(":"));
-                        let has_css_pattern = content_str.contains("<style")
-                            || content_str.contains("</style>")
-                            || content_str.contains(".main")
-                            || content_str.contains(".container")
-                            || content_str.contains("{ color:")
-                            || content_str.contains("{ background:")
-                            || content_str.contains("{ padding:")
-                            || content_str.contains("{ margin:")
-                            || content_str.contains("{ font-size")
-                            || (content_str.contains(".")
-                                && content_str.contains("{ ")
-                                && content_str.contains(": "));
 
                         if has_css_pattern {
                             errors.push(quote_spanned! { expr.span =>
