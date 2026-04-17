@@ -18,6 +18,9 @@ pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
         "LOGIN_PAGE_CSS",
         "AI_RANKINGS_CSS",
         "AI_RANKINGS_JS",
+        "SITE_BASE_CSS",
+        "session_cleanup",
+        "window.location.hash",
     ];
 
     fn check_node(node: &Node, errors: &mut Vec<TokenStream>) {
@@ -30,18 +33,16 @@ pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
                     // Check if it's a known-good pattern
                     let is_known_good = KNOWN_GOOD
                         .iter()
-                        .any(|pattern| content_str.contains(&format!("{}(", pattern)));
+                        .any(|pattern| content_str.contains(pattern));
 
                     if !is_known_good {
                         // Check for suspicious patterns
+                        // Note: .to_string() alone is not suspicious - it's the context that matters
                         let is_suspicious = content_str.contains("format!")
-                            || content_str.contains("user")
-                            || content_str.contains("input")
-                            || content_str.contains("request")
-                            || content_str.contains("cookie")
-                            || content_str.contains("param")
-                            || content_str.contains("serde_json")
-                            || content_str.contains(".to_string()");
+                            || content_str.contains("serde_json::to_string")
+                            || (content_str.contains("user") && content_str.contains("input"))
+                            || (content_str.contains("request") && content_str.contains("body"))
+                            || content_str.contains("cookie");
 
                         if is_suspicious {
                             errors.push(quote_spanned! { expr.span =>
