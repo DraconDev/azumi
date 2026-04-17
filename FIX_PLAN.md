@@ -6,8 +6,16 @@
 
 ## Status (Updated April 17, 2026)
 
-### Current Release: v13.7.0
-All Phase 1-8 items completed. CSS scoping for functional pseudo-classes now fully supported.
+### Current Release: v13.7.0 (Latest)
+All Phase 1-9 items completed. CSS scoping for functional pseudo-classes now fully supported.
+
+### Dracon Platform Compatibility
+- Dracon Platform updated to v13.7.0 ✅
+- All 75+ tests pass ✅
+- Build succeeds ✅
+
+### Known Pre-existing Issues (Not Related to Our Changes)
+- `demo/src/examples/lessons/pages/lesson18_security.rs` has broken test referencing `__azumi_live_handlers` module that isn't properly imported - this is a demo issue, not an azumi issue
 
 ### Phase 9: CSS Selector Scoping Fixes (April 17, 2026)
 | Item | Status | Notes |
