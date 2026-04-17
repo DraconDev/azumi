@@ -539,6 +539,62 @@ mod tests {
     }
 
     #[test]
+    fn test_scope_css_is_with_root() {
+        let css = ":is(.foo, :root) { color: red; }";
+        let scope_id = "abc";
+        let scoped = scope_css(css, scope_id);
+
+        // :root inside :is() should NOT be scoped
+        assert!(
+            scoped.contains(":is(.foo[data-abc], :root)"),
+            ":root in :is() should remain unscoped, Actual: {}",
+            scoped
+        );
+    }
+
+    #[test]
+    fn test_scope_css_where_with_root() {
+        let css = ":where(.foo, :root) { color: blue; }";
+        let scope_id = "xyz";
+        let scoped = scope_css(css, scope_id);
+
+        // :root inside :where() should NOT be scoped
+        assert!(
+            scoped.contains(":where(.foo[data-xyz], :root)"),
+            ":root in :where() should remain unscoped, Actual: {}",
+            scoped
+        );
+    }
+
+    #[test]
+    fn test_scope_css_not_with_root() {
+        let css = ":not(:root) { color: green; }";
+        let scope_id = "def";
+        let scoped = scope_css(css, scope_id);
+
+        // :root inside :not() should NOT be scoped
+        assert!(
+            scoped.contains(":not(:root)"),
+            ":root in :not() should remain unscoped, Actual: {}",
+            scoped
+        );
+    }
+
+    #[test]
+    fn test_scope_css_has_with_root() {
+        let css = ":has(.child, :root) { color: yellow; }";
+        let scope_id = "ghi";
+        let scoped = scope_css(css, scope_id);
+
+        // :root inside :has() should NOT be scoped
+        assert!(
+            scoped.contains(":has(.child[data-ghi], :root)"),
+            ":root in :has() should remain unscoped, Actual: {}",
+            scoped
+        );
+    }
+
+    #[test]
     fn test_extract_selectors_nested() {
         let css = "@media screen { .foo { color: red; } } .bar { color: blue; }";
         let (classes, _ids) = extract_selectors(css);
