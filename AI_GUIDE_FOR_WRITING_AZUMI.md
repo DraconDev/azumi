@@ -108,13 +108,20 @@ html! {
 
 | Situation | Example | Why Safe |
 |----------|---------|----------|
-| Constant CSS strings | `Raw(CSS_CONSTANT)` | No user data |
-| Hardcoded JS constants | `Raw(JAVASCRIPT_CODE)` | No dynamic content |
-| Trusted library output | `Raw(azumi_script())` | Framework-generated |
+| Trusted framework JS | `Raw(azumi_script())` | Framework-generated |
+| Session cleanup inline JS | `Raw("window.location.hash...")` | Constant string |
+
+> [!WARNING]
+> **CSS should NEVER be inside `Raw()`!** CSS in Raw() cannot be scoped, validated, or deduplicated by Azumi.
 
 #### When `Raw()` Is NOT Appropriate
 
 ```rust
+// ❌ WRONG - CSS in Raw() is always a mistake!
+html! {
+    @{Raw("<style>.foo { color: red; }</style>")}
+}
+
 // ❌ WRONG - User data in Raw is an XSS vector
 html! {
     @{Raw(user_comment)}  // If user_comment contains <script>, it's XSS!
