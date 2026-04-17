@@ -827,7 +827,6 @@ mod tests {
             eprintln!("DEBUG has { color:: {}", content_str.contains("{ color:"));
         }
         node
-        })
     }
 
     fn create_raw_expression_with_css(css_content: &str) -> Node {
