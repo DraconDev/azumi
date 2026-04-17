@@ -19,6 +19,7 @@ All Phase 1-9 items completed. CSS scoping for functional pseudo-classes now ful
 |------|--------|-------|
 | 10.1 CSS in head being HTML-escaped | ✅ FIXED | Used RawText node instead of Text node for CSS injection |
 | 10.2 AI confusion: CSS in Raw() | ✅ FIXED | Added compile ERROR when CSS patterns detected inside Raw() |
+| 10.3 Extension tests | ✅ DONE | Added 8 unit tests for CSS-in-Raw detection |
 
 **Root Cause:** When CSS was injected into `<head>` via `inject_css_into_head`, it was stored as a `Text` node. When `generate_body_with_context` rendered Text nodes, it wrapped them in `Escaped()` which HTML-escapes `<` to `&lt;` and `>` to `&gt;`.
 
@@ -28,6 +29,17 @@ All Phase 1-9 items completed. CSS scoping for functional pseudo-classes now ful
 AI assistants incorrectly suggest putting CSS inside `Raw()` which bypasses Azumi's CSS scoping and validation.
 
 **Fix:** Enhanced `validate_raw_usage()` to detect CSS-like patterns (`<style>`, `.class {`, etc.) inside Raw() and emit a COMPILE ERROR with guidance toward proper `<style>` block usage.
+
+**Phase 10.3 - Extension Tests:**
+Added 8 unit tests in `html_structure_validator.rs`:
+- `test_css_in_raw_detected_style_tag` - Verifies `<style>` tag in Raw triggers error
+- `test_css_in_raw_detected_dot_class_syntax` - Verifies `.class { }` pattern triggers error
+- `test_css_in_raw_detected_property_syntax` - Verifies CSS properties trigger error
+- `test_css_in_raw_detected_color_property` - Verifies `{ color: }` triggers error
+- `test_known_good_azumi_script_allowed` - Verifies `azumi_script()` is allowed
+- `test_known_good_session_cleanup_allowed` - Verifies session cleanup patterns allowed
+- `test_suspicious_format_not_allowed` - Verifies `format!` with user input is blocked
+- `test_safe_expression_no_error` - Verifies non-Raw expressions pass
 
 ### Known Pre-existing Issues (Not Related to Our Changes)
 - `demo/src/examples/lessons/pages/lesson18_security.rs` has broken test referencing `__azumi_live_handlers` module that isn't properly imported - this is a demo issue, not an azumi issue
