@@ -1,9 +1,10 @@
 # Project State
 
 ## Current Focus
-Added security guidance for `Raw()` usage in Azumi templates
+Added security validation for `Raw()` usage in HTML templates to prevent XSS vulnerabilities
 
 ## Completed
-- [x] docs(security): Added warning about XSS risk when using `Raw()` in templates
-- [x] docs(security): Clarified safer alternatives to raw HTML injection
-```
+- [x] Implemented `validate_raw_usage()` function to detect and warn about potentially unsafe `Raw()` patterns
+- [x] Added detection for suspicious patterns like `format!` with user-controlled data
+- [x] Included comprehensive warning message with security guidance and reference to documentation
+- [x] Enhanced token parsing to recursively check nested expressions for `Raw()` calls

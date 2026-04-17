@@ -1,7 +1,62 @@
 use crate::token_parser::Element;
 use crate::token_parser::Node;
-use proc_macro2::TokenStream;
+use proc_macro2::{TokenStream, TokenTree};
 use quote::{quote, quote_spanned};
+
+/// Check if a TokenStream contains a call to `Raw(...)`
+fn contains_raw_call(tokens: &TokenStream) -> bool {
+    tokens.into_iter().any(|tree| match tree {
+        TokenTree::Group(group) => contains_raw_call(&group.stream()),
+        TokenTree::Ident(ident) => ident.to_string() == "Raw",
+        _ => false,
+    })
+}
+
+/// Validate Raw usage patterns - warn when Raw is used inappropriately
+pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
+    let mut warnings = vec![];
+
+    fn check_node(node: &Node, warnings: &mut Vec<TokenStream>) {
+        match node {
+            Node::Expression(expr) => {
+                if contains_raw_call(&expr.content) {
+                    let content_str = expr.content.to_string();
+
+                    // Check for suspicious patterns
+                    let is_suspicious = content_str.contains("format!")
+                        || content_str.contains("user")
+                        || content_str.contains("input")
+                        || content_str.contains("request")
+                        || content_str.contains("cookie")
+                        || content_str.contains("param");
+
+                    if is_suspicious {
+                        warnings.push(quote_spanned! { expr.span =>
+                            compile_error!("Potentially unsafe Raw() usage detected. Raw() disables ALL HTML escaping, which can lead to XSS vulnerabilities if used with user-controlled data. Consider using Azumi's built-in escaping ({value}) or data attributes instead of Raw(format!(...)). See AI_GUIDE_FOR_WRITING_AZUMI.md for proper patterns.");
+                        });
+                    }
+                }
+            }
+            Node::Element(elem) => {
+                for child in &elem.children {
+                    check_node(child, warnings);
+                }
+            }
+            Node::Fragment(frag) => {
+                for child in &frag.children {
+                    check_node(child, warnings);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    for node in nodes {
+        check_node(node, &mut warnings);
+    }
+
+    warnings
+}
 
 /// Rule 10: Component Structure Enforcement
 /// Enforces Script -> Content -> Style order
