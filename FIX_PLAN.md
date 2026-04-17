@@ -6,13 +6,33 @@
 
 ## Status (Updated April 17, 2026)
 
-### Current Release: v13.8.0 (Latest)
-All Phase 1-9 items completed. CSS scoping for functional pseudo-classes now fully supported. CSS injection into head now uses RawText nodes to prevent HTML escaping.
+### Current Release: v14.0.0 (Latest)
+All Phase 1-11 items completed. Framework solution for `azumi_script()` - now returns Component, not String. AI不会再误用Raw()包裹azumi_script()。
 
 ### Dracon Platform Compatibility
 - Dracon Platform uses local azumi path dependency for testing ✅
 - All 94 tests pass ✅
 - Build succeeds ✅
+
+### Phase 11: azumi_script() Framework Fix (April 17, 2026)
+| Item | Status | Notes |
+|------|--------|-------|
+| 11.1 azumi_script() returns Component | ✅ FIXED | Changed from String to AzumiScript Component |
+| 11.2 AI guide updated | ✅ DONE | Shows {azumi_script()} not @{Raw(azumi_script())} |
+| 11.3 Extension tests | ✅ DONE | Added 4 unit tests for AzumiScript Component |
+
+**Root Cause:** `azumi_script()` returned a `String` containing `<script>...</script>`. When rendered via `@{azumi_script()}`, the tags were HTML-escaped to `&lt;script&gt;`.
+
+**Framework Fix:** Changed `azumi_script()` to return `AzumiScript` which implements `Component`. Components render directly without HTML escaping via `{azumi_script()}` syntax.
+
+**Correct Usage (Now):**
+```rust
+html! {
+    <head>
+        {azumi_script()}  // ✅ Correct - Component renders as-is
+    </head>
+}
+```
 
 ### Phase 10: Style Tag HTML Escaping Fix (April 17, 2026)
 | Item | Status | Notes |
