@@ -4,7 +4,17 @@
 
 ---
 
-## Status (Updated April 15, 2026)
+## Status (Updated April 17, 2026)
+
+### Current Release: v13.1.0
+All Phase 1-7 items from April 15 are now released. Current focus is on Raw() security hardening.
+
+### Phase 8: Raw() Security Hardening (April 17, 2026)
+| Item | Status | Notes |
+|------|--------|-------|
+| 8.1 Raw() compile-time validation | ✅ DONE | Suspicious patterns blocked, known-good allowed |
+| 8.2 AI Guide Raw() documentation | ✅ DONE | Proper patterns documented |
+| 8.3 html! closure semantics | ✅ DONE | FnOnce allows proper value capture |
 
 ### Phase 7: Round 3 Review Fixes (April 15, 2026)
 | Item | Status | Notes |
