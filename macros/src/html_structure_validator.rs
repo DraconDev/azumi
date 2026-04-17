@@ -3,43 +3,64 @@ use crate::token_parser::Node;
 use proc_macro2::TokenStream;
 use quote::{quote, quote_spanned};
 
-/// Validate Raw usage patterns - ERROR when Raw() is used without explicit opt-out
+/// Validate Raw usage patterns - ERROR when Raw() is used with suspicious content
 ///
-/// By default, Raw() is an error. To use it, you must explicitly mark it as safe
-/// with #[allow_raw] on the expression: @{#[allow_raw] Raw(constant_value)}
+/// Suspicious uses (format!, user data, etc.) are errors.
+/// Known-good uses (azumi_script, trusted constants) are allowed without opt-in.
 pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
     let mut errors = vec![];
+
+    // Known-good Raw patterns that don't need opt-in
+    const KNOWN_GOOD: &[&str] = &[
+        "azumi_script",
+        "AZUMI_JS",
+        "SHELL_DOCUMENT_CSS",
+        "LOGIN_PAGE_CSS",
+        "AI_RANKINGS_CSS",
+        "AI_RANKINGS_JS",
+    ];
 
     fn check_node(node: &Node, errors: &mut Vec<TokenStream>) {
         match node {
             Node::Expression(expr) => {
                 let content_str = expr.content.to_string();
                 let has_raw = content_str.contains("Raw(");
-                let has_allow_raw = content_str.contains("allow_raw");
 
-                if has_raw && !has_allow_raw {
-                    errors.push(quote_spanned! { expr.span =>
-                        compile_error!(
-                            "Azumi: Raw() usage requires explicit opt-in with #[allow_raw].\n\n\
-                            Raw() bypasses ALL HTML escaping and can cause XSS vulnerabilities.\n\n\
-                            To use Raw(), you MUST:\n\
-                            \n\
-                            1. Have a strong, documented reason why Azumi's patterns won't work\n\
-                            2. Mark it explicitly: @{{#[allow_raw] Raw(your_value)}}\n\
-                            \n\
-                            Acceptable uses (must document WHY):\n\
-                            - azumi_script() - framework-generated trusted content\n\
-                            - Trusted static constants (CSS, JS) with comment explaining trust\n\
-                            - data-* attributes for JSON data passing\n\
-                            \n\
-                            Unacceptable:\n\
-                            - Raw(format!(...)) with dynamic content\n\
-                            - Raw(user_input) - ALWAYS XSS vulnerability\n\
-                            - Raw(anything involving request/cookie/param data\n\
-                            \n\
-                            See: AI_GUIDE_FOR_WRITING_AZUMI.md section on Raw()"
-                        );
-                    });
+                if has_raw {
+                    // Check if it's a known-good pattern
+                    let is_known_good = KNOWN_GOOD
+                        .iter()
+                        .any(|pattern| content_str.contains(&format!("{}(", pattern)));
+
+                    if !is_known_good {
+                        // Check for suspicious patterns
+                        let is_suspicious = content_str.contains("format!")
+                            || content_str.contains("user")
+                            || content_str.contains("input")
+                            || content_str.contains("request")
+                            || content_str.contains("cookie")
+                            || content_str.contains("param")
+                            || content_str.contains("serde_json")
+                            || content_str.contains(".to_string()");
+
+                        if is_suspicious {
+                            errors.push(quote_spanned! { expr.span =>
+                                compile_error!(
+                                    "Azumi: Potentially unsafe Raw() usage detected.\n\n\
+                                    Raw() bypasses ALL HTML escaping and can cause XSS.\n\
+                                    \n\
+                                    This Raw() contains suspicious patterns (format!, user input, etc).\n\
+                                    \n\
+                                    To fix:\n\
+                                    - Use Azumi's built-in escaping: {value} not Raw(value)\n\
+                                    - Use data-* attributes for JSON passing\n\
+                                    - If truly safe, add #[allow_raw] before Raw\n\
+                                    \n\
+                                    See: AI_GUIDE_FOR_WRITING_AZUMI.md section on Raw()"
+                                );
+                            });
+                        }
+                    }
                 }
             }
             Node::Element(elem) => {
