@@ -19,21 +19,25 @@ No runtime errors. No "works on my machine". No surprises.
 
 ---
 
-## 🚀 v6.0.0 Release Notes
+## 🚀 v13.1.0 Release Notes
 
-**Azumi v6.0.0** — Production-ready release with full review complete.
+**Azumi v13.1.0** — Production-ready with compile-time security hardening.
 
 ### What's Fixed
-- **Security**: XSS prevention in SEO, HMAC panic in release builds, proper error handling in live actions
-- **Tests**: 1128 tests passing, all HTML validation errors fixed, data-predict documentation corrected
-- **Documentation**: Accurate API docs, fixed version references, removed auto-generation claims
-- **Code Quality**: Removed dead code, fixed component resolution, cleaned up duplicate constants
-- **Release**: Proper crate metadata, versioned dependencies, publish-ready packaging
+- **Security**: Raw() validation blocks suspicious patterns (format!, user input, etc.) at compile time
+- **html! closures**: Fixed FnOnce semantics allowing proper value capture
+- **JSON-LD**: Fixed HTML over-escaping in schema generation
+- **is_self_field_mutation**: Improved detection for better optimistic UI
+- **Demo**: Fixed function naming conflicts with modules
 
-### Migration from v4
+### Migration from v12
 - No breaking API changes
-- `data-predict` attributes must be manually added to buttons (unchanged behavior, now correctly documented)
-- Set `AZUMI_SECRET` environment variable in production (required in release builds)
+- Raw() with suspicious patterns now causes compile error (see AI_GUIDE_FOR_WRITING_AZUMI.md)
+
+### Migration from v6
+- `#[azumi::page]` replaces manual SEO setup
+- `azumi_script()` replaces `<script src="azumi.js" />`
+- `AZUMI_SECRET` still required in production
 
 ---
 
