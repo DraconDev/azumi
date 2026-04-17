@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use crate::{compute_scope_id, scope_css, AZUMI_AI_HASH, AZUMI_RULES, AZUMI_VERSION};
+    use crate::{
+        azumi_script, compute_scope_id, scope_css, AzumiScript, AZUMI_AI_HASH, AZUMI_RULES,
+        AZUMI_VERSION,
+    };
 
     #[test]
     fn test_scope_css_basic() {
@@ -68,5 +71,57 @@ mod tests {
         );
         assert!(all_rules.contains("HMAC"), "Rules must mention HMAC");
         assert!(all_rules.contains("@let"), "Rules must mention @let");
+    }
+
+    #[test]
+    fn test_azumi_script_returns_component() {
+        let script = azumi_script();
+        let _ = script;
+    }
+
+    #[test]
+    fn test_azumi_script_renders_correctly() {
+        use std::fmt::Write;
+        let script = azumi_script();
+        let mut output = String::new();
+        script.render(&mut output).unwrap();
+        assert!(
+            output.starts_with("<script>"),
+            "Should start with <script>, got: {}",
+            output
+        );
+        assert!(
+            output.ends_with("</script>"),
+            "Should end with </script>, got: {}",
+            output
+        );
+    }
+
+    #[test]
+    fn test_azumi_script_escapes_script_end_tag() {
+        use std::fmt::Write;
+        let script = azumi_script();
+        let mut output = String::new();
+        script.render(&mut output).unwrap();
+        assert!(
+            !output.contains("</script>"),
+            "Should escape </script> as <\\/script>"
+        );
+        assert!(
+            output.contains(r"<\/script>"),
+            "Should contain escaped \\/script"
+        );
+    }
+
+    #[test]
+    fn test_azumi_script_contains_azumi_code() {
+        use std::fmt::Write;
+        let script = azumi_script();
+        let mut output = String::new();
+        script.render(&mut output).unwrap();
+        assert!(
+            output.contains("azumi"),
+            "Should contain 'azumi' identifier"
+        );
     }
 }
