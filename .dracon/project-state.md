@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Added 8 unit tests for CSS-in-Raw detection to prevent security bypasses
+Updated Cargo.lock due to minor dependency version changes during documentation improvements
 
 ## Completed
-- [x] Added 8 unit tests for CSS-in-Raw detection in `html_structure_validator.rs`
-- [x] Enhanced `validate_raw_usage()` to detect CSS-like patterns in Raw() usage
-- [x] Added compile-time protection against CSS-in-Raw() usage to prevent security bypasses
+- [x] Updated Cargo.lock to reflect minor dependency version changes
+```
