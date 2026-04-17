@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed redundant CSS pattern detection logic from HTML structure validation
+Update Cargo.lock due to minor dependency version changes during documentation improvements
 
 ## Completed
-- [x] Removed helper function `create_raw_expression_with_css` that was only used in tests
-- [x] Simplified test cases by removing the CSS pattern detection logic that was previously used for validation
+- [x] Updated Cargo.lock with new dependency versions from recent documentation work
+- [x] Maintained project dependency consistency after documentation-related changes
