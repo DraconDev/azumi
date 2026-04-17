@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added special handling for document-level CSS pseudo-classes to prevent scoping
+Update Cargo.lock due to minor dependency version changes during documentation work
 
 ## Completed
-- [x] Added explicit handling for `:root` and `:fullscreen` pseudo-classes to prevent CSS scoping
-- [x] Implemented document-level pseudo-class detection in CSS selector processing
+- [x] Updated Cargo.lock with new dependency versions
+```
