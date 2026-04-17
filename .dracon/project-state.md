@@ -4,7 +4,6 @@
 Added security validation for `Raw()` usage in HTML templates to prevent XSS vulnerabilities
 
 ## Completed
-- [x] Implemented `validate_raw_usage()` function to detect and warn about potentially unsafe `Raw()` patterns
-- [x] Added detection for suspicious patterns like `format!` with user-controlled data
-- [x] Included comprehensive warning message with security guidance and reference to documentation
-- [x] Enhanced token parsing to recursively check nested expressions for `Raw()` calls
+- [x] Updated `html_structure_validator.rs` to properly iterate through TokenStream
+- [x] Added `Raw()` usage validation in `lib.rs` to generate warnings for unsafe content
+```

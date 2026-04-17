@@ -610,6 +610,15 @@ fn generate_body(
         return tokens;
     }
 
+    let raw_warnings = html_structure_validator::validate_raw_usage(nodes);
+    if !raw_warnings.is_empty() {
+        let mut tokens = proc_macro2::TokenStream::new();
+        for warn in raw_warnings {
+            tokens.extend(warn);
+        }
+        return tokens;
+    }
+
     let (global_css, scoped_css) = collect_all_styles(nodes);
     let (valid_classes, valid_ids) = crate::css::extract_selectors(&scoped_css);
 
