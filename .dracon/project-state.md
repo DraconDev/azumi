@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved CSS selector scoping by removing unnecessary colon in functional pseudo-class handling
+Update Cargo.lock due to minor dependency version changes during documentation improvements
 
 ## Completed
-- [x] Fixed CSS selector scoping for functional pseudo-classes by removing redundant colon in the output format
+- [x] Updated Cargo.lock with new dependency versions from documentation work
 ```
