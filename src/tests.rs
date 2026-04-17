@@ -83,23 +83,40 @@ mod tests {
     fn test_azumi_script_renders_correctly() {
         let script = azumi_script();
         let output = crate::render_to_string(&script);
-        assert!(output.starts_with("<script>"), "Should start with <script>, got: {}", output);
-        assert!(output.ends_with("</script>"), "Should end with </script>, got: {}", output);
+        assert!(
+            output.starts_with("<script>"),
+            "Should start with <script>, got: {}",
+            output
+        );
+        assert!(
+            output.ends_with("</script>"),
+            "Should end with </script>, got: {}",
+            output
+        );
     }
 
     #[test]
     fn test_azumi_script_escapes_script_end_tag() {
         let script = azumi_script();
         let output = crate::render_to_string(&script);
-        assert!(!output.contains("</script>"), "Should escape </script> as <\\/script>");
-        assert!(output.contains(r"<\/script>"), "Should contain escaped \\/script");
+        assert!(
+            !output.contains("</script>"),
+            "Should escape </script> as <\\/script>"
+        );
+        assert!(
+            output.contains(r"<\/script>"),
+            "Should contain escaped \\/script"
+        );
     }
 
     #[test]
     fn test_azumi_script_contains_azumi_code() {
         let script = azumi_script();
         let output = crate::render_to_string(&script);
-        assert!(output.contains("azumi"), "Should contain 'azumi' identifier");
+        assert!(
+            output.contains("azumi"),
+            "Should contain 'azumi' identifier"
+        );
     }
 }
 
