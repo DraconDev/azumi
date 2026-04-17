@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock due to minor dependency version changes during documentation improvements
+CSS selector scoping improvements for functional pseudo-classes and document-level selectors
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions from documentation work
-```
+- [x] Updated release version to v13.7.0
+- [x] Added Phase 9 items for CSS selector scoping fixes
+- [x] Implemented exact match checks for `:root` and `:fullscreen` pseudo-classes
+- [x] Enhanced selector scoping for complex pseudo-classes like `:is()`, `:where()`, and `:has()`

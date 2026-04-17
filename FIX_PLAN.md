@@ -6,8 +6,15 @@
 
 ## Status (Updated April 17, 2026)
 
-### Current Release: v13.1.0
-All Phase 1-7 items from April 15 are now released. Current focus is on Raw() security hardening.
+### Current Release: v13.7.0
+All Phase 1-8 items completed. CSS scoping for functional pseudo-classes now fully supported.
+
+### Phase 9: CSS Selector Scoping Fixes (April 17, 2026)
+| Item | Status | Notes |
+|------|--------|-------|
+| 9.1 :root not scoped | ✅ DONE | Exact match check added |
+| 9.2 :fullscreen not scoped | ✅ DONE | Exact match check added |
+| 9.3 :is/:where/:not/:has() with :root | ✅ DONE | extract_balanced_paren + scope_selector_list_preserve_docs |
 
 ### Phase 8: Raw() Security Hardening (April 17, 2026)
 | Item | Status | Notes |
