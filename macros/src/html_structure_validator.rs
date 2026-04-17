@@ -5,43 +5,56 @@ use quote::{quote, quote_spanned};
 
 /// Check if a TokenStream contains a call to `Raw(...)`
 fn contains_raw_call(tokens: &TokenStream) -> bool {
-    let s = tokens.to_string();
-    s.contains("Raw(")
+    tokens.to_string().contains("Raw(")
 }
 
-/// Validate Raw usage patterns - warn when Raw is used inappropriately
+/// Validate Raw usage patterns - ERROR when Raw() is used without explicit opt-out
+///
+/// By default, Raw() is an error. To use it, you must explicitly mark it as safe
+/// with #[allow_raw] on the expression: @{#[allow_raw] Raw(constant_value)}
 pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
-    let mut warnings = vec![];
+    let mut errors = vec![];
 
-    fn check_node(node: &Node, warnings: &mut Vec<TokenStream>) {
+    fn check_node(node: &Node, errors: &mut Vec<TokenStream>) {
         match node {
             Node::Expression(expr) => {
-                if contains_raw_call(&expr.content) {
-                    let content_str = expr.content.to_string();
+                let content_str = expr.content.to_string();
+                let has_raw = content_str.contains("Raw(");
+                let has_allow_raw = content_str.contains("allow_raw");
 
-                    // Check for suspicious patterns
-                    let is_suspicious = content_str.contains("format!")
-                        || content_str.contains("user")
-                        || content_str.contains("input")
-                        || content_str.contains("request")
-                        || content_str.contains("cookie")
-                        || content_str.contains("param");
-
-                    if is_suspicious {
-                        warnings.push(quote_spanned! { expr.span =>
-                            compile_error!("Potentially unsafe Raw() usage detected. Raw() disables ALL HTML escaping, which can lead to XSS vulnerabilities if used with user-controlled data. Consider using Azumi's built-in escaping ({value}) or data attributes instead of Raw(format!(...)). See AI_GUIDE_FOR_WRITING_AZUMI.md for proper patterns.");
-                        });
-                    }
+                if has_raw && !has_allow_raw {
+                    errors.push(quote_spanned! { expr.span =>
+                        compile_error!(
+                            "Azumi: Raw() usage requires explicit opt-in with #[allow_raw].\n\n\
+                            Raw() bypasses ALL HTML escaping and can cause XSS vulnerabilities.\n\n\
+                            To use Raw(), you MUST:\n\
+                            \n\
+                            1. Have a strong, documented reason why Azumi's patterns won't work\n\
+                            2. Mark it explicitly: @{{#[allow_raw] Raw(your_value)}}\n\
+                            \n\
+                            Acceptable uses (must document WHY):\n\
+                            - azumi_script() - framework-generated trusted content\n\
+                            - Trusted static constants (CSS, JS) with comment explaining trust\n\
+                            - data-* attributes for JSON data passing\n\
+                            \n\
+                            Unacceptable:\n\
+                            - Raw(format!(...)) with dynamic content\n\
+                            - Raw(user_input) - ALWAYS XSS vulnerability\n\
+                            - Raw(anything involving request/cookie/param data\n\
+                            \n\
+                            See: AI_GUIDE_FOR_WRITING_AZUMI.md section on Raw()"
+                        );
+                    });
                 }
             }
             Node::Element(elem) => {
                 for child in &elem.children {
-                    check_node(child, warnings);
+                    check_node(child, errors);
                 }
             }
             Node::Fragment(frag) => {
                 for child in &frag.children {
-                    check_node(child, warnings);
+                    check_node(child, errors);
                 }
             }
             _ => {}
@@ -49,10 +62,10 @@ pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
     }
 
     for node in nodes {
-        check_node(node, &mut warnings);
+        check_node(node, &mut errors);
     }
 
-    warnings
+    errors
 }
 
 /// Rule 10: Component Structure Enforcement
