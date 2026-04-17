@@ -813,9 +813,20 @@ mod tests {
 
     fn create_expression_node(content: &str) -> Node {
         let tokens: TokenStream = content.parse().unwrap();
-        Node::Expression(Expression {
+        let node = Node::Expression(Expression {
             content: tokens,
             span: proc_macro2::Span::call_site(),
+        });
+        // Debug: print what we detect
+        if let Node::Expression(expr) = &node {
+            let content_str = expr.content.to_string();
+            eprintln!("DEBUG content_str: {:?}", content_str);
+            eprintln!("DEBUG has_Raw(: {}", content_str.contains("Raw("));
+            eprintln!("DEBUG has <style: {}", content_str.contains("<style"));
+            eprintln!("DEBUG has .main: {}", content_str.contains(".main"));
+            eprintln!("DEBUG has { color:: {}", content_str.contains("{ color:"));
+        }
+        node
         })
     }
 

@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock due to minor dependency version changes during documentation work
+Added debug logging for HTML structure validation to detect CSS-in-Raw() usage patterns
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions
+- [x] Added debug output for Raw() content detection in expression nodes
+- [x] Added specific pattern checks for CSS-related strings in Raw() usage
 ```
