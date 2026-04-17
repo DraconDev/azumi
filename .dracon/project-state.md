@@ -1,11 +1,8 @@
 # Project State
 
 ## Current Focus
-Enhanced CSS selector scoping to properly handle functional pseudo-classes while preserving document-level selectors
+Update Cargo.lock due to minor dependency version changes during documentation updates
 
 ## Completed
-- [x] Added support for functional pseudo-classes like `:is()`, `:where()`, `:not()`, and `:has()`
-- [x] Implemented balanced parentheses extraction for nested selectors
-- [x] Added preservation of document-level selectors (`:root`, `:fullscreen`, `:host`, `::slotted`, `::part`)
-- [x] Refactored selector scoping logic to handle complex selector lists
+- [x] Updated Cargo.lock to reflect minor dependency version changes during documentation work
 ```
