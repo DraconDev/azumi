@@ -1038,6 +1038,14 @@ fn generate_body_with_context(
                     });
                 }
             }
+            token_parser::Node::RawText(text) => {
+                let content = &text.content;
+                if !content.is_empty() {
+                    instructions.push(quote! {
+                        write!(f, "{}", #content)?;
+                    });
+                }
+            }
             token_parser::Node::Element(elem) => {
                 let name = &elem.name;
 
