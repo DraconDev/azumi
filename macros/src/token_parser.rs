@@ -13,21 +13,12 @@ use syn::{
 pub enum Node {
     Element(Element),
     Text(Text),
+    RawText(Text),
     Expression(Expression),
     Comment(Comment),
     Doctype(Doctype),
     Fragment(Fragment),
     Block(Block),
-}
-
-#[derive(Debug, Clone)]
-pub struct Element {
-    pub name: String,
-    pub attrs: Vec<Attribute>,
-    pub children: Vec<Node>,
-    pub bind_struct: Option<syn::Path>,
-    pub span: Span,
-    pub full_span: Span,
 }
 
 #[derive(Debug, Clone)]
