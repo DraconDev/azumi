@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock during documentation improvements
+Updated AzumiScript documentation to clarify proper component usage in trusted framework JS
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions
-```
+- [x] Updated `AI_GUIDE_FOR_WRITING_AZUMI.md` to show correct component syntax (`{azumi_script()}`) instead of raw string usage (`Raw(azumi_script())`) for framework-generated JS

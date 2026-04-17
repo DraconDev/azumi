@@ -108,7 +108,7 @@ html! {
 
 | Situation | Example | Why Safe |
 |----------|---------|----------|
-| Trusted framework JS | `Raw(azumi_script())` | Framework-generated |
+| Trusted framework JS | `{azumi_script()}` | Framework-generated Component |
 | Session cleanup inline JS | `Raw("window.location.hash...")` | Constant string |
 
 > [!WARNING]
