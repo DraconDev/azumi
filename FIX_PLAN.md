@@ -18,10 +18,16 @@ All Phase 1-9 items completed. CSS scoping for functional pseudo-classes now ful
 | Item | Status | Notes |
 |------|--------|-------|
 | 10.1 CSS in head being HTML-escaped | ✅ FIXED | Used RawText node instead of Text node for CSS injection |
+| 10.2 AI confusion: CSS in Raw() | ✅ FIXED | Added compile ERROR when CSS patterns detected inside Raw() |
 
 **Root Cause:** When CSS was injected into `<head>` via `inject_css_into_head`, it was stored as a `Text` node. When `generate_body_with_context` rendered Text nodes, it wrapped them in `Escaped()` which HTML-escapes `<` to `&lt;` and `>` to `&gt;`.
 
 **Fix:** Changed CSS injection to use `RawText` variant which is rendered without `Escaped()` wrapping.
+
+**Phase 10.2 - CSS-in-Raw Protection:**
+AI assistants incorrectly suggest putting CSS inside `Raw()` which bypasses Azumi's CSS scoping and validation.
+
+**Fix:** Enhanced `validate_raw_usage()` to detect CSS-like patterns (`<style>`, `.class {`, etc.) inside Raw() and emit a COMPILE ERROR with guidance toward proper `<style>` block usage.
 
 ### Known Pre-existing Issues (Not Related to Our Changes)
 - `demo/src/examples/lessons/pages/lesson18_security.rs` has broken test referencing `__azumi_live_handlers` module that isn't properly imported - this is a demo issue, not an azumi issue

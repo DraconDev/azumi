@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock due to minor dependency version changes during documentation work
+Added compile-time protection against CSS-in-Raw() usage to prevent bypassing Azumi's CSS scoping and validation
 
 ## Completed
-- [x] Updated Cargo.lock to reflect minor dependency version changes
+- [x] Fixed CSS HTML escaping in head injection by using RawText nodes
+- [x] Added compile ERROR when CSS patterns detected inside Raw() to prevent bypassing Azumi's CSS scoping
 ```
