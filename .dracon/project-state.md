@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock during documentation improvements
+Refactored `azumi_script()` to return a `Component` instead of a `String`
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions
+- [x] Updated test imports to include `Component` type
 ```
