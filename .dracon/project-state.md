@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-docs(azumi): update `azumi_script()` usage example to use proper component syntax
+Minor dependency version updates in Cargo.lock during documentation improvements
 
 ## Completed
-- [x] updated `azumi_script()` example to use `{}` instead of `@{}` for component rendering
-- [x] wrapped the script in `<head>` tags for proper HTML structure
+- [x] Updated Cargo.lock with new dependency versions during documentation work
 ```
