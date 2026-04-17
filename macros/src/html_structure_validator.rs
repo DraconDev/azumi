@@ -822,14 +822,6 @@ mod tests {
         })
     }
 
-    fn create_raw_expression_with_css(css_content: &str) -> Node {
-        let content = format!(
-            "Raw(\"<style>{}\\n{}</style>\")",
-            css_content, ".foo { color: red; }"
-        );
-        create_expression_node(&content)
-    }
-
     #[test]
     fn test_css_in_raw_detected_style_tag() {
         let node = create_expression_node(r#"Raw("<style>.foo { color: red; }</style>")"#);
