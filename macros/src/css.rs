@@ -439,6 +439,40 @@ mod tests {
     }
 
     #[test]
+    fn test_scope_css_root_not_scoped() {
+        let css = ":root { --color: red; } .foo { color: var(--color); }";
+        let scope_id = "abc";
+        let scoped = scope_css(css, scope_id);
+
+        // :root should NOT be scoped - it always refers to document root
+        assert!(
+            scoped.contains(":root {"),
+            ":root should remain unscoped, Actual: {}",
+            scoped
+        );
+        // .foo should still be scoped
+        assert!(
+            scoped.contains(".foo[data-abc]"),
+            ".foo should be scoped, Actual: {}",
+            scoped
+        );
+    }
+
+    #[test]
+    fn test_scope_css_fullscreen_not_scoped() {
+        let css = ":fullscreen { background: black; }";
+        let scope_id = "xyz";
+        let scoped = scope_css(css, scope_id);
+
+        // :fullscreen should NOT be scoped
+        assert!(
+            scoped.contains(":fullscreen"),
+            ":fullscreen should remain unscoped, Actual: {}",
+            scoped
+        );
+    }
+
+    #[test]
     fn test_extract_selectors_nested() {
         let css = "@media screen { .foo { color: red; } } .bar { color: blue; }";
         let (classes, _ids) = extract_selectors(css);
