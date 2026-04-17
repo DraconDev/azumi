@@ -821,10 +821,10 @@ mod tests {
         if let Node::Expression(expr) = &node {
             let content_str = expr.content.to_string();
             eprintln!("DEBUG content_str: {:?}", content_str);
-            eprintln!("DEBUG has_Raw(: {}", content_str.contains("Raw("));
-            eprintln!("DEBUG has <style: {}", content_str.contains("<style"));
-            eprintln!("DEBUG has .main: {}", content_str.contains(".main"));
-            eprintln!("DEBUG has { color:: {}", content_str.contains("{ color:"));
+            eprintln!("DEBUG has_Raw: {}", content_str.contains("Raw("));
+            eprintln!("DEBUG has_<style: {}", content_str.contains("<style"));
+            eprintln!("DEBUG has_.main: {}", content_str.contains(".main"));
+            eprintln!("DEBUG has_{{_color: {}", content_str.contains("{ color:"));
         }
         node
     }
