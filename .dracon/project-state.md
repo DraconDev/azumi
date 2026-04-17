@@ -1,9 +1,12 @@
 # Project State
 
 ## Current Focus
-Added compile-time protection against CSS-in-Raw() usage to prevent bypassing Azumi's CSS scoping and validation
+Added comprehensive CSS detection tests for Raw() usage in HTML templates
 
 ## Completed
-- [x] Fixed CSS HTML escaping in head injection by using RawText nodes
-- [x] Added compile ERROR when CSS patterns detected inside Raw() to prevent bypassing Azumi's CSS scoping
+- [x] Added 12 unit tests for CSS detection in Raw() usage
+- [x] Tests cover style tags, class selectors, property syntax, and color values
+- [x] Added positive tests for allowed patterns (azumi_script, session_cleanup)
+- [x] Added negative tests for dangerous patterns (format! with user input)
+- [x] Updated Cargo.lock with dependency version changes
 ```

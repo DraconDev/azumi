@@ -804,3 +804,128 @@ pub fn validate_attribute_name(attr: &crate::token_parser::Attribute) -> Option<
         compile_error!(#msg);
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use proc_macro2::TokenStream;
+
+    fn create_expression_node(content: &str) -> Node {
+        let tokens: TokenStream = content.parse().unwrap();
+        Node::Expression(Expression {
+            content: tokens,
+            span: proc_macro2::Span::call_site(),
+        })
+    }
+
+    fn create_raw_expression_with_css(css_content: &str) -> Node {
+        let content = format!(
+            "Raw(\"<style>{}\\n{}</style>\")",
+            css_content, ".foo { color: red; }"
+        );
+        create_expression_node(&content)
+    }
+
+    #[test]
+    fn test_css_in_raw_detected_style_tag() {
+        let node = create_expression_node(r#"Raw("<style>.foo { color: red; }</style>")"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            !errors.is_empty(),
+            "Should detect CSS in Raw with <style> tag"
+        );
+        let error_str = errors[0].to_string();
+        assert!(
+            error_str.contains("CSS content detected inside Raw"),
+            "Error should mention CSS detection, got: {}",
+            error_str
+        );
+    }
+
+    #[test]
+    fn test_css_in_raw_detected_dot_class_syntax() {
+        let node = create_expression_node(r#"Raw(".main { color: blue; }")"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            !errors.is_empty(),
+            "Should detect CSS in Raw with .class syntax"
+        );
+        let error_str = errors[0].to_string();
+        assert!(
+            error_str.contains("CSS content detected inside Raw"),
+            "Error should mention CSS detection, got: {}",
+            error_str
+        );
+    }
+
+    #[test]
+    fn test_css_in_raw_detected_property_syntax() {
+        let node = create_expression_node(r#"Raw(".container { padding: 1rem; }")"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            !errors.is_empty(),
+            "Should detect CSS in Raw with property syntax"
+        );
+    }
+
+    #[test]
+    fn test_css_in_raw_detected_color_property() {
+        let node = create_expression_node(r#"Raw("{ color: #fff; }")"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            !errors.is_empty(),
+            "Should detect CSS color property in Raw"
+        );
+    }
+
+    #[test]
+    fn test_known_good_azumi_script_allowed() {
+        let node = create_expression_node(r#"Raw(azumi_script())"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            errors.is_empty(),
+            "azumi_script should be allowed, got errors: {:?}",
+            errors
+        );
+    }
+
+    #[test]
+    fn test_known_good_session_cleanup_allowed() {
+        let node = create_expression_node(r#"Raw("window.location.hash")"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            errors.is_empty(),
+            "session_cleanup pattern should be allowed, got errors: {:?}",
+            errors
+        );
+    }
+
+    #[test]
+    fn test_suspicious_format_not_allowed() {
+        let node = create_expression_node(r#"Raw(format!("<div>{}</div>", user_input))"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            !errors.is_empty(),
+            "format! with user input should be blocked"
+        );
+    }
+
+    #[test]
+    fn test_safe_expression_no_error() {
+        let node = create_expression_node(r#"some_variable"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            errors.is_empty(),
+            "Non-Raw expression should have no errors, got: {:?}",
+            errors
+        );
+    }
+}
