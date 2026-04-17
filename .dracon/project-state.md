@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored HTML structure validator to simplify Raw() call detection
+Update Cargo.lock due to minor dependency version changes during documentation work
 
 ## Completed
-- [x] Removed unused `TokenTree` import in `html_structure_validator.rs`
-- [x] Updated Cargo.lock with minor dependency version changes
+- [x] Updated Cargo.lock with new dependency versions
 ```
