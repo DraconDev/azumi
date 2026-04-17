@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added Expression import for HTML structure validation tests
+Update Cargo.lock due to minor dependency version changes during documentation work
 
 ## Completed
-- [x] Added `use crate::token_parser::Expression` import to enable expression handling in HTML structure validator tests
+- [x] Updated Cargo.lock with new dependency versions
 ```
