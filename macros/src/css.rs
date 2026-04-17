@@ -270,6 +270,20 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     if selector == ":root" || selector == ":fullscreen" {
         return selector.to_string();
     }
+    // Handle functional pseudo-classes like :is(), :where(), :not(), :has()
+    // These may contain nested selectors that shouldn't be scoped (like :root inside)
+    if let Some(paren_pos) = selector.find('(') {
+        let before_paren = &selector[..paren_pos];
+        let paren_content = extract_balanced_paren(selector, paren_pos);
+        let after_paren = &selector[paren_pos + paren_content.len() + 2..]; // +2 for ()
+
+        // Check if this is a functional pseudo-class (starts with :)
+        if before_paren.starts_with(':') {
+            // For :is(), :where(), :not(), :has() - process content but preserve document selectors
+            let scoped_content = scope_selector_list_preserve_docs(paren_content, scope_attr);
+            return format!("{}{}({}){}", before_paren, scoped_content, after_paren);
+        }
+    }
     // Handle pseudo-elements (::before, ::after, etc.)
     // They must come AFTER pseudo-classes in the selector
     if let Some(pseudo_pos) = selector.find("::") {
@@ -293,6 +307,60 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     }
     format!("{}{}", selector, scope_attr)
 }
+
+/// Extract balanced parentheses content starting at position (opening paren)
+fn extract_balanced_paren(s: &str, start: usize) -> String {
+    let mut result = String::new();
+    let mut depth = 0;
+    let chars: Vec<char> = s[start..].chars().collect();
+    for (i, ch) in chars.iter().enumerate() {
+        if *ch == '(' && i > 0 {
+            // Only count if we're inside the parens (not the opening paren)
+            if i > 0 {
+                depth += 1;
+            }
+            if i > 0 {
+                result.push(*ch);
+            }
+        } else if *ch == ')' {
+            if depth == 0 {
+                // End of balanced content
+                return result;
+            }
+            depth = depth.saturating_sub(1);
+            result.push(*ch);
+        } else if depth > 0 || i == 0 {
+            // Only include chars inside parens (or the opening paren)
+            if i > 0 {
+                result.push(*ch);
+            }
+        }
+    }
+    result
+}
+
+/// Scope a comma-separated selector list while preserving document-level selectors
+fn scope_selector_list_preserve_docs(content: &str, scope_attr: &str) -> String {
+    let selectors = split_selector_list(content);
+    let scoped: Vec<String> = selectors
+        .iter()
+        .filter(|s| !s.trim().is_empty())
+        .map(|s| {
+            let trimmed = s.trim();
+            // If this selector is or contains a document-level selector, preserve it unchanged
+            if trimmed == ":root"
+                || trimmed == ":fullscreen"
+                || trimmed.starts_with(":host")
+                || trimmed.starts_with("::slotted")
+                || trimmed.starts_with("::part")
+            {
+                trimmed.to_string()
+            } else {
+                scope_selector(trimmed, scope_attr)
+            }
+        })
+        .collect();
+    scoped.join(", ")
 
 /// Extract all defined class names and IDs from CSS content
 pub fn extract_selectors(css: &str) -> (HashSet<String>, HashSet<String>) {
