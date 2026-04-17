@@ -265,6 +265,11 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     {
         return selector.to_string();
     }
+    // Document-level pseudo-classes - do NOT scope these
+    // These refer to the document root or document state, not individual components
+    if selector == ":root" || selector == ":fullscreen" {
+        return selector.to_string();
+    }
     // Handle pseudo-elements (::before, ::after, etc.)
     // They must come AFTER pseudo-classes in the selector
     if let Some(pseudo_pos) = selector.find("::") {
