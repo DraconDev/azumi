@@ -275,13 +275,18 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     if let Some(paren_pos) = selector.find('(') {
         let before_paren = &selector[..paren_pos];
         let paren_content = extract_balanced_paren(selector, paren_pos);
-        let after_paren = &selector[paren_pos + paren_content.len() + 2..]; // +2 for ()
+        let after_paren_start = paren_pos + 1 + paren_content.len() + 1; // Skip "(", content, and ")"
+        let after_paren = if after_paren_start < selector.len() {
+            &selector[after_paren_start..]
+        } else {
+            ""
+        };
 
         // Check if this is a functional pseudo-class (starts with :)
         if before_paren.starts_with(':') {
             // For :is(), :where(), :not(), :has() - process content but preserve document selectors
-            let scoped_content = scope_selector_list_preserve_docs(paren_content, scope_attr);
-            return format!("{}{}({}){}", before_paren, scoped_content, after_paren);
+            let scoped_content = scope_selector_list_preserve_docs(&paren_content, scope_attr);
+            return format!("{}:({}){}", before_paren, scoped_content, after_paren);
         }
     }
     // Handle pseudo-elements (::before, ::after, etc.)

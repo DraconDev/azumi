@@ -1,7 +1,9 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock due to minor dependency version changes during documentation updates
+Refactored CSS parenthesis parsing logic for more accurate selector scoping
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions from recent documentation work
+- [x] Improved handling of functional pseudo-classes (like :is(), :where()) by properly scoping their content while preserving document selectors
+- [x] Fixed edge case where selector content might end with parentheses
+- [x] Enhanced selector processing to maintain correct syntax when reconstructing scoped selectors
