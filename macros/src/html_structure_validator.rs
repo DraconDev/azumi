@@ -5,11 +5,8 @@ use quote::{quote, quote_spanned};
 
 /// Check if a TokenStream contains a call to `Raw(...)`
 fn contains_raw_call(tokens: &TokenStream) -> bool {
-    tokens.iter().any(|tree| match tree {
-        TokenTree::Group(group) => contains_raw_call(&group.stream()),
-        TokenTree::Ident(ident) => ident.to_string() == "Raw",
-        _ => false,
-    })
+    let s = tokens.to_string();
+    s.contains("Raw(")
 }
 
 /// Validate Raw usage patterns - warn when Raw is used inappropriately
