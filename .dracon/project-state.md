@@ -4,7 +4,7 @@
 Refactored CSS injection logic to handle both global and scoped styles more efficiently
 
 ## Completed
-- [x] Removed redundant node cloning for CSS injection
-- [x] Simplified conditional logic for CSS handling
-- [x] Added proper conditional injection based on `has_global` and `has_scoped` flags
-- [x] Maintained consistent CSS injection behavior while reducing code duplication
+- [x] Modified CSS injection to track whether styles were injected into the document
+- [x] Simplified conditional logic for CSS injection by removing redundant checks
+- [x] Improved code organization by consolidating style injection logic
+- [x] Maintained backward compatibility while improving performance
