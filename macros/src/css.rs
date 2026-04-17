@@ -308,32 +308,24 @@ fn scope_selector(selector: &str, scope_attr: &str) -> String {
     format!("{}{}", selector, scope_attr)
 }
 
-/// Extract balanced parentheses content starting at position (opening paren)
+/// Extract balanced parentheses content starting after the opening paren
 fn extract_balanced_paren(s: &str, start: usize) -> String {
     let mut result = String::new();
-    let mut depth = 0;
-    let chars: Vec<char> = s[start..].chars().collect();
-    for (i, ch) in chars.iter().enumerate() {
-        if *ch == '(' && i > 0 {
-            // Only count if we're inside the parens (not the opening paren)
-            if i > 0 {
+    let mut depth = 1; // Start at 1 since we're already inside the paren
+    for ch in s[start + 1..].chars() {
+        match ch {
+            '(' => {
                 depth += 1;
+                result.push(ch);
             }
-            if i > 0 {
-                result.push(*ch);
+            ')' => {
+                depth -= 1;
+                if depth == 0 {
+                    return result;
+                }
+                result.push(ch);
             }
-        } else if *ch == ')' {
-            if depth == 0 {
-                // End of balanced content
-                return result;
-            }
-            depth = depth.saturating_sub(1);
-            result.push(*ch);
-        } else if depth > 0 || i == 0 {
-            // Only include chars inside parens (or the opening paren)
-            if i > 0 {
-                result.push(*ch);
-            }
+            _ => result.push(ch),
         }
     }
     result

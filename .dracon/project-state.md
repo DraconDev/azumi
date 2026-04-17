@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Added missing closing brace in CSS selector scoping function
+Refactored CSS parenthesis parsing logic for more accurate selector scoping
 
 ## Completed
-- [x] Fixed syntax error in `scope_selector_list_preserve_docs` function by adding missing closing brace
+- [x] Improved balanced parentheses extraction by simplifying depth tracking logic
+- [x] Fixed off-by-one error in parenthesis position handling
+- [x] Optimized character iteration by avoiding unnecessary string conversions
 ```
