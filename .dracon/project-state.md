@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved test assertions in `tests.rs` with better formatting and error messages
+Removed redundant AzumiScript rendering tests to simplify test suite
 
 ## Completed
-- [x] Enhanced test assertions with consistent formatting and clearer error messages
+- [x] Removed 5 redundant tests for AzumiScript rendering behavior
+- [x] Kept only essential test_azumi_script_returns_component test
 - [x] Updated Cargo.lock with minor dependency version updates
