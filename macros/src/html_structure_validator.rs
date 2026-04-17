@@ -1,6 +1,6 @@
 use crate::token_parser::Element;
 use crate::token_parser::Node;
-use proc_macro2::{TokenStream, TokenTree};
+use proc_macro2::TokenStream;
 use quote::{quote, quote_spanned};
 
 /// Check if a TokenStream contains a call to `Raw(...)`
