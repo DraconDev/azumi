@@ -192,7 +192,9 @@ html! {
 
 ```rust
 html! {
-    @{azumi_script()}  // ✅ Correct - no Raw wrapper
+    <head>
+        {azumi_script()}  // ✅ Correct - returns a Component, use {} not @{}
+    </head>
 }
 ```
 
