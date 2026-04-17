@@ -6,13 +6,22 @@
 
 ## Status (Updated April 17, 2026)
 
-### Current Release: v13.7.0 (Latest)
-All Phase 1-9 items completed. CSS scoping for functional pseudo-classes now fully supported.
+### Current Release: v13.8.0 (Latest)
+All Phase 1-9 items completed. CSS scoping for functional pseudo-classes now fully supported. CSS injection into head now uses RawText nodes to prevent HTML escaping.
 
 ### Dracon Platform Compatibility
-- Dracon Platform updated to v13.7.0 ✅
-- All 75+ tests pass ✅
+- Dracon Platform uses local azumi path dependency for testing ✅
+- All 94 tests pass ✅
 - Build succeeds ✅
+
+### Phase 10: Style Tag HTML Escaping Fix (April 17, 2026)
+| Item | Status | Notes |
+|------|--------|-------|
+| 10.1 CSS in head being HTML-escaped | ✅ FIXED | Used RawText node instead of Text node for CSS injection |
+
+**Root Cause:** When CSS was injected into `<head>` via `inject_css_into_head`, it was stored as a `Text` node. When `generate_body_with_context` rendered Text nodes, it wrapped them in `Escaped()` which HTML-escapes `<` to `&lt;` and `>` to `&gt;`.
+
+**Fix:** Changed CSS injection to use `RawText` variant which is rendered without `Escaped()` wrapping.
 
 ### Known Pre-existing Issues (Not Related to Our Changes)
 - `demo/src/examples/lessons/pages/lesson18_security.rs` has broken test referencing `__azumi_live_handlers` module that isn't properly imported - this is a demo issue, not an azumi issue
