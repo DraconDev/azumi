@@ -11,14 +11,10 @@ pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
     let mut errors = vec![];
 
     // Known-good Raw patterns that don't need opt-in
+    // NOTE: CSS constants are NO LONGER on this list - CSS should use <style> blocks!
     const KNOWN_GOOD: &[&str] = &[
         "azumi_script",
         "AZUMI_JS",
-        "SHELL_DOCUMENT_CSS",
-        "LOGIN_PAGE_CSS",
-        "AI_RANKINGS_CSS",
-        "AI_RANKINGS_JS",
-        "SITE_BASE_CSS",
         "session_cleanup",
         "window.location.hash",
     ];
@@ -36,6 +32,50 @@ pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
                         .any(|pattern| content_str.contains(pattern));
 
                     if !is_known_good {
+                        // Check for CSS patterns inside Raw() - this is always wrong!
+                        // CSS in Raw() bypasses Azumi's scoping, validation, and deduplication
+                        let has_css_pattern = content_str.contains("<style")
+                            || content_str.contains("</style>")
+                            || content_str.contains(".main")
+                            || content_str.contains(".container")
+                            || content_str.contains("{ color:")
+                            || content_str.contains("{ background:")
+                            || content_str.contains("{ padding:")
+                            || content_str.contains("{ margin:")
+                            || content_str.contains("{ font-size")
+                            || (content_str.contains(".")
+                                && content_str.contains("{ ")
+                                && content_str.contains(": "));
+
+                        if has_css_pattern {
+                            errors.push(quote_spanned! { expr.span =>
+                                compile_error!(
+                                    "Azumi: CSS content detected inside Raw().\n\n\
+                                    Raw() is NOT for CSS - it bypasses Azumi's CSS scoping and validation.\n\
+                                    \n\
+                                    ✅ Correct pattern:\n\
+                                    \n\
+                                    html! {\n\
+                                        <style>\n\
+                                            .my_class { color: \"red\"; }\n\
+                                        </style>\n\
+                                    }\n\
+                                    \n\
+                                    ❌ Wrong pattern:\n\
+                                    \n\
+                                    html! {\n\
+                                        @{Raw(\"<style>.my_class { color: red; }</style>\")}\n\
+                                    }\n\
+                                    \n\
+                                    CSS in Raw() cannot be scoped, validated, or deduplicated by Azumi.\n\
+                                    \n\
+                                    See: AI_GUIDE_FOR_WRITING_AZUMI.md section \"Proper CSS Patterns\"\n\
+                                    Or run: cargo expand to see the generated code"
+                                );
+                            });
+                            return;
+                        }
+
                         // Check for suspicious patterns
                         // Note: .to_string() alone is not suspicious - it's the context that matters
                         let is_suspicious = content_str.contains("format!")
