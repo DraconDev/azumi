@@ -361,6 +361,7 @@ fn scope_selector_list_preserve_docs(content: &str, scope_attr: &str) -> String 
         })
         .collect();
     scoped.join(", ")
+}
 
 /// Extract all defined class names and IDs from CSS content
 pub fn extract_selectors(css: &str) -> (HashSet<String>, HashSet<String>) {
