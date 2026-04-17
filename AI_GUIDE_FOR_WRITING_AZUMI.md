@@ -2544,6 +2544,8 @@ This guide covers all aspects of Azumi development. Use it as your comprehensive
 | `@let x = "hello"; class={x}` | `class={x}; <style>.x { ... }</style>` | @let shadows CSS variable |
 | `<style>.foo { ... }</style><div>` | `<div class={foo}><style>...</style>` | Style must come after HTML |
 | `<script>alert(1)</script>` | `<script src="/app.js"></script>` | Inline scripts blocked |
+| `Raw(dynamic_value)` | `<style>` / `<script>` / data attrs | Raw disables escaping — XSS risk |
+| `Raw(format!("<div>{}</div>", x))` | `{x}` (auto-escaped) or data attributes | Use Azumi's built-in escaping |
 | `state.counter = 42` (in predict) | `#[azumi::predict("counter = 42")]` | Use predict macro for mutations |
 
 ---
