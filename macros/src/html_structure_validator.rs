@@ -23,17 +23,32 @@ pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
         match node {
             Node::Expression(expr) => {
                 let content_str = expr.content.to_string();
-                let has_raw = content_str.contains("Raw(");
+                // TokenStream may add spaces, so normalize by removing spaces for detection
+                let normalized_str = content_str.replace(' ', "");
+                let has_raw = normalized_str.contains("Raw(");
 
                 if has_raw {
-                    // Check if it's a known-good pattern
+                    // Check if it's a known-good pattern (use normalized string)
                     let is_known_good = KNOWN_GOOD
                         .iter()
-                        .any(|pattern| content_str.contains(pattern));
+                        .any(|pattern| normalized_str.contains(pattern));
 
                     if !is_known_good {
                         // Check for CSS patterns inside Raw() - this is always wrong!
                         // CSS in Raw() bypasses Azumi's scoping, validation, and deduplication
+                        // Use normalized string for detection
+                        let has_css_pattern = normalized_str.contains("<style")
+                            || normalized_str.contains("</style>")
+                            || normalized_str.contains(".main")
+                            || normalized_str.contains(".container")
+                            || normalized_str.contains("{color:")
+                            || normalized_str.contains("{background:")
+                            || normalized_str.contains("{padding:")
+                            || normalized_str.contains("{margin:")
+                            || normalized_str.contains("{font-size")
+                            || (normalized_str.contains(".")
+                                && normalized_str.contains("{")
+                                && normalized_str.contains(":"));
                         let has_css_pattern = content_str.contains("<style")
                             || content_str.contains("</style>")
                             || content_str.contains(".main")
