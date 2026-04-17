@@ -100,7 +100,99 @@ html! {
 - It shadows the CSS-generated variable, causing confusing bugs
 - The `<style>` block already creates the variable for you
 
-### 4. CSS Classes MUST Be Defined in `<style>` Block
+### 4. AVOID `Raw()` — Use Proper Patterns Instead
+
+**`Raw<T>` is an escape hatch that DISABLES all HTML escaping.** It should be used rarely and only for trusted, constant content. Overusing `Raw()` circumvents Azumi's compile-time safety guarantees.
+
+#### When `Raw()` IS Acceptable
+
+| Situation | Example | Why Safe |
+|----------|---------|----------|
+| Constant CSS strings | `Raw(CSS_CONSTANT)` | No user data |
+| Hardcoded JS constants | `Raw(JAVASCRIPT_CODE)` | No dynamic content |
+| Trusted library output | `Raw(azumi_script())` | Framework-generated |
+
+#### When `Raw()` Is NOT Appropriate
+
+```rust
+// ❌ WRONG - User data in Raw is an XSS vector
+html! {
+    @{Raw(user_comment)}  // If user_comment contains <script>, it's XSS!
+}
+
+// ❌ WRONG - Dynamic content should use Azumi's escaping
+html! {
+    @{Raw(format!("<div>{}</div>", dynamic_value))}
+}
+
+// ❌ WRONG - CSS from untrusted sources
+html! {
+    @{Raw(user_provided_css)}
+}
+```
+
+#### Correct Patterns for Common Needs
+
+**1. For CSS — use `<style>` blocks:**
+
+```rust
+html! {
+    <div class={container}>
+        <style>
+            .container { padding: "1rem"; }
+            .title { color: "blue"; }
+        </style>
+    </div>
+}
+```
+
+**2. For JavaScript — use `<script>` blocks:**
+
+```rust
+html! {
+    <head>
+        <script>
+            console.log("Hello from Azumi!");
+        </script>
+    </head>
+}
+```
+
+**3. For dynamic data in scripts — use `data-*` attributes or JSON:**
+
+```rust
+html! {
+    <div id="app" data-models={serde_json::to_string(&models).unwrap()}>
+        <script>
+            // Read from data attribute
+            const models = JSON.parse(document.getElementById('app').dataset.models);
+        </script>
+    </div>
+}
+```
+
+**4. For inline scripts with constants:**
+
+```rust
+html! {
+    <script>
+        @{Raw("console.log('trusted constant');".to_string())}
+    </script>
+}
+```
+
+**5. For trusted framework functions:**
+
+```rust
+html! {
+    @{azumi_script()}  // ✅ Correct - no Raw wrapper
+}
+```
+
+> [!IMPORTANT]
+> If you find yourself reaching for `Raw()`, ask: "Can I use a `<style>` block, `<script>` block, or data attribute instead?" If yes, do that instead. `Raw()` bypasses all of Azumi's safety guarantees.
+
+### 5. CSS Classes MUST Be Defined in `<style>` Block
 
 **This is a common AI mistake.** Every class used in `class={...}` MUST have a corresponding `.classname` definition in the `<style>` block (or `<style global>`). The compiler will reject undefined classes.
 

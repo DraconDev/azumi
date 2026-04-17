@@ -1,8 +1,12 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock due to minor dependency version changes during documentation refactoring
+Expanded Azumi's documentation to clarify proper usage of `Raw()` and its alternatives
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency version changes (binary modification)
-- [x] Part of ongoing documentation consistency efforts across multiple lesson files
+- [x] Added comprehensive guidance on when `Raw()` is safe vs unsafe
+- [x] Provided correct patterns for CSS, JavaScript, and dynamic content
+- [x] Included security warnings about XSS risks with `Raw()`
+- [x] Documented proper alternatives to `Raw()` (style blocks, data attributes)
+- [x] Added example code demonstrating correct usage patterns
+- [x] Maintained existing rule about CSS class definitions in style blocks
