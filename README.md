@@ -19,24 +19,24 @@ No runtime errors. No "works on my machine". No surprises.
 
 ---
 
-## 🚀 v13.1.0 Release Notes
+## 🚀 v15.6.0 Release Notes
 
-**Azumi v13.1.0** — Production-ready with compile-time security hardening.
+**Azumi v15.6.0** — Production-ready with TrustedHtml Component and improved safety.
 
-### What's Fixed
-- **Security**: Raw() validation blocks suspicious patterns (format!, user input, etc.) at compile time
-- **html! closures**: Fixed FnOnce semantics allowing proper value capture
-- **JSON-LD**: Fixed HTML over-escaping in schema generation
-- **is_self_field_mutation**: Improved detection for better optimistic UI
-- **Demo**: Fixed function naming conflicts with modules
+### What's New
+- **TrustedHtml Component**: User-facing escape hatch for pre-sanitized HTML from trusted sources
+- **SessionCleanupScript**: Framework Component for OAuth session token cleanup
+- **Stricter Raw() validation**: JS/CSS patterns blocked at compile time
+- **azumi_script()**: Returns Component (not String), properly renders without escaping
 
-### Migration from v12
-- No breaking API changes
-- Raw() with suspicious patterns now causes compile error (see AI_GUIDE_FOR_WRITING_AZUMI.md)
+### Migration from v14.x
+- `Raw("window.location.hash...")` → Use `{session_cleanup_script()}`
+- `Raw(trusted_html)` → Use `{TrustedHtml::new(html)}`
+- All framework Components use `{}` syntax, not `@{Raw(...)}`
 
-### Migration from v6
+### Migration from v6-v13
 - `#[azumi::page]` replaces manual SEO setup
-- `azumi_script()` replaces `<script src="azumi.js" />`
+- `{azumi_script()}` replaces `<script src="azumi.js" />`
 - `AZUMI_SECRET` still required in production
 
 ---
