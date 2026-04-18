@@ -985,7 +985,7 @@ mod tests {
 
     #[test]
     fn test_format_in_raw_always_blocked() {
-        let node = create_expression_node(r#"Raw(format!("<style>{}</style>", css_const))"#);
+        let node = create_expression_node(r#"Raw(format!("<div>{}</div>", some_var))"#);
         let errors = validate_raw_usage(&[node]);
 
         assert!(
