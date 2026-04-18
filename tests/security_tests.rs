@@ -296,25 +296,28 @@ fn test_default_secret_is_obviously_dev() {
 #[test]
 fn test_seo_title_only() {
     let html = azumi::seo::generate_head("Page Title", None, None, None, None);
-    assert!(html.contains("Page Title"));
+    let html = 
+    assert!(html.0.contains("Page Title"));
 }
 
 #[test]
 fn test_seo_description_only() {
     let html = azumi::seo::generate_head("", Some("Page description"), None, None, None);
-    assert!(html.contains("Page description"));
-    assert!(html.contains(r#"name="description""#));
+    let html = 
+    assert!(html.0.contains("Page description"));
+    assert!(html.0.contains(r#"name="description""#));
 }
 
 #[test]
 fn test_seo_title_no_raw_script_tags() {
     let html = azumi::seo::generate_head("<script>alert('xss')</script>", None, None, None, None);
+    let html = 
     assert!(
-        !html.contains("<script>"),
+        !html.0.contains("<script>"),
         "Title must escape <script> tags"
     );
     assert!(
-        html.contains("&lt;script&gt;"),
+        html.0.contains("&lt;script&gt;"),
         "Title must contain escaped script"
     );
 }
@@ -330,13 +333,13 @@ fn test_seo_description_quotes_escaped() {
     );
     // Quotes must be escaped in the content attribute
     assert!(
-        html.contains("&quot;"),
+        html.0.contains("&quot;"),
         "Description quotes must be escaped. Got: {}",
         html
     );
     // The closing > should also be escaped
     assert!(
-        !html.contains("<script>"),
+        !html.0.contains("<script>"),
         "Description must not contain raw script. Got: {}",
         html
     );
@@ -422,7 +425,8 @@ fn test_escaped_wrapper_angle_brackets() {
 fn test_render_automatic_seo_empty_context() {
     // Without init_seo or page context, render_automatic_seo should still work
     let html = azumi::seo::generate_head("", None, None, None, None);
-    assert!(html.contains("<title>"));
+    let html = 
+    assert!(html.0.contains("<title>"));
 }
 
 #[test]
@@ -477,9 +481,9 @@ fn test_escaped_wrapper_newline_becomes_space() {
 fn test_render_simple_component() {
     let component = azumi::html! { <div>"Hello"</div> };
     let html = azumi::test::render(&component);
-    assert!(html.contains("<div>"));
-    assert!(html.contains("Hello"));
-    assert!(html.contains("</div>"));
+    assert!(html.0.contains("<div>"));
+    assert!(html.0.contains("Hello"));
+    assert!(html.0.contains("</div>"));
 }
 
 #[test]
@@ -490,11 +494,11 @@ fn test_render_nested_components() {
         </div>
     };
     let html = azumi::test::render(&component);
-    assert!(html.contains("<div>"));
-    assert!(html.contains("<span>"));
-    assert!(html.contains("Nested"));
-    assert!(html.contains("</span>"));
-    assert!(html.contains("</div>"));
+    assert!(html.0.contains("<div>"));
+    assert!(html.0.contains("<span>"));
+    assert!(html.0.contains("Nested"));
+    assert!(html.0.contains("</span>"));
+    assert!(html.0.contains("</div>"));
 }
 
 #[test]
@@ -502,17 +506,17 @@ fn test_render_with_attributes() {
     let class = "link";
     let component = azumi::html! { <a href="https://example.com" class={class}>"Link"</a> };
     let html = azumi::test::render(&component);
-    assert!(html.contains("href=\"https://example.com\""));
-    assert!(html.contains("class=\"link\""));
+    assert!(html.0.contains("href=\"https://example.com\""));
+    assert!(html.0.contains("class=\"link\""));
 }
 
 #[test]
 fn test_render_self_closing_tags() {
     let component = azumi::html! { <input type="text" name="field" /> };
     let html = azumi::test::render(&component);
-    assert!(html.contains("<input"));
-    assert!(html.contains("type=\"text\""));
-    assert!(html.contains("name=\"field\""));
+    assert!(html.0.contains("<input"));
+    assert!(html.0.contains("type=\"text\""));
+    assert!(html.0.contains("name=\"field\""));
 }
 
 #[test]
@@ -525,9 +529,9 @@ fn test_render_multiple_elements() {
         </div>
     };
     let html = azumi::test::render(&component);
-    assert!(html.contains("<p>First</p>"));
-    assert!(html.contains("<p>Second</p>"));
-    assert!(html.contains("<p>Third</p>"));
+    assert!(html.0.contains("<p>First</p>"));
+    assert!(html.0.contains("<p>Second</p>"));
+    assert!(html.0.contains("<p>Third</p>"));
 }
 
 #[test]
