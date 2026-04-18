@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated documentation to clarify `TrustedHtml` usage and deprecate `Raw()` for HTML rendering
+Minor dependency version updates in Cargo.lock after SEO-related refactoring
 
 ## Completed
-- [x] docs(security): Emphasized `TrustedHtml::new()` as preferred method for safe HTML rendering
-- [x] docs(security): Marked `Raw("constant_string")` as **INTERNAL USE ONLY** in documentation
+- [x] Updated dependency versions in Cargo.lock
+```
