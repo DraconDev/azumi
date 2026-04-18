@@ -79,10 +79,81 @@ pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
                             return;
                         }
 
-                        // Check for suspicious patterns
+                        // Check for format! inside Raw() - THIS IS ALWAYS WRONG in Azumi
+                        // format! suggests building HTML/CSS/JS dynamically which defeats Azumi's purpose
+                        if normalized_str.contains("format!") {
+                            errors.push(quote_spanned! { expr.span =>
+                                compile_error!(
+                                    "Azumi: Raw(format!(...)) detected.\n\n\
+                                    Using format! inside Raw() defeats Azumi's compile-time safety.\n\
+                                    \n\
+                                    ✅ Correct patterns:\n\
+                                    \n\
+                                    // For HTML content - use html! macro:\n\
+                                    html! { <div class={my_class}>\"Hello\"</div> }\n\
+                                    \n\
+                                    // For dynamic values - use data attributes:\n\
+                                    html! { <div data-value={value}>...</div> }\n\
+                                    \n\
+                                    // For JSON data - use data-* with JSON:\n\
+                                    html! { <div data-models={serde_json::to_string(&models).unwrap()}>...</div> }\n\
+                                    \n\
+                                    ❌ Wrong pattern:\n\
+                                    \n\
+                                    @{Raw(format!(\"<div>{}</div>\", value))}\n\
+                                    \n\
+                                    If you MUST use Raw (legacy entry points only), use string concatenation\n                                    outside the macro instead of format! inside.\n\
+                                    \n\
+                                    See: AI_GUIDE_FOR_WRITING_AZUMI.md"
+                                );
+                            });
+                            return;
+                        }
+
+                        // Check for JS injection patterns inside Raw()
+                        let has_js_pattern = normalized_str.contains("<script")
+                            || normalized_str.contains("</script>")
+                            || normalized_str.contains("window.")
+                            || normalized_str.contains("document.")
+                            || normalized_str.contains(".addEventListener")
+                            || normalized_str.contains("JSON.parse");
+
+                        if has_js_pattern {
+                            errors.push(quote_spanned! { expr.span =>
+                                compile_error!(
+                                    "Azumi: JavaScript content detected inside Raw().\n\n\
+                                    Raw() with JS bypasses Azumi's security model.\n\
+                                    \n\
+                                    ✅ Correct pattern:\n\
+                                    \n\
+                                    html! {\n\
+                                        <script>\n\
+                                            console.log(\"Hello\");\n\
+                                        </script>\n\
+                                    }\n\
+                                    \n\
+                                    ❌ Wrong pattern:\n\
+                                    \n\
+                                    @{Raw(\"<script>alert('hi')</script>\")}\n\
+                                    \n\
+                                    For dynamic JS with data, use data attributes:\n\
+                                    html! {\n\
+                                        <div data-config={json_string}>\n\
+                                            <script>\n\
+                                                const config = JSON.parse(document.getElementById(\"config\").dataset.config);\n\
+                                            </script>\n\
+                                        </div>\n\
+                                    }\n\
+                                    \n\
+                                    See: AI_GUIDE_FOR_WRITING_AZUMI.md"
+                                );
+                            });
+                            return;
+                        }
+
+                        // Check for suspicious patterns (XSS vectors)
                         // Note: .to_string() alone is not suspicious - it's the context that matters
-                        let is_suspicious = content_str.contains("format!")
-                            || content_str.contains("serde_json::to_string")
+                        let is_suspicious = content_str.contains("serde_json::to_string")
                             || (content_str.contains("user") && content_str.contains("input"))
                             || (content_str.contains("request") && content_str.contains("body"))
                             || content_str.contains("cookie");
@@ -93,12 +164,11 @@ pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
                                     "Azumi: Potentially unsafe Raw() usage detected.\n\n\
                                     Raw() bypasses ALL HTML escaping and can cause XSS.\n\
                                     \n\
-                                    This Raw() contains suspicious patterns (format!, user input, etc).\n\
+                                    This Raw() contains suspicious patterns (user input, etc).\n\
                                     \n\
                                     To fix:\n\
                                     - Use Azumi's built-in escaping: {value} not Raw(value)\n\
                                     - Use data-* attributes for JSON passing\n\
-                                    - If truly safe, add #[allow_raw] before Raw\n\
                                     \n\
                                     See: AI_GUIDE_FOR_WRITING_AZUMI.md section on Raw()"
                                 );
