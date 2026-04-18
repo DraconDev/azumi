@@ -54,6 +54,6 @@ fn test_dynamic_values() {
         description: page_desc.as_str()
     };
 
-    assert!(meta.0.contains("<title>Dynamic Title</title>"));
-    assert!(meta.0.contains("Description for Dynamic Title"));
+    assert!(meta.contains("<title>Dynamic Title</title>"));
+    assert!(meta.contains("Description for Dynamic Title"));
 }
