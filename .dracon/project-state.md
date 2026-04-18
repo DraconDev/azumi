@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Added TrustedHtml component for safe HTML rendering in Azumi framework
+Updated documentation to clarify `TrustedHtml` usage and deprecate `Raw()` for HTML rendering
 
 ## Completed
-- [x] Added TrustedHtml component to public API
-- [x] Updated documentation to emphasize component usage
-- [x] Added example usage pattern in FIX_PLAN.md
-```
+- [x] docs(security): Emphasized `TrustedHtml::new()` as preferred method for safe HTML rendering
+- [x] docs(security): Marked `Raw("constant_string")` as **INTERNAL USE ONLY** in documentation

@@ -67,7 +67,8 @@ html! {
 **What Is Allowed:**
 - `{azumi_script()}` → Returns Component, no escaping
 - `{session_cleanup_script()}` → Session token cleanup Component
-- `Raw("constant_string")` → Only for truly inert strings (no HTML/JS/CSS syntax)
+- `TrustedHtml::new(...)` → For pre-sanitized HTML from trusted sources
+- `Raw("constant_string")` → **INTERNAL USE ONLY** - Use TrustedHtml instead
 
 **Root Cause:** `azumi_script()` returned a `String` containing `<script>...</script>`. When rendered via `@{azumi_script()}`, the tags were HTML-escaped to `&lt;script&gt;`.
 
