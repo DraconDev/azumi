@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored SEO test to match updated SEO head generation return type changes
+Minor dependency version updates in Cargo.lock after SEO-related refactoring
 
 ## Completed
-- [x] Updated test assertion to check `html.0` instead of raw `html` to match the refactored SEO head generation return type
-```
+- [x] Updated dependency versions in Cargo.lock to reflect recent SEO-related refactoring work
