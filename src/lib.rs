@@ -18,7 +18,7 @@ pub use inventory;
 pub mod devtools;
 
 pub mod seo;
-pub use script::{AzumiScript, session_cleanup_script};
+pub use script::{AzumiScript, session_cleanup_script, TrustedHtml};
 
 #[cfg(feature = "test-utils")]
 pub mod test;

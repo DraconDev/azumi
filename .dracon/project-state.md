@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock after SEO-related refactoring
+Added `TrustedHtml` component to the public API for safe HTML rendering
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to resolve version conflicts from recent SEO-related refactoring
-```
+- [x] Exposed `TrustedHtml` in the public API alongside existing script-related exports
+- [x] Maintained backward compatibility with existing `AzumiScript` and `session_cleanup_script` exports
