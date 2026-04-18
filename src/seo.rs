@@ -126,7 +126,7 @@ pub fn generate_head(
     image: Option<&str>,
     url: Option<&str>,
     type_: Option<&str>,
-) -> String {
+) -> crate::Raw<String> {
     let global = SITE_CONFIG.get();
 
     // 0. Resolve Context (ThreadLocal override from #[azumi::page])
@@ -290,7 +290,7 @@ pub fn generate_head(
         }
     }
 
-    html
+    crate::Raw(html)
 }
 
 /// Helper function to automatically render SEO tags based on current context.
