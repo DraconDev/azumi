@@ -10,15 +10,6 @@ use quote::{quote, quote_spanned};
 pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
     let mut errors = vec![];
 
-    // Known-good Raw patterns that don't need opt-in
-    // NOTE: CSS constants are NO LONGER on this list - CSS should use <style> blocks!
-    const KNOWN_GOOD: &[&str] = &[
-        "azumi_script",
-        "AZUMI_JS",
-        "session_cleanup",
-        "window.location.hash",
-    ];
-
     fn check_node(node: &Node, errors: &mut Vec<TokenStream>) {
         match node {
             Node::Expression(expr) => {

@@ -1,8 +1,8 @@
 pub mod prelude {
     pub use crate::action::Action;
     pub use crate::{
-        action, azumi_script, component, head, html, live, live_impl, page, predict, AzumiScript,
-        Component, escape_css_string, from_fn, FnComponent,
+        action, azumi_script, component, head, html, live, live_impl, page, predict,
+        session_cleanup_script, AzumiScript, Component, escape_css_string, from_fn, FnComponent,
     };
 }
 
@@ -18,7 +18,7 @@ pub use inventory;
 pub mod devtools;
 
 pub mod seo;
-pub use script::AzumiScript;
+pub use script::{AzumiScript, session_cleanup_script};
 
 #[cfg(feature = "test-utils")]
 pub mod test;
