@@ -6,8 +6,8 @@
 
 ## Status (Updated April 17, 2026)
 
-### Current Release: v14.0.0 (Latest)
-All Phase 1-11 items completed. Framework solution for `azumi_script()` - now returns Component, not String. AI不会再误用Raw()包裹azumi_script()。
+### Current Release: v14.1.0 (Latest)
+All Phase 1-11 items completed. Framework solution for `azumi_script()` - now returns Component, not String. Stricter Raw() validation ensures AI-generated code uses proper Azumi patterns.
 
 ### Dracon Platform Compatibility
 - Dracon Platform uses local azumi path dependency for testing ✅
@@ -20,6 +20,26 @@ All Phase 1-11 items completed. Framework solution for `azumi_script()` - now re
 | 11.1 azumi_script() returns Component | ✅ FIXED | Changed from String to AzumiScript Component |
 | 11.2 AI guide updated | ✅ DONE | Shows {azumi_script()} not @{Raw(azumi_script())} |
 | 11.3 Extension tests | ✅ DONE | Added 4 unit tests for AzumiScript Component |
+
+### Phase 11.x: Stricter Raw() Validation (April 17, 2026)
+| Item | Status | Notes |
+|------|--------|-------|
+| 11.x.1 format! in Raw() blocked | ✅ DONE | Raw(format!(...)) now causes compile ERROR |
+| 11.x.2 CSS patterns in Raw() blocked | ✅ DONE | compile ERROR with migration guidance |
+| 11.x.3 JS patterns in Raw() blocked | ✅ DONE | <script>, addEventListener, etc. cause compile ERROR |
+| 11.x.4 Extension tests | ✅ DONE | 3 new tests added |
+
+**What Now Causes Compile ERROR:**
+- `@{Raw(format!("<style>...</style>", ...))}` → Use `<style>` block
+- `@{Raw("<script>...</script>")}` → Use `<script>` block
+- `@{Raw("element.addEventListener(...)")}` → Use proper Azumi event handlers
+- `style="..."` (static) → Use `style={--var: value}` CSS variables
+- `class="..."` (static) → Use `class={variable_name}`
+
+**What Is Allowed:**
+- `{azumi_script()}` → Returns Component, no escaping
+- `Raw("constant_string")` → Only for trusted constants
+- `Raw(session_cleanup_pattern)` → Known-good patterns
 
 **Root Cause:** `azumi_script()` returned a `String` containing `<script>...</script>`. When rendered via `@{azumi_script()}`, the tags were HTML-escaped to `&lt;script&gt;`.
 
