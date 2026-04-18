@@ -32,17 +32,27 @@ All Phase 1-11 items completed. Framework solution for `azumi_script()` - now re
 | 11.x.3 JS patterns in Raw() blocked | ✅ DONE | <script>, addEventListener, etc. cause compile ERROR |
 | 11.x.4 Extension tests | ✅ DONE | 3 new tests added |
 
+### Phase 11.y: SessionCleanupScript Component (April 18, 2026)
+| Item | Status | Notes |
+|------|--------|-------|
+| 11.y.1 SessionCleanupScript Component | ✅ DONE | New component in src/script.rs |
+| 11.y.2 Export from lib.rs | ✅ DONE | Available via prelude |
+| 11.y.3 Dracon Platform updated | ✅ DONE | Uses {session_cleanup_script()} |
+| 11.y.4 KNOWN_GOOD removed | ✅ DONE | All bypass patterns eliminated |
+
 **What Now Causes Compile ERROR:**
 - `@{Raw(format!("<style>...</style>", ...))}` → Use `<style>` block
 - `@{Raw("<script>...</script>")}` → Use `<script>` block
 - `@{Raw("element.addEventListener(...)")}` → Use proper Azumi event handlers
+- `@{Raw(azumi_script())}` → Use `{azumi_script()}` (returns Component)
+- `@{Raw("window.location.hash...")}` → Use `{session_cleanup_script()}`
 - `style="..."` (static) → Use `style={--var: value}` CSS variables
 - `class="..."` (static) → Use `class={variable_name}`
 
 **What Is Allowed:**
 - `{azumi_script()}` → Returns Component, no escaping
-- `Raw("constant_string")` → Only for trusted constants
-- `Raw(session_cleanup_pattern)` → Known-good patterns
+- `{session_cleanup_script()}` → Session token cleanup Component
+- `Raw("constant_string")` → Only for truly inert strings (no HTML/JS/CSS syntax)
 
 **Root Cause:** `azumi_script()` returned a `String` containing `<script>...</script>`. When rendered via `@{azumi_script()}`, the tags were HTML-escaped to `&lt;script&gt;`.
 
