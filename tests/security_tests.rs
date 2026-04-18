@@ -416,9 +416,7 @@ fn test_escaped_wrapper_angle_brackets() {
 
 #[test]
 fn test_render_automatic_seo_empty_context() {
-    // Without init_seo or page context, render_automatic_seo should still work
     let html = azumi::seo::generate_head("", None, None, None, None);
-    let html = 
     assert!(html.0.contains("<title>"));
 }
 
