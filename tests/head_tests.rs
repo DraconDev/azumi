@@ -20,7 +20,6 @@ fn test_minimal_head() {
 
     assert!(meta.contains("<title>Minimal Page</title>"));
     assert!(meta
-        .0
         .contains("<meta name=\"description\" content=\"Just a title and description\">"));
     assert!(meta
         .0
