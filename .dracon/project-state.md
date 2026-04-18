@@ -1,9 +1,12 @@
 # Project State
 
 ## Current Focus
-Added session cleanup script component to the public API and removed deprecated Raw() usage patterns
+Enhanced HTML structure validation with stricter Raw() usage rules to prevent unsafe patterns
 
 ## Completed
-- [x] Added `session_cleanup_script` to public prelude exports
-- [x] Removed deprecated Raw() usage patterns from HTML structure validation
-- [x] Updated Cargo.lock with dependency version updates
+- [x] Added comprehensive validation for CSS patterns inside Raw() with clear error messages
+- [x] Added detection for format! inside Raw() with guidance on proper dynamic content patterns
+- [x] Added JavaScript content detection inside Raw() with security warnings
+- [x] Implemented suspicious pattern detection for potential XSS vectors
+- [x] Enhanced error messages with correct usage examples and documentation references
+- [x] Improved validation logic with more specific pattern matching for Raw() content
