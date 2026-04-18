@@ -109,7 +109,7 @@ html! {
 | Situation | Example | Why Safe |
 |----------|---------|----------|
 | Trusted framework JS | `{azumi_script()}` | Framework-generated Component |
-| Session cleanup inline JS | `Raw("window.location.hash...")` | Constant string |
+| Session token cleanup | `{session_cleanup_script()}` | Framework Component for OAuth flow cleanup |
 
 > [!WARNING]
 > **CSS should NEVER be inside `Raw()`!** CSS in Raw() cannot be scoped, validated, or deduplicated by Azumi.
