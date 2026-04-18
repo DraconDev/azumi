@@ -100,41 +100,48 @@ html! {
 - It shadows the CSS-generated variable, causing confusing bugs
 - The `<style>` block already creates the variable for you
 
-### 4. AVOID `Raw()` — Use Proper Patterns Instead
+### 4. Use Components First — `TrustedHtml` for Rare Edge Cases
 
-**`Raw<T>` is an escape hatch that DISABLES all HTML escaping.** It should be used rarely and only for trusted, constant content. Overusing `Raw()` circumvents Azumi's compile-time safety guarantees.
+**Azumi Components are the primary building blocks.** They render correctly, are type-safe, and integrate with the framework. Use `TrustedHtml` only for pre-sanitized HTML from trusted sources.
 
-#### When `Raw()` IS Acceptable
+#### When Components Are Appropriate
 
-| Situation | Example | Why Safe |
-|----------|---------|----------|
-| Trusted framework JS | `{azumi_script()}` | Framework-generated Component |
-| Session token cleanup | `{session_cleanup_script()}` | Framework Component for OAuth flow cleanup |
+| Situation | Use This |
+|-----------|----------|
+| Framework JS | `{azumi_script()}` |
+| Session cleanup | `{session_cleanup_script()}` |
+| Any HTML/CSS/JS | Component with proper `<style>` or `<script>` blocks |
 
-> [!WARNING]
-> **CSS should NEVER be inside `Raw()`!** CSS in Raw() cannot be scoped, validated, or deduplicated by Azumi.
+#### When `TrustedHtml` Is Appropriate
 
-#### When `Raw()` Is NOT Appropriate
+`TrustedHtml` is for **extreme edge cases only** — embedding pre-sanitized HTML from trusted sources (your own backend, trusted third-party APIs).
 
 ```rust
-// ❌ WRONG - CSS in Raw() is always a mistake!
+// ✅ CORRECT - TrustedHtml for pre-sanitized HTML
 html! {
-    @{Raw("<style>.foo { color: red; }</style>")}
+    <div>{TrustedHtml::new(pre_sanitized_html)}</div>
+}
+```
+
+> [!WARNING]
+> **Never use `TrustedHtml` with user input!** User data should always go through proper Azumi escaping.
+
+#### What Is NOT Appropriate
+
+```rust
+// ❌ WRONG - CSS should use <style> blocks
+html! {
+    <style>.foo { color: red; }</style>  // Use <style> block, not TrustedHtml
 }
 
-// ❌ WRONG - User data in Raw is an XSS vector
+// ❌ WRONG - User data in TrustedHtml is XSS!
 html! {
-    @{Raw(user_comment)}  // If user_comment contains <script>, it's XSS!
+    <div>{TrustedHtml::new(user_comment)}</div>  // XSS vulnerability!
 }
 
-// ❌ WRONG - Dynamic content should use Azumi's escaping
+// ❌ WRONG - Dynamic content
 html! {
-    @{Raw(format!("<div>{}</div>", dynamic_value))}
-}
-
-// ❌ WRONG - CSS from untrusted sources
-html! {
-    @{Raw(user_provided_css)}
+    <div>{TrustedHtml::new(&format!("<div>{}</div>", value))}</div>
 }
 ```
 

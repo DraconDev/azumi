@@ -1,8 +1,11 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock after SEO-related refactoring
+Updated Azumi's HTML safety guidelines to emphasize component usage over `TrustedHtml`
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to resolve version conflicts
+- [x] Removed outdated `Raw()` guidance in favor of component-based patterns
+- [x] Added clear warnings about `TrustedHtml` usage and security implications
+- [x] Updated CSS guidance to prefer `<style>` blocks over `TrustedHtml`
+- [x] Simplified examples to focus on proper Azumi patterns
 ```
