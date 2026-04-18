@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored SEO head generation to return `String` instead of `Raw<String>` for consistency
+Refactored SEO head generation to return `crate::Raw<String>` instead of `String`
 
 ## Completed
-- [x] Changed `generate_head` return type from `String` to `crate::Raw<String>`
-- [x] Updated test cases to match the refactored return type
+- [x] Changed `render_automatic_seo()` return type from `String` to `crate::Raw<String>`
 ```

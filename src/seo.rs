@@ -295,7 +295,7 @@ pub fn generate_head(
 
 /// Helper function to automatically render SEO tags based on current context.
 /// Call this inside your Layout's <head>.
-pub fn render_automatic_seo() -> String {
+pub fn render_automatic_seo() -> crate::Raw<String> {
     // Pass empty strings to force reading from Context/Global
     generate_head("", None, None, None, None)
 }
