@@ -290,7 +290,7 @@ pub fn generate_head(
         }
     }
 
-    crate::Raw(html)
+    html
 }
 
 /// Helper function to automatically render SEO tags based on current context.
