@@ -22,7 +22,6 @@ fn test_minimal_head() {
     assert!(meta
         .contains("<meta name=\"description\" content=\"Just a title and description\">"));
     assert!(meta
-        .0
         .contains("<meta property=\"og:title\" content=\"Minimal Page\">"));
     // assert!(meta.0.contains("<meta name=\"twitter:card\" content=\"summary\">")); // Twitter card default might confirm this
 }
@@ -39,10 +38,8 @@ fn test_full_head() {
     };
 
     assert!(meta
-        .0
         .contains("<meta property=\"og:image\" content=\"/static/preview.jpg\">"));
     assert!(meta
-        .0
         .contains("<meta name=\"twitter:image\" content=\"/static/preview.jpg\">"));
     // assert!(meta.0.contains("<meta name=\"twitter:card\" content=\"summary_large_image\">"));
 }

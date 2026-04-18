@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored SEO test cases to match the updated SEO head generation return type
+Refactored SEO test cases to remove redundant Raw() wrapper access in assertions
 
 ## Completed
-- [x] Updated SEO test cases to remove Raw() wrapper from meta content assertions
+- [x] Removed redundant `.0` access in SEO head test assertions
+- [x] Simplified test assertions to directly check String content
 ```
