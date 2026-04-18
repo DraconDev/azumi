@@ -417,7 +417,7 @@ fn test_escaped_wrapper_angle_brackets() {
 #[test]
 fn test_render_automatic_seo_empty_context() {
     let html = azumi::seo::generate_head("", None, None, None, None);
-    assert!(html.contains("<title>"));
+    assert!(html.0.contains("<title>"));
 }
 
 #[test]
