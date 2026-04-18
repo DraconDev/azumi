@@ -309,7 +309,7 @@ fn test_noscript() {
 #[test]
 fn test_seo_xss_title_script_injection() {
     let html = azumi::seo::generate_head(r#""><script>alert(1)</script>"#, None, None, None, None);
-    let output = html.0;
+    let output = html;
     // Must not contain unescaped <script>
     assert!(
         !output.contains("<script>"),
@@ -329,7 +329,7 @@ fn test_seo_xss_title_script_injection() {
 fn test_seo_xss_description_onload() {
     let html =
         azumi::seo::generate_head("Safe Title", Some(r#"onload="alert(2)""#), None, None, None);
-    let output = html.0;
+    let output = html;
     // The quotes in the description must be escaped to prevent attribute breakout.
     // Output should be: content="onload=&quot;alert(2)&quot;"
     // NOT: content="onload="alert(2)"" (which would allow XSS)
@@ -354,7 +354,7 @@ fn test_seo_xss_image_url_javascript_protocol() {
         None,
         None,
     );
-    let output = html.0;
+    let output = html;
     // The value should be present in a properly-quoted attribute
     assert!(
         output.contains(r#"content="javascript:alert(3)""#),
@@ -366,7 +366,7 @@ fn test_seo_xss_image_url_javascript_protocol() {
 #[test]
 fn test_seo_xss_angle_brackets_in_title() {
     let html = azumi::seo::generate_head("<script>alert('xss')</script>", None, None, None, None);
-    let output = html.0;
+    let output = html;
     assert!(!output.contains("<script>"), "Raw <script> in title");
     assert!(
         output.contains("&lt;script&gt;"),
@@ -383,7 +383,7 @@ fn test_seo_xss_ampersand_escaping() {
         None,
         None,
     );
-    let output = html.0;
+    let output = html;
     // Title (text context) should escape <, >, &
     assert!(
         output.contains("Tom &amp; Jerry"),
@@ -413,7 +413,7 @@ fn test_seo_safe_values_unchanged() {
         Some("https://example.com/page"),
         None,
     );
-    let output = html.0;
+    let output = html;
     assert!(
         output.contains("<title>Normal Title</title>") || output.contains("<title>Normal Title |"),
         "Title should be present. Got: {}",
