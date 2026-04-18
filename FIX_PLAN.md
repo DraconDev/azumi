@@ -6,15 +6,15 @@
 
 ## Status (Updated April 18, 2026)
 
-### Current Release: v14.3.0 (Latest)
-All Phase 1-11 items completed. Framework solution for `azumi_script()` - now returns Component, not String. Stricter Raw() validation ensures AI-generated code uses proper Azumi patterns. SessionCleanupScript Component provides safe session token cleanup.
+### Current Release: v15.6.0 (Latest)
+All Phase 1-11 items completed. Framework solution for `azumi_script()` - now returns Component, not String. Stricter Raw() validation ensures AI-generated code uses proper Azumi patterns. SessionCleanupScript Component and TrustedHtml Component provide safe patterns.
 
-### Breaking Change in v14.3.0
-**KNOWN_GOOD bypass patterns removed.** Raw() now only allows truly inert strings with no HTML/JS/CSS syntax. Use `{session_cleanup_script()}` for session cleanup instead of `Raw(...)`.
+### Breaking Change in v14.3.0 / v15.6.0
+**KNOWN_GOOD bypass patterns removed.** Raw() now only allows truly inert strings with no HTML/JS/CSS syntax. Use `{session_cleanup_script()}` for session cleanup instead of `Raw(...)`. Use `TrustedHtml::new()` for pre-sanitized HTML.
 
 ### Dracon Platform Compatibility
-- Dracon Platform uses local azumi path dependency for testing ✅
-- All 94 tests pass ✅
+- Dracon Platform uses azumi v15.6.0 ✅
+- All modules compile successfully ✅
 - Build succeeds ✅
 
 ### Phase 11: azumi_script() Framework Fix (April 17, 2026)
