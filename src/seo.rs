@@ -126,7 +126,7 @@ pub fn generate_head(
     image: Option<&str>,
     url: Option<&str>,
     type_: Option<&str>,
-) -> crate::Raw<String> {
+) -> String {
     let global = SITE_CONFIG.get();
 
     // 0. Resolve Context (ThreadLocal override from #[azumi::page])
