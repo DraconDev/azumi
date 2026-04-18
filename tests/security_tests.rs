@@ -296,25 +296,25 @@ fn test_default_secret_is_obviously_dev() {
 #[test]
 fn test_seo_title_only() {
     let html = azumi::seo::generate_head("Page Title", None, None, None, None);
-    assert!(html.contains("Page Title"));
+    assert!(html.0.contains("Page Title"));
 }
 
 #[test]
 fn test_seo_description_only() {
     let html = azumi::seo::generate_head("", Some("Page description"), None, None, None);
-    assert!(html.contains("Page description"));
-    assert!(html.contains(r#"name="description""#));
+    assert!(html.0.contains("Page description"));
+    assert!(html.0.contains(r#"name="description""#));
 }
 
 #[test]
 fn test_seo_title_no_raw_script_tags() {
     let html = azumi::seo::generate_head("<script>alert('xss')</script>", None, None, None, None);
     assert!(
-        !html.contains("<script>"),
+        !html.0.contains("<script>"),
         "Title must escape <script> tags"
     );
     assert!(
-        html.contains("&lt;script&gt;"),
+        html.0.contains("&lt;script&gt;"),
         "Title must contain escaped script"
     );
 }
@@ -329,12 +329,12 @@ fn test_seo_description_quotes_escaped() {
         None,
     );
     assert!(
-        html.contains("&quot;"),
+        html.0.contains("&quot;"),
         "Description quotes must be escaped. Got: {}",
         html.0
     );
     assert!(
-        !html.contains("<script>"),
+        !html.0.contains("<script>"),
         "Description must not contain raw script. Got: {}",
         html.0
     );
@@ -350,7 +350,7 @@ fn test_seo_url_special_chars() {
         None,
     );
     assert!(
-        html.contains(r#"href="https://example.com/page?a=1&amp;b=2""#),
+        html.0.contains(r#"href="https://example.com/page?a=1&amp;b=2""#),
         "URL ampersands must be escaped. Got: {}",
         html.0
     );
