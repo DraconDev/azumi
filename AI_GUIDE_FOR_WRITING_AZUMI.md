@@ -190,7 +190,7 @@ html! {
 ```rust
 html! {
     <script>
-        @{Raw("console.log('trusted constant');".to_string())}
+        {TrustedHtml::new("console.log('trusted constant');")}
     </script>
 }
 ```
@@ -206,7 +206,7 @@ html! {
 ```
 
 > [!IMPORTANT]
-> If you find yourself reaching for `Raw()`, ask: "Can I use a `<style>` block, `<script>` block, or data attribute instead?" If yes, do that instead. `Raw()` bypasses all of Azumi's safety guarantees.
+> If you find yourself reaching for `TrustedHtml`, ask: "Can I use a Component, `<style>` block, or data attribute instead?" If yes, do that instead. `TrustedHtml` bypasses all of Azumi's safety guarantees.
 
 ### 5. CSS Classes MUST Be Defined in `<style>` Block
 

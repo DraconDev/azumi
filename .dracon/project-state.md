@@ -1,11 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated Azumi's HTML safety guidelines to emphasize component usage over `TrustedHtml`
+Updated documentation to emphasize component usage over `TrustedHtml` for safer HTML rendering
 
 ## Completed
-- [x] Removed outdated `Raw()` guidance in favor of component-based patterns
-- [x] Added clear warnings about `TrustedHtml` usage and security implications
-- [x] Updated CSS guidance to prefer `<style>` blocks over `TrustedHtml`
-- [x] Simplified examples to focus on proper Azumi patterns
+- [x] Updated `AI_GUIDE_FOR_WRITING_AZUMI.md` to recommend using components instead of `TrustedHtml` for safer HTML rendering
 ```
