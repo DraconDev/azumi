@@ -1051,26 +1051,36 @@ mod tests {
     }
 
     #[test]
-    fn test_known_good_azumi_script_allowed() {
+    fn test_azumi_script_in_raw_now_blocked() {
         let node = create_expression_node(r#"Raw(azumi_script())"#);
         let errors = validate_raw_usage(&[node]);
 
         assert!(
-            errors.is_empty(),
-            "azumi_script should be allowed, got errors: {:?}",
-            errors
+            !errors.is_empty(),
+            "Raw(azumi_script()) should now be blocked - use {azumi_script()} instead"
+        );
+        let error_str = errors[0].to_string();
+        assert!(
+            error_str.contains("JavaScript content detected"),
+            "Should mention JS detection, got: {}",
+            error_str
         );
     }
 
     #[test]
-    fn test_known_good_session_cleanup_allowed() {
+    fn test_window_location_in_raw_now_blocked() {
         let node = create_expression_node(r#"Raw("window.location.hash")"#);
         let errors = validate_raw_usage(&[node]);
 
         assert!(
-            errors.is_empty(),
-            "session_cleanup pattern should be allowed, got errors: {:?}",
-            errors
+            !errors.is_empty(),
+            "Raw with window.location should now be blocked"
+        );
+        let error_str = errors[0].to_string();
+        assert!(
+            error_str.contains("JavaScript content detected"),
+            "Should mention JS detection, got: {}",
+            error_str
         );
     }
 
