@@ -296,25 +296,25 @@ fn test_default_secret_is_obviously_dev() {
 #[test]
 fn test_seo_title_only() {
     let html = azumi::seo::generate_head("Page Title", None, None, None, None);
-    assert!(html.0.contains("Page Title"));
+    assert!(html.contains("Page Title"));
 }
 
 #[test]
 fn test_seo_description_only() {
     let html = azumi::seo::generate_head("", Some("Page description"), None, None, None);
-    assert!(html.0.contains("Page description"));
-    assert!(html.0.contains(r#"name="description""#));
+    assert!(html.contains("Page description"));
+    assert!(html.contains(r#"name="description""#));
 }
 
 #[test]
 fn test_seo_title_no_raw_script_tags() {
     let html = azumi::seo::generate_head("<script>alert('xss')</script>", None, None, None, None);
     assert!(
-        !html.0.contains("<script>"),
+        !html.contains("<script>"),
         "Title must escape <script> tags"
     );
     assert!(
-        html.0.contains("&lt;script&gt;"),
+        html.contains("&lt;script&gt;"),
         "Title must contain escaped script"
     );
 }
@@ -329,12 +329,12 @@ fn test_seo_description_quotes_escaped() {
         None,
     );
     assert!(
-        html.0.contains("&quot;"),
+        html.contains("&quot;"),
         "Description quotes must be escaped. Got: {}",
         html.0
     );
     assert!(
-        !html.0.contains("<script>"),
+        !html.contains("<script>"),
         "Description must not contain raw script. Got: {}",
         html.0
     );
@@ -350,7 +350,7 @@ fn test_seo_url_special_chars() {
         None,
     );
     assert!(
-        html.0.contains(r#"href="https://example.com/page?a=1&amp;b=2""#),
+        html.contains(r#"href="https://example.com/page?a=1&amp;b=2""#),
         "URL ampersands must be escaped. Got: {}",
         html.0
     );
@@ -417,7 +417,7 @@ fn test_escaped_wrapper_angle_brackets() {
 #[test]
 fn test_render_automatic_seo_empty_context() {
     let html = azumi::seo::generate_head("", None, None, None, None);
-    assert!(html.0.contains("<title>"));
+    assert!(html.contains("<title>"));
 }
 
 #[test]
@@ -472,9 +472,9 @@ fn test_escaped_wrapper_newline_becomes_space() {
 fn test_render_simple_component() {
     let component = azumi::html! { <div>"Hello"</div> };
     let html = azumi::test::render(&component);
-    assert!(html.0.contains("<div>"));
-    assert!(html.0.contains("Hello"));
-    assert!(html.0.contains("</div>"));
+    assert!(html.contains("<div>"));
+    assert!(html.contains("Hello"));
+    assert!(html.contains("</div>"));
 }
 
 #[test]
@@ -485,11 +485,11 @@ fn test_render_nested_components() {
         </div>
     };
     let html = azumi::test::render(&component);
-    assert!(html.0.contains("<div>"));
-    assert!(html.0.contains("<span>"));
-    assert!(html.0.contains("Nested"));
-    assert!(html.0.contains("</span>"));
-    assert!(html.0.contains("</div>"));
+    assert!(html.contains("<div>"));
+    assert!(html.contains("<span>"));
+    assert!(html.contains("Nested"));
+    assert!(html.contains("</span>"));
+    assert!(html.contains("</div>"));
 }
 
 #[test]
@@ -497,17 +497,17 @@ fn test_render_with_attributes() {
     let class = "link";
     let component = azumi::html! { <a href="https://example.com" class={class}>"Link"</a> };
     let html = azumi::test::render(&component);
-    assert!(html.0.contains("href=\"https://example.com\""));
-    assert!(html.0.contains("class=\"link\""));
+    assert!(html.contains("href=\"https://example.com\""));
+    assert!(html.contains("class=\"link\""));
 }
 
 #[test]
 fn test_render_self_closing_tags() {
     let component = azumi::html! { <input type="text" name="field" /> };
     let html = azumi::test::render(&component);
-    assert!(html.0.contains("<input"));
-    assert!(html.0.contains("type=\"text\""));
-    assert!(html.0.contains("name=\"field\""));
+    assert!(html.contains("<input"));
+    assert!(html.contains("type=\"text\""));
+    assert!(html.contains("name=\"field\""));
 }
 
 #[test]
@@ -520,9 +520,9 @@ fn test_render_multiple_elements() {
         </div>
     };
     let html = azumi::test::render(&component);
-    assert!(html.0.contains("<p>First</p>"));
-    assert!(html.0.contains("<p>Second</p>"));
-    assert!(html.0.contains("<p>Third</p>"));
+    assert!(html.contains("<p>First</p>"));
+    assert!(html.contains("<p>Second</p>"));
+    assert!(html.contains("<p>Third</p>"));
 }
 
 #[test]
