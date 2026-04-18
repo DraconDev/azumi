@@ -984,6 +984,51 @@ mod tests {
     }
 
     #[test]
+    fn test_format_in_raw_always_blocked() {
+        let node = create_expression_node(r#"Raw(format!("<style>{}</style>", css_const))"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            !errors.is_empty(),
+            "format! inside Raw() should always be blocked"
+        );
+        let error_str = errors[0].to_string();
+        assert!(
+            error_str.contains("Raw(format!(...)) detected"),
+            "Error should mention format! pattern, got: {}",
+            error_str
+        );
+    }
+
+    #[test]
+    fn test_js_in_raw_detected() {
+        let node = create_expression_node(r#"Raw("<script>alert('hi')</script>")"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            !errors.is_empty(),
+            "JS inside Raw should be blocked"
+        );
+        let error_str = errors[0].to_string();
+        assert!(
+            error_str.contains("JavaScript content detected inside Raw"),
+            "Error should mention JS detection, got: {}",
+            error_str
+        );
+    }
+
+    #[test]
+    fn test_js_event_listener_in_raw_blocked() {
+        let node = create_expression_node(r#"Raw("element.addEventListener('click', fn)")"#);
+        let errors = validate_raw_usage(&[node]);
+
+        assert!(
+            !errors.is_empty(),
+            "addEventListener inside Raw should be blocked"
+        );
+    }
+
+    #[test]
     fn test_safe_expression_no_error() {
         let node = create_expression_node(r#"some_variable"#);
         let errors = validate_raw_usage(&[node]);
