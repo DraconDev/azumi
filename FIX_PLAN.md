@@ -40,6 +40,21 @@ All Phase 1-11 items completed. Framework solution for `azumi_script()` - now re
 | 11.y.3 Dracon Platform updated | ✅ DONE | Uses {session_cleanup_script()} |
 | 11.y.4 KNOWN_GOOD removed | ✅ DONE | All bypass patterns eliminated |
 
+### Phase 11.z: TrustedHtml Component (April 18, 2026)
+| Item | Status | Notes |
+|------|--------|-------|
+| 11.z.1 TrustedHtml Component | ✅ DONE | New component for pre-sanitized HTML |
+| 11.z.2 Export from lib.rs | ✅ DONE | Available as `azumi::TrustedHtml` |
+| 11.z.3 AI guide updated | ✅ DONE | Documents TrustedHtml as user escape hatch |
+
+**TrustedHtml Usage:**
+```rust
+// For pre-sanitized HTML from trusted sources
+html! {
+    <div>{TrustedHtml::new(pre_sanitized_html)}</div>
+}
+```
+
 **What Now Causes Compile ERROR:**
 - `@{Raw(format!("<style>...</style>", ...))}` → Use `<style>` block
 - `@{Raw("<script>...</script>")}` → Use `<script>` block
