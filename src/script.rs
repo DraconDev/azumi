@@ -27,3 +27,17 @@ impl Component for SessionCleanupScript {
 pub fn session_cleanup_script() -> SessionCleanupScript {
     SessionCleanupScript
 }
+
+pub struct TrustedHtml(pub String);
+
+impl Component for TrustedHtml {
+    fn render(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl TrustedHtml {
+    pub fn new(html: &str) -> Self {
+        TrustedHtml(html.to_string())
+    }
+}
