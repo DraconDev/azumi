@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock after SEO-related refactoring
+Added TrustedHtml component to public API for safe HTML rendering
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions
+- [x] Added TrustedHtml to prelude exports for easier access
 ```
