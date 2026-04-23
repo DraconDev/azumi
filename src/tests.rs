@@ -117,4 +117,45 @@ mod tests {
             "Should contain 'azumi' identifier"
         );
     }
+
+    #[test]
+    fn test_session_cleanup_script_renders() {
+        let script = crate::session_cleanup_script();
+        let output = crate::render_to_string(&script);
+        assert!(
+            output.starts_with("<script>"),
+            "Should start with <script>, got: {}",
+            output
+        );
+        assert!(
+            output.ends_with("</script>"),
+            "Should end with </script>, got: {}",
+            output
+        );
+        assert!(
+            output.contains("window.location.hash"),
+            "Should contain session cleanup logic"
+        );
+    }
+
+    #[test]
+    fn test_trusted_html_renders_without_escaping() {
+        let html = crate::TrustedHtml::new("<div>Hello &amp; World</div>");
+        let output = crate::render_to_string(&html);
+        assert_eq!(
+            output, "<div>Hello &amp; World</div>",
+            "TrustedHtml should render without escaping"
+        );
+    }
+
+    #[test]
+    fn test_trusted_html_preserves_script_tags() {
+        let html = crate::TrustedHtml::new("<script>alert('test')</script>");
+        let output = crate::render_to_string(&html);
+        assert!(
+            output.contains("<script>"),
+            "TrustedHtml should preserve script tags, got: {}",
+            output
+        );
+    }
 }
