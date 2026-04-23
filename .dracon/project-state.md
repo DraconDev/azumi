@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Added TrustedHtml component to public API for safe HTML rendering
+Restricted `Raw` usage to internal framework components only
 
 ## Completed
-- [x] Added TrustedHtml to prelude exports for easier access
+- [x] Marked `Raw` as internal-only with clear documentation
+- [x] Removed user-facing examples and warnings about unsafe usage
+- [x] Added guidance to use `TrustedHtml` instead for public API
 ```
