@@ -4,5 +4,5 @@
 Minor dependency version updates in Cargo.lock after SEO-related refactoring
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock
+- [x] Updated dependency versions in Cargo.lock to resolve SEO-related compatibility issues
 ```
