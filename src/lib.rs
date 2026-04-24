@@ -515,9 +515,8 @@ fn scope_css_level(
                 if finding_close {
                     result.push_str(&buffer);
                     return result;
-                } else {
-                    buffer.push(ch);
                 }
+                buffer.push(ch);
             }
             ';' => {
                 buffer.push(ch);
