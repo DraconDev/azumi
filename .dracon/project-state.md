@@ -1,9 +1,7 @@
 # Project State
 
 ## Current Focus
-Enhanced HTML structure validation to support new Azumi script patterns
+Minor dependency version updates in Cargo.lock after recent feature additions
 
 ## Completed
-- [x] Added validation for `azumi_script()` usage in HTML templates
-- [x] Added validation for `session_cleanup_script()` usage in HTML templates
-```
+- [x] Updated dependency versions in Cargo.lock to reflect recent feature implementations
