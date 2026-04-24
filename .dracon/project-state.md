@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Fixed a test assertion message to correctly document the required syntax for `azumi_script()`
+Updated test assertions to verify secure counter handler behavior in lesson 18
 
 ## Completed
-- [x] Updated test assertion to show correct syntax with double curly braces `{{azumi_script()}}` instead of single `azumi_script()`
+- [x] Updated test assertions to verify secure counter handler behavior in lesson 18
+- [x] Modified handler references from `__azumi_live_handlers` to `__azumi_live_handlers_securecounter`
