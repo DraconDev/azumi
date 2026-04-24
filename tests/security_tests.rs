@@ -204,6 +204,7 @@ fn test_verify_rejects_unicode_in_signature() {
 // Dev Token Validation (hot_reload)
 // ════════════════════════════════════════════════════════════════════════════
 
+#[cfg(feature = "devtools")]
 #[test]
 fn test_dev_token_valid_when_matching() {
     std::env::set_var("AZUMI_DEV_TOKEN", "test-secret-token");

@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated release notes for Azumi v15.9.2 with comprehensive test fixes and clarified breaking changes
+Added feature-gated dev token validation test for hot-reload functionality
 
 ## Completed
-- [x] Updated release version from v15.6.0 to v15.9.2
-- [x] Added test coverage note for devtools feature
-- [x] Clarified breaking change version reference from v15.6.0 to v15.9.2
-- [x] Maintained all existing framework improvements (TrustedHtml Component, session cleanup patterns)
+- [x] Added `#[cfg(feature = "devtools")]` attribute to `test_dev_token_valid_when_matching` test to ensure it only runs when devtools feature is enabled
+```
