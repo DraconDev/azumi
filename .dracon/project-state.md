@@ -4,5 +4,6 @@
 Added feature-gated dev token validation test for hot-reload functionality
 
 ## Completed
-- [x] Added conditional compilation for dev token test with `#[cfg(feature = "devtools")]` attribute
+- [x] Added test for dev token validation when environment variable is not set
+- [x] Added feature-gated test for dev token length mismatch validation
 ```

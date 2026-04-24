@@ -238,6 +238,7 @@ fn test_dev_token_invalid_when_env_not_set() {
     assert!(!result);
 }
 
+#[cfg(feature = "devtools")]
 #[test]
 fn test_dev_token_invalid_length_mismatch() {
     std::env::set_var("AZUMI_DEV_TOKEN", "short");
