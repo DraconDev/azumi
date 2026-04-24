@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated release notes for Azumi v15.12.13 with comprehensive test fixes
+Updated breaking change version reference in FIX_PLAN.md to v15.12.13
 
 ## Completed
-- [x] Updated release notes to reflect v15.12.13 as the latest version
-```
+- [x] Updated breaking change reference from v15.9.2 to v15.12.13 to reflect current release version
