@@ -1,7 +1,14 @@
 # Project State
 
 ## Current Focus
-Minor test module refactoring by removing unused `Component` import in test file
+Added comprehensive integration tests for TrustedHtml and SessionCleanupScript components
 
 ## Completed
-- [x] Removed unused `Component` import from test module to reduce test dependencies
+- [x] Added 13 new integration tests for TrustedHtml component
+- [x] Added 6 new integration tests for SessionCleanupScript component
+- [x] Verified TrustedHtml renders without escaping HTML content
+- [x] Validated TrustedHtml preserves script tags
+- [x] Confirmed TrustedHtml handles HTML entities correctly
+- [x] Ensured SessionCleanupScript renders properly in document head
+- [x] Tested TrustedHtml with complex nested HTML structures
+- [x] Verified compatibility between azumi_script and session_cleanup_script
