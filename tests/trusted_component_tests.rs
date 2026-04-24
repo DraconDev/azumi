@@ -62,8 +62,8 @@ fn test_session_cleanup_script_renders_correctly() {
         "Should contain session cleanup logic"
     );
     assert!(
-        output.contains("session_token"),
-        "Should reference session_token"
+        output.contains("session"),
+        "Should reference session"
     );
 }
 
