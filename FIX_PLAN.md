@@ -13,7 +13,7 @@ All Phase 1-11 items completed. Framework solution for `azumi_script()` - now re
 **KNOWN_GOOD bypass patterns removed.** Raw() now only allows truly inert strings with no HTML/JS/CSS syntax. Use `{session_cleanup_script()}` for session cleanup instead of `Raw(...)`. Use `TrustedHtml::new()` for pre-sanitized HTML.
 
 ### Dracon Platform Compatibility
-- Dracon Platform uses azumi v15.12.13 ✅
+- Dracon Platform uses azumi v15.13.0 ✅
 - All modules compile successfully ✅
 - Build succeeds ✅
 

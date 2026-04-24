@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated breaking change version reference in FIX_PLAN.md to v15.13.0
+Updated Dracon Platform compatibility reference to azumi v15.13.0
 
 ## Completed
-- [x] docs(breaking change): Updated version reference for KNOWN_GOOD bypass patterns removal to v15.13.0
+- [x] Updated version reference in FIX_PLAN.md to reflect azumi v15.13.0 compatibility
+```
