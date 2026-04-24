@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added explicit Clippy lint suppression for unnecessary literal unwrap in test cases
+Refactored CSS injection logic to simplify fragment handling
 
 ## Completed
-- [x] Added `#[allow(clippy::unnecessary_literal_unwrap)]` to `test_unwrap_or_default()` and `test_unwrap_or_custom()` to suppress false positives
-```
+- [x] Simplified CSS injection for fragment nodes by using a single-line `if` expression instead of a block
+- [x] Removed redundant nested block structure for fragment handling
