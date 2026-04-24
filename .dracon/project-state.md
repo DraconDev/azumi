@@ -1,9 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated version references for Azumi v15.12.17 release documentation
+Updated Azumi dependency version in documentation to v15.12.17
 
 ## Completed
-- [x] Updated version numbers in FIX_PLAN.md and README.md to v15.12.17
-- [x] docs(release): Consistent version references across documentation files
-```
+- [x] docs(version references): Updated Azumi version reference in README.md to v15.12.17
