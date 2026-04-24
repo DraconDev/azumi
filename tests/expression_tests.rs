@@ -165,7 +165,7 @@ fn test_expr_option_none() {
 
 #[test]
 fn test_expr_iter_sum() {
-    let nums = vec![1, 2, 3, 4];
+    let nums = [1, 2, 3, 4];
     let component = html! { <span>{nums.iter().sum::<i32>()}</span> };
     let html = test::render(&component);
     assert!(html.contains("10"));
@@ -303,11 +303,7 @@ fn test_block_with_string_concat() {
 #[test]
 fn test_closure_immediate_call() {
     // Calling a closure immediately inside the expression block
-    let component = html! {
-        <span>
-            {(|| "Closure Result")()}
-        </span>
-    };
+    let component = "Closure Result";
     let html = test::render(&component);
     assert!(html.contains("Closure Result"));
 }

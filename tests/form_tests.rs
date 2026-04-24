@@ -569,7 +569,7 @@ fn test_feedback_form() {
 
 #[test]
 fn test_survey_form() {
-    let questions = vec!["How did you hear about us?", "Would you recommend us?"];
+    let questions = ["How did you hear about us?", "Would you recommend us?"];
     let component = html! {
         <form action="/survey" method="post">
             @for (i, q) in questions.iter().enumerate() {

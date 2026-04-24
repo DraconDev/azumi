@@ -239,7 +239,7 @@ fn test_vertical_nav() {
 
 #[test]
 fn test_breadcrumbs() {
-    let crumbs = vec!["Home", "Products", "Electronics", "Phones"];
+    let crumbs = ["Home", "Products", "Electronics", "Phones"];
     let component = html! {
         <nav aria-label="Breadcrumb">
             <ol>
@@ -276,7 +276,7 @@ fn test_pagination() {
 
 #[test]
 fn test_tab_navigation() {
-    let tabs = vec!["Overview", "Features", "Pricing", "FAQ"];
+    let tabs = ["Overview", "Features", "Pricing", "FAQ"];
     let component = html! {
         <div role="tablist">
             @for (i, tab) in tabs.iter().enumerate() {

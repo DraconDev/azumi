@@ -284,7 +284,7 @@ fn test_expression_in_attribute() {
 
 #[test]
 fn test_method_call_in_attribute() {
-    let items = vec!["a", "b", "c"];
+    let items = ["a", "b", "c"];
     let component = html! { <div data-count={items.len()}></div> };
     let html = test::render(&component);
     assert!(html.contains("data-count=\"3\""));
