@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Consistent documentation of the `azumi_script()` usage across the project
+Minor dependency version updates in Cargo.lock after recent feature additions
 
 ## Completed
-- [x] Updated all instances of `<script src="azumi.js" />` to use the new `{azumi_script()}` helper function
+- [x] Updated dependency versions in Cargo.lock to resolve recent feature additions
 ```
