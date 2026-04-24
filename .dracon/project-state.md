@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock after SEO-related refactoring
+Reordered asset manifest entries to group related files together
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock (binary change only)
-```
+- [x] Restructured `assets_manifest.json` to group image assets (`photo.jpg`, `test_logo.png`, `nature.jpg`) together for better organization
+- [x] Maintained all existing asset mappings while improving file structure readability
