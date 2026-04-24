@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refined session-related test assertions to verify history cleanup logic
+Consistent documentation of the `azumi_script()` usage across the project
 
 ## Completed
-- [x] Updated test assertion to check for `history.replaceState` instead of generic "session" reference
-- [x] Minor dependency version updates in Cargo.lock
+- [x] Updated all instances of `<script src="azumi.js" />` to use `{azumi_script()}` for consistency
+- [x] Standardized client runtime documentation in the README to reflect the new syntax

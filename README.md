@@ -36,7 +36,7 @@ No runtime errors. No "works on my machine". No surprises.
 
 ### Migration from v6-v13
 - `#[azumi::page]` replaces manual SEO setup
-- `{azumi_script()}` replaces `<script src="azumi.js" />`
+- `{azumi_script()}` replaces `{azumi_script()}`
 - `AZUMI_SECRET` still required in production
 
 ---
@@ -287,7 +287,7 @@ pub fn RootLayout(children: impl Component) -> impl Component {
             </head>
             <body>
                 {children}
-                <script src="azumi.js" />
+                {azumi_script()}
             </body>
         </html>
     }
@@ -652,7 +652,7 @@ pub fn HomePage() -> impl azumi::Component {
             <body>
                 <h1>"Hello, Azumi!"</h1>
                 <p>"Welcome to the framework that catches your CSS typos."</p>
-                <script src="azumi.js" />
+                {azumi_script()}
             </body>
         </html>
     }
@@ -685,7 +685,7 @@ async fn main() {
 | `azumi::devtools::auto_reload()` | Sub-second CSS hot reload in development |
 | `azumi::action::register_actions(...)` | Registers interactive endpoints |
 | `azumi::devtools::router()` | WebSocket endpoint for hot reload |
-| `<script src="azumi.js" />` | Client runtime (~3KB) for optimistic UI |
+| `{azumi_script()}` | Client runtime (~3KB) for optimistic UI |
 
 #### Production Deployment
 
