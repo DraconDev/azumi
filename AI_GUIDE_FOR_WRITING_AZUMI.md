@@ -366,7 +366,7 @@ The Azumi client runtime (`azumi.js`) must be **manually injected** in your root
 
 #### How It Works
 
-1.  **You Add the Script**: Place `<script src="azumi.js" />` in your root layout.
+1.  **You Add the Script**: Place `{azumi_script()}` in your root layout.
 2.  **The Route is Served Automatically**: `azumi::action::register_actions()` serves the file.
 
 ```rust
@@ -382,7 +382,7 @@ pub fn RootLayout(children: impl Component) -> impl Component {
             <body>
                 {children}
                 // ✅ REQUIRED: Manually include the runtime for interactivity
-                <script src="azumi.js" />
+                {azumi_script()}
             </body>
         </html>
     }
@@ -645,7 +645,7 @@ If your buttons aren't working, you likely missed one of these 3 steps:
 1.  **Add Script to Layout**:
     ```rust
     // In your root HTML layout (e.g. layout.rs)
-    <script src="azumi.js" />
+    {azumi_script()}
     ```
 2.  **Register Routes in `main.rs`**:
     ```rust
@@ -823,7 +823,7 @@ pub fn MyCustomLayout(children: impl Component) -> impl Component {
            {azumi::seo::render_automatic_seo()}
 
            // 2. Inject Client Runtime (Required for interactivity)
-           <script src="azumi.js" />
+           {azumi_script()}
        </head>
        <body>
            {children}
@@ -2319,7 +2319,7 @@ pub fn InteractivePage() -> impl Component {
         <head>
             // No manual script tags needed!
             // Manually include the runtime for interactivity
-            <script src="azumi.js" />
+            {azumi_script()}
         </head>
         <body>
             // Your components here
@@ -2329,7 +2329,7 @@ pub fn InteractivePage() -> impl Component {
 }
 ```
 
-If you ever need to manually place it (e.g. for specific ordering), use `<script src="azumi.js" />`.
+If you ever need to manually place it (e.g. for specific ordering), use `{azumi_script()}`.
 
 ### CSS ID Handling
 
