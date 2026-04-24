@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Added feature-gated devtools test for shell metachar filtering
+Minor dependency version updates in Cargo.lock after recent feature additions
 
 ## Completed
-- [x] Added `#[cfg(feature = "devtools")]` attribute to `test_devtools_safe_chars_allowed` test to ensure it only runs when the devtools feature is enabled
+- [x] Updated Cargo.lock with new dependency versions from recent feature work
+```
