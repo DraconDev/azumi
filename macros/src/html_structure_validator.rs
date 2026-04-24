@@ -938,14 +938,14 @@ mod tests {
 
         assert!(
             !errors.is_empty(),
-            "Raw(azumi_script()) should now be blocked - use {azumi_script()} instead"
+            "Raw(azumi_script()) should now be blocked - use {{azumi_script()}} instead"
         );
         let error_str = errors[0].to_string();
         assert!(
             error_str.contains("JavaScript content detected"),
             "Should mention JS detection, got: {}",
             error_str
-        );
+        )
     }
 
     #[test]

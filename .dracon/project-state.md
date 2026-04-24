@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated Azumi dependency version in documentation to v15.12.17
+Fixed a test assertion message to correctly document the required syntax for `azumi_script()`
 
 ## Completed
-- [x] docs(version references): Updated Azumi version reference in README.md to v15.12.17
+- [x] Updated test assertion to show correct syntax with double curly braces `{{azumi_script()}}` instead of single `azumi_script()`
