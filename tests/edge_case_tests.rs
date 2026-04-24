@@ -368,7 +368,7 @@ fn test_triple_nested_if() {
 
 #[test]
 fn test_loop_with_enumerate() {
-    let items = vec!["first", "second", "third"];
+    let items = ["first", "second", "third"];
     let component = html! {
         <ul>
             @for (i, item) in items.iter().enumerate() {
@@ -382,7 +382,7 @@ fn test_loop_with_enumerate() {
 
 #[test]
 fn test_loop_with_filter() {
-    let numbers = vec![1, 2, 3, 4, 5, 6];
+    let numbers = [1, 2, 3, 4, 5, 6];
     let component = html! {
         <ul>
             @for n in numbers.iter().filter(|x| *x % 2 == 0) {
@@ -397,7 +397,7 @@ fn test_loop_with_filter() {
 
 #[test]
 fn test_loop_with_take() {
-    let items = vec!["a", "b", "c", "d", "e"];
+    let items = ["a", "b", "c", "d", "e"];
     let component = html! {
         <ul>
             @for item in items.iter().take(2) {

@@ -457,7 +457,7 @@ fn test_two_column() {
 
 #[test]
 fn test_breadcrumb() {
-    let crumbs = vec!["Home", "Products", "Category", "Item"];
+    let crumbs = ["Home", "Products", "Category", "Item"];
     let component = html! {
         <nav>
             @for (idx, crumb) in crumbs.iter().enumerate() {

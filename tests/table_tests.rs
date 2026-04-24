@@ -176,7 +176,7 @@ fn test_table_empty_body() {
 
 #[test]
 fn test_data_table_with_index() {
-    let items = vec!["A", "B", "C"];
+    let items = ["A", "B", "C"];
     let component = html! {
         <table>
             <tbody>
@@ -271,7 +271,7 @@ fn test_sortable_table_header() {
 
 #[test]
 fn test_striped_table() {
-    let rows = vec![1, 2, 3, 4];
+    let rows = [1, 2, 3, 4];
     let component = html! {
         <table>
             @for (i, row) in rows.iter().enumerate() {

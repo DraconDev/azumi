@@ -249,7 +249,7 @@ fn test_empty_condition() {
 
 #[test]
 fn test_len_condition() {
-    let items = vec!["a", "b", "c"];
+    let items = ["a", "b", "c"];
     let component = html! {
         <div>
             @if items.len() >= 3 {
@@ -309,7 +309,7 @@ fn test_for_simple() {
 
 #[test]
 fn test_for_with_index() {
-    let items = vec!["first", "second"];
+    let items = ["first", "second"];
     let component = html! {
         <ol>
             @for (i, item) in items.iter().enumerate() {
@@ -351,7 +351,7 @@ fn test_for_range() {
 
 #[test]
 fn test_for_filter() {
-    let nums = vec![1, 2, 3, 4, 5, 6];
+    let nums = [1, 2, 3, 4, 5, 6];
     let component = html! {
         <ul>
             @for n in nums.iter().filter(|x| **x % 2 == 0) {
@@ -365,7 +365,7 @@ fn test_for_filter() {
 
 #[test]
 fn test_for_map() {
-    let nums = vec![1, 2, 3];
+    let nums = [1, 2, 3];
     let component = html! {
         <ul>
             @for n in nums.iter().map(|x| x * 10) {
@@ -379,7 +379,7 @@ fn test_for_map() {
 
 #[test]
 fn test_for_take() {
-    let nums = vec![1, 2, 3, 4, 5];
+    let nums = [1, 2, 3, 4, 5];
     let component = html! {
         <ul>
             @for n in nums.iter().take(2) {
@@ -393,7 +393,7 @@ fn test_for_take() {
 
 #[test]
 fn test_for_skip() {
-    let nums = vec![1, 2, 3, 4, 5];
+    let nums = [1, 2, 3, 4, 5];
     let component = html! {
         <ul>
             @for n in nums.iter().skip(3) {
@@ -407,8 +407,8 @@ fn test_for_skip() {
 
 #[test]
 fn test_for_chain() {
-    let a = vec![1, 2];
-    let b = vec![3, 4];
+    let a = [1, 2];
+    let b = [3, 4];
     let component = html! {
         <ul>
             @for n in a.iter().chain(b.iter()) {
@@ -422,7 +422,7 @@ fn test_for_chain() {
 
 #[test]
 fn test_for_rev() {
-    let nums = vec![1, 2, 3];
+    let nums = [1, 2, 3];
     let component = html! {
         <ul>
             @for n in nums.iter().rev() {

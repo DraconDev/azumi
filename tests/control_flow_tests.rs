@@ -315,7 +315,7 @@ fn test_for_range() {
 
 #[test]
 fn test_for_with_index() {
-    let items = vec!["A", "B", "C"];
+    let items = ["A", "B", "C"];
     let component = html! {
         <ul>
             @for (idx, item) in items.iter().enumerate() {
@@ -401,7 +401,7 @@ fn test_for_with_conditionals() {
 
 #[test]
 fn test_for_filter_iterator() {
-    let numbers = vec![1, 2, 3, 4, 5, 6];
+    let numbers = [1, 2, 3, 4, 5, 6];
     let component = html! {
         <ul>
             @for n in numbers.iter().filter(|x| *x % 2 == 0) {
@@ -415,7 +415,7 @@ fn test_for_filter_iterator() {
 
 #[test]
 fn test_for_map_iterator() {
-    let numbers = vec![1, 2, 3];
+    let numbers = [1, 2, 3];
     let component = html! {
         <ul>
             @for n in numbers.iter().map(|x| x * 2) {
@@ -624,7 +624,7 @@ fn test_let_multiple() {
 
 #[test]
 fn test_let_used_in_condition() {
-    let items = vec![1, 2, 3];
+    let items = [1, 2, 3];
     let component = html! {
         <div>
             @let count = items.len();

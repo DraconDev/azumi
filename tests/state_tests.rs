@@ -246,7 +246,7 @@ fn test_vec_tuples() {
 
 #[test]
 fn test_vec_enumerate() {
-    let items = vec!["first", "second", "third"];
+    let items = ["first", "second", "third"];
     let component = html! {
         <ol>
             @for (i, item) in items.iter().enumerate() {
@@ -260,7 +260,7 @@ fn test_vec_enumerate() {
 
 #[test]
 fn test_vec_filter() {
-    let nums = vec![1, 2, 3, 4, 5, 6];
+    let nums = [1, 2, 3, 4, 5, 6];
     let component = html! {
         <ul>
             @for n in nums.iter().filter(|x| *x % 2 == 0) {
@@ -275,7 +275,7 @@ fn test_vec_filter() {
 
 #[test]
 fn test_vec_map() {
-    let nums = vec![1, 2, 3];
+    let nums = [1, 2, 3];
     let component = html! {
         <ul>
             @for n in nums.iter().map(|x| x * 2) {
@@ -289,7 +289,7 @@ fn test_vec_map() {
 
 #[test]
 fn test_vec_take() {
-    let nums = vec![1, 2, 3, 4, 5];
+    let nums = [1, 2, 3, 4, 5];
     let component = html! {
         <ul>
             @for n in nums.iter().take(3) {
@@ -304,7 +304,7 @@ fn test_vec_take() {
 
 #[test]
 fn test_vec_skip() {
-    let nums = vec![1, 2, 3, 4, 5];
+    let nums = [1, 2, 3, 4, 5];
     let component = html! {
         <ul>
             @for n in nums.iter().skip(2) {
@@ -319,7 +319,7 @@ fn test_vec_skip() {
 
 #[test]
 fn test_vec_rev() {
-    let nums = vec![1, 2, 3];
+    let nums = [1, 2, 3];
     let component = html! {
         <ul>
             @for n in nums.iter().rev() {
