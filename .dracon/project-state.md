@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added explicit Clippy lint suppression for unnecessary literal unwrap in option display test
+Minor dependency version updates in Cargo.lock after recent feature additions
 
 ## Completed
-- [x] Added `#[allow(clippy::unnecessary_literal_unwrap)]` to `test_expr_option_display` to suppress false positive lint warnings
+- [x] Updated dependency versions in Cargo.lock to reflect recent feature implementations
 ```
