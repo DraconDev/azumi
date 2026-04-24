@@ -19,9 +19,9 @@ No runtime errors. No "works on my machine". No surprises.
 
 ---
 
-## 🚀 v15.13.28 Release Notes
+## 🚀 v15.13.29 Release Notes
 
-**Azumi v15.13.28** — Production-ready with TrustedHtml Component, improved safety, and comprehensive test fixes.
+**Azumi v15.13.29** — Production-ready with TrustedHtml Component, improved safety, and comprehensive test fixes.
 
 ### What's New
 - **TrustedHtml Component**: User-facing escape hatch for pre-sanitized HTML from trusted sources
@@ -308,7 +308,7 @@ pub fn RootLayout(children: impl Component) -> impl Component {
 
 Production builds without devtools:
 ```toml
-azumi = { version = "15.13.28", default-features = false }
+azumi = { version = "15.13.29", default-features = false }
 ```
 
 ---
