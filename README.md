@@ -19,9 +19,9 @@ No runtime errors. No "works on my machine". No surprises.
 
 ---
 
-## 🚀 v15.6.0 Release Notes
+## 🚀 v15.9.2 Release Notes
 
-**Azumi v15.6.0** — Production-ready with TrustedHtml Component and improved safety.
+**Azumi v15.9.2** — Production-ready with TrustedHtml Component, improved safety, and comprehensive test fixes.
 
 ### What's New
 - **TrustedHtml Component**: User-facing escape hatch for pre-sanitized HTML from trusted sources
