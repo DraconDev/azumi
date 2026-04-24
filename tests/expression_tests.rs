@@ -146,6 +146,7 @@ fn test_expr_conditional_ternary_simulation() {
 }
 
 #[test]
+#[allow(clippy::unnecessary_literal_unwrap)]
 fn test_expr_option_display() {
     // Option doesn't implement Display directly usually.
     // If usage is {opt.unwrap_or("default")}, verify that.
