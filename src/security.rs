@@ -235,7 +235,7 @@ fn verify_state_internal(
                 .chars()
                 .all(|c| c.is_alphanumeric() || c == '_' || c == '-')
                 && !rest.is_empty()
-                && rest.chars().next() == Some('{')
+                && rest.starts_with('{')
             {
                 (Some(uid), rest)
             } else {
