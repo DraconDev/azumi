@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock after recent feature additions
+Updated release version in README.md to v15.13.28
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to reflect recent feature implementations
-```
+- [x] docs(readme): updated release version from v15.13.0 to v15.13.28 to reflect current production state
