@@ -737,8 +737,7 @@ fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool 
             token_parser::Node::Block(token_parser::Block::If(if_block)) => {
                 if inject_css_into_head(&mut if_block.then_branch, css) {
                     return true;
-                }
-                if let Some(else_branch) = &mut if_block.else_branch {
+                } else if let Some(else_branch) = &mut if_block.else_branch {
                     if inject_css_into_head(else_branch, css) {
                         return true;
                     }

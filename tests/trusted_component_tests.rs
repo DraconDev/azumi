@@ -1,6 +1,6 @@
 // Integration tests for TrustedHtml and SessionCleanupScript Components
 
-use azumi::{html, test, Component};
+use azumi::{html, test};
 
 #[test]
 fn test_trusted_html_renders_without_escaping() {
