@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::{
-        azumi_script, compute_scope_id, scope_css, Component, AZUMI_AI_HASH, AZUMI_RULES,
+        azumi_script, compute_scope_id, scope_css, AZUMI_AI_HASH, AZUMI_RULES,
         AZUMI_VERSION,
     };
 
