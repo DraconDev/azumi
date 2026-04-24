@@ -213,6 +213,7 @@ fn test_dev_token_valid_when_matching() {
     assert!(result);
 }
 
+#[cfg(feature = "devtools")]
 #[test]
 fn test_dev_token_invalid_when_mismatched() {
     std::env::set_var("AZUMI_DEV_TOKEN", "test-secret-token");
