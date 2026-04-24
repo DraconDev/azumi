@@ -251,6 +251,7 @@ fn test_dev_token_invalid_length_mismatch() {
 // Shell Metachar Filtering (devtools)
 // ════════════════════════════════════════════════════════════════════════════
 
+#[cfg(feature = "devtools")]
 #[test]
 fn test_devtools_blocked_chars_filtered() {
     let blocked = [

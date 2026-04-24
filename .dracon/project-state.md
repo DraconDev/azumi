@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Added feature-gated dev token validation test for hot-reload functionality
+Added feature-gated devtools test for shell metachar filtering
 
 ## Completed
-- [x] Added test for dev token validation when environment variable is not set
-- [x] Added feature-gated test for dev token length mismatch validation
+- [x] Added `#[cfg(feature = "devtools")]` attribute to `test_devtools_blocked_chars_filtered` test
 ```
