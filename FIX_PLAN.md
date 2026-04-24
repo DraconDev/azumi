@@ -170,7 +170,7 @@ Added 8 unit tests in `html_structure_validator.rs`:
 | Item | Status | Notes |
 |------|--------|-------|
 | 4.1 CI expansion | ⚠️ UNKNOWN | No .github checked |
-| 4.2-4.3 Test files | ✅ 1232 tests | All passing, 0 failures |
+| 4.2-4.3 Test files | ✅ DONE | All tests pass (macro, lib, integration) |
 
 ### Phase 5: Cleanup
 | Item | Status | Notes |
