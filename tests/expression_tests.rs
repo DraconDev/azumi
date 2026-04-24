@@ -157,6 +157,7 @@ fn test_expr_option_display() {
 }
 
 #[test]
+#[allow(clippy::unnecessary_literal_unwrap)]
 fn test_expr_option_none() {
     let opt: Option<&str> = None;
     let component = html! { <span>{opt.unwrap_or("Default")}</span> };
