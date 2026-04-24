@@ -222,6 +222,7 @@ fn test_dev_token_invalid_when_mismatched() {
     assert!(!result);
 }
 
+#[cfg(feature = "devtools")]
 #[test]
 fn test_dev_token_invalid_when_none() {
     std::env::remove_var("AZUMI_DEV_TOKEN");

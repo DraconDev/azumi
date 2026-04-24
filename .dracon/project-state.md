@@ -4,5 +4,4 @@
 Added feature-gated dev token validation test for hot-reload functionality
 
 ## Completed
-- [x] Added conditional compilation for dev token test using `#[cfg(feature = "devtools")]` attribute
-```
+- [x] Added conditional compilation for dev token validation test under `devtools` feature flag
