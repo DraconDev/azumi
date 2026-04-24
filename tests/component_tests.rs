@@ -150,6 +150,7 @@ fn test_option_none() {
 }
 
 #[test]
+#[allow(clippy::unnecessary_literal_unwrap)]
 fn test_unwrap_or_default() {
     let count: Option<i32> = None;
     let display = count.unwrap_or(0);
@@ -161,6 +162,7 @@ fn test_unwrap_or_default() {
 }
 
 #[test]
+#[allow(clippy::unnecessary_literal_unwrap)]
 fn test_unwrap_or_custom() {
     let count: Option<i32> = Some(42);
     let display = count.unwrap_or(0);
