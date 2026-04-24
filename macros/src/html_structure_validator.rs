@@ -101,7 +101,9 @@ pub fn validate_raw_usage(nodes: &[Node]) -> Vec<TokenStream> {
                         || normalized_str.contains("window.")
                         || normalized_str.contains("document.")
                         || normalized_str.contains(".addEventListener")
-                        || normalized_str.contains("JSON.parse");
+                        || normalized_str.contains("JSON.parse")
+                        || normalized_str.contains("azumi_script()")
+                        || normalized_str.contains("session_cleanup_script()");
 
                     if has_js_pattern {
                         errors.push(quote_spanned! { expr.span =>

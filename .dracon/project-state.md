@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Documentation updates for Azumi's state management patterns and test status improvements
+Enhanced HTML structure validation to support new Azumi script patterns
 
 ## Completed
-- [x] Updated AI guide with improved code block formatting for client-side state management
-- [x] Updated test status in FIX_PLAN.md to reflect all tests passing
-- [x] Updated dependency versions in Cargo.lock for recent feature additions
+- [x] Added validation for `azumi_script()` usage in HTML templates
+- [x] Added validation for `session_cleanup_script()` usage in HTML templates
+```
