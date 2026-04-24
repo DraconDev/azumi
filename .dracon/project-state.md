@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated version references for Azumi v15.13.0 release documentation
+Updated breaking change version reference in FIX_PLAN.md to v15.13.0
 
 ## Completed
-- [x] Updated FIX_PLAN.md to reflect v15.13.0 as the latest release
-- [x] Updated README.md to reference v15.13.0 release notes and documentation
+- [x] docs(breaking change): Updated version reference for KNOWN_GOOD bypass patterns removal to v15.13.0
