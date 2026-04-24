@@ -6,7 +6,7 @@
 
 ## Status (Updated April 18, 2026)
 
-### Current Release: v15.13.28 (Latest)
+### Current Release: v15.13.29 (Latest)
 All Phase 1-11 items completed. Framework solution for `azumi_script()` - now returns Component, not String. Stricter Raw() validation ensures AI-generated code uses proper Azumi patterns. SessionCleanupScript Component and TrustedHtml Component provide safe patterns. Tests now pass with and without devtools feature.
 
 ### Breaking Change in v14.3.0 / v15.13.0
