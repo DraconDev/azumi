@@ -1,4 +1,5 @@
 #[cfg(test)]
+#[allow(clippy::module_inception)]
 mod tests {
     use crate::{
         azumi_script, compute_scope_id, scope_css, AZUMI_AI_HASH, AZUMI_RULES,
