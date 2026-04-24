@@ -269,6 +269,7 @@ fn test_devtools_blocked_chars_filtered() {
     }
 }
 
+#[cfg(feature = "devtools")]
 #[test]
 fn test_devtools_safe_chars_allowed() {
     let safe = ["arg", "value", "123", "abc-def", "file.txt", "path/to/dir"];
