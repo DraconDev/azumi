@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock after recent feature additions
+Refactored CSS injection logic to improve fragment handling readability
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to reflect recent feature implementations
+- [x] Refactored `inject_css_into_head` to use explicit `if` block for fragment handling instead of implicit match guard
 ```

@@ -729,8 +729,10 @@ fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool 
                     return true;
                 }
             }
-            token_parser::Node::Fragment(frag) if inject_css_into_head(&mut frag.children, css) => {
-                return true;
+            token_parser::Node::Fragment(frag) => {
+                if inject_css_into_head(&mut frag.children, css) {
+                    return true;
+                }
             }
             token_parser::Node::Block(token_parser::Block::If(if_block)) => {
                 if inject_css_into_head(&mut if_block.then_branch, css) {
