@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock after recent feature additions
+Added explicit Clippy lint suppression for collapsible match in WebSocket ping/pong handling
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock (binary change only)
+- [x] Added `#[allow(clippy::collapsible_match)]` to prevent Clippy warning about redundant match pattern
 ```

@@ -216,6 +216,7 @@ async fn handle_socket(mut socket: WebSocket) {
                 }
             }
             res = socket.recv() => {
+                #[allow(clippy::collapsible_match)]
                 match res {
                     Some(Ok(Message::Ping(data))) => {
                         if socket.send(Message::Pong(data)).await.is_err() {
