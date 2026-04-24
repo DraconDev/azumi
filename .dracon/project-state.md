@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored CSS injection logic to improve fragment handling readability
+Added explicit Clippy lint suppression for collapsible match in CSS injection logic
 
 ## Completed
-- [x] Refactored `inject_css_into_head` to use explicit `if` block for fragment handling instead of implicit match guard
-```
+- [x] Added `#[allow(clippy::collapsible_match)]` to `inject_css_into_head` function to suppress Clippy warning about potentially collapsible match statement

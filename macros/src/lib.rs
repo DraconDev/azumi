@@ -712,6 +712,7 @@ fn generate_body(
 }
 
 #[allow(clippy::ptr_arg)]
+#[allow(clippy::collapsible_match)]
 fn inject_css_into_head(nodes: &mut Vec<token_parser::Node>, css: &str) -> bool {
     for node in nodes.iter_mut() {
         match node {
