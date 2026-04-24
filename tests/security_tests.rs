@@ -230,6 +230,7 @@ fn test_dev_token_invalid_when_none() {
     assert!(!result);
 }
 
+#[cfg(feature = "devtools")]
 #[test]
 fn test_dev_token_invalid_when_env_not_set() {
     std::env::remove_var("AZUMI_DEV_TOKEN");
