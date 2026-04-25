@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated release version to v15.13.29 in FIX_PLAN.md
+Removed implicit `<script src="azumi.js">` transformation in favor of explicit `{azumi_script()}` component
 
 ## Completed
-- [x] docs(release version): Updated release version in FIX_PLAN.md to v15.13.29
-```
+- [x] Removed automatic transformation of `<script src="azumi.js">` tags during parsing
+- [x] Added note explaining the change and recommending explicit component usage

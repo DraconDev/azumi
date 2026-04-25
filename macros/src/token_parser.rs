@@ -482,25 +482,8 @@ impl Parse for Element {
             // I will use the L406 block to do BOTH remove and inject. It's safer.
             // So I undo the L325 block removal (make it empty) and put logic here.
 
-            if let Some(pos) = attrs.iter().position(|attr: &Attribute| {
-                if attr.name == "src" {
-                    if let AttributeValue::Static(v) = &attr.value {
-                        return v.trim().trim_matches('"').trim_matches('\'') == "azumi.js";
-                    }
-                }
-                false
-            }) {
-                attrs.remove(pos);
-                // Using syn::parse_str to create the expression
-                // This is a hardcoded string, so unwrap is safe here - it will only panic
-                // if the azumi crate doesn't export Raw and AZUMI_JS (which would be a build error anyway)
-                let expr: syn::Expr = syn::parse_str("azumi::Raw(azumi::AZUMI_JS)")
-                    .expect("azumi::Raw and azumi::AZUMI_JS must be available - ensure azumi crate is properly imported");
-                children.push(Node::Expression(Expression {
-                    content: expr.to_token_stream(),
-                    span: Span::call_site(),
-                }));
-            }
+            // NOTE: <script src="azumi.js" /> transformation REMOVED in v15.14.0
+            // Use {azumi_script()} instead - it's explicit, type-safe, and follows Component patterns.
         }
 
         // Azumi 2.0: Block inline <style> and <script> tags
