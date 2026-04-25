@@ -447,7 +447,7 @@ impl Parse for Element {
         // NOTE: <script src="azumi.js" /> transformation was REMOVED in v15.14.0
         // Use {azumi_script()} instead - explicit, type-safe, follows Component patterns
 
-        // Azumi 2.0: Block inline <style> and <script> tags
+        // Azumi: Block inline <style> and <script> tags
         // Moved to end of parsing to allow checking children for expressions
         if name == "style" || name == "script" {
             let has_src = attrs.iter().any(|attr: &Attribute| attr.name == "src");
