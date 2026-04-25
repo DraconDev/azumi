@@ -383,7 +383,7 @@ impl Parse for Element {
         let mut children = Vec::new();
         if input.peek(Token![/]) {
             // Self-closing tag (e.g., <img />, <br />)
-            input.parse::<Token![/]>()>?;
+            input.parse::<Token![/]>()?;
             let end_token = input.parse::<Token![>]>()?;
             if let Some(joined) = start_span.join(end_token.span()) {
                 full_span = joined;
