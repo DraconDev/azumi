@@ -1,9 +1,7 @@
 # Project State
 
 ## Current Focus
-docs(readme): updated script injection documentation to reflect explicit `<script>` tag usage
+Updated release version to v15.14.11 in FIX_PLAN.md
 
 ## Completed
-- [x] Updated release version in README from v15.13.29 to v15.14.11
-- [x] Modified script injection documentation to explicitly require `{azumi_script()}` instead of implicit `<script src="azumi.js">` transformation
-```
+- [x] docs(release version): Updated release version in FIX_PLAN.md to v15.14.11
