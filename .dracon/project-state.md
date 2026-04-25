@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored script injection to use explicit `<script>` tags instead of implicit transformation
+Refactored script injection in demo component to use explicit `azumi_script()` function instead of hardcoded `<script>` tag
 
 ## Completed
-- [x] Updated `live_component_demo.rs` to use explicit `<script src="/static/azumi.js">` instead of `azumi_script()` macro
-- [x] Updated `live_demo.rs` to use `azumi_script()` macro instead of explicit `<script>` tag for consistency
+- [x] Replaced hardcoded `<script src="/static/azumi.js"></script>` with `azumi_script()` function call in demo component
+- [x] Maintained same functionality while improving code organization and maintainability

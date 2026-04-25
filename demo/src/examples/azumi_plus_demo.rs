@@ -3,7 +3,7 @@ use azumi::prelude::*;
 
 pub fn azumi_plus_demo() -> impl Component {
     html! {
-        <script src="/static/azumi.js"></script>
+        {azumi_script()}
 
         <div class={demo_container}>
             <h1>"Azumi+ Demo"</h1>
