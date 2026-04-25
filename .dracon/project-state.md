@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed magic `<script src="azumi.js">` transformation in favor of explicit `azumi_script()` component
+Minor dependency version updates in Cargo.lock after recent feature additions
 
 ## Completed
-- [x] Removed implicit script injection logic in token parser
-- [x] Added explicit documentation note about the removal
-- [x] Updated code to reflect the v15.14.0 change
+- [x] Updated dependency versions in Cargo.lock to align with recent feature implementations
 ```
