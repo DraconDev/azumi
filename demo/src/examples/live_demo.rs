@@ -82,7 +82,7 @@ pub fn live_demo() -> impl azumi::Component {
     };
 
     html! {
-        <script src="/static/azumi.js"></script>
+        {azumi_script()}
 
         <div class={page_container}>
             <h1 class={page_title}>"Azumi Live: Compiler-Driven Optimistic UI"</h1>

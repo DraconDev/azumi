@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored script injection in live component demo to use explicit template syntax
+Refactored script injection to use explicit `<script>` tags instead of implicit transformation
 
 ## Completed
-- [x] Changed implicit script injection to explicit double-brace syntax in live component demo
-- [x] Maintained same functionality while improving template clarity and consistency
+- [x] Updated `live_component_demo.rs` to use explicit `<script src="/static/azumi.js">` instead of `azumi_script()` macro
+- [x] Updated `live_demo.rs` to use `azumi_script()` macro instead of explicit `<script>` tag for consistency
