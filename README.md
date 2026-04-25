@@ -19,9 +19,9 @@ No runtime errors. No "works on my machine". No surprises.
 
 ---
 
-## 🚀 v15.14.15 Release Notes
+## 🚀 v15.15.0 Release Notes
 
-**Azumi v15.14.15** — Consolidated FIX_PLAN.md into README.md. All docs now live in one place.
+**Azumi v15.15.0** — Clean release with consolidated documentation and removed magic transformations.
 
 ### What's New
 - **TrustedHtml Component**: User-facing escape hatch for pre-sanitized HTML from trusted sources
@@ -328,7 +328,7 @@ pub fn RootLayout(children: impl Component) -> impl Component {
 
 Production builds without devtools:
 ```toml
-azumi = { version = "15.14.15", default-features = false }
+azumi = { version = "15.15.0", default-features = false }
 ```
 
 ---

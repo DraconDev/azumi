@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.toml after recent feature additions
+Updated documentation to reflect v15.15.0 release with consolidated docs and removed magic transformations
 
 ## Completed
-- [x] Updated dependency versions in Cargo.toml to align with recent feature implementations
-```
+- [x] docs(readme): updated release notes to v15.15.0
+- [x] docs(readme): consolidated all documentation into README.md
+- [x] docs(readme): removed reference to magic transformations in release notes
