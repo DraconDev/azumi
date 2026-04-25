@@ -444,47 +444,8 @@ impl Parse for Element {
             }
         }
 
-        // Post-processing for magic scripts
-        if name == "script" && children.is_empty() {
-            // We can't easily know if we removed the attribute from here without re-checking or flag.
-            // Let's move the check/remove logic HERE.
-
-            // Check if we removed it? No, checking again logic...
-            // Wait, I removed it in the logic block above (L325).
-            // Since I need to know IF I removed it, I should have used a flag.
-            // But variables defined there aren't accessible here unless defined outside.
-
-            // RE-IMPLEMENTATION:
-            // Let's remove the block at L325 and only do it here OR define flag outside.
-            // Trying to mutate attrs twice is messy.
-            // Let's rely on checking if children are empty AND we are script.
-            // If we are script AND empty children, did we have the magic src?
-            // Since I removed it, I can't check it anymore!
-
-            // CORRECTION: The block at L325 creates a scope issue.
-            // I will remove the L325 block entirely in this step and implement the logic fully here
-            // BUT I already wrote the replacement for L325 above.
-            // So in this block I will just perform the insertion IF the attribute was removed.
-            // But wait, if I removed it, I don't know it was there.
-
-            // Actually, I can leave L325 block, but I need to make sure I add children THERE if possible?
-            // No, `children` vector created at L354.
-
-            // SOLUTION: Do nothing here, rely on L325-L333 replacement above to use a more robust check?
-            // No, L325 is BEFORE children parsing.
-
-            // I will use a different strategy:
-            // 1. In L325 block (above), remove the attribute and set a `magic_script_content` variable?
-            // No, scope.
-
-            // 2. Just check for the attribute HERE (L406+) and remove it + inject children.
-            // BUT parsing logic for children L354+ might choke on empty script? No.
-            // I will use the L406 block to do BOTH remove and inject. It's safer.
-            // So I undo the L325 block removal (make it empty) and put logic here.
-
-            // NOTE: <script src="azumi.js" /> transformation REMOVED in v15.14.0
-            // Use {azumi_script()} instead - it's explicit, type-safe, and follows Component patterns.
-        }
+        // NOTE: <script src="azumi.js" /> transformation was REMOVED in v15.14.0
+        // Use {azumi_script()} instead - explicit, type-safe, follows Component patterns
 
         // Azumi 2.0: Block inline <style> and <script> tags
         // Moved to end of parsing to allow checking children for expressions
