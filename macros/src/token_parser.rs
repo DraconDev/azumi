@@ -348,8 +348,8 @@ impl Parse for Element {
             }
         }
 
-        // Azumi 2.0: Magic "src" attributes
-        // <script src="azumi.js"> -> <script>{azumi::Raw(azumi::AZUMI_JS)}</script>
+        // NOTE: Magic <script src="azumi.js"> transformation was REMOVED in v15.14.0
+        // Use {azumi_script()} instead - explicit, type-safe, follows Component patterns
 
         // Azumi: Enforce component-scoped CSS - block <link rel="stylesheet"> for local files
         if name == "link" {

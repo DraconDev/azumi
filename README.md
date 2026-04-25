@@ -36,7 +36,7 @@ No runtime errors. No "works on my machine". No surprises.
 
 ### Migration from v6-v13
 - `#[azumi::page]` replaces manual SEO setup
-- `<script src="azumi.js" />` replaces `{azumi_script()}`
+- `<script src="azumi.js" />` → Use `{azumi_script()}` (macro transformation removed)
 - `AZUMI_SECRET` still required in production
 
 ### Raw() Validation
