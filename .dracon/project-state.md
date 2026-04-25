@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored script injection in layout component to use explicit `azumi_script()` macro
+Refactored script injection in lesson plan to use explicit `azumi_script()` function
 
 ## Completed
-- [x] Replaced hardcoded `<script src="azumi.js">` with `azumi_script()` macro for better maintainability
-- [x] Maintained same functionality while improving code organization
+- [x] Replaced implicit `<script src="/static/azumi.js">` with explicit `azumi_script()` call in lesson component
+- [x] Updated Cargo.lock with minor dependency version updates
+```

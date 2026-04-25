@@ -248,7 +248,7 @@ struct CounterState { count: i32 }
 #[azumi::component]
 fn counter_view(state: CounterState) -> impl azumi::Component {
     html! {
-        <script src="/static/azumi.js"></script>
+        {azumi_script()}
         <style>
             .counter { text-align: "center"; padding: "2rem"; }
             .count { font-size: "3rem"; color: "#2196f3"; }
