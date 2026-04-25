@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated release version in documentation to v15.14.12
+Updated Dracon Platform compatibility to azumi v15.14.12
 
 ## Completed
-- [x] docs(release version): Updated release version in FIX_PLAN.md to v15.14.12
+- [x] Updated FIX_PLAN.md to reflect Dracon Platform now uses azumi v15.14.12 ✅
