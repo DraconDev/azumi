@@ -382,19 +382,8 @@ impl Parse for Element {
 
         let mut children = Vec::new();
         if input.peek(Token![/]) {
-            // Self-closing <script src="azumi.js" />
-
-            // Check if we just removed the magic src attribute (and thus should inject content)
-            // We know we did if name is script and src is missing (since we removed it)
-            // But wait, user might have just written <script /> which is invalid.
-            // Let's rely on a flag or check.
-            // Actually, we can check if we *should* inject.
-
-            // Simplification: logic above removed the attr.
-            // If it was "azumi.js", we want to basically turn this into a non-self-closing tag with content.
-            // BUT, `Element` struct doesn't care if it was self-closing in source, only children matter.
-
-            input.parse::<Token![/]>()?;
+            // Self-closing tag (e.g., <img />, <br />)
+            input.parse::<Token![/]>()>?;
             let end_token = input.parse::<Token![>]>()?;
             if let Some(joined) = start_span.join(end_token.span()) {
                 full_span = joined;
