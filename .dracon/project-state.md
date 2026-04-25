@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored self-closing tag handling in token parser to improve error handling
+Minor dependency version updates in Cargo.lock after recent feature additions
 
 ## Completed
-- [x] Removed redundant span joining in self-closing tag parsing
-- [x] Simplified error handling for self-closing tags by removing unnecessary type annotation
+- [x] Updated dependency versions in Cargo.lock to ensure compatibility with recent feature implementations
 ```
