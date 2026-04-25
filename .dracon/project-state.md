@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-docs(readme): update script injection documentation to reflect explicit `<script>` tag usage
+docs(readme): updated script injection documentation to reflect explicit `<script>` tag usage
 
 ## Completed
-- [x] docs(readme): updated migration guide to show explicit `<script src="azumi.js" />` replacement for `{azumi_script()}`
+- [x] Updated release version in README from v15.13.29 to v15.14.11
+- [x] Modified script injection documentation to explicitly require `{azumi_script()}` instead of implicit `<script src="azumi.js">` transformation
 ```
