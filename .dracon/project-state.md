@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock after recent feature additions
+Minor dependency version updates in Cargo.toml after recent feature additions
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with recent feature implementations
+- [x] Updated dependency versions in Cargo.toml to align with recent feature implementations
 ```
