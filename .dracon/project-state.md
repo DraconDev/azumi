@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock after recent feature additions
+docs(readme): update script injection documentation to reflect explicit `<script>` tag usage
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to maintain compatibility with recent feature implementations
+- [x] docs(readme): updated migration guide to show explicit `<script src="azumi.js" />` replacement for `{azumi_script()}`
 ```
