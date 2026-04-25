@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Update release version to v15.17.0 and clarify security documentation
+Updated error message to clarify Azumi version compatibility in inline tag validation
 
 ## Completed
-- [x] Updated release version in README.md to v15.17.0
-- [x] Clarified security documentation in token_parser.rs by removing outdated Azumi 2.0 reference
+- [x] Modified inline tag validation error message to remove "2.0" version reference, making it more generic
 ```

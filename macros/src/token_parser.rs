@@ -488,7 +488,7 @@ For dynamic styles: use style attribute with expressions"
                 return Err(Error::new(
                     if let Some(joined) = start_span.join(name_span) { joined } else { name_span },
                     format!(
-                        "Inline <{}> tags not allowed in Azumi 2.0\n\n{}\n\nNote: the escape hatch is explicit expressions only (`@{{azumi::Raw(...)}}`) and should be used sparingly.\n\nWhy? External files get full IDE support (linting, autocomplete, error checking).",
+                                "Inline <{}> tags not allowed in Azumi\n\n{}\n\nNote: the escape hatch is explicit expressions only (`@{{azumi::Raw(...)}}`) and should be used sparingly.\n\nWhy? External files get full IDE support (linting, autocomplete, error checking).",
                         name, tag_help
                     ),
                 ));
