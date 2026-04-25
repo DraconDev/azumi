@@ -1,7 +1,10 @@
 # Project State
 
 ## Current Focus
-Updated Dracon Platform compatibility to azumi v15.14.12
+Added documentation for Raw() validation patterns and allowed cases
 
 ## Completed
-- [x] Updated FIX_PLAN.md to reflect Dracon Platform now uses azumi v15.14.12 ✅
+- [x] docs(readme): added table of prohibited Raw() patterns with recommended fixes
+- [x] docs(readme): documented allowed Raw() usage cases
+- [x] docs(readme): clarified framework component usage requirements
+```

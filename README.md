@@ -39,6 +39,26 @@ No runtime errors. No "works on my machine". No surprises.
 - `<script src="azumi.js" />` replaces `{azumi_script()}`
 - `AZUMI_SECRET` still required in production
 
+### Raw() Validation
+
+These patterns cause **compile errors** (not runtime failures):
+
+| Pattern | Fix |
+|---------|-----|
+| `@{Raw(format!("<style>...</style>", ...))}` | Use `<style>` block |
+| `@{Raw("<script>...</script>")}` | Use `<script>` block |
+| `@{Raw("element.addEventListener(...)")}` | Use proper Azumi event handlers |
+| `@{Raw(azumi_script())}` | Use `{azumi_script()}` (returns Component) |
+| `@{Raw("window.location.hash...")}` | Use `{session_cleanup_script()}` |
+| `style="..."` (static) | Use `style={--var: value}` |
+| `class="..."` (static) | Use `class={variable_name}` |
+
+**Allowed patterns:**
+- `{azumi_script()}` — Framework JS Component
+- `{session_cleanup_script()}` — Session cleanup Component
+- `TrustedHtml::new(...)` — Pre-sanitized HTML from trusted sources
+- `Raw("constant_string")` — Internal framework use only
+
 ---
 
 ## 🛠️ Development Experience
