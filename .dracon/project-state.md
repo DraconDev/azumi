@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated documentation to reflect v15.15.0 release with consolidated docs and removed magic transformations
+Minor dependency version updates in Cargo.lock after recent feature additions
 
 ## Completed
-- [x] docs(readme): updated release notes to v15.15.0
-- [x] docs(readme): consolidated all documentation into README.md
-- [x] docs(readme): removed reference to magic transformations in release notes
+- [x] Updated Cargo.lock with latest dependency versions
+```
