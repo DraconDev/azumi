@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored script injection in demo component to use explicit `azumi_script()` function instead of hardcoded `<script>` tag
+Refactored script injection in layout component to use explicit `azumi_script()` macro
 
 ## Completed
-- [x] Replaced hardcoded `<script src="/static/azumi.js"></script>` with `azumi_script()` function call in demo component
-- [x] Maintained same functionality while improving code organization and maintainability
+- [x] Replaced hardcoded `<script src="azumi.js">` with `azumi_script()` macro for better maintainability
+- [x] Maintained same functionality while improving code organization

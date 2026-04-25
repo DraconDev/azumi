@@ -1,4 +1,4 @@
-use azumi::html;
+use azumi::{html, azumi_script};
 
 /// Modern dark layout component that uses global CSS variables
 #[azumi::component]
@@ -26,8 +26,7 @@ pub fn DarkModernLayout(children: impl azumi::Component) -> impl azumi::Componen
                 {children}
             </div>
             // Scripts for Hot Reload and Interactivity
-            // We use the simplified "azumi.js" magic source
-            <script src="azumi.js" />
+            {azumi_script()}
         </div>
         </body>
         </html>
