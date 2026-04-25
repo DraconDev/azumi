@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-docs(readme): updated Dracon Platform compatibility to azumi v15.14.15
+Minor dependency version updates in Cargo.lock after recent feature additions
 
 ## Completed
-- [x] Updated azumi dependency version in README.md to v15.14.15
+- [x] Updated dependency versions in Cargo.lock to ensure compatibility with recent feature implementations
 ```
