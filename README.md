@@ -19,9 +19,9 @@ No runtime errors. No "works on my machine". No surprises.
 
 ---
 
-## 🚀 v15.14.12 Release Notes
+## 🚀 v15.14.15 Release Notes
 
-**Azumi v15.14.12** — Removed `<script src="azumi.js" />` magic transformation. Use `{azumi_script()}` explicitly.
+**Azumi v15.14.15** — Consolidated FIX_PLAN.md into README.md. All docs now live in one place.
 
 ### What's New
 - **TrustedHtml Component**: User-facing escape hatch for pre-sanitized HTML from trusted sources
