@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Minor dependency version updates in Cargo.lock after recent feature additions
+Updated release version in documentation to v15.14.12
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions
-```
+- [x] docs(release version): Updated release version in README.md to v15.14.12
+- [x] docs(script injection): Updated script injection documentation to reflect explicit `{azumi_script()}` usage
